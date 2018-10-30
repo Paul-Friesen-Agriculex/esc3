@@ -1,14 +1,19 @@
-#blacklist files/folders in directory
+#blacklist all files/folders in directory
 /*
 
-#whitelist files ending in:
+#whitelist in root:
 !.gitignore
-!*.cpp
-!*.hpp
+!cntr/
 
 #whitelist files in folder ending in .cpp or .hpp
-!folder/
-folder/*
-!folder/*.cpp
-!folder/*.hpp
+cntr/*
+!cntr/*.cpp
+!cntr/*.hpp
+moc*
+
+!cntr/screens/
+cntr/screens/*
+!cntr/screens/*.cpp
+!cntr/screens/*.hpp
+
 
