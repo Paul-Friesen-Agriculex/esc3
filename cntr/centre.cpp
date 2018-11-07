@@ -30,7 +30,7 @@
 //#include "batch_save_file.hpp"
 //#include "delete_program.hpp"
 #include "crop_name_exists.hpp"
-#include "recording_control.hpp"
+#include "diagnostics_console.hpp"
 #include "macro_screen.hpp"	//TEST~~~
 //#include "table.hpp"        //TEST~~~ //access barcodes and count from table
 
@@ -40,8 +40,8 @@ Q_DECLARE_METATYPE(crop)
 
 using namespace std;
 
-extern const int image_lines = 32;
-//extern const int image_lines = 64;
+//extern const int image_lines = 32;
+extern const int image_lines = 64;
 //extern const int image_lines = 128;
 //extern const int image_lines = 256;
 //extern const int image_lines = 512;
@@ -51,8 +51,8 @@ extern const int image_lines = 32;
 extern const int line_length = 2048;
 
 //extern const int images_to_record = 128;
-//extern const int images_to_record = 512;
-extern const int images_to_record = 1500;
+extern const int images_to_record = 512;
+//extern const int images_to_record = 1500;
 
 centre::centre():
   QObject()
@@ -182,8 +182,11 @@ centre::centre():
  
   load_settings("default");
   
-  recording_control_p = new recording_control(this);
-  recording_control_p -> show();
+  diagnostics_console_p = new diagnostics_console(this);
+  diagnostics_console_p -> show();
+  connect(processor_p, SIGNAL(send_message(QString)), diagnostics_console_p, SLOT(receive_message1(QString)));
+  connect(batch_mode_driver_p, SIGNAL(send_message2(QString)), diagnostics_console_p, SLOT(receive_message2(QString)));
+  connect(diagnostics_console_p, SIGNAL(reset_time_tests_signal()), processor_p, SLOT(reset_time_tests()));
   
   tm_macro_updated = 0; 
   
@@ -191,7 +194,7 @@ centre::centre():
 
 centre::~centre()
 {
-  delete recording_control_p;
+  delete diagnostics_console_p;
 
   if(screen_p) 
   {
@@ -289,6 +292,7 @@ void centre::run()
       }
     }
   }
+  /*
   else if(current_screen==15)//batch
   {
     
@@ -300,14 +304,36 @@ void centre::run()
       {
 //        cout<<"block_endgate_opening "<<block_endgate_opening<<endl;
 //        if (block_endgate_opening == false) endgate_p -> open();
-        if (block_endgate_opening == false) set_endgate_state(ENDGATE_OPEN);
+        if (block_endgate_opening == false) 
+        {
+          cout<<"opening endgate\n";
+          set_endgate_state(ENDGATE_OPEN);
+        }
       }
     }
     else //endgate is open
     {
       if(batch_mode_driver_p->force_endgate_open==false && envelope_present==false)
       {
-        endgate_p -> close();
+//        endgate_p -> close();
+        set_endgate_state(ENDGATE_CLOSED);
+      }
+    }
+  }
+  */
+  else if(current_screen==15)//batch
+  {
+    if(endgate_state == ENDGATE_CLOSED)
+    {
+      if(envelope_present==true && block_endgate_opening==false)
+      {
+        set_endgate_state(ENDGATE_OPEN);
+      }
+    }
+    else //endgate is open
+    {
+      if(envelope_present==false)
+      {
         set_endgate_state(ENDGATE_CLOSED);
       }
     }
@@ -318,7 +344,7 @@ void centre::run()
     {
       if(envelope_present==true)
       {
-        endgate_p -> open();
+//        endgate_p -> open();
         set_endgate_state(ENDGATE_OPEN);
       }
     }
@@ -326,7 +352,7 @@ void centre::run()
     {
       if(envelope_present==false)
       {
-        endgate_p -> close();
+//        endgate_p -> close();
         set_endgate_state(ENDGATE_CLOSED);
       }
     }
@@ -656,6 +682,45 @@ screen::screen(centre* set_centre_p)
   setGeometry(0,0,800,480);		//Original~~~
   //setMaximumSize(1000,600);		  //TEST~~~
   //setGeometry(0,0,1000,600);		//TEST~~~
+  
+  setStyleSheet(
+    "button {"
+        "border: 2px solid #8f8f91;"
+        "height: 30px;"
+        "font: 18px;"
+        "border-radius: 12px;"
+        "background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
+        "stop: 0 #f6f7fa, stop: 1 #dadbde);"
+        "min-width: 80px;}"
+    
+    "QPushButton {"
+        "border: 2px solid #8f8f91;"
+        "height: 50px;"
+        "font: 20px;"
+        "border-radius: 12px;"
+        "background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
+        "stop: 0 #f6f7fa, stop: 1 #dadbde);"
+        "min-width: 80px;}"
+                                  
+    ".QSlider::groove:horizontal {"
+        "border:none;"
+        "margin-top: 10px;"
+        "margin-bottom: 10px;"
+        "height: 10px;}"
+    
+    ".QSlider::sub-page {"
+        "background: #009900;}"
+
+    ".QSlider::add-page {"
+        "background: rgb(70, 70, 70);}"
+
+    ".QSlider::handle {"
+        "background: e1e8a7;"
+        "border: 3px solid #8f8f91;"
+        "width: 60px;"
+        "margin: -30px 0;}"
+  );
+  
 }
 //==============================================================================================================//
 void centre::load_macros()	//TEST~~~ connecting macros screen
@@ -777,11 +842,11 @@ void centre::load_macros()	//TEST~~~ connecting macros screen
         QString macro_string;							//TEST~~~
         //macro_string = macro_function_char;			//TEST~~~
         //combined_macro_functions = combined_macro_functions + macro_string;
-        cout<<"bool:"<<macro_status_bool<<endl;			//OMIT~~~
-        cout<<"int:"<<macro_numb_int<<endl;				//OMIT~~~
-        cout<<"char:"<<macro_name_char<<endl;			//OMIT~~~
-        cout<<"char:"<<macro_mask_char<<endl;			//OMIT~~~
-	      cout<<"char:"<<macro_function_char<<endl;		//OMIT~~~
+        //cout<<"bool:"<<macro_status_bool<<endl;			//OMIT~~~
+        //cout<<"int:"<<macro_numb_int<<endl;				//OMIT~~~
+        //cout<<"char:"<<macro_name_char<<endl;			//OMIT~~~
+        //cout<<"char:"<<macro_mask_char<<endl;			//OMIT~~~
+	    //cout<<"char:"<<macro_function_char<<endl;		//OMIT~~~
 	  
 	    for(int j=0; j<strlen(macro_function_char); ++j)
 	    {

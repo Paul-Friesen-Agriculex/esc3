@@ -36,7 +36,12 @@ class macro_screen : public screen
   //void usb_serial_out(QString macro_string);	//original
   void usb_serial_out(int bar1, int bar2, int bar3, int bar4, int totalize_count, int weight);	      //totalize mode
   void usb_serial_out(int lotcode, int packcode, int batch_count, int substitution, int dump_count);	//batch mode
-
+  
+  //TEST~~~//
+  //void usb_serial_out(QString bar_str_1, QString bar_str_2, QString bar_str_3, QString bar_str_4, QString totalize_str_count, QString totalize_str_weight);	//batch mode - barcodes as characters instead of integers 11_02_2018~~~//
+  void usb_serial_out(QString bar_str_1, QString bar_str_2, QString bar_str_3, QString bar_str_4, QString totalize_str_count, QString totalize_str_weight);
+  void usb_serial_out(QString lotcode_str, QString packcode_str, QString batch_count_str, QString substitution_str, QString dump_count_str);
+  
   private slots:
   void back_button_clicked();
   void ok_button_clicked();
@@ -102,7 +107,24 @@ class macro_screen : public screen
   int lot_num;          //TEST~~~
   int pack_num;         //TEST~~~
   
-  //QString
+  //QString Alternatives to Integer variables// 11_02_2018~~~//
+  QString bar_str_1;            //Totalize variables//
+  QString bar_str_2;
+  QString bar_str_3;
+  QString bar_str_4;
+  QString totalize_str_count;
+  QString totalize_str_weight;
+  //============================================//
+  QString totalize_count_str;
+  QString weight_str;
+  //============================================//
+  
+  //macro_screen_p -> usb_serial_out(lotcode_str, packcode_str, batch_count_str, substitution_str, dump_count_str);
+  QString lotcode_str;         //Batch variables//
+  QString packcode_str; 
+  QString batch_count_str;
+  QString substitution_str;
+  QString dump_count_str;
 };
 
 #endif

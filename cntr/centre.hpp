@@ -18,7 +18,7 @@ class camera;
 class processor;
 class screen;
 class batch_mode_driver;
-class recording_control;
+class diagnostics_console;
 
 
 const int screen_wait_list_size=10;
@@ -65,7 +65,7 @@ class centre : public QObject
   bool previous_screen_going_back;
   CUTGATE_STATE cutgate_state;
   ENDGATE_STATE endgate_state;
-  recording_control* recording_control_p;
+  diagnostics_console* diagnostics_console_p;
   //table* table_p; //TEST~~~
   
   int user;

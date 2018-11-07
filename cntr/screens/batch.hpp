@@ -51,8 +51,9 @@ class batch : public screen
   private slots:
   void options_clicked();
   void back_clicked();
-  void zero_clicked();
-  void endgate_clicked();
+//  void zero_clicked();
+//  void endgate_clicked();
+  void restart_clicked();
   void save_program_clicked();
   void save_table_clicked();
   void clear_table_clicked();
@@ -64,8 +65,9 @@ class batch : public screen
   button* options_button_p;
   button* back_button_p;
   barcode_line* barcode_line_p;
-  button* zero_button_p;
-  button* endgate_button_p;
+//  button* zero_button_p;
+//  button* endgate_button_p;
+  button* restart_button_p;
   QLabel* high_speed_label_p;
   QLabel* low_speed_label_p;
   QLabel* dump_speed_label_p;

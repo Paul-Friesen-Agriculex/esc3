@@ -22,8 +22,8 @@ using namespace std;
 extern const int image_lines;   //defined in centre.cpp
 extern const int line_length;   //defined in centre.cpp
 extern const int images_to_record;
-extern const int valid_start = 40;
-extern const int valid_end = 1976;//ignore pixels outside valid range
+int valid_start;
+int valid_end;//ignore pixels outside valid range
 
 //=================================================================================//
 //------------- variables used in calculating standard deviation ------------ //
@@ -56,6 +56,9 @@ static const int calibration_seed_number = 50;		//------------------------------
 
 processor::processor()
 {
+//  valid_start = 130;
+//  valid_end = 1920;//ignore pixels outside valid range
+  
   int result;
   if(SK_LOADDLL() != SK_RESULT_OK)
   {
@@ -109,6 +112,9 @@ processor::processor()
   //testing
   t.start();
   run_number = 0;
+  max_image_processing_time = 0;
+  min_slack_time = 100000;
+  first_cycle = true;//processing time and cycle time invalid until set false
   
   
   if(SK_GRABCONTINUOUS(0, image_lines, 5000, false, 512, 0, SK_FREERUN) != SK_RESULT_OK)
@@ -116,6 +122,69 @@ processor::processor()
     std::cout << "SK_GRAB_CONTINUOUS failure" << std::endl;
     exit(1);
   }
+  
+  
+  
+  //We need to determine the part of the camera's field that is useable, and store values in valid_start and valid_end.
+  //We take one image from the camera and determine average readings for all pixels.
+  //This is used to set valid_start and valid_end such that dark ends of the field are ignored.
+  while(1)
+  {
+    result = SK_GETIMAGE(0, &image_p, 1000);
+    if (result == SK_RESULT_IMAGE_COMPLETED)
+    {
+      break;
+    }
+    else
+    {
+      cout<<"SK_GETIMAGE did not complete\n";
+      if (result != SK_RESULT_OPERATION_PENDING)
+      {
+        std::cout << "SK_GETIMAGE failure "<<result<< std::endl;
+      }
+    }
+  }
+  int average_pixel_values[line_length];
+  unsigned char* position_p = image_p;
+  for (int i=0; i<line_length; ++i) average_pixel_values[i] = 0;
+  for (int j=0; j<image_lines; ++j)
+  {
+    for (int i=0; i<line_length; ++i)
+    {
+      average_pixel_values[i] += *position_p;
+      ++ position_p;
+    }
+  }
+  for (int i=0; i<line_length; ++i)
+  {
+	average_pixel_values[i] /= image_lines;
+	
+//	cout<<"average_pixel_values["<<i<<"] = "<<average_pixel_values[i]<<endl;
+	
+  }
+  int dark_start_end = 0;//this will become the end of the dark area at the start of the line
+  for(int i=0; i<500; ++i)
+  {
+	if(average_pixel_values[i] < 150) dark_start_end = i;
+  }
+  int dark_end_start = line_length;//this will become the start of the dark area at the end of the line
+  for(int i=line_length; i>(line_length-500); --i)
+  {
+	if(average_pixel_values[i] < 150) dark_end_start = i;
+  }
+  valid_start = dark_start_end + 10;
+  valid_end = dark_end_start - 10;
+  
+  cout<<"valid_start = "<<valid_start<<endl;
+  cout<<"valid_end = "<<valid_end<<endl;
+		  
+
+  
+  
+  
+  
+  
+  
 
 }
 
@@ -336,6 +405,13 @@ void processor::load_image(QString file_name)
   infile.close();
 }
 
+void processor::reset_time_tests()
+{
+  cout<<"processor::reset_time_tests()\n";
+  max_image_processing_time = 0;
+  min_slack_time = 100000;
+}
+
 void processor::calibrate()//does the calibration after data has been collected
 {
   calibration_crop.name = current_crop.name;
@@ -401,15 +477,22 @@ void processor::new_image(unsigned char* pixel_p)
   }
   
   image_processing_time = t.restart();
+  if(first_cycle==false)//slack_time and image_processing_time are now valid
+  {
+    if(slack_time<min_slack_time) min_slack_time = slack_time;
+    if(image_processing_time>max_image_processing_time) max_image_processing_time = image_processing_time;
+  }
   image_cycle_time = slack_time + image_processing_time;
   emit send_cycle_time(image_cycle_time);
   ++run_number;
   if(run_number >= 5)
   {
     run_number = 0;
-    QString str = QString("Image processing %1 ms.  Slack %2 ms.")
-    .arg(image_processing_time).arg(slack_time);
+    QString str = QString("Max image processing %1 ms.  Min slack %2 ms.")
+    .arg(max_image_processing_time).arg(min_slack_time);
+    emit send_message(str);
     //cout<<(str.toStdString())<<endl;
+    first_cycle = false;
   }
 
   if (record_this_image)
@@ -548,8 +631,8 @@ void processor::add_line(unsigned char* start_p)
 //        cout<<"add_line point 3.  current_crop.calibrated="<<current_crop.calibrated<<".  calibration_crop.calibrated="<<calibration_crop.calibrated<<endl;
   
       }
-//      if(show_blob_bool)
-      //if(show_blob_bool && blob_seed_count>1) //TEST~~~ //to disable and re-enable seed raster generation
+      //if(show_blob_bool)
+      if(show_blob_bool && blob_seed_count>1) //TEST~~~ //to disable and re-enable seed raster generation
       {
         cout<<blob_seed_count <<" seeds in blob\n";
         cout<<"  area = "<<blob_list[blob_index]->area<<endl;
@@ -567,7 +650,7 @@ void processor::add_line(unsigned char* start_p)
         //------------------------------------------------------------------------------------//        
         blob_list[blob_index]->print_display_raster();        //original image
 
-        blob_list[blob_index]->kmeans_clustering(blob_seed_count);     //ORIGINAL~~~
+        //blob_list[blob_index]->kmeans_clustering(blob_seed_count);     //ORIGINAL~~~
         
         //blob_list[blob_index]->kmeans_clustering_2(blob_seed_count);       //TEST~~~ test alternative cluster seed starting positions//
         
@@ -575,7 +658,7 @@ void processor::add_line(unsigned char* start_p)
         
         //blob_list[blob_index]->overlap_test(blob_seed_count);              //TEST~~~
 
-        blob_list[blob_index]->print_display_raster();                 //TEST~~~  //modified image
+        //blob_list[blob_index]->print_display_raster();                 //TEST~~~  //modified image
                 
         //------------------------------------------------------------------------------------//
 //=====================================================================================================// //TEST~~~
@@ -592,10 +675,10 @@ void processor::add_line(unsigned char* start_p)
           //blob_list[blob_index]->overlap_test_multiple(blob_seed_count);       //TEST~~~  //Multiple Cluster TEST
           //blob_list[blob_index]->overlap_test_multiple(3);       //TEST~~~  //Multiple Cluster TEST
           
-          blob_list[blob_index]->silhouette_scoring();
+          //blob_list[blob_index]->silhouette_scoring();
         }
         
-        else if(!calibration_data && blob_seed_count < 2) blob_list[blob_index]->store_raw_image_rasters(); 
+        //else if(!calibration_data && blob_seed_count < 2) blob_list[blob_index]->store_raw_image_rasters(); 
             //  1.store_raw_image_rasters()
             //  2.store_rotated_rasters()
             //  3.remove_similar_rasters()
@@ -1060,14 +1143,14 @@ int blob::seeds_in_blob()
 
 
     float f = pow(2.0*3.14*expected_variance_area[i], -0.5) * exp(-pow(float(area)-expected_mean_area[i], 2.0)/2.0/expected_variance_area[i]);//height of normal dist
-    score_area[i] = f * expected_mean_area[i] * 2.0;
+    score_area[i] = f * expected_mean_area[i] * 6.0;
     
 
 
 
 
-    score_ic[i] = 40.0/((ic_estimate-float(i))*(ic_estimate-float(i))+1)/(1+ic_uncertainty);
-    score_likelihood[i] = -2*i;
+    score_ic[i] = 120.0/((ic_estimate-float(i))*(ic_estimate-float(i))+1)/(1+ic_uncertainty);
+    score_likelihood[i] = -20*i;
   }
   score_mi[1] = 10 * (mi_n - max_inflection);//negative if single seed is unlikely
   int most_likely_number = 0;

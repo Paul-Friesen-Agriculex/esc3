@@ -293,6 +293,20 @@ void totalize::run()
     totalize_count = (table_p -> model_p -> item(current_totalize_table_row,4) -> text().toInt());  //Count
     weight = (table_p -> model_p -> item(current_totalize_table_row,5) -> text().toInt());          //Weight
     
+    
+    //modified to handle barcodes as characters instead of integers// 11_02_2018~~~//
+    QString bar_str_1, bar_str_2, bar_str_3, bar_str_4, totalize_str_count, totalize_str_weight;
+    
+    bar_str_1 = (table_p -> model_p -> item(current_totalize_table_row,0) -> text());
+    bar_str_2 = (table_p -> model_p -> item(current_totalize_table_row,1) -> text());
+    bar_str_3 = (table_p -> model_p -> item(current_totalize_table_row,2) -> text());
+    bar_str_4 = (table_p -> model_p -> item(current_totalize_table_row,3) -> text());
+    totalize_str_count = (table_p -> model_p -> item(current_totalize_table_row,4) -> text());
+    totalize_str_weight = (table_p -> model_p -> item(current_totalize_table_row,5) -> text());
+    
+    //=============================================================================//
+    
+    
     /*cout<<endl<<"bar1: "<<barcode_1<<endl;        //OMIT~~~
     cout<<endl<<"bar2: "<<barcode_2<<endl;        //OMIT~~~
     cout<<endl<<"bar3: "<<barcode_3<<endl;        //OMIT~~~
@@ -305,7 +319,11 @@ void totalize::run()
     
     //macro_screen_p = new macro_screen;  //TEST~~~
     //macro_screen_p -> usb_serial_out(centre_p->combined_macro_functions);	//TEST~~~
-    macro_screen_p -> usb_serial_out(barcode_1, barcode_2, barcode_3, barcode_4, totalize_count, weight);	//TEST~~~
+    
+    
+    //send strings instead of ints//
+    //macro_screen_p -> usb_serial_out(barcode_1, barcode_2, barcode_3, barcode_4, totalize_count, weight);	  //ORIGINAL~~~
+    macro_screen_p -> usb_serial_out(bar_str_1, bar_str_2, bar_str_3, bar_str_4, totalize_str_count, totalize_str_weight);	  //TEST~~~ Strings instead of ints 11_02_2018~~~//
   }
 
   if(centre_p->tm_zero_when_seed_discharged == true)

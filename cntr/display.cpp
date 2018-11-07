@@ -4,8 +4,8 @@
 
 using namespace std;
 
-extern const int valid_start; //defined in processor.cpp
-extern const int valid_end;
+extern int valid_start; //defined in processor.cpp
+extern int valid_end;
 extern const int line_length; //defined in centre.cpp
 
 display::display(int lines_to_display_set, QWidget* parent)

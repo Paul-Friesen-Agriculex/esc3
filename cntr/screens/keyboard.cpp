@@ -510,7 +510,8 @@ batch_save_program::batch_save_program(centre* centre_p, batch_mode_driver* batc
   int chars_to_take = path.length() - slash_index - 1;
   QString file_name = path.right(chars_to_take);
   file_name.remove(".ESC3");
-  entry_line_display_p->setText(file_name);
+  *entry_line_p = file_name;
+  entry_line_display_p->setText(*entry_line_p);
 
   connect(enter_key_p, SIGNAL(clicked()), this, SLOT(enter_clicked()));
 }

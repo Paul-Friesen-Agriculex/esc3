@@ -337,12 +337,13 @@ void macro_screen::usb_serial_out(int bar1, int bar2, int bar3, int bar4, int to
     cout<<endl<<combined_macro_functions.toUtf8().constData()<<endl;  //OMIT~~~
     macros.close();
   }
-  cout<<"Macros loaded"<<endl;  //OMIT~~~
+  //cout<<"Macros loaded"<<endl;  //OMIT~~~
   
 //--------------------------------------------------------------OUTPUT TO SERIAL--------------------------------------------------------------//
   int size_string_macros = combined_macro_functions.size();
   //int filedesc = open("/dev/ttyACM0", O_WRONLY);
-  int filedesc = open("/dev/ttyUSB1", O_WRONLY);
+  //int filedesc = open("/dev/ttyUSB0", O_WRONLY);
+  int filedesc = open("/dev/usb2serial", O_WRONLY);
   write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros) != size_string_macros;
 //--------------------------------------------------------------------------------------------------------------------------------------------//
 }
@@ -427,15 +428,226 @@ void macro_screen::usb_serial_out(int lotcode, int packcode, int batch_count, in
     cout<<endl<<combined_macro_functions.toUtf8().constData()<<endl;  //OMIT~~~
     macros.close();
   }
-  cout<<"Macros loaded"<<endl;  //OMIT~~~
+  //cout<<"Macros loaded"<<endl;  //OMIT~~~
   
 //--------------------------------------------------------------OUTPUT TO SERIAL--------------------------------------------------------------//
   int size_string_macros = combined_macro_functions.size();
   //int filedesc = open("/dev/ttyACM0", O_WRONLY);
-  int filedesc = open("/dev/ttyUSB1", O_WRONLY);
+  //int filedesc = open("/dev/ttyUSB0", O_WRONLY);
+  int filedesc = open("/dev/usb2serial", O_WRONLY);
   write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros) != size_string_macros;
+  
+  
 //--------------------------------------------------------------------------------------------------------------------------------------------// 
 }
+//============================================================================================================================================// 
+//modified to handle barcodes as characters instead of integers// 11_02_2018~~~//
+//void macro_screen::usb_serial_out(QString bar_str_1, QString bar_str_2, QString bar_str_3, QString bar_str_4, QString totalize_str_count, QString totalize_str_weight)
+void macro_screen::usb_serial_out(QString bar_str_1, QString bar_str_2, QString bar_str_3, QString bar_str_4, QString totalize_count_str, QString weight_str)
+{
+  cout<<endl<<"USB2SERIAL QStringVariant"<<endl;  //OMIT~~~
+  
+  cout<<"bar_1: "<<bar_str_1.toUtf8().constData();          //OMIT~~~
+  cout<<"\tbar_2: "<<bar_str_2.toUtf8().constData();        //
+  cout<<"\tbar_3: "<<bar_str_3.toUtf8().constData();        //
+  cout<<"\tbar_4: "<<bar_str_4.toUtf8().constData()<<endl;  //
+  cout<<endl<<"totalize_str_count: "<<totalize_count_str.toUtf8().constData()<<endl;    //
+  cout<<endl<<"totalize_str_weight: "<<weight_str.toUtf8().constData()<<endl;  //
+  
+  
+  /*cout<<endl<<endl<<"USBSerial - totalize_count"<<endl;                                             //OMIT~~~
+  cout<<"bar1: "<<bar1<<"\t"<<"bar2: "<<bar2<<"\t"<<"bar3: "<<bar3<<"\t"                            //OMIT~~~
+      <<"bar4: "<<bar4<<"\t"<<"totalize_count: "<<totalize_count<<"\t"<<"weight: "<<weight<<endl;   //OMIT~~~*/
+  
+  //QString bar_str_1 = QString::number(bar1);
+  //QString bar_str_2 = QString::number(bar2);
+  //QString bar_str_3 = QString::number(bar3);
+  //QString bar_str_4 = QString::number(bar4);
+  //QString totalize_count_str = QString::number(totalize_count);
+  //QString weight_str = QString::number(weight); //not implemented yet
+  
+  //cout<<"bar_1: "<<bar_str_1.toUtf8().constData();          //OMIT~~~
+  //cout<<"\tbar_2: "<<bar_str_2.toUtf8().constData();        //
+  //cout<<"\tbar_3: "<<bar_str_3.toUtf8().constData();        //
+  //cout<<"\tbar_4: "<<bar_str_4.toUtf8().constData()<<endl;  //
+  
+  //----------------------------------------------------------------------------------------//
+  
+  bool macro_status_bool;			      //temporary variable to transfer ifstream to tablewidget
+  int macro_numb_int;				        //
+  char macro_name_char[30];			    //
+  char macro_mask_char[30];			    //
+  char macro_function_char[30];		  //
+ 
+  //QString combined_macro_functions;	//new char to combine all macros 
+  QString macro_string;
+  QString combined_macro_functions;
+  QString count_string;
+  QString barcode_string;
+        
+  {
+    ifstream macros("macro_table");
+    for(int i=0; i<10; ++i)		//searches all 10 macros available
+    {
+	    macros>>macro_status_bool;
+	    macros>>macro_numb_int;
+	    macros>>macro_name_char;
+	    macros>>macro_mask_char;
+	    macros>>macro_function_char;
+
+	    if(macro_status_bool != 0)
+      {
+        QString macro_string;
+	      for(int j=0; j<strlen(macro_function_char); ++j)
+	      {
+		      if(macro_function_char[j] == '\\')
+		      {
+            if(macro_function_char[j+1] == 'C')
+	          {
+	            macro_string = macro_string + totalize_count_str;
+	          }
+  	        else if(macro_function_char[j+1] == '1')		//Barcodes
+	          {
+              macro_string = macro_string + bar_str_1;
+              cout<<"bar_1: "<<bar_str_1.toUtf8().constData()<<endl;  //OMIT~~~
+  	        }
+	          else if(macro_function_char[j+1] == '2')
+	          {
+              macro_string = macro_string + bar_str_2;
+              cout<<"bar_2: "<<bar_str_2.toUtf8().constData()<<endl;  //OMIT~~~
+	          }
+	          else if(macro_function_char[j+1] == '3')
+	          {
+              macro_string = macro_string + bar_str_3;
+              cout<<"bar_3: "<<bar_str_3.toUtf8().constData()<<endl;  //OMIT~~~
+	          }
+	          else if(macro_function_char[j+1] == '4')
+	          {
+              macro_string = macro_string + bar_str_4;
+              cout<<"bar_4: "<<bar_str_4.toUtf8().constData()<<endl;  //OMIT~~~
+	          }
+  	        /*else if(macro_function_char[j+1] == 'T')		//Lot code
+ 	          {
+	   		      //macro_string = macro_string + lotcode;
+            }
+	          else if(macro_function_char[j+1] == 'P')		//Pack code
+	          {
+			        //macro_string = macro_string + packcode;
+	          }*/
+	          else
+	          {
+			        macro_string = macro_string + macro_function_char[j] + macro_function_char[j+1];
+	          }
+	        }
+	      }
+        /*for(int j=0; j<strlen(macro_function_char); ++j)
+        {
+          macro_string.append(macro_function_char[j]);
+        }*/
+        combined_macro_functions = combined_macro_functions + macro_string;
+	    }
+	    if(macros.eof()) break;
+    }
+    cout<<endl<<combined_macro_functions.toUtf8().constData()<<endl;  //OMIT~~~
+    macros.close();
+  }
+  
+//--------------------------------------------------------------OUTPUT TO SERIAL--------------------------------------------------------------//
+  int size_string_macros = combined_macro_functions.size();
+  int filedesc = open("/dev/usb2serial", O_WRONLY);
+  write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros) != size_string_macros;
+  
+  //filedesc.close();
+//--------------------------------------------------------------------------------------------------------------------------------------------//
+}
+
+void macro_screen::usb_serial_out(QString lotcode_str, QString packcode_str, QString batch_count_str, QString substitution_str, QString dump_count_str)
+{
+  cout<<endl<<"QString Variant BATCHMODE"<<endl;  //OMIT~~~//
+  
+  cout<<"lotcode: "<<lotcode_str.toUtf8().constData();                   //OMIT~~~
+  cout<<endl<<"packcode: "<<packcode_str.toUtf8().constData();           //
+  cout<<endl<<"batch count: "<<batch_count_str.toUtf8().constData();     //
+  cout<<endl<<"substitution: "<<substitution_str.toUtf8().constData();   //
+  cout<<endl<<"dump count: "<<dump_count_str.toUtf8().constData();       //
+  cout<<endl<<endl;                                                      //
+  
+  bool macro_status_bool;			      //temporary variable to transfer ifstream to tablewidget
+  int macro_numb_int;				        //
+  char macro_name_char[30];			    //
+  char macro_mask_char[30];			    //
+  char macro_function_char[30];		  //
+ 
+  //QString combined_macro_functions;	//new char to combine all macros 
+  QString macro_string;
+  QString combined_macro_functions;
+  QString count_string;
+  QString barcode_string;
+        
+  {
+    ifstream macros("macro_table");
+    for(int i=0; i<10; ++i)		//searches all 10 macros available
+    {
+	    macros>>macro_status_bool;
+	    macros>>macro_numb_int;
+	    macros>>macro_name_char;
+	    macros>>macro_mask_char;
+	    macros>>macro_function_char;
+    
+	    if(macro_status_bool != 0)
+      {
+        QString macro_string;
+	      for(int j=0; j<strlen(macro_function_char); ++j)
+	      {
+		      if(macro_function_char[j] == '\\')
+		      {
+            if(macro_function_char[j+1] == 'C')
+	          {
+	            macro_string = macro_string + batch_count_str;
+	          }
+  	        else if(macro_function_char[j+1] == 'T')		  //Lot code
+ 	          {
+	   		      macro_string = macro_string + lotcode_str;
+            }
+	          else if(macro_function_char[j+1] == 'P')		  //Pack code
+	          {
+			        macro_string = macro_string + packcode_str;
+	          }
+            else if(macro_function_char[j+1] == 'Q')		  //Dump count
+	          {
+			        macro_string = macro_string + dump_count_str; //TEST~~~
+	          }
+            else if(macro_function_char[j+1] == '1') {}		//Barcodes
+	          else if(macro_function_char[j+1] == '2') {}
+	          else if(macro_function_char[j+1] == '3') {}
+	          else if(macro_function_char[j+1] == '4') {}
+	          else
+	          {
+			        macro_string = macro_string + macro_function_char[j] + macro_function_char[j+1];
+	          }
+	        }
+	      }
+        /*for(int j=0; j<strlen(macro_function_char); ++j)
+        {
+          macro_string.append(macro_function_char[j]);
+        }*/
+        combined_macro_functions = combined_macro_functions + macro_string;
+	    }
+	    if(macros.eof()) break;
+    }
+    cout<<endl<<combined_macro_functions.toUtf8().constData()<<endl;  //OMIT~~~
+    macros.close();
+  }
+  //cout<<"Macros loaded"<<endl;  //OMIT~~~
+  
+//--------------------------------------------------------------OUTPUT TO SERIAL--------------------------------------------------------------//
+  int size_string_macros = combined_macro_functions.size();
+  int filedesc = open("/dev/usb2serial", O_WRONLY);
+  write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros) != size_string_macros;
+  //filedesc.close();
+//--------------------------------------------------------------------------------------------------------------------------------------------// 
+}
+//============================================================================================================================================// 
 //--------------------------------------------------------------------------------------------------------------// 
 void macro_screen::load_macros_2(int bar1, int bar2, int bar3, int bar4, int totalize_count, int weight)
 {
@@ -547,7 +759,7 @@ void macro_screen::load_macros_2(int bar1, int bar2, int bar3, int bar4, int tot
 	  if(macros.eof()) break;
   }
   macros.close();
-  cout<<"Macros loaded"<<endl;  //OMIT~~~
+  //cout<<"Macros loaded"<<endl;  //OMIT~~~
   cout<<endl<<combined_macro_functions.toUtf8().constData()<<endl;  //OMIT~~~
 }
 //--------------------------------------------------------------------------------------------------------------// 
@@ -676,7 +888,7 @@ void macro_screen::load_macros()
 	  if(macros.eof()) break;
   }
   macros.close();
-  cout<<"Macros loaded"<<endl;  //OMIT~~~
+  //cout<<"Macros loaded"<<endl;  //OMIT~~~
   
 //--------------------------------------------------------------OUTPUT TO SERIAL--------------------------------------------------------------//
   /*int size_string_macros = macro_string.size();
