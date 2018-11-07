@@ -33,6 +33,11 @@ gpio_keyboard::gpio_keyboard()
   bit_value = BIT_LOW;
   clock_on();
   clk_value = CLK_ON;
+  
+  for(int i=0; i<8; ++i)
+  {
+    binary_array[i] = 0;
+  }
 }
 
 gpio_keyboard::~gpio_keyboard()
@@ -102,14 +107,15 @@ void gpio_keyboard::string2ascii(QString string_input)
 void gpio_keyboard::dec2bit(int decimal_input)
 {
   memset(binary_array, 0, sizeof(binary_array));	//reset contents to 0
-  binary_array[8];
+  //binary_array[8];
   int i = 0;
 
   while(decimal_input != 0)
   {
-	binary_array[i] = ((decimal_input % 2 == 0) ? 0:1) ;
-	++i;
-	decimal_input = decimal_input/=2;
+    binary_array[i] = ((decimal_input % 2 == 0) ? 0:1) ;
+    ++i;
+    //decimal_input = decimal_input/=2; //Original//
+    decimal_input = decimal_input/2; //Test//
   }
   
   for(int j=0; j<8; ++j)
@@ -299,13 +305,13 @@ int gpio_keyboard::macro_characters(int macro_int)		//remap ascii keycodes to ad
 		macro_int = 39;	//corresponding to 'R'
 		break;
     
-        /*case 67 : 	//corresponds to 'C' for count
+    /*case 67 : 	//corresponds to 'C' for count
 		//macro_int = 110;	//corresponding to count value		//attempt to generate count value from centre files
 		QString countstring = QString::number();
 		gpio_keyboard_p = new gpio_keyboard;
 		//macro_function_string.append("\\X");					//TEST~~~ figure out hex value for CC
 		macro_int = 0;
-		break;
+		break;*/
     
     /*case 67 : 	//corresponds to 'C' for count
 		//macro_int = 110;	//corresponding to count value		//attempt to generate count value from centre files

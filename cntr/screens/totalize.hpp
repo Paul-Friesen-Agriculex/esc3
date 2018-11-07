@@ -2,7 +2,6 @@
 #define totalize_hpp
 #include "table.hpp"
 #include "centre.hpp"
-#include "gpio_keyboard.hpp"	//TEST~~~ interfacing gpio_keyboard output, connect properly to "centre.cpp/hpp"
 #include "macro_screen.hpp"
 
 
@@ -72,10 +71,8 @@ class totalize : public screen
   bool old_envelope_present;
   
   QTimer* run_timer_p;
-  gpio_keyboard* gpio_keyboard_p;	//OMIT~~~
   macro_screen* macro_screen_p;		//TEST~~~
   QString count_string;				//seed count access from gpio_keyboard
-  //friend class gpio_keyboard;
 };
 
 #endif

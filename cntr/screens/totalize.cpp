@@ -10,7 +10,7 @@
 #include "centre.hpp"
 #include "totalize.hpp"
 #include "button.hpp"
-#include <QString>				//for gpio_keyboard, send count to keyboardout
+#include <QString>
 
 using namespace std;
 
@@ -267,8 +267,6 @@ void totalize::run()
     }
     
     count_string = QString::number(old_count);
-    gpio_keyboard_p = new gpio_keyboard;
-    //macro_screen_p = new macro_screen;  //TEST~~~
     
     if(!(centre_p->tm_macro_updated))
     {
@@ -280,32 +278,19 @@ void totalize::run()
 	    cout<<"macros already loaded"<<endl;
 	  }
 	  
-//--------------------------------------------------------------------------------------------------------------------------//
     //load totalize table variables//
+    QString bar_str_1, bar_str_2, bar_str_3, bar_str_4, totalize_str_count, totalize_str_weight;      //modified to handle barcodes as characters instead of integers// 11_02_2018~~~//
     int current_totalize_table_row;    
-    int barcode_1, barcode_2, barcode_3, barcode_4, totalize_count, weight;
-    
     current_totalize_table_row = table_p -> model_row - 1;
-    barcode_1 = (table_p -> model_p -> item(current_totalize_table_row,0) -> text().toInt());       //Barcode 1
-    barcode_2 = (table_p -> model_p -> item(current_totalize_table_row,1) -> text().toInt());       //Barcode 2
-    barcode_3 = (table_p -> model_p -> item(current_totalize_table_row,2) -> text().toInt());       //Barcode 3
-    barcode_4 = (table_p -> model_p -> item(current_totalize_table_row,3) -> text().toInt());       //Barcode 4
-    totalize_count = (table_p -> model_p -> item(current_totalize_table_row,4) -> text().toInt());  //Count
-    weight = (table_p -> model_p -> item(current_totalize_table_row,5) -> text().toInt());          //Weight
     
-    /*cout<<endl<<"bar1: "<<barcode_1<<endl;        //OMIT~~~
-    cout<<endl<<"bar2: "<<barcode_2<<endl;        //OMIT~~~
-    cout<<endl<<"bar3: "<<barcode_3<<endl;        //OMIT~~~
-    cout<<endl<<"bar4: "<<barcode_4<<endl;        //OMIT~~~
-    cout<<endl<<"count: "<<totalize_count<<endl;  //OMIT~~~
-    cout<<endl<<"weight: "<<weight<<endl;         //OMIT~~~*/
-//--------------------------------------------------------------------------------------------------------------------------//
-    //gpio_keyboard_p -> gpio_send(count_string+(centre_p->combined_macro_functions));
-	  //gpio_keyboard_p -> gpio_send((centre_p->combined_macro_functions));	//Original~~~
+    bar_str_1 = (table_p -> model_p -> item(current_totalize_table_row,0) -> text());
+    bar_str_2 = (table_p -> model_p -> item(current_totalize_table_row,1) -> text());
+    bar_str_3 = (table_p -> model_p -> item(current_totalize_table_row,2) -> text());
+    bar_str_4 = (table_p -> model_p -> item(current_totalize_table_row,3) -> text());
+    totalize_str_count = (table_p -> model_p -> item(current_totalize_table_row,4) -> text());
+    totalize_str_weight = (table_p -> model_p -> item(current_totalize_table_row,5) -> text());
     
-    //macro_screen_p = new macro_screen;  //TEST~~~
-    //macro_screen_p -> usb_serial_out(centre_p->combined_macro_functions);	//TEST~~~
-    macro_screen_p -> usb_serial_out(barcode_1, barcode_2, barcode_3, barcode_4, totalize_count, weight);	//TEST~~~
+    macro_screen_p -> usb_serial_out(bar_str_1, bar_str_2, bar_str_3, bar_str_4, totalize_str_count, totalize_str_weight);	  //TEST~~~ Strings instead of ints 11_02_2018~~~//
   }
 
   if(centre_p->tm_zero_when_seed_discharged == true)

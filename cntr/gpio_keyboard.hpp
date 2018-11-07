@@ -28,10 +28,11 @@ class gpio_keyboard:public QObject
   
   BIT_STATE bit_value;
   CLK_STATE clk_value;
-  const long initialization_duration = 15;	//delay between two characters
-  const long signal_duration = 8;			//delay between two bits
-  const int binary_length = 8;
-  int binary_array[8] = {0,0,0,0,0,0,0,0};
+  static const long initialization_duration = 15;	//delay between two characters
+  static const long signal_duration = 8;			//delay between two bits
+  static const int binary_length = 8;
+  //int binary_array[8] = {0,0,0,0,0,0,0,0};
+  int binary_array[8];
   QList<int> ascii_int_list;
   QString count_string;	//TEST~~~
   

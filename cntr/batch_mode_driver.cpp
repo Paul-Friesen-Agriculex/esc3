@@ -32,9 +32,9 @@ batch_mode_driver::batch_mode_driver(centre* centre_p_s)
   seed_lot_barcode_ok = false;
   pack_barcode_ok = false;
   
-  high_feed_speed = centre_p->crops[0].high_feed_speed;
-  low_feed_speed = centre_p->crops[0].low_feed_speed;
-  dump_speed = centre_p->crops[0].dump_speed;
+//  high_feed_speed = centre_p->crops[0].high_feed_speed;
+//  low_feed_speed = centre_p->crops[0].low_feed_speed;
+//  dump_speed = centre_p->crops[0].dump_speed;
 }
   
 batch_mode_driver::~batch_mode_driver()
@@ -204,6 +204,8 @@ void batch_mode_driver::clear_program()
   }
   program.clear();
   program_size = 0;
+  
+//  program_path = "";
 }
 
 void batch_mode_driver::add_line(int packs, int seeds)

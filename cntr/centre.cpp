@@ -30,7 +30,7 @@
 //#include "batch_save_file.hpp"
 //#include "delete_program.hpp"
 #include "crop_name_exists.hpp"
-#include "recording_control.hpp"
+#include "diagnostics_console.hpp"
 #include "macro_screen.hpp"	//TEST~~~
 //#include "table.hpp"        //TEST~~~ //access barcodes and count from table
 
@@ -40,8 +40,8 @@ Q_DECLARE_METATYPE(crop)
 
 using namespace std;
 
-extern const int image_lines = 32;
-//extern const int image_lines = 64;
+//extern const int image_lines = 32;
+extern const int image_lines = 64;
 //extern const int image_lines = 128;
 //extern const int image_lines = 256;
 //extern const int image_lines = 512;
@@ -51,8 +51,8 @@ extern const int image_lines = 32;
 extern const int line_length = 2048;
 
 //extern const int images_to_record = 128;
-//extern const int images_to_record = 512;
-extern const int images_to_record = 1500;
+extern const int images_to_record = 512;
+//extern const int images_to_record = 1500;
 
 centre::centre():
   QObject()
@@ -182,8 +182,10 @@ centre::centre():
  
   load_settings("default");
   
-  recording_control_p = new recording_control(this);
-  recording_control_p -> show();
+  diagnostics_console_p = new diagnostics_console(this);
+  diagnostics_console_p -> show();
+  connect(processor_p, SIGNAL(send_message(QString)), diagnostics_console_p, SLOT(receive_message(QString)));
+  connect(diagnostics_console_p, SIGNAL(reset_time_tests_signal()), processor_p, SLOT(reset_time_tests()));
   
   tm_macro_updated = 0; 
   
@@ -191,7 +193,7 @@ centre::centre():
 
 centre::~centre()
 {
-  delete recording_control_p;
+  delete diagnostics_console_p;
 
   if(screen_p) 
   {
@@ -656,6 +658,84 @@ screen::screen(centre* set_centre_p)
   setGeometry(0,0,800,480);		//Original~~~
   //setMaximumSize(1000,600);		  //TEST~~~
   //setGeometry(0,0,1000,600);		//TEST~~~
+  
+  setStyleSheet(
+    "button {"
+        "border: 2px solid #8f8f91;"
+        "height: 30px;"
+        "font: 18px;"
+        "border-radius: 12px;"
+        "background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
+        "stop: 0 #f6f7fa, stop: 1 #dadbde);"
+        "min-width: 40px;}"
+                                  
+    ".QSlider::groove:horizontal {"
+        "border:none;"
+        "margin-top: 10px;"
+        "margin-bottom: 10px;"
+        //"min-width: 140px;" //TEST~~~
+        "height: 5px;}"
+    
+    ".QSlider::sub-page {"
+        "background: #009900;}"
+
+    ".QSlider::add-page {"
+        "background: #8c8c8c;}"
+
+    ".QSlider::handle {"
+        //"background: e1e8a7;"
+        "background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
+        "stop: 0 #f6f7fa, stop: 1 #dadbde);"
+        "border: 3px solid #404040;"  //TEST~~~
+        //"border: 3px solid black;"
+        "width: 60px;"
+        "margin: -13px 0;"
+        "border-radius: 15px;}"
+        
+    "QGridLayout {"
+        "padding: 0px;"
+        "margin: 0px;"
+        "border: 0px;"
+        "max-height: 480px;}"
+    
+    "QTableWidget {"                    //macro-screen//
+        "font-size: 13pt;}"
+        
+    "QHeaderView {"
+        "font-size: 13pt;}"
+        
+    "QTableView {"
+        "font-size: 13pt;"
+        "border: 2px solid #8f8f91;}"
+        
+    "QScrollBar {"
+        "width: 40px;"
+        //"border: 3px solid #404040;"
+        "border: 3px solid white;"
+        "background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
+        "stop: 0 #f6f7fa, stop: 1 #dadbde);}"
+        
+    "QScrollBar::handle {"
+        //"border: 3px solid black;"
+        "border: 3px solid #595959;"
+        "min-height: 40px;"
+        "border-radius: 12px;"
+        "margin-top: 43px;"
+        "margin-bottom: 43px;}"
+        
+    /*"QScrollBar::up-arrow:vertical {"
+        //"background: black;"
+        "border: 3px solid #595959;}"
+        
+    "QScrollBar::down-arrow:vertical {"
+        //"background: black;"
+        "border: 3px solid #595959;}"*/
+        
+    /*"QCheckBox {"
+        "width: 100px;"
+        "height: 100px;}"*/
+  );
+  
 }
 //==============================================================================================================//
 void centre::load_macros()	//TEST~~~ connecting macros screen
@@ -777,11 +857,11 @@ void centre::load_macros()	//TEST~~~ connecting macros screen
         QString macro_string;							//TEST~~~
         //macro_string = macro_function_char;			//TEST~~~
         //combined_macro_functions = combined_macro_functions + macro_string;
-        cout<<"bool:"<<macro_status_bool<<endl;			//OMIT~~~
-        cout<<"int:"<<macro_numb_int<<endl;				//OMIT~~~
-        cout<<"char:"<<macro_name_char<<endl;			//OMIT~~~
-        cout<<"char:"<<macro_mask_char<<endl;			//OMIT~~~
-	      cout<<"char:"<<macro_function_char<<endl;		//OMIT~~~
+        //cout<<"bool:"<<macro_status_bool<<endl;			//OMIT~~~
+        //cout<<"int:"<<macro_numb_int<<endl;				//OMIT~~~
+        //cout<<"char:"<<macro_name_char<<endl;			//OMIT~~~
+        //cout<<"char:"<<macro_mask_char<<endl;			//OMIT~~~
+	    //cout<<"char:"<<macro_function_char<<endl;		//OMIT~~~
 	  
 	    for(int j=0; j<strlen(macro_function_char); ++j)
 	    {

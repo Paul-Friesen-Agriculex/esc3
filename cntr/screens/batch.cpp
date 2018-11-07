@@ -52,8 +52,9 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
   back_button_p = new button("Back");
   barcode_line_p = new barcode_line;
   barcode_line_p->setMaximumSize(20,10);
-  zero_button_p = new button("Zero");
-  endgate_button_p = new button("");
+//  zero_button_p = new button("Zero");
+//  endgate_button_p = new button("");
+  restart_button_p = new button("Dump out and\nrestart seed lot");
   high_speed_label_p = new QLabel("High");
   high_speed_set_p = new QSlider;
   high_speed_set_p->setMinimum(0);
@@ -108,10 +109,11 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
   top_layout_p -> addWidget(options_button_p, 0, 1);
   top_layout_p -> addWidget(back_button_p, 0, 2);
   top_layout_p -> addWidget(barcode_line_p, 1, 0);
-  control_layout_p -> addWidget(zero_button_p, 0, 0);
-  control_layout_p -> addWidget(endgate_button_p, 1, 0);  //ORIGINAL~~~
+//  control_layout_p -> addWidget(zero_button_p, 0, 0);
+//  control_layout_p -> addWidget(endgate_button_p, 1, 0);  //ORIGINAL~~~
+  control_layout_p -> addWidget(restart_button_p, 0, 0);  //ORIGINAL~~~
   //control_layout_p -> addWidget(endgate_button_p, 0, 1);    //TEST~~~
-  control_layout_p -> addWidget(speed_box_p, 2, 0);       //ORIGINAL~~~
+  control_layout_p -> addWidget(speed_box_p, 1, 0);       //ORIGINAL~~~
   //control_layout_p -> addWidget(speed_box_p, 1, 0);         //TEST~~~
   speed_layout_p -> addWidget(high_speed_label_p, 0, 0);
   speed_layout_p -> addWidget(high_speed_set_p, 0, 1);
@@ -138,8 +140,9 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
   
   connect(options_button_p, SIGNAL(clicked()), this, SLOT(options_clicked()));
   connect(back_button_p, SIGNAL(clicked()), this, SLOT(back_clicked()));
-  connect(zero_button_p, SIGNAL(clicked()), this, SLOT(zero_clicked()));
-  connect(endgate_button_p, SIGNAL(clicked()), this, SLOT(endgate_clicked()));
+//  connect(zero_button_p, SIGNAL(clicked()), this, SLOT(zero_clicked()));
+//  connect(endgate_button_p, SIGNAL(clicked()), this, SLOT(endgate_clicked()));
+  connect(restart_button_p, SIGNAL(clicked()), this, SLOT(restart_clicked()));
   connect(high_speed_set_p, SIGNAL(valueChanged(int)), batch_mode_driver_p, SLOT(set_high_feed_speed(int)));
   connect(low_speed_set_p, SIGNAL(valueChanged(int)), batch_mode_driver_p, SLOT(set_low_feed_speed(int)));
   connect(dump_speed_set_p, SIGNAL(valueChanged(int)), batch_mode_driver_p, SLOT(set_dump_feed_speed(int)));
@@ -161,7 +164,7 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
   {
     screen_endgate=ENDGATE_CLOSED;
   }
-  endgate_button_p->setText("Open Endgate\nRelease Seed");
+//  endgate_button_p->setText("Open Endgate\nRelease Seed");
   
   centre_p->set_cutgate_state(CUTGATE_OPEN);
   
@@ -212,7 +215,7 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
 
   table_p->load_file("settings/batch_backup");
   
-  if(batch_mode_driver_p->bm_save_program_filename != "")//returning from batch_save_program_file screen with name of file to save
+  if(batch_mode_driver_p->bm_save_program_filename != "")//returning from batch_save_program screen with name of file to save
   {
     batch_mode_driver_p->save_program(batch_mode_driver_p->bm_save_program_filename);
 //    batch_mode_driver_p->save_program(batch_mode_driver_p->bm_save_program_filename + "test");
@@ -284,8 +287,9 @@ batch::~batch()
   delete count_message_p;
   delete options_button_p;
   delete back_button_p;
-  delete zero_button_p;
-  delete endgate_button_p;
+//  delete zero_button_p;
+//  delete endgate_button_p;
+  delete restart_button_p;
   delete high_speed_label_p;
   delete high_speed_set_p;
   delete low_speed_label_p;
@@ -324,7 +328,7 @@ void batch::pack_collected(int count_to_record)
   table_p->enter_seeds(count_to_record);
   
 //--------------------------------------------------------------------------------------------------------------//
-    centre_p->count = count_to_record;	//TEST~~~
+    /*centre_p->count = count_to_record;	//TEST~~~
 
     gpio_keyboard_p = new gpio_keyboard;
     
@@ -366,9 +370,39 @@ void batch::pack_collected(int count_to_record)
   batch_count = table_p -> model_p -> item(row-1, 2) -> text().toInt();
   substitution = table_p -> model_p -> item(row-1, 3) -> text().toInt();
   
-	macro_screen_p -> usb_serial_out(lotcode,packcode,batch_count,substitution,0);	//TEST~~~
+  macro_screen_p -> usb_serial_out(lotcode,packcode,batch_count,substitution,0);	//TEST~~~*/
   
   //void macro_screen::usb_serial_out(int lotcode, int packcode, int batch_count, int substitution, int dump_count)	//batch mode
+//--------------------------------------------------------------------------------------------------------------//
+//TEST Serial Keyboard Output// 10_31_2018
+  int row;
+  //int lotcode;
+  //int packcode;
+  //int batch_count;
+  //int substitution;
+  
+  row = table_p -> model_row;
+  //lotcode = table_p -> model_p -> item(row-1, 0) -> text().toInt();
+  //packcode = table_p -> model_p -> item(row-1, 1) -> text().toInt();
+  //batch_count = table_p -> model_p -> item(row-1, 2) -> text().toInt();
+  //batch_count = count_to_record;
+  //substitution = table_p -> model_p -> item(row-1, 3) -> text().toInt();
+  
+  //macro_screen_p -> usb_serial_out(lotcode,packcode,batch_count,substitution,0);	//ORIGINAL~~~
+  
+  //===========================================================================//11_02_2018~~~//
+  //QString Alternative  to Integers//
+  QString lotcode_str, packcode_str, batch_count_str, substitution_str, dump_count_str;
+  
+  lotcode_str = table_p -> model_p -> item(row-1, 0) -> text();
+  packcode_str = table_p -> model_p -> item(row-1, 1) -> text();
+  batch_count_str = QString::number(count_to_record);
+  substitution_str = table_p -> model_p -> item(row-1, 3) -> text();
+  
+  macro_screen_p -> usb_serial_out(lotcode_str, packcode_str, batch_count_str, substitution_str, dump_count_str);	//TEST~~~ 11_02_2018//
+  //===========================================================================//
+
+//--------------------------------------------------------------------------------------------------------------//
   
 //  pack_ready_count = count;
   barcode_line_p->setFocus();
@@ -381,7 +415,12 @@ void batch::dump_complete(int dump_count)
   dump_container_can_be_removed = true;
   dump_container_ready_count = dump_count;
   barcode_line_p->setFocus();
-  macro_screen_p -> usb_serial_out(0,0,0,0,dump_count); //TEST~~~
+  //macro_screen_p -> usb_serial_out(0,0,0,0,dump_count); //TEST~~~
+  
+  //QString variant to integers//	11_02_2018//
+  QString lotcode_str, packcode_str, batch_count_str, substitution_str, dump_count_str;
+  dump_count_str = QString::number(dump_count);
+  macro_screen_p -> usb_serial_out(lotcode_str, packcode_str, batch_count_str, substitution_str, dump_count_str);
 }
 
 void batch::dumping(bool value)
@@ -410,7 +449,7 @@ void batch::back_clicked()
   centre_p->add_waiting_screen(centre_p->get_previous_screen());
   centre_p->screen_done=true;
 }
-  
+/*  
 void batch::zero_clicked()
 {
   centre_p->count = 0;
@@ -429,6 +468,12 @@ void batch::endgate_clicked()
     screen_endgate = ENDGATE_OPEN;
   }
   barcode_line_p->setFocus();
+}
+*/
+
+void batch::restart_clicked()
+{
+  batch_mode_driver_p -> mode = dump_into_end;
 }
 
 void batch::save_program_clicked()
@@ -466,7 +511,7 @@ void batch::run()
   QString message=QString("Count: %1").arg(centre_p->count);
   count_message_p->setText(message);
   centre_p->processor_display_blobs(false);
- 
+  /*
   if(screen_endgate==ENDGATE_OPEN)
   {
     batch_mode_driver_p -> force_endgate_open = true;
@@ -477,7 +522,7 @@ void batch::run()
     batch_mode_driver_p -> force_endgate_open = false;
     endgate_button_p->setText("Open Endgate\nDischarge Seed");
   }
-  
+  */
   count = centre_p->count;
 //  cout<<"count = "<<count<<endl;
   

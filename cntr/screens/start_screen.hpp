@@ -8,7 +8,6 @@ class button;
 class QGridLayout;
 class QGroupBox;
 
-class QPushButton;  //TEST~~~
 
 class start_screen : public screen
 {
@@ -35,11 +34,5 @@ class start_screen : public screen
   QGroupBox* modebox_p;
   QGroupBox* shutdownbox_p;
   QGridLayout* main_layout_p;
-  
-  QPushButton* totalize_button_p_test;    //TEST~~~ QPushButton alternative//
-  QPushButton* batch_button_p_test;       //
-  QPushButton* tools_button_p_test;       //
-  QPushButton* shutdown_button_p_test;    //
-  QPushButton* exit_button_p_test;        //
 };
 #endif

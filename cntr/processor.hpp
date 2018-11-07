@@ -242,6 +242,7 @@ class processor : public QObject
   void restart_calibration();
   void save_image(QString filename);
   void load_image(QString filename);
+  void reset_time_tests();//testing
   
   signals:
   void count_out(int count_incr);
@@ -249,8 +250,10 @@ class processor : public QObject
   void send_calibrated_crop(crop calibrated_crop);
   void end_of_playback();
   void send_cycle_time(int value);
+  void send_message(QString message);
   
   private:
+  
   void calibrate();
   void new_image(unsigned char* pixel_p);
   void add_line(unsigned char* start_p);
@@ -260,12 +263,21 @@ class processor : public QObject
   int start_slice;//start of next slice of matter
   int end_slice;
   
+//  int valid_start;
+//  int valid_end;//ignore pixels outside valid range
+
+  
   //testing
   int run_number;
   QTime t;
   int image_processing_time;//milliseconds
+  int max_image_processing_time;//milliseconds
   int slack_time;//milliseconds from end of processing to start of next image
+  int min_slack_time;//milliseconds from end of processing to start of next image
+  bool first_cycle;//will be true when program starts, but false after that.  When true, processing time and slack time not valid.
   int image_cycle_time;//miliseconds for complete image cycle
+  
+  
   int detect_size;//minimum area in pixels to be detected as a seed
   
   int calibration_area_list[50];

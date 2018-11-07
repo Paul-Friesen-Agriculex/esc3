@@ -202,6 +202,7 @@ void program_choice::add_program_clicked()
 {
   centre_p->add_waiting_screen(14);//enter_program
   batch_mode_driver_p->clear_program();
+  batch_mode_driver_p->program_path = "";
   centre_p->screen_done=true;
 }
 
