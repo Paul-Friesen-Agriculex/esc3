@@ -102,9 +102,6 @@ class centre : public QObject
   void save_image(QString filename);
   void load_image(QString filename);
   void load_macros();	//original~~~
-  //void load_macros(QString count_num);	//just including count
-  //void load_macros(QString count_num, QString barcode_num);	//TEST~~~ 08_31_2018
-  
   
   processor* processor_p;
   int count;
@@ -138,14 +135,12 @@ class centre : public QObject
   int tm_autosave_count;//counts how many counts were recorded;
   QString tm_save_filename;
   
-  bool macro_status_bool;			//temporary variable to transfer ifstream to tablewidget
-  int macro_numb_int;				//
+  bool macro_status_bool;			  //temporary variable to transfer ifstream to tablewidget
+  int macro_numb_int;				    //
   char macro_name_char[30];			//
   char macro_mask_char[30];			//
   char macro_function_char[30];		//
   QString combined_macro_functions;	//new char to combine all macros
-  //QStringList barcodes_count	//variable to hold barcodes and count values into stringlist	//need to append
-
   
   //batch mode
   bool block_endgate_opening;//true prevents endgate from opening.  Used if barcode test fails in batch.

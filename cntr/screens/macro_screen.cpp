@@ -301,13 +301,12 @@ void macro_screen::usb_serial_out(QString bar_str_1, QString bar_str_2, QString 
     cout<<endl<<combined_macro_functions.toUtf8().constData()<<endl;  //OMIT~~~
     macros.close();
   }
-  
 //--------------------------------------------------------------OUTPUT TO SERIAL--------------------------------------------------------------//
   int size_string_macros = combined_macro_functions.size();
   //int filedesc = open("/dev/usb2serial", O_WRONLY);
   int filedesc = open("/dev/ttyUSB0", O_WRONLY);  //if udev rules are not applied//
-  write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros) != size_string_macros;
   //write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros) != size_string_macros;
+  cout<<endl<<"serial string buffer length: "<<write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros)<<endl;
 //--------------------------------------------------------------------------------------------------------------------------------------------//
 }
 
@@ -394,8 +393,9 @@ void macro_screen::usb_serial_out(QString lotcode_str, QString packcode_str, QSt
   int size_string_macros = combined_macro_functions.size();
   //int filedesc = open("/dev/usb2serial", O_WRONLY);
   int filedesc = open("/dev/ttyUSB0", O_WRONLY);  //if udev rules are not applied//
-  write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros) != size_string_macros;
+  //write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros) != size_string_macros;
   //write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros);
+  cout<<endl<<"serial string buffer length: "<<write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros)<<endl;
 //--------------------------------------------------------------------------------------------------------------------------------------------// 
 }
 
@@ -419,7 +419,6 @@ void macro_screen::initialize_macro_menu()
         //QPushButton *on_off_button = new  QPushButton(tr("ON"), this);
         //connect(on_off_button, SIGNAL(clicked()), this, SLOT(on_off_button_clicked(tableWidget_p->currentRow(),tableWidget_p->currentColumn()))); //TEST~~~
         //connect(on_off_button, SIGNAL(clicked()), this, SLOT(on_off_button_clicked(1,1))); //TEST~~~
-
         
         //tableWidget_p->setCellWidget (i, j, on_off_button); //TEST~~~
       }

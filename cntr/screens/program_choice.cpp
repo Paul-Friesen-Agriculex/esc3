@@ -94,16 +94,6 @@ program_choice::program_choice(centre*set_centre_p, batch_mode_driver* batch_mod
   }
   first_program_displayed = 0;
   display_programs();
-  
-  //TEST~~~//
-  setStyleSheet("button {     border: 2px solid #8f8f91;"
-                                  //"width: 13px;"
-                                  "height: 40px;"
-                                  "font: 25px;"
-                                  "border-radius: 12px;"
-                                  "background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
-                                  "stop: 0 #f6f7fa, stop: 1 #dadbde);"
-                                  "min-width: 80px;}");
 }
 
 program_choice::~program_choice()

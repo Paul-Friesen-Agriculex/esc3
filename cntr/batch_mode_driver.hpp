@@ -82,6 +82,7 @@ class batch_mode_driver : public QObject
   void program_remove_last();
   void start();
   void stop();
+  void restart();//dump out seed and restart program
 
   QString program_path;
   float count_rate_multiplier;
@@ -140,6 +141,9 @@ class batch_mode_driver : public QObject
   void dump_complete(int dump_count);
   void seed_lot_barcode_entered(QString barcode);
   void pack_barcode_entered(QString barcode);
+  
+  //testing
+  void send_message2(QString);
 };
 	
 class count_rate_predictor : public QObject

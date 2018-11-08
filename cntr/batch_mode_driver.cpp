@@ -188,6 +188,7 @@ void batch_mode_driver::reset_program()
   current_pack_limit = program[current_set]->packs;
   mode = wait_for_seed_lot_barcode;
   barcode_mode = seed_lot;
+  dump_end_qtime.restart();
 //  cout<<"\n\nbatch_mode_driver::reset_program\n";
 //  for(int i=0; i<program_size; ++i)
 //  {
@@ -270,6 +271,15 @@ void batch_mode_driver::start()
 void batch_mode_driver::stop()
 {
   timer_p->stop();
+}
+
+void batch_mode_driver::restart()
+{
+  dump_into_end_time.restart();
+  mode = dump_into_end;
+  cout<<"mode dump_into_end\n";
+  pack_barcode_ok = true;
+  pack_barcode_old = true;
 }
 
 void batch_mode_driver::save_program(QString filename)
@@ -426,6 +436,13 @@ void batch_mode_driver::run()
     }
   }
   */
+
+  //testing
+  int dump_elapsed;
+  QString message2;
+
+
+
   switch(mode)
   {
     case wait_for_seed_lot_barcode:
@@ -722,6 +739,12 @@ void batch_mode_driver::run()
         centre_p->set_cutgate_state(CUTGATE_OPEN);
       }
       centre_p->block_endgate_opening = false;
+      
+      dump_elapsed = dump_end_qtime.elapsed();
+      message2 = QString("dump_end_qtime.elapsed = %1").arg(dump_elapsed);
+      send_message2(message2);
+//      cout<<"dump_end_qtime.elapsed = "<<dump_elapsed<<endl;
+      
       if(dump_end_qtime.elapsed() >= dump_end_qtime_limit)//if count has not changed, dump is complete
       {
         dump_end_qtime.restart();

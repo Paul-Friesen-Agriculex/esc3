@@ -1,18 +1,16 @@
 #ifndef macro_screen_hpp
 #define macro_screen_hpp
 
-#include <QTableWidget>			//TEST~~~ building macro creator menu and dispaly GPIO_keyboard
+#include <QTableWidget>			  //TEST~~~ building macro creator menu and dispaly GPIO_keyboard
 #include <QTableWidgetItem>		//TEST~~~ table items for tablewidget
 #include "centre.hpp"
-
-#include "gpio_keyboard.hpp"	//TEST~~~ interfacing gpio_keyboard output, connect properly to "centre.cpp/hpp"
 
 #include <QMessageBox>			//TEST~~~ macro table popup menu
 #include <QInputDialog>			//TEST~~~ alternative to dialog window, retrieve user input
 #include <QStringList>			//TEST~~~
 #include <QTextStream>			//TEST~~~ for streaming out Qstrings
 #include <QString>
-#include "table.hpp"  //TEST~~~ 
+#include "table.hpp"        //TEST~~~ 
 //#include <QDialogButtonBox>		//TEST~~~
 
 class button;
@@ -30,8 +28,7 @@ class macro_screen : public screen
   public:
   macro_screen(centre*set_centre_p);
   
-  public slots:
-  
+  public slots:  
   //batch mode - barcodes as characters instead of integers 11_02_2018~~~//
   void usb_serial_out(QString bar_str_1, QString bar_str_2, QString bar_str_3, QString bar_str_4, QString totalize_str_count, QString totalize_str_weight);
   void usb_serial_out(QString lotcode_str, QString packcode_str, QString batch_count_str, QString substitution_str, QString dump_count_str);
@@ -80,8 +77,6 @@ class macro_screen : public screen
   static const int macro_cols = 5;
   static const int macro_rows = 10;
   centre* centre_p;
-  gpio_keyboard* gpio_keyboard_p;	//OMIT~~~
-  //table* table_p; //TEST~~~
   
   //QString Alternatives to Integer variables// 11_02_2018~~~//
   QString bar_str_1;            //Totalize variables//

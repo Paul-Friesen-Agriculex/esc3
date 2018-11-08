@@ -130,7 +130,11 @@ totalize::totalize(centre* set_centre_p)
   }
   
 //  cout<<"end totalize::totalize\n";
-  
+  top_layout_p->setContentsMargins(0,0,0,0);        //set layout margins to shrink to designated container dimensions//
+  control_layout_p->setContentsMargins(0,0,0,0);
+  speed_layout_p->setContentsMargins(0,0,0,0);
+  bottom_layout_p->setContentsMargins(0,0,0,0);
+  main_layout_p->setContentsMargins(0,0,0,0);
 }
 
 totalize::~totalize()
@@ -285,11 +289,11 @@ void totalize::run()
     
     bar_str_1 = (table_p -> model_p -> item(current_totalize_table_row,0) -> text());
     bar_str_2 = (table_p -> model_p -> item(current_totalize_table_row,1) -> text());
-    bar_str_3 = (table_p -> model_p -> item(current_totalize_table_row,2) -> text());
+    bar_str_3 = (table_p -> model_p -> item(current_totalize_table_row,2) -> text()); 
     bar_str_4 = (table_p -> model_p -> item(current_totalize_table_row,3) -> text());
     totalize_str_count = (table_p -> model_p -> item(current_totalize_table_row,4) -> text());
     totalize_str_weight = (table_p -> model_p -> item(current_totalize_table_row,5) -> text());
-    
+
     macro_screen_p -> usb_serial_out(bar_str_1, bar_str_2, bar_str_3, bar_str_4, totalize_str_count, totalize_str_weight);	  //TEST~~~ Strings instead of ints 11_02_2018~~~//
   }
 

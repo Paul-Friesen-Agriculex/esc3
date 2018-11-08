@@ -1684,8 +1684,8 @@ void::blob::overlap_test_multiple(int cluster_num)  //TEST~~~ 10_22_2018
   int largest_library_seed_width = 0;
   int largest_library_seed_height = 0;
   
-  int static_shift_x[4];  //x and y shifts to get from 0,0 to new starting location
-  int static_shift_y[4];  //
+  //int static_shift_x[4];  //x and y shifts to get from 0,0 to new starting location
+  //int static_shift_y[4];  //
   
   //library seed retrieval//
   for(int i=0; i<cluster_num; ++i)
@@ -1801,24 +1801,28 @@ void::blob::overlap_test_multiple(int cluster_num)  //TEST~~~ 10_22_2018
 //==================================================================================================================================================//
 void blob::overlap_test(int cluster_num) //TEST~~~ 10_18_2018
 {
-  //variables used to determine library raster centroid//
-  int library_seed_size, library_seed_size_1;
-  int lc_x, lc1_x, lc2_x, lc3_x, lc4_x;
-  int lc_y, lc1_y, lc2_y, lc3_y, lc4_y;
+  cout<<"cluster_num: "<<cluster_num<<endl; //OMIT~~~
   
-  lc_x = 0;     lc_y = 0;   //intermediate calculation variable//
+  //variables used to determine library raster centroid//
+  int library_seed_size;
+  //int library_seed_size_1;
+  //int lc_x, lc1_x, lc2_x, lc3_x, lc4_x; //temporary to remove warnings
+  //int lc_y, lc1_y, lc2_y, lc3_y, lc4_y; //
+  int lc1_x, lc1_y;                       //
+  
+  //lc_x = 0;     lc_y = 0;   //intermediate calculation variable//
   lc1_x = 0;    lc1_y = 0;
-  lc2_x = 0;    lc2_y = 0;
-  lc3_x = 0;    lc3_y = 0;
-  lc4_x = 0;    lc4_y = 0;
+  //lc2_x = 0;    lc2_y = 0;
+  //lc3_x = 0;    lc3_y = 0;
+  //lc4_x = 0;    lc4_y = 0;
   
   //variables used to retrieve random library raster//
   srand(time(NULL));
   int random_calibration_seed;
   int seed_list_start_position = 0;
   int seed_list_end_position;
-  int library_seed_width_1, library_seed_width_2, library_seed_width_3, library_seed_width_4;
-  int library_seed_height_1, library_seed_height_2, library_seed_height_3, library_seed_height_4;
+  //int library_seed_width_1, library_seed_width_2, library_seed_width_3, library_seed_width_4;
+  //int library_seed_height_1, library_seed_height_2, library_seed_height_3, library_seed_height_4;
   
   int library_seed_height;  //OMIT~~~
   int library_seed_width;   //OMIT~~~
@@ -1831,17 +1835,17 @@ void blob::overlap_test(int cluster_num) //TEST~~~ 10_18_2018
   
 //===============================================================================================================//   //TEST~~~~~~~~~~
   //array alternatives//
-  int lcx[4];
-  int lcy[4];
-  int library_seed_sizes[4] = {0, 0, 0, 0};
-  int library_seed_widths[4] = {0, 0, 0, 0};
-  int library_seed_heights[4] = {0, 0, 0, 0};
+  //int lcx[4];
+  //int lcy[4];
+  //int library_seed_sizes[4] = {0, 0, 0, 0};
+  //int library_seed_widths[4] = {0, 0, 0, 0};
+  //int library_seed_heights[4] = {0, 0, 0, 0};
 
-  int largest_library_seed_width = 0;
-  int largest_library_seed_height = 0;
+  //int largest_library_seed_width = 0;
+  //int largest_library_seed_height = 0;
   
-  int static_shift_x[4];  //x and y shifts to get from 0,0 to new starting location
-  int static_shift_y[4];  //
+  //int static_shift_x[4];  //x and y shifts to get from 0,0 to new starting location
+  //int static_shift_y[4];  //
 
 //===============================================================================================================//   //TEST~~~~~~~~~~
   //library seed retrieval//
@@ -1968,8 +1972,10 @@ void blob::overlap_test(int cluster_num) //TEST~~~ 10_18_2018
   
   //---------------------------------------------------------------------------------------------------------------//  
 
-  int centroid_x_1, centroid_x_2, centroid_x_3, centroid_x_4;
-  int centroid_y_1, centroid_y_2, centroid_y_3, centroid_y_4;
+  //int centroid_x_1, centroid_x_2, centroid_x_3, centroid_x_4;
+  int centroid_x_1;
+  //int centroid_y_1, centroid_y_2, centroid_y_3, centroid_y_4;
+  int centroid_y_1;
 
   centroid_x_1 = (c1_x+width*c1_y + static_x_shift + static_y_shift + width_expansion*c1_y) % larger_container_width;   //define centroids relative to larger container//
   centroid_y_1 = (c1_x+width*c1_y + static_x_shift + static_y_shift + width_expansion*c1_y) / larger_container_width;
@@ -2272,8 +2278,9 @@ void blob::remove_similar_rasters()	//compare and remove similar seeds in Qlist,
       }
       seed_area_2 = index_segment_2.size();
 //---------------------calculate scores method----------------------//
-      i = 0;
-      j = 0;
+      int i = 0;
+      int j = 0;
+      
       while((i<seed_area_1) || (j<seed_area_2))
       {
         if(index_segment_1.at(i) == index_segment_2.at(j))      //no condition for when seeds end on same index value (stuck on encounter)
@@ -3125,6 +3132,7 @@ bool blob::read_calibration_data_file()
   int file_to_calibration;
   int loop_counter;					    //OMIT~~~
   bool find_loop = 1;
+  bool return_bool; //TEST~~~
 
 //-----------------------------------------------------------------------------------//	TEST~~~
   for(int i=0; i<30; ++i)						          //initialize empty array
@@ -3209,14 +3217,17 @@ bool blob::read_calibration_data_file()
     cout<<endl<<calibrated_crop_name<<endl<<largest_dimension<<" "<<average_calibration_seed_size<<endl<<height_mean<<" "		//OMIT~~~
         <<width_mean<<" "<<area_mean<<endl<<std_deviation_height<<" "<<std_deviation_width<<" "<<std_deviation_area<<endl;		//OMIT~~~
     cin>>loop_counter;																											//OMIT~~~
-    return 1;
+    //return 1;
+    return_bool = 1;
   }
   if(!raster_f || !raster_h || find_loop==1)
   {
     cout<<"Warning: missing or corrupted calibration data files."<<endl;
     cin>>loop_counter;	//OMIT~~~
-    return 0;
+    //return 0;
+    return_bool = 0;
   }
+  return return_bool;
 }
 
 bool blob::write_calibration_data_file() 

@@ -233,50 +233,12 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
   
   barcode_line_p->setFocus();
 //  batch_mode_driver_p->list_program();
-  
-  //TEST~~ Stylesheet//
-  setStyleSheet(
-    "button {"
-        "border: 2px solid #8f8f91;"
-        "height: 30px;"
-        "font: 18px;"
-        "border-radius: 12px;"
-        "background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
-        "stop: 0 #f6f7fa, stop: 1 #dadbde);"
-        "min-width: 80px;}"
-                                  
-    ".QSlider::groove:horizontal {"
-        "border:none;"
-        "margin-top: 10px;"
-        "margin-bottom: 10px;"
-        "height: 10px;}"
     
-    ".QSlider::sub-page {"
-        "background: #009900;}"
-
-    ".QSlider::add-page {"
-        "background: rgb(70, 70, 70);}"
-
-    ".QSlider::handle {"
-        "background: e1e8a7;"
-        "border: 3px solid #8f8f91;"
-        "width: 60px;"
-        "margin: -30px 0;}"
-        
-    /*".QGridLayout {"
-        "padding: 0px;"
-        "margin: 0px;"
-        "border: 0px;"
-        "max-height: 480px;}"*/
-  );
-  
-  top_layout_p->setContentsMargins(0,0,0,0);        //TEST~~~
-  control_layout_p->setContentsMargins(0,0,0,0);    //
-  speed_layout_p->setContentsMargins(0,0,0,0);      //
-  bottom_layout_p->setContentsMargins(0,0,0,0);     //
-  main_layout_p->setContentsMargins(0,0,0,0);       //
-  
-  this->setFixedSize(800,480);  //TEST~~~ works to adjust entire window
+  top_layout_p->setContentsMargins(0,0,0,0);        //set layout margins to shrink to designated container dimensions//
+  control_layout_p->setContentsMargins(0,0,0,0);
+  speed_layout_p->setContentsMargins(0,0,0,0);
+  bottom_layout_p->setContentsMargins(0,0,0,0);
+  main_layout_p->setContentsMargins(0,0,0,0);
 }
 
 batch::~batch()
@@ -326,72 +288,15 @@ void batch::pack_collected(int count_to_record)
   pack_removed_too_soon = false;
   pack_was_placed = false;
   table_p->enter_seeds(count_to_record);
-  
-//--------------------------------------------------------------------------------------------------------------//
-    /*centre_p->count = count_to_record;	//TEST~~~
 
-    gpio_keyboard_p = new gpio_keyboard;
-    
-    if(!(centre_p->tm_macro_updated))
-    {
-      centre_p->load_macros();
-      cout<<"loading macros"<<endl;
-	}
-	else
-	{
-	  cout<<"macros already loaded"<<endl;
-	}
-	//gpio_keyboard_p -> gpio_send((centre_p->combined_macro_functions));	//original
-	
-	//macro_screen_p = new macro_screen;	//TEST~~~
-	//macro_screen_p -> usb_serial_out();	//TEST~~~
-	//macro_screen_p -> usb_serial_out(centre_p->combined_macro_functions);	//TEST~~~
-  //load totalize table variables//
-    //int current_totalize_table_row;    
-    //int barcode_1, barcode_2, barcode_3, barcode_4, totalize_count, weight;
-
-  //int k;
-  //int l;
-  //int m;
-    
-  //k = table_p -> model_row;
-  //l = table_p -> model_p -> item(k-1, 0) -> data().toInt();
-  //m = table_p -> model_p -> item(k-1, 0) -> text().toInt();
+//  pack_ready_count = count;
+  barcode_line_p->setFocus();
+//  pack_was_placed = false;
+  pack_was_removed = true;
   
+  //QString Alternative  to Integers//  //11_02_2018~~~//
   int row;
-  int lotcode;
-  int packcode;
-  int batch_count;
-  int substitution;
-  
   row = table_p -> model_row;
-  lotcode = table_p -> model_p -> item(row-1, 0) -> text().toInt();
-  packcode = table_p -> model_p -> item(row-1, 1) -> text().toInt();
-  batch_count = table_p -> model_p -> item(row-1, 2) -> text().toInt();
-  substitution = table_p -> model_p -> item(row-1, 3) -> text().toInt();
-  
-  macro_screen_p -> usb_serial_out(lotcode,packcode,batch_count,substitution,0);	//TEST~~~*/
-  
-  //void macro_screen::usb_serial_out(int lotcode, int packcode, int batch_count, int substitution, int dump_count)	//batch mode
-//--------------------------------------------------------------------------------------------------------------//
-//TEST Serial Keyboard Output// 10_31_2018
-  int row;
-  //int lotcode;
-  //int packcode;
-  //int batch_count;
-  //int substitution;
-  
-  row = table_p -> model_row;
-  //lotcode = table_p -> model_p -> item(row-1, 0) -> text().toInt();
-  //packcode = table_p -> model_p -> item(row-1, 1) -> text().toInt();
-  //batch_count = table_p -> model_p -> item(row-1, 2) -> text().toInt();
-  //batch_count = count_to_record;
-  //substitution = table_p -> model_p -> item(row-1, 3) -> text().toInt();
-  
-  //macro_screen_p -> usb_serial_out(lotcode,packcode,batch_count,substitution,0);	//ORIGINAL~~~
-  
-  //===========================================================================//11_02_2018~~~//
-  //QString Alternative  to Integers//
   QString lotcode_str, packcode_str, batch_count_str, substitution_str, dump_count_str;
   
   lotcode_str = table_p -> model_p -> item(row-1, 0) -> text();
@@ -399,15 +304,8 @@ void batch::pack_collected(int count_to_record)
   batch_count_str = QString::number(count_to_record);
   substitution_str = table_p -> model_p -> item(row-1, 3) -> text();
   
-  macro_screen_p -> usb_serial_out(lotcode_str, packcode_str, batch_count_str, substitution_str, dump_count_str);	//TEST~~~ 11_02_2018//
+  macro_screen_p -> usb_serial_out(lotcode_str, packcode_str, batch_count_str, substitution_str, dump_count_str);
   //===========================================================================//
-
-//--------------------------------------------------------------------------------------------------------------//
-  
-//  pack_ready_count = count;
-  barcode_line_p->setFocus();
-//  pack_was_placed = false;
-  pack_was_removed = true;
 }  
 
 void batch::dump_complete(int dump_count)
@@ -415,16 +313,17 @@ void batch::dump_complete(int dump_count)
   dump_container_can_be_removed = true;
   dump_container_ready_count = dump_count;
   barcode_line_p->setFocus();
-  //macro_screen_p -> usb_serial_out(0,0,0,0,dump_count); //TEST~~~
   
   //QString variant to integers//	11_02_2018//
   QString lotcode_str, packcode_str, batch_count_str, substitution_str, dump_count_str;
   dump_count_str = QString::number(dump_count);
   macro_screen_p -> usb_serial_out(lotcode_str, packcode_str, batch_count_str, substitution_str, dump_count_str);
+  //===========================================================================//
 }
 
 void batch::dumping(bool value)
 {
+  cout<<"batch::dumping.  value = "<<value<<endl;
   dump_flag = value;
 }
 
@@ -473,7 +372,14 @@ void batch::endgate_clicked()
 
 void batch::restart_clicked()
 {
-  batch_mode_driver_p -> mode = dump_into_end;
+  //batch_mode_driver_p -> mode = dump_into_end;
+
+  batch_mode_driver_p -> restart();
+  pack_can_be_removed = true;
+  pack_removed_too_soon = false;
+  dump_container_can_be_removed = false;
+  dump_flag = true;
+  dump_container_removed_too_soon = false;
 }
 
 void batch::save_program_clicked()
@@ -536,6 +442,9 @@ void batch::run()
     pack_was_removed = true;
     if( (dump_flag==false) && (count>0) && (centre_p->get_cutgate_state()==CUTGATE_OPEN) && (pack_removed_too_soon==false) )
     {
+      
+      cout<<"setting pack_removed_too_soon true\n";
+      
       pack_removed_too_soon = true;
     }
     if( (dump_flag==true) && (count>0) && (centre_p->get_cutgate_state()==CUTGATE_OPEN) && (dump_container_removed_too_soon==false) )
@@ -558,7 +467,7 @@ void batch::run()
 //    pack_barcode_ok = false;
   }
   
-  
+
   /*
   if( (pack_can_be_removed==true) && (pack_was_removed==true) ) // && (pack_removed_too_soon==false) ) //&& (batch_mode_driver_p->pack_barcode_ok==true) )
   {
@@ -583,6 +492,7 @@ void batch::run()
     dump_container_can_be_removed = false;
     dump_container_removed_too_soon = false;
     dump_container_was_placed = false;
+    cout<<"setting dump_flag false 1 \n";
     dump_flag = false;
     pack_was_removed = false;
     pack_can_be_removed = false;

@@ -4,7 +4,6 @@
 #include "batch_table.hpp"
 #include "centre.hpp"
 #include "batch_mode_driver.hpp"
-#include "gpio_keyboard.hpp"	//TEST~~~ interfacing gpio_keyboard output, connect properly to "centre.cpp/hpp"
 #include "macro_screen.hpp"
 
 #include <QTextEdit>
@@ -119,8 +118,7 @@ class batch : public screen
   bool dump_flag;//true -> dumping
   barcode_entry_mode old_barcode_mode;
   
-  gpio_keyboard* gpio_keyboard_p;	//OMIT~~~
-  macro_screen* macro_screen_p;		//TEST~~~
+  macro_screen* macro_screen_p;
   QString count_string;				//seed count access from gpio_keyboard
   QTimer* run_timer_p;
 };
