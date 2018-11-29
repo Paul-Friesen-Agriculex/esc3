@@ -14,6 +14,8 @@ class cutgate:public QObject
   private:
   QTimer* open_pulse_timer_p;
   QTimer* close_pulse_timer_p;
+  bool opening;//true if opening has started but not finished
+  bool closing;//true if closing has started but not finished
   CUTGATE_STATE state;
   
   public:
@@ -31,6 +33,7 @@ class cutgate:public QObject
   
   signals:
   void closed_while_opening();
+  void opened_while_closing();
 };
 
 #endif

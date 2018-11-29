@@ -186,6 +186,7 @@ centre::centre():
   diagnostics_console_p -> show();
   connect(processor_p, SIGNAL(send_message(QString)), diagnostics_console_p, SLOT(receive_message1(QString)));
   connect(batch_mode_driver_p, SIGNAL(send_message2(QString)), diagnostics_console_p, SLOT(receive_message2(QString)));
+  connect(batch_mode_driver_p, SIGNAL(send_message_time_to_end(QString)), diagnostics_console_p, SLOT(receive_message3(QString)));
   connect(diagnostics_console_p, SIGNAL(reset_time_tests_signal()), processor_p, SLOT(reset_time_tests()));
   
   tm_macro_updated = 0; 
@@ -237,7 +238,7 @@ centre::~centre()
 void centre::increase_count(int to_add)
 {
   count += to_add;
-  batch_mode_driver_p->count_rate_predictor_p->add_counts(to_add, feed_speed);
+//  batch_mode_driver_p->count_rate_predictor_p->add_counts(to_add, feed_speed);
 }
 
 void centre::receive_qimage(QImage qimage_set)

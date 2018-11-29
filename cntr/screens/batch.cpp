@@ -482,7 +482,13 @@ void batch::restart_clicked()
 //  batch_mode_driver_p -> pack_barcode_ok = true;
 //  batch_mode_driver_p -> pack_barcode_old = true;
   batch_mode_driver_p -> restart();
-  pack_can_be_removed = true;
+  
+  
+  
+  pack_can_be_removed = false;
+  
+  
+  
   pack_removed_too_soon = false;
   dump_container_can_be_removed = false;
   dump_flag = true;
@@ -622,7 +628,7 @@ void batch::run()
 
 
 
-  if( (pack_can_be_removed==true) && (pack_removed_too_soon==false) )
+  if( (pack_can_be_removed==true) && (pack_removed_too_soon==false) && (dump_flag==false) )
   {
     QString number;
     pack_ready_message = "PACK READY\nPackage ";

@@ -2,13 +2,14 @@
 #include <iostream>
 #include <QFile>
 #include <QTextStream>
+#include <iomanip>
 
 using namespace std;
 
 batch_mode_driver::batch_mode_driver(centre* centre_p_s)
 {
   centre_p = centre_p_s;
-  count_rate_predictor_p = new count_rate_predictor();
+  count_rate_predictor_p = new count_rate_predictor(centre_p);
   pack_present = old_pack_present = false;
   pack_changed = true;
   timer_p = new QTimer;
@@ -32,9 +33,17 @@ batch_mode_driver::batch_mode_driver(centre* centre_p_s)
   seed_lot_barcode_ok = false;
   pack_barcode_ok = false;
   
+  dump_into_cut_gate_time.start();
+  dump_into_end_time.start();
+  dump_end_qtime.start();
+  
 //  high_feed_speed = centre_p->crops[0].high_feed_speed;
 //  low_feed_speed = centre_p->crops[0].low_feed_speed;
 //  dump_speed = centre_p->crops[0].dump_speed;
+
+
+
+  print_message_count = 0;
 }
   
 batch_mode_driver::~batch_mode_driver()
@@ -364,6 +373,22 @@ void batch_mode_driver::run()
   {
     time_to_end = 1000;
   }
+  
+  
+  
+  
+  //testing
+  if(print_message_count>=100)
+  {
+    cout<<"count "<<centre_p->count<<".  time_to_end "<<time_to_end<<".  predicted count rate "<<predicted_count_rate<<endl;
+    emit send_message_time_to_end(QString("time_to_end %1.  predicted count rate %2\n").arg(time_to_end).arg(predicted_count_rate));
+    print_message_count = 0;
+  }
+  ++print_message_count;
+  
+  
+  
+  
   old_pack_present = pack_present;
   pack_present = centre_p->envelope_present;
 /*
@@ -476,7 +501,7 @@ void batch_mode_driver::run()
         centre_p->set_cutgate_state(CUTGATE_OPEN);
       }
       centre_p->block_endgate_opening = !pack_barcode_ok;
-      if(time_to_end<0.5)
+      if(time_to_end<0.4)
       {
         mode = low_open;
         cout<<"mode low_open. count "<<centre_p->count<<"\n";
@@ -577,7 +602,7 @@ void batch_mode_driver::run()
         cout<<"mode wait_for_endgate_to_close. count "<<centre_p->count<<"\n";
         endgate_close_counter = 0;
       }
-      if(time_to_end<1.0)
+      if(time_to_end<1.5)
       {
         mode = wait_for_pack;
         cout<<"mode wait_for_pack. count "<<centre_p->count<<"\n";
@@ -866,12 +891,11 @@ void batch_mode_driver::barcode_entered(QString value)
 //  cout<<"end batch_mode_driver::barcode_entered\n";
 }
 
-count_rate_predictor::count_rate_predictor()
+count_rate_predictor::count_rate_predictor(centre* centre_p_s)
 {
-  count = 0;
-  feed_speed = 0;
-  old_feed_speed = 0;
-  smoothed_rate = 0;
+  centre_p = centre_p_s;
+  count_rate_multiplier = 1;
+  old_count = 0;
   connect(&timer, SIGNAL(timeout()), this, SLOT(run()));
   timer.start(100);
 }
@@ -883,29 +907,20 @@ count_rate_predictor::~count_rate_predictor()
 
 void count_rate_predictor::run()
 {
-  if(feed_speed != old_feed_speed) smoothed_rate = 0;
-  old_feed_speed = feed_speed;
-  float current_rate = count*10.0;
-  if(current_rate > smoothed_rate)
+  float current_rate = (centre_p->count-old_count)*10.0;
+  old_count = centre_p->count;
+  if(current_rate>0 && centre_p->feed_speed>0)//if rate is 0, feeder is empty.  do not calculate.
   {
-    smoothed_rate = current_rate;
+    float current_count_rate_multiplier = current_rate/float(centre_p->feed_speed);
+//    cout<<"current_count_rate_multiplier "<<setw(15)<<current_count_rate_multiplier;
+//    cout<<"    count_rate_multiplier "<<setw(15)<<count_rate_multiplier<<endl;
+    count_rate_multiplier = (1.0-averaging_weight) * count_rate_multiplier   +   averaging_weight * current_count_rate_multiplier;
   }
-  else
-  {
-    smoothed_rate = (1.0-averaging_weight) * smoothed_rate   +   averaging_weight * current_rate;
-  }
-  count = 0;
 }
 
-void count_rate_predictor::add_counts(int to_add, int feed_speed_s)
+float count_rate_predictor::get_rate()
 {
-  count += to_add;
-  feed_speed = feed_speed_s;
-}
-
-int count_rate_predictor::get_rate()
-{
-  return smoothed_rate;
+  return (count_rate_multiplier * centre_p->feed_speed);
 }
 
     

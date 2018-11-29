@@ -1,6 +1,9 @@
 #include <QTimer>
 #include "cutgate.hpp"
 #include <stdio.h>
+#include <iostream>
+
+using namespace std;
 
 cutgate::cutgate()
 {
@@ -10,6 +13,9 @@ cutgate::cutgate()
   close_pulse_timer_p -> setSingleShot(true);
   connect(open_pulse_timer_p, SIGNAL(timeout()), this, SLOT(end_open()));
   connect(close_pulse_timer_p, SIGNAL(timeout()), this, SLOT(end_close()));
+  opening = false;
+  closing = false;
+
   open();
   state = CUTGATE_OPEN;
 }
@@ -28,8 +34,14 @@ void cutgate::open()
   fp = fopen("/sys/class/gpio/gpio171/value", "w");
   fprintf(fp, "1");
   fclose(fp);
-  open_pulse_timer_p -> start(500);//changed from 400 2018-03-28.  think it was 300 originally
+  open_pulse_timer_p -> start(700);
   state = CUTGATE_OPEN;
+  opening = true;
+  if(closing==true)
+  {
+    cout<<"cutgate opened while closing\n";
+    emit opened_while_closing();
+  }
 }
 
 void cutgate::close()
@@ -39,8 +51,14 @@ void cutgate::close()
   fp = fopen("/sys/class/gpio/gpio172/value", "w");
   fprintf(fp, "1");
   fclose(fp);
-  close_pulse_timer_p -> start(120);//changed from 80 2018-06-24
+  close_pulse_timer_p -> start(300);
   state = CUTGATE_CLOSED;
+  closing = true;
+  if(opening==true)
+  {
+    cout<<"cutgate closed while opening\n";
+    emit closed_while_opening();
+  }
 }
 
 void cutgate::end_open()
@@ -49,6 +67,7 @@ void cutgate::end_open()
   fp = fopen("/sys/class/gpio/gpio171/value", "w");
   fprintf(fp, "0");
   fclose(fp);
+  opening = false;
 }
 
 void cutgate::end_close()
@@ -57,5 +76,6 @@ void cutgate::end_close()
   fp = fopen("/sys/class/gpio/gpio172/value", "w");
   fprintf(fp, "0");
   fclose(fp);
+  closing = false;
 }
 

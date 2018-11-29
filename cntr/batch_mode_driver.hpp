@@ -55,9 +55,9 @@ class batch_mode_driver : public QObject
   bool old_pack_present;
   bool pack_changed;
   QTime dump_into_cut_gate_time;
-  static const int dump_into_cut_gate_time_limit = 10000;//millisecs.  Max time for dumping into cut gate
+  static const int dump_into_cut_gate_time_limit = 2000;//millisecs.  Max time for dumping into cut gate
   QTime dump_into_end_time;
-  static const int dump_into_end_time_limit = 20000;//millisecs. Max time for dumping into end gate
+  static const int dump_into_end_time_limit = 4000;//millisecs. Max time for dumping into end gate
   QTime dump_end_qtime;
   static const int dump_end_qtime_limit = 2000;//millisecs.  If no change in count for this time, consider dump complete
   int old_count;
@@ -65,6 +65,10 @@ class batch_mode_driver : public QObject
   QList<bm_set*> program;
   bm_set* set_p;
   int program_size;
+  
+  //testing
+  int print_message_count;
+  
   
   public:
   batch_mode_driver(centre* centre_p_s);
@@ -144,8 +148,30 @@ class batch_mode_driver : public QObject
   
   //testing
   void send_message2(QString);
+  void send_message_time_to_end(QString);
 };
 	
+class count_rate_predictor : public QObject
+{
+  Q_OBJECT
+  
+  centre* centre_p;
+  float count_rate_multiplier;
+  QTimer timer;
+  int old_count;
+  const static float averaging_weight = .01;
+  
+  private slots:
+  void run();
+  
+  public:
+  count_rate_predictor(centre* centre_p_s);
+  ~count_rate_predictor();
+//  void add_counts(int to_add, int feed_speed_s);
+  void set_initial_count_rate_multiplier(float multiplier_s) {count_rate_multiplier = multiplier_s;};
+  float get_rate();
+};
+/*
 class count_rate_predictor : public QObject
 {
   Q_OBJECT
@@ -166,5 +192,5 @@ class count_rate_predictor : public QObject
   void add_counts(int to_add, int feed_speed_s);
   int get_rate();
 };
-
+*/
 #endif
