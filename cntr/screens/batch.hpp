@@ -6,8 +6,10 @@
 #include "batch_mode_driver.hpp"
 #include "macro_screen.hpp"
 
-#include <QTextEdit>
 #include <QLabel>
+#include <QTextEdit>  //ORIGINAL~~~
+#include <QLineEdit>  //TEST~~~
+
 
 class button;
 class QGridLayout;
@@ -20,7 +22,8 @@ class QFileDialog;
 //class batch_mode_driver;
 class message_box;
 
-class barcode_line : public QTextEdit
+//class barcode_line : public QTextEdit   //ORIGINAL~~~
+class barcode_line : public QLineEdit     //TEST~~~
 {
   Q_OBJECT
   
@@ -86,12 +89,11 @@ class batch : public screen
   QGroupBox* control_box_p;
   QGroupBox* speed_box_p;
   QGroupBox* bottom_box_p;
-  
+    
   QGridLayout* top_layout_p;
   QGridLayout* control_layout_p;
   QGridLayout* speed_layout_p;
   QGridLayout* bottom_layout_p;
-  
   QGridLayout* main_layout_p;
   
   bool feeder_is_running;

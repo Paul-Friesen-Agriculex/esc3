@@ -12,6 +12,8 @@
 #include "button.hpp"
 #include <QString>
 
+//#include <QtMath> //exponential qslider// TEST~~~//
+
 using namespace std;
 
 totalize::totalize(centre* set_centre_p)
@@ -53,26 +55,28 @@ totalize::totalize(centre* set_centre_p)
   control_layout_p = new QGridLayout;
   speed_layout_p = new QGridLayout;
   bottom_layout_p = new QGridLayout;
-  
   main_layout_p = new QGridLayout;
 
-  top_layout_p -> addWidget(count_message_p, 0, 0);
+  top_layout_p -> addWidget(count_message_p, 0, 0);                      //NEW~~~ 11_16_2018//
   top_layout_p -> addWidget(options_button_p, 0, 1);
   top_layout_p -> addWidget(back_button_p, 0, 2);
   control_layout_p -> addWidget(zero_button_p, 0, 0);
   control_layout_p -> addWidget(endgate_button_p, 1, 0);
-  control_layout_p -> addWidget(speed_box_p, 2, 0);
-  speed_layout_p -> addWidget(speed_label_p, 0, 0);
-  speed_layout_p -> addWidget(startstop_button_p, 0, 1);
-  speed_layout_p -> addWidget(speed_set_p, 1, 0, 1, 2);
+  //control_layout_p -> addWidget(speed_box_p, 2, 0);
+  speed_layout_p -> addWidget(speed_label_p, 0, 1, 1, 3);
+  speed_layout_p -> addWidget(startstop_button_p, 0, 0, 2, 1);
+  speed_layout_p -> addWidget(speed_set_p, 1, 1, 1, 3);
   bottom_layout_p -> addWidget(status_box_p, 0, 0);
   bottom_layout_p -> addWidget(save_button_p, 0, 2);
   bottom_layout_p -> addWidget(clear_table_button_p, 0, 3);
   bottom_layout_p -> addWidget(quit_button_p, 0, 4);
+  
   main_layout_p -> addWidget(top_box_p, 0, 0, 1, 2);
-  main_layout_p -> addWidget(control_box_p, 1, 0);
-  main_layout_p -> addWidget(table_p, 1, 1);
-  main_layout_p -> addWidget(bottom_box_p, 2, 0, 1, 2);
+  main_layout_p -> addWidget(speed_box_p, 1, 0, 1, 4);
+  main_layout_p -> addWidget(control_box_p, 2, 0);
+  main_layout_p -> addWidget(table_p, 2, 1);
+  //main_layout_p -> addWidget(speed_box_p, 2, 0, 1, 4); //TEST~~~
+  main_layout_p -> addWidget(bottom_box_p, 3, 0, 1, 2); //TEST~~~
   
   top_box_p -> setLayout(top_layout_p);
   control_box_p -> setLayout(control_layout_p);
@@ -129,12 +133,12 @@ totalize::totalize(centre* set_centre_p)
     centre_p->tm_save_filename = "";
   }
   
-//  cout<<"end totalize::totalize\n";
+  speed_label_p->setAlignment(Qt::AlignCenter);
   top_layout_p->setContentsMargins(0,0,0,0);        //set layout margins to shrink to designated container dimensions//
   control_layout_p->setContentsMargins(0,0,0,0);
   speed_layout_p->setContentsMargins(0,0,0,0);
   bottom_layout_p->setContentsMargins(0,0,0,0);
-  main_layout_p->setContentsMargins(0,0,0,0);
+  main_layout_p->setContentsMargins(0,0,10,10);
 }
 
 totalize::~totalize()
@@ -204,6 +208,13 @@ void totalize::change_speed(int value)
 {
   centre_p->totalize_feed_speed=value;
 //  cout<<"totalize_feed_speed set to "<<value<<endl;
+  
+  //~~~feeder speed behaviour~~~//
+  if(value <= 500) value = value/2;         //~~~piece-wise linear, 2 parts~~~//
+  else value = 1.5*value-500;
+  //value = pow(1.0069, value) - 1;          //~~~exponential~~~//
+  
+  
   if(feeder_is_running)
   {
     centre_p->set_speed(value);
@@ -233,16 +244,31 @@ void totalize::quit_clicked()
 void totalize::run()
 {
 
-  QString message=QString("Count: %1").arg(centre_p->count);
+  QString message=QString("Count:  %1").arg(centre_p->count);
   count_message_p->setText(message);
     centre_p->processor_display_blobs(false);
-    message=QString("Crop: %1.  Sensitivity: %2.\nGate should be set at %3.\nLine frequency %4\nDust Streak Prcnt %5") 
+    message=QString("Crop: %1.  Sensitivity: %2.\nGate should be set at %3.") 
     .arg(centre_p->crops[0].name) 
     .arg(centre_p->crops[0].sensitivity) 
-    .arg(centre_p->crops[0].gate_setting)
-    .arg(centre_p->measured_line_frequency)
-    .arg(centre_p->dust_streak_percentage(), 0, 'f', 3);
-  status_box_p->setText(message);
+    .arg(centre_p->crops[0].gate_setting);
+  status_box_p->setText(message);                           //NEW~~~ 11_16_2018//
+  
+  count_message_p->setStyleSheet("QLabel {"     //TEST~~~
+          "background-color: white;"            //
+          "border: 3px solid black;"            //
+          "font-size: 20pt;}");                 //
+
+  int slider_position_num;
+  if(speed_set_p->sliderPosition() <= 500) slider_position_num = (speed_set_p->sliderPosition())/2;      //piece-wise linear, 2 sections//
+  else slider_position_num = 1.5*(speed_set_p->sliderPosition())-500;
+  //slider_position_num = pow(1.0069, (speed_set_p->sliderPosition())) - 1;         //exponential function//
+
+  QString slider_position_message = QString("Speed:  %1 \%").arg(1.0*slider_position_num/10);    //TEST~~~
+  //QString slider_position_message = QString("Speed:  %1 \%").arg(1.0*speed_set_p->sliderPosition()/10);    //ORIGINAL~~~
+  speed_label_p->setText(slider_position_message);                                                         //TEST~~~
+  speed_label_p->setStyleSheet("QLabel {"
+          "font: bold;}");
+  
  
   if(screen_endgate==ENDGATE_OPEN)
   {

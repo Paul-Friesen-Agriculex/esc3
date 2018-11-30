@@ -98,6 +98,10 @@ void diagnostics_console::receive_message7(QString message)
 void diagnostics_console::run()
 {
   QString status_string;
+  status_string.append(QString("Line frequency %1\nDust Streak Prcnt %2\n\n")   //reimplemented from totalize mode //11_16_2018//
+    .arg(centre_p->measured_line_frequency)
+    .arg(centre_p->dust_streak_percentage(), 0, 'f', 3));
+  
   if(centre_p->block_endgate_opening)
   {
     status_string.append("block_endgate_opening true\n");

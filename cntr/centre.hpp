@@ -19,7 +19,7 @@ class processor;
 class screen;
 class batch_mode_driver;
 class diagnostics_console;
-
+class macro_screen; //TEST~~~
 
 const int screen_wait_list_size=10;
 
@@ -103,6 +103,12 @@ class centre : public QObject
   void load_image(QString filename);
   void load_macros();	//original~~~
   
+//=========================================================//  
+  void macro_name_cell(int row, int col);
+  void macro_name_keyboard(QString);
+  int nRow, nCol;
+//=========================================================//
+  
   processor* processor_p;
   int count;
 //  CUTGATE_STATE cutgate_state;
@@ -148,7 +154,10 @@ class centre : public QObject
   //playback
   QImage qimage;
   
+  QString macro_name; //TEST~~~11_13_2018//
+  
   batch_mode_driver* batch_mode_driver_p;
+  macro_screen* macro_screen_p; //TEST~~~ 11_13_2018//
 };
 
 class screen : public QWidget

@@ -19,11 +19,13 @@ using namespace std;
 void barcode_line::keyPressEvent(QKeyEvent* event)
 {
 //  cout<<"batch_table::keyPressEvent\n";
-  QTextEdit::keyPressEvent(event);
+  QLineEdit::keyPressEvent(event); //TEST~~~
+  //QTextEdit::keyPressEvent(event);
   if(event->key() == Qt::Key_Return)
   {
 //    cout<<"about to emit barcode_entered\n";
-    emit barcode_entered(toPlainText());
+    //emit barcode_entered(toPlainText());  //ORIGINAL~~~
+    emit barcode_entered(displayText());  //TEST~~~
     clear();
   }
 }
@@ -51,7 +53,7 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
   options_button_p = new button("Options");
   back_button_p = new button("Back");
   barcode_line_p = new barcode_line;
-  barcode_line_p->setMaximumSize(20,10);
+  barcode_line_p->setMaximumSize(120,40);  //ORIGINAL~~~
 //  zero_button_p = new button("Zero");
 //  endgate_button_p = new button("");
   restart_button_p = new button("Dump out and\nrestart seed lot");
@@ -97,24 +99,24 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
   speed_box_p = new QGroupBox;
   speed_box_p -> setTitle("Speeds");
   bottom_box_p = new QGroupBox;
-  
+    
   top_layout_p = new QGridLayout;
   control_layout_p = new QGridLayout;
   speed_layout_p = new QGridLayout;
-  bottom_layout_p = new QGridLayout;
-  
+  bottom_layout_p = new QGridLayout;  
   main_layout_p = new QGridLayout;
 
   top_layout_p -> addWidget(count_message_p, 0, 0);
   top_layout_p -> addWidget(options_button_p, 0, 1);
   top_layout_p -> addWidget(back_button_p, 0, 2);
-  top_layout_p -> addWidget(barcode_line_p, 1, 0);
+  //top_layout_p -> addWidget(barcode_line_p, 1, 0);        //ORIGINAL~~~
+  bottom_layout_p -> addWidget(barcode_line_p, 1, 4);       //TEST~~~
 //  control_layout_p -> addWidget(zero_button_p, 0, 0);
 //  control_layout_p -> addWidget(endgate_button_p, 1, 0);  //ORIGINAL~~~
-  control_layout_p -> addWidget(restart_button_p, 0, 0);  //ORIGINAL~~~
-  //control_layout_p -> addWidget(endgate_button_p, 0, 1);    //TEST~~~
-  control_layout_p -> addWidget(speed_box_p, 1, 0);       //ORIGINAL~~~
-  //control_layout_p -> addWidget(speed_box_p, 1, 0);         //TEST~~~
+  control_layout_p -> addWidget(restart_button_p, 0, 0);    //ORIGINAL~~~
+  //control_layout_p -> addWidget(endgate_button_p, 0, 1);  //TEST~~~
+  control_layout_p -> addWidget(speed_box_p, 1, 0);         //ORIGINAL~~~
+  //control_layout_p -> addWidget(speed_box_p, 1, 0);       //TEST~~~
   speed_layout_p -> addWidget(high_speed_label_p, 0, 0);
   speed_layout_p -> addWidget(high_speed_set_p, 0, 1);
   speed_layout_p -> addWidget(low_speed_label_p, 1, 0);
@@ -233,12 +235,20 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
   
   barcode_line_p->setFocus();
 //  batch_mode_driver_p->list_program();
-    
+
   top_layout_p->setContentsMargins(0,0,0,0);        //set layout margins to shrink to designated container dimensions//
   control_layout_p->setContentsMargins(0,0,0,0);
   speed_layout_p->setContentsMargins(0,0,0,0);
   bottom_layout_p->setContentsMargins(0,0,0,0);
-  main_layout_p->setContentsMargins(0,0,0,0);
+  main_layout_p->setContentsMargins(0,0,10,10);
+  
+  main_layout_p->setRowMinimumHeight(5, 0);
+  main_layout_p->setRowStretch(5, 0);
+
+  count_message_p->setStyleSheet("QLabel {"   //TEST~~~
+        "background-color: white;"            //
+        "border: 3px solid black;"            //
+        "font-size: 20pt;}");                 //
 }
 
 batch::~batch()
@@ -305,7 +315,6 @@ void batch::pack_collected(int count_to_record)
   substitution_str = table_p -> model_p -> item(row-1, 3) -> text();
   
   macro_screen_p -> usb_serial_out(lotcode_str, packcode_str, batch_count_str, substitution_str, dump_count_str);
-  //===========================================================================//
 }  
 
 void batch::dump_complete(int dump_count)
@@ -318,7 +327,6 @@ void batch::dump_complete(int dump_count)
   QString lotcode_str, packcode_str, batch_count_str, substitution_str, dump_count_str;
   dump_count_str = QString::number(dump_count);
   macro_screen_p -> usb_serial_out(lotcode_str, packcode_str, batch_count_str, substitution_str, dump_count_str);
-  //===========================================================================//
 }
 
 void batch::dumping(bool value)
@@ -417,6 +425,28 @@ void batch::run()
   QString message=QString("Count: %1").arg(centre_p->count);
   count_message_p->setText(message);
   centre_p->processor_display_blobs(false);
+  
+  /*QString speed_label_string = (QString("Speeds:        H: %1%   L: %2%   D: %3%")
+    .arg(1.0*high_speed_set_p->sliderPosition()/10)
+    .arg(1.0*low_speed_set_p->sliderPosition()/10)
+    .arg(1.0*dump_speed_set_p->sliderPosition()/10));
+  speed_box_p -> setTitle(speed_label_string);*/
+  
+  int high_speed_slider_position, low_speed_slider_position, dump_speed_slider_position;
+  
+  if(high_speed_set_p->sliderPosition() <= 500) high_speed_slider_position = (high_speed_set_p->sliderPosition())/2;      //piece-wise linear, 2 sections//
+  else high_speed_slider_position = 1.5*(high_speed_set_p->sliderPosition())-500;
+  if(low_speed_set_p->sliderPosition() <= 50) low_speed_slider_position = (low_speed_set_p->sliderPosition())/2;          //piece-wise linear, 2 sections//
+  else low_speed_slider_position = 1.5*(low_speed_set_p->sliderPosition())-50;
+  if(dump_speed_set_p->sliderPosition() <= 500) dump_speed_slider_position = (dump_speed_set_p->sliderPosition())/2;      //piece-wise linear, 2 sections//
+  else dump_speed_slider_position = 1.5*(dump_speed_set_p->sliderPosition())-500;
+
+  QString speed_label_string = (QString("Speeds:        H: %1%   L: %2%   D: %3%")
+    .arg(1.0*high_speed_slider_position/10)
+    .arg(1.0*low_speed_slider_position/10)
+    .arg(1.0*dump_speed_slider_position/10));
+  speed_box_p -> setTitle(speed_label_string);  
+  
   /*
   if(screen_endgate==ENDGATE_OPEN)
   {

@@ -13,6 +13,7 @@
 
 class processor;
 class centre;
+//class secondary_processor;  //11_21_2018//
 
 struct slice
 {
@@ -61,45 +62,12 @@ class blob
   void print_display_raster();
   void calculate_characteristics();
   int seeds_in_blob();
-//==============================================================================================================//
-  //TEST Functions for guided overlap algorithm functionality//
-  void kmeans_clustering(int cluster_num); //testing k_means_clustering techniques
-  
-  void silhouette_scoring();      //calculate and scores fitting cluster configuration
-  
-  void overlap_test(int cluster_num);      //cluster assisted overlap algorithm ~~~ Single Cluster
-  void overlap_test_multiple(int cluster_num);      //cluster assisted overlap algorithm ~~~ Multiple Clusters
-      //TEST FUNCTION~~~
-  
-//==============================================================================================================//
-  //FUNCTIONS FOR OVERLAP ALGORITHM//
-  void store_raw_image_rasters();		    //--- if no calibration data found, stores first 50 seeds to a QList	---//
-  void store_rotated_rasters();			    //------------------------------------
-  //void form_rotated_rasters();			  //--- forms rotated rasters from index Qlist ---//	OMIT~~~
-  void print_rotated_rasters(); 		    //--- functions same as print display rasters --- //
-  void remove_similar_rasters();		    //--- compare and remove similar seeds ---//
-  //void raster_comparison();				      //--- compares first 400 rasters to following 50 seeds	---//
-  void raster_comparison(int cluster_num);				      //--TEST~~~~~~
-  bool write_calibration_data_file();	  //--- writes calibration data to file if none exist	---//
-  
-  bool write_diagnostic_data_file(float seed_number_overlap_test, float score, float best_score, float camera_seed_size, 
-                                  float best_fit_size, float variability_score, float larger_area);	                      //	===Generate Diagnostic Data File===	//	//OMIT~~~
-  bool read_calibration_data_file();	  //--- reads calibration to QList for comparing camera images	---//
-  //void resize_calibration_data();		  //--- resizes calibration data matrices to rmax_x_store dimensions ---// OMIT~~~
-  void print_resized_rasters();			    //--- prints resized rasters in 20x20	---//
-  void print_resized_rasters_2(int display_width, int display_height);			//	---display to dynamic display container--//
-  void calculate_threshold_values();	  //--- calculates thresholds and stores into file	---//
-  
-//==============================================================================================================//
   
   processor* processor_p;
   bool remove;//true indicates this blob should be removed
   int area;
   int inflection_count;
-  float max_inflection;
-  int seed_number_overlap_test; 		//	---number of overlapped seeds found using overlap algorithm	---//
-  
-  int cluster_num;  //-------------------------- K-means clustiner//~~~
+  float max_inflection;  
   
   bool took_slice;//true indicates that this blob already took a slice on this line.
   //if a blob gets no slice on a line, it is complete
@@ -112,17 +80,7 @@ class blob
   int width;
   int height;
   
-//==============================================================================================================//
-  char* display_rotated_raster_p; 	    //----------------- raster_image_container-------------------//
-  int index_position; 				          //----------------- rotated raster image storage -------------------/
-  //QList<int> index_list;			        //save raster index values for first 50 seeds~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  QList<float> full_score_list;		      //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  //QList<int> camera_seed; 		        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  QList<int> similar_raster_list;       //list of very similar rasters to be removed
-  //QList<int> raw_image_list;		      //for storing first 50 raw images from image file
-  //QList<int> raw_image_zeroes_list;
-//==============================================================================================================//  
-  
+
   QList<outline_point*> outline_point_list;//holds a list of points tracing the outline of the blob.  Starts with the leftmost point of the bottom line.
   int ol_x, ol_y;
   int ol_angle;//while tracing around the blob, this holds the angle of the last move.
@@ -149,8 +107,42 @@ class blob
   //when line_count in processor reaches finish_line, it will finish this blob by determining number of seeds and deleting.
   //this allows a delay for dust streaks to be detected before the number of seeds is determined.
   long long finish_line;
+
+//==============================================================================================================//  
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+  //TEST Functions for guided overlap algorithm functionality//
+  void kmeans_clustering(int cluster_num); //testing k_means_clustering techniques
   
+  void silhouette_scoring();      //calculate and scores fitting cluster configuration
+  
+  void overlap_test(int cluster_num);      //cluster assisted overlap algorithm ~~~ Single Cluster
+  void overlap_test_multiple(int cluster_num);      //cluster assisted overlap algorithm ~~~ Multiple Clusters
+      //TEST FUNCTION~~~
+  
+//==============================================================================================================//
+  //FUNCTIONS FOR OVERLAP ALGORITHM//
+  void store_raw_image_rasters();		    //--- if no calibration data found, stores first 50 seeds to a QList	---//
+  void store_rotated_rasters();			    //------------------------------------
+  void print_rotated_rasters(); 		    //--- functions same as print display rasters --- //
+  void remove_similar_rasters();		    //--- compare and remove similar seeds ---//
+  //void raster_comparison();				      //--- compares first 400 rasters to following 50 seeds	---//
+  void raster_comparison(int cluster_num);				      //--TEST~~~~~~
+  bool write_calibration_data_file();	  //--- writes calibration data to file if none exist	---//
+  
+  bool write_diagnostic_data_file(float seed_number_overlap_test, float score, float best_score, float camera_seed_size, 
+                                  float best_fit_size, float variability_score, float larger_area);	                      //	===Generate Diagnostic Data File===	//	//OMIT~~~
+  bool read_calibration_data_file();	  //--- reads calibration to QList for comparing camera images	---//
+  //void resize_calibration_data();		  //--- resizes calibration data matrices to rmax_x_store dimensions ---// OMIT~~~
+  void print_resized_rasters();			    //--- prints resized rasters in 20x20	---//
+  void print_resized_rasters_2(int display_width, int display_height);			//	---display to dynamic display container--//
+  void calculate_threshold_values();	  //--- calculates thresholds and stores into file	---//
+  
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//==============================================================================================================//  
   //variables for centroid approximations generated by kmeans_clustering()//
+  int cluster_num;                //K-means clustiner//
+  int seed_number_overlap_test; 	//number of overlapped seeds found using overlap algorithm//
+
   int c1_mean_x, c2_mean_x, c3_mean_x, c4_mean_x;
   int c1_mean_y, c2_mean_y, c3_mean_y, c4_mean_y;
   int c1_x, c2_x, c3_x, c4_x;
@@ -170,44 +162,65 @@ class blob
   int static_x_shift_l1[number_overlaps_to_test];
   
 //==============================================================================================================//
-    //----------------- variables used in rotated image rasters ----------------- //
-  //int rmax_x;				//static container dimensions
-  //int rmax_y;	
-  static const int rmax_x = 20;  //static container dimensions
-  static const int rmax_y = 20;
-  
-  static const int rmax_x_store = 40;			//-----------------------store image rasters into compressed 20x20 matrices
-  static const int rmax_y_store = 40;			//-----------------------
-  float x_scale_factor;							//-----------------------scaling factor to fit full size images to 20x20 images
-  //float y_scale_factor;						//-----------------------
-  //int largest_dimension;						//-----------------------holds the largest seed image width or height in the calibration data set
-  static const float scaling_buffer = 0.20;		//-----------------------% buffer for scaling affect
+
   static const float similar_threshold = 0.10; 	//-----------------------defines threshold for two rasters to be "similar"
   
   //------------- variables used in calculating standard deviation ------------ //
   //float width_mean, height_mean, area_mean;								//-----------------------
   //float std_deviation_width, std_deviation_height, std_deviation_area;	//-----------------------
   
-  double half_width;		//midpoint of seed raster
+//=====================================================================================================================================================================//  
+  //original overlap test variables + functions//
+//----------store_raw_image_rasters----------//  
+  static const int calibration_seed_number = 50;		//number of seeds to be used for calibration data//     //store_raw_image_rasters()//
+  //int largest_dimension;						              //holds the largest seed image width or height in the calibration data set
+  //int number_listed_rasters;          //initialize in constructor + omit global declaration in .cpp//
+  //QList<int> raw_image_list;		      //contains calibration seed raster images//
+  //QList<int> raw_image_zeroes_list;   //contains start+end points of raster images defined by zeroes and seed dimensions//
+  //QList<int> raw_image_size_list;     //contains areas of calibration seeds//
+  
+  
+//----------store_rotated_image_rasters----------//  
+  float x_scale_factor;							//scaling factor to fit full size images to 20x20 images
+  //float y_scale_factor;						//
+  static const float scaling_buffer = 0.20;		  //-----------------------% buffer for scaling affect
+  
+  double half_width;		  //midpoint of seed raster                             //centering image 
   double half_height;
   double start_raster_x;	//start point of raster image in container
   double start_raster_y;  
   double end_raster_x;		//end point of raster image in container
   double end_raster_y;
-  int raster_position_in_container;	//possibly omit
-  //int raster_image_width;
+
+  static const double pi = 3.1415926535897;
+  float theta;
   int raster_container_width;
-  double shifted_x;			//Remap seed raster index into 2D
-  double shifted_y;		//changed from double to int to round Y to whole numbers
-  double unshifted_x;
-  int unshifted_y;		//toggle (rounding error)
+  int raster_position_in_container;	//possibly omit  
+
+    //----------------- variables used in rotated image rasters ----------------- //
+  static const int rmax_x = 20;  //static container dimensions
+  static const int rmax_y = 20;
+  static const int rmax_x_store = 40;			//-store image rasters into compressed 20x20 matrices
+  static const int rmax_y_store = 40;			//
+  double shifted_x;			  //Remap seed raster index into 2D
+  double shifted_y;		    //changed from double to int to round Y to whole numbers
   double rotated_x; 
   double rotated_y;
-  static const double pi = 3.1415926535897;
-  float theta;  
-  //static const int calibration_seed_number = 50;		//------------------------------- used to define the number of seeds to used for calibration data
+  double unshifted_x;
+  int unshifted_y;		 
+  
+  float average_calibration_seed_size;  //remove original declaraction as global variable//
 
-//==============================================================================================================//  
+  
+  char* display_rotated_raster_p; 	    //----------------- raster_image_container-------------------//
+  int index_position; 				          //----------------- rotated raster image storage -------------------/
+  //QList<int> index_list;			        //save raster index values for first 50 seeds~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  QList<float> full_score_list;		      //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  //QList<int> camera_seed; 		        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  QList<int> similar_raster_list;       //list of very similar rasters to be removed
+//=====================================================================================================================================================================//  
+  //moving overlap test to another file and class //11_21_2018//
+
 };
 
 
@@ -231,6 +244,9 @@ class processor : public QObject
   dust_streak dust_streak_list[2048];
   bool dust_streak_present;//true value indicates dust on window.  should be cleaned.
   float dust_streak_percentage();//returns percentage of width in which inflections will not be counted due to dust streaks
+  
+  //secondary_processor* secondary_processor_p; //TEST~~~ //11_21_2018//
+
   
   public slots:
   void set_camera_processing(bool state);
@@ -307,12 +323,13 @@ class processor : public QObject
   int qimage_bottom_line;
   
 //==============================================================================================================//
-  bool calibration_data;	//-----------------------true means calibration data exists in file-------------------//
+  bool calibration_data;	  //-----------------------true means calibration data exists in file-------------------//
   int seed_number_overlap;  //TEST~~~ used to retrieve number of expected seeds in blob
 //==============================================================================================================//
     
   private slots:
   void run();//processes camera images
+  
 };
 
 #endif

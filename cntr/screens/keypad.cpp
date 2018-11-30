@@ -12,27 +12,38 @@ keypad::keypad()
   
   display_p = new QLabel;
   n0_button_p = new QPushButton("0");
-  n0_button_p -> setMaximumWidth(50);
+  //n0_button_p -> setMaximumWidth(50);
+  n0_button_p -> setMinimumSize(50,50);
   n1_button_p = new QPushButton("1");
-  n1_button_p -> setMaximumWidth(50);
+  //n1_button_p -> setMaximumWidth(50);
+  n1_button_p -> setMinimumSize(50,50);
   n2_button_p = new QPushButton("2");
-  n2_button_p -> setMaximumWidth(50);
+  //n2_button_p -> setMaximumWidth(50);
+  n2_button_p -> setMinimumSize(50,50);
   n3_button_p = new QPushButton("3");
-  n3_button_p -> setMaximumWidth(50);
+  //n3_button_p -> setMaximumWidth(50);
+  n3_button_p -> setMinimumSize(50,50);
   n4_button_p = new QPushButton("4");
-  n4_button_p -> setMaximumWidth(50);
+  //n4_button_p -> setMaximumWidth(50);
+  n4_button_p -> setMinimumSize(50,50);
   n5_button_p = new QPushButton("5");
-  n5_button_p -> setMaximumWidth(50);
+  //n5_button_p -> setMaximumWidth(50);
+  n5_button_p -> setMinimumSize(50,50);
   n6_button_p = new QPushButton("6");
-  n6_button_p -> setMaximumWidth(50);
+  //n6_button_p -> setMaximumWidth(50);
+  n6_button_p -> setMinimumSize(50,50);
   n7_button_p = new QPushButton("7");
-  n7_button_p -> setMaximumWidth(50);
+  //n7_button_p -> setMaximumWidth(50);
+  n7_button_p -> setMinimumSize(50,50);
   n8_button_p = new QPushButton("8");
-  n8_button_p -> setMaximumWidth(50);
+  //n8_button_p -> setMaximumWidth(50);
+  n8_button_p -> setMinimumSize(50,50);
   n9_button_p = new QPushButton("9");
-  n9_button_p -> setMaximumWidth(50);
+  //n9_button_p -> setMaximumWidth(50);
+  n9_button_p -> setMinimumSize(50,50);
   enter_button_p = new QPushButton("Enter");
-  enter_button_p -> setMaximumWidth(50);
+  //enter_button_p -> setMaximumWidth(50);
+  enter_button_p -> setMinimumSize(50,50);
   
   layout_p = new QGridLayout;
   layout_p -> addWidget(display_p, 0, 0, 1, 3);
@@ -60,6 +71,8 @@ keypad::keypad()
   connect(n8_button_p, SIGNAL(clicked()), this, SLOT(n8_clicked()));
   connect(n9_button_p, SIGNAL(clicked()), this, SLOT(n9_clicked()));
   connect(enter_button_p, SIGNAL(clicked()), this, SLOT(enter_clicked()));
+  
+  display_p -> setStyleSheet( "font-size: 15pt;");
 }
   
 keypad::~keypad() 

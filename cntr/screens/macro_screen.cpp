@@ -15,14 +15,18 @@
 #include <QDialogButtonBox>
 #include <QDialog>
 #include <QSignalMapper>
-#include <QTabWidget>	//TEST~~~
-  //tableWidget_p->setDisabled(true);//TEST~~~
-  //explore some databases that may be used and spreadsheet programs, may need to include more features 
-  //such as moving to or creating another sheet/file
+#include <QTabWidget>
+
 #include <fcntl.h>	//library used to use system call command "open()" used to check available serial
 #include <unistd.h>	//library to enable write() function
 
+#include <QtGui>  //included to implement delay in serial output//
+#include <QTime>  //
+  //explore some databases that may be used and spreadsheet programs, may need to include more features 
+  //such as moving to or creating another sheet/file
 
+//#include <QSize>      //OMIT~~~
+//#include <QCheckBox>  //OMIT~~~
 
 using namespace std;
 
@@ -48,8 +52,9 @@ macro_screen::macro_screen(centre*set_centre_p)
   tableWidget_label_p = new QLabel("Keyboard Output Macro(s)");
   
   tableWidget_p->setColumnWidth(1, 50);
-  tableWidget_p->setColumnWidth(3, 300);		//change width of macro column if hiding function column
-  //tableWidget_p->setColumnHidden(2, true);	//hide macro name column
+  tableWidget_p->setColumnWidth(2,200);
+  tableWidget_p->setColumnWidth(3, 355);		//change width of macro column if hiding function column
+  tableWidget_p->setColumnHidden(4, true);	//hide macro name column
   
   main_layout_p = new QGridLayout;
   main_layout_p->addWidget(screen_title_label_p, 0, 0);
@@ -72,14 +77,13 @@ macro_screen::macro_screen(centre*set_centre_p)
   screen_title_label_p->setStyleSheet("QLabel { font: bold }");
   
   initialize_macro_menu();
-  load_macro_table();
-  check_serial_connection();	//checks connection with serial communication line
+
+  load_macro_table();  
+  check_serial_connection();	//checks connection with serial communication line//
   
-  //tableWidget_p->setDisabled(true);
-  
-  //on_off_button = new  QPushButton(tr("ON"));     //TEST~~~
-  //connect(on_off_button, SIGNAL(clicked()), this, SLOT(on_off_button_clicked(int, int))); //TEST~~~
-  //connect(on_off_button, SIGNAL(clicked()), this, SLOT(on_off_button_clicked(1,1))); //TEST~~~
+  //tableWidget_p->setDisabled(true);  
+  tableWidget_p->setStyleSheet("QTableWidget { font: 15pt;}");
+  tableWidget_p->verticalHeader()->setDefaultSectionSize(45);
 }
 
 void macro_screen::check_serial_connection()
@@ -135,8 +139,18 @@ void macro_screen::disable_all_clicked()
     if(tableWidget_p->item(j, 0)->checkState())
     {
       tableWidget_p->item(j, 0)->setCheckState ( Qt::Unchecked );
-	}
-	store_macro_table();
+
+      QLabel *on_off_label_p = new QLabel("OFF");
+      tableWidget_p->setCellWidget (j, 0, on_off_label_p);
+      on_off_label_p->setAlignment(Qt::AlignCenter);
+                                    
+      tableWidget_p->item(j,0)->setBackground(QColor(255, 255, 255));
+      tableWidget_p->item(j,1)->setBackground(QColor(255, 255, 255));
+      tableWidget_p->item(j,2)->setBackground(QColor(255, 255, 255));
+      tableWidget_p->item(j,3)->setBackground(QColor(255, 255, 255));
+      tableWidget_p->item(j,4)->setBackground(QColor(255, 255, 255));
+    }
+    store_macro_table();
   }
 }
 
@@ -148,8 +162,18 @@ void macro_screen::enable_all_clicked()
     if(!tableWidget_p->item(j, 0)->checkState())
     {
       tableWidget_p->item(j, 0)->setCheckState ( Qt::Checked );
-	}
-	store_macro_table();
+      
+      QLabel *on_off_label_p = new QLabel("ON");
+      tableWidget_p->setCellWidget (j, 0, on_off_label_p);
+      on_off_label_p->setAlignment(Qt::AlignCenter);
+                                    
+      tableWidget_p->item(j,0)->setBackground(QColor(154, 229, 154));
+      tableWidget_p->item(j,1)->setBackground(QColor(154, 229, 154));
+      tableWidget_p->item(j,2)->setBackground(QColor(154, 229, 154));
+      tableWidget_p->item(j,3)->setBackground(QColor(154, 229, 154));
+      tableWidget_p->item(j,4)->setBackground(QColor(154, 229, 154));
+    }
+    store_macro_table();
   }
 }
 
@@ -213,14 +237,13 @@ void macro_screen::help_button_clicked()
 //modified to handle barcodes as characters instead of integers// 11_02_2018~~~//
 void macro_screen::usb_serial_out(QString bar_str_1, QString bar_str_2, QString bar_str_3, QString bar_str_4, QString totalize_count_str, QString weight_str)
 {
-  cout<<endl<<"USB2SERIAL QStringVariant"<<endl;  //OMIT~~~
-  
-  cout<<"bar_1: "<<bar_str_1.toUtf8().constData();          //OMIT~~~
-  cout<<"\tbar_2: "<<bar_str_2.toUtf8().constData();        //
-  cout<<"\tbar_3: "<<bar_str_3.toUtf8().constData();        //
-  cout<<"\tbar_4: "<<bar_str_4.toUtf8().constData()<<endl;  //
+  cout<<endl<<"USB2SERIAL QStringVariant"<<endl;                                        //OMIT~~~
+  cout<<"bar_1: "<<bar_str_1.toUtf8().constData();                                      //OMIT~~~
+  cout<<"\tbar_2: "<<bar_str_2.toUtf8().constData();                                    //
+  cout<<"\tbar_3: "<<bar_str_3.toUtf8().constData();                                    //
+  cout<<"\tbar_4: "<<bar_str_4.toUtf8().constData()<<endl;                              //
   cout<<endl<<"totalize_str_count: "<<totalize_count_str.toUtf8().constData()<<endl;    //
-  cout<<endl<<"totalize_str_weight: "<<weight_str.toUtf8().constData()<<endl;  //
+  cout<<endl<<"totalize_str_weight: "<<weight_str.toUtf8().constData()<<endl;           //
   //----------------------------------------------------------------------------------------//
   
   bool macro_status_bool;			      //temporary variable to transfer ifstream to tablewidget
@@ -306,28 +329,61 @@ void macro_screen::usb_serial_out(QString bar_str_1, QString bar_str_2, QString 
   //int filedesc = open("/dev/usb2serial", O_WRONLY);
   int filedesc = open("/dev/ttyUSB0", O_WRONLY);  //if udev rules are not applied//
   //write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros) != size_string_macros;
-  cout<<endl<<"serial string buffer length: "<<write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros)<<endl;
+  //cout<<endl<<"serial string buffer length: "<<write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros)<<endl;
+//--------------------------------------------------------------------------------------------------------------------------------------------//
+  //serial terminal write function with slight delay between commands//
+  int write_output = 0;         //TEST~~~
+  QString current_char_string;  //TEST~~~
+  
+  for(int xy = 0; xy< size_string_macros; ++xy)
+  {
+    if(combined_macro_functions.at(xy) == '\\')
+    {
+      QTime dieTime= QTime::currentTime().addMSecs(250);
+      while (QTime::currentTime() < dieTime)
+      {
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+      }
+      ++xy;
+      if(combined_macro_functions.at(xy) == 'Q')
+      {
+        QTime dieTime= QTime::currentTime().addMSecs(350);
+        while (QTime::currentTime() < dieTime)
+        {
+          QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+        }
+      }
+      current_char_string = '\\' + combined_macro_functions.at(xy);
+      write_output = write(filedesc, current_char_string.toUtf8().constData(), 2);
+    }
+    else
+    {
+      current_char_string = combined_macro_functions.at(xy);
+      write_output = write(filedesc, current_char_string.toUtf8().constData(), 2);
+    }
+  }
+  cout<<current_char_string.toUtf8().constData();  //OMIT~~~
+  cout<<write_output<<endl; //TEST~~~
 //--------------------------------------------------------------------------------------------------------------------------------------------//
 }
 
 void macro_screen::usb_serial_out(QString lotcode_str, QString packcode_str, QString batch_count_str, QString substitution_str, QString dump_count_str)
 {
-  cout<<endl<<"QString Variant BATCHMODE"<<endl;  //OMIT~~~//
-  
+  cout<<endl<<"QString Variant BATCHMODE"<<endl;                         //OMIT~~~//
   cout<<"lotcode: "<<lotcode_str.toUtf8().constData();                   //OMIT~~~
   cout<<endl<<"packcode: "<<packcode_str.toUtf8().constData();           //
   cout<<endl<<"batch count: "<<batch_count_str.toUtf8().constData();     //
   cout<<endl<<"substitution: "<<substitution_str.toUtf8().constData();   //
   cout<<endl<<"dump count: "<<dump_count_str.toUtf8().constData();       //
   cout<<endl<<endl;                                                      //
-  
+//----------------------------------------------------------------------------------------//
+    
   bool macro_status_bool;			      //temporary variable to transfer ifstream to tablewidget
   int macro_numb_int;				        //
-  char macro_name_char[30];			    //
-  char macro_mask_char[30];			    //
-  char macro_function_char[30];		  //
+  char macro_name_char[300];			  //
+  char macro_mask_char[300];			  //
+  char macro_function_char[300];		//
  
-  //QString combined_macro_functions;	//new char to combine all macros 
   QString macro_string;
   QString combined_macro_functions;
   QString count_string;
@@ -335,7 +391,7 @@ void macro_screen::usb_serial_out(QString lotcode_str, QString packcode_str, QSt
         
   {
     ifstream macros("macro_table");
-    for(int i=0; i<10; ++i)		  //searches all 10 macros available
+    for(int i=0; i<10; ++i)
     {
 	    macros>>macro_status_bool;
 	    macros>>macro_numb_int;
@@ -366,10 +422,10 @@ void macro_screen::usb_serial_out(QString lotcode_str, QString packcode_str, QSt
 	          {
 			        macro_string = macro_string + dump_count_str;
 	          }
-            else if(macro_function_char[j+1] == '1') {}		//Barcodes
-	          else if(macro_function_char[j+1] == '2') {}
-	          else if(macro_function_char[j+1] == '3') {}
-	          else if(macro_function_char[j+1] == '4') {}
+            //else if(macro_function_char[j+1] == '1') {}		//Barcodes
+	          //else if(macro_function_char[j+1] == '2') {}
+	          //else if(macro_function_char[j+1] == '3') {}
+	          //else if(macro_function_char[j+1] == '4') {}
 	          else
 	          {
 			        macro_string = macro_string + macro_function_char[j] + macro_function_char[j+1];
@@ -386,17 +442,50 @@ void macro_screen::usb_serial_out(QString lotcode_str, QString packcode_str, QSt
     }
     cout<<endl<<combined_macro_functions.toUtf8().constData()<<endl;  //OMIT~~~
     macros.close();
-  }
-  //cout<<"Macros loaded"<<endl;  //OMIT~~~
-  
+  }  
 //--------------------------------------------------------------OUTPUT TO SERIAL--------------------------------------------------------------//
+  //cout<<"Macros loaded"<<endl;  //OMIT~~~
   int size_string_macros = combined_macro_functions.size();
   //int filedesc = open("/dev/usb2serial", O_WRONLY);
   int filedesc = open("/dev/ttyUSB0", O_WRONLY);  //if udev rules are not applied//
   //write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros) != size_string_macros;
   //write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros);
-  cout<<endl<<"serial string buffer length: "<<write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros)<<endl;
-//--------------------------------------------------------------------------------------------------------------------------------------------// 
+  //cout<<endl<<"serial string buffer length: "<<write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros)<<endl; //ORIGINAL~~~
+//--------------------------------------------------------------------------------------------------------------------------------------------//
+  //serial terminal write function with slight delay between commands//
+  int write_output = 0; //TEST~~~
+  QString current_char_string;
+  
+  for(int xy = 0; xy< size_string_macros; ++xy)
+  {
+    if(combined_macro_functions.at(xy) == '\\')
+    {
+      QTime dieTime= QTime::currentTime().addMSecs(250);
+      while (QTime::currentTime() < dieTime)
+      {
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+      }
+      ++xy;
+      if(combined_macro_functions.at(xy) == 'Q')
+      {
+        QTime dieTime= QTime::currentTime().addMSecs(350);
+        while (QTime::currentTime() < dieTime)
+        {
+          QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+        }
+      }
+      current_char_string = '\\' + combined_macro_functions.at(xy);
+      write_output = write(filedesc, current_char_string.toUtf8().constData(), 2);
+    }
+    else
+    {
+      current_char_string = combined_macro_functions.at(xy);
+      write_output = write(filedesc, current_char_string.toUtf8().constData(), 2);
+    }
+  }
+  //cout<<current_char_string.toUtf8().constData();  //OMIT~~~
+  cout<<write_output<<endl; //TEST~~~
+//--------------------------------------------------------------------------------------------------------------------------------------------//
 }
 
 void macro_screen::initialize_macro_menu()
@@ -409,18 +498,13 @@ void macro_screen::initialize_macro_menu()
       item->setText("");
       item->setTextAlignment (Qt::AlignCenter);
       tableWidget_p->setItem(i, j, item);
-      
-      //tableWidget_p->setStyleSheet("margin-left:50%; margin-right:50%;");
-      
+            
       if(j==0)
       {
         tableWidget_p->item(i, 0)->setCheckState ( Qt::Unchecked );
-        
-        //QPushButton *on_off_button = new  QPushButton(tr("ON"), this);
-        //connect(on_off_button, SIGNAL(clicked()), this, SLOT(on_off_button_clicked(tableWidget_p->currentRow(),tableWidget_p->currentColumn()))); //TEST~~~
-        //connect(on_off_button, SIGNAL(clicked()), this, SLOT(on_off_button_clicked(1,1))); //TEST~~~
-        
-        //tableWidget_p->setCellWidget (i, j, on_off_button); //TEST~~~
+        QLabel *on_off_label_p = new QLabel("OFF");
+        tableWidget_p->setCellWidget (i, j, on_off_label_p);
+        on_off_label_p->setAlignment(Qt::AlignCenter);
       }
       if(j==1)
       {
@@ -438,21 +522,11 @@ void macro_screen::initialize_macro_menu()
       {
         tableWidget_p->item(i, 4)->setText(QString("-"));
       }
-      /*if(j==5)
-      {
-        tableWidget_p->item(i, 5)->setText(QString("-"));
-        
-      }*/
     }
   }
   //QTableView class, considering hiding actual function code
   //hideRow(), hideColumn(), showRow(), and showColumn()
-}
- 
-void macro_screen::on_off_button_clicked(int current_row, int current_column)
-{
-  cout<<"row: "<<current_row<<endl<<"\tcolumn: "<<current_column<<endl;
-  
+  //tableWidget_p->setColumnWidth(0, (tableWidget_p->item(0, 0)->sizeHint()).width());  //TEST~~~    
 }
  
 void macro_screen::load_macro_table()
@@ -478,14 +552,55 @@ void macro_screen::load_macro_table()
       if(temp_state == 0)
       {
         tableWidget_p->item(i, 0)->setCheckState ( Qt::Unchecked );
+        QLabel *on_off_label_p = new QLabel("OFF");
+        tableWidget_p->setCellWidget (i, 0, on_off_label_p);
+        on_off_label_p->setAlignment(Qt::AlignCenter);
+
+        tableWidget_p->item(i,0)->setBackground(QColor(255, 255, 255));
+        tableWidget_p->item(i,1)->setBackground(QColor(255, 255, 255));
+        tableWidget_p->item(i,2)->setBackground(QColor(255, 255, 255));
+        tableWidget_p->item(i,3)->setBackground(QColor(255, 255, 255));
+        tableWidget_p->item(i,4)->setBackground(QColor(255, 255, 255));
       }
       else
       {
         tableWidget_p->item(i, 0)->setCheckState ( Qt::Checked );
+        QLabel *on_off_label_p = new QLabel("ON");
+        tableWidget_p->setCellWidget (i, 0, on_off_label_p);
+        on_off_label_p->setAlignment(Qt::AlignCenter);
+                                      
+        tableWidget_p->item(i,0)->setBackground(QColor(154, 229, 154));
+        tableWidget_p->item(i,1)->setBackground(QColor(154, 229, 154));
+        tableWidget_p->item(i,2)->setBackground(QColor(154, 229, 154));
+        tableWidget_p->item(i,3)->setBackground(QColor(154, 229, 154));
+        tableWidget_p->item(i,4)->setBackground(QColor(154, 229, 154));
       }
       tableWidget_p->item(i, 1)->setText(QString("%1").arg(temp_num));
+      
+      if(QString(temp_name) == "-")
+      {
+        QLabel *placement_holder_text_label = new QLabel(this);
+        placement_holder_text_label->setText("< Click to edit name >");
+        tableWidget_p->setCellWidget (i, 2, placement_holder_text_label);
+        placement_holder_text_label->setAlignment(Qt::AlignCenter);
+        placement_holder_text_label->setStyleSheet("font: italic; color: grey; background-color: white;");
+      }
+      else if(QString(temp_name).contains("_"))                                     //TEST~~~ 11_19_2018//
+      {                                                                             //TEST~~~
+        for(int mn = 0; mn<300; ++mn) if(temp_name[mn] == '_') temp_name[mn] = ' '; //TEST~~~
+      }                                                                             //TEST~~~
+      
       tableWidget_p->item(i, 2)->setText(temp_name);
       tableWidget_p->item(i, 3)->setText(temp_mask);
+        
+      if(QString(temp_mask) == "-")
+      {
+        QLabel *placement_holder_text_label = new QLabel(this);
+        placement_holder_text_label->setText("< Click to edit/create macro >");
+        tableWidget_p->setCellWidget (i, 3, placement_holder_text_label);
+        placement_holder_text_label->setAlignment(Qt::AlignCenter);
+        placement_holder_text_label->setStyleSheet("font: italic; color: grey; background-color: white;");
+      }
       tableWidget_p->item(i, 4)->setText(temp_func);
       if(macros.eof()) break;
     }
@@ -507,49 +622,67 @@ void macro_screen::store_macro_table()
     {
       macros<<0<<" ";
     }
-    macros<<i+1;																     //macro number
-    macros<<endl<<(tableWidget_p->item(i, 2)->text()).toUtf8().constData();		//macro name
+    macros<<i+1;																                              //macro number
+    
+    QString macro_temp_name_str = (tableWidget_p->item(i, 2)->text().toUtf8().constData());
+    if(macro_temp_name_str.contains(" "))
+    {
+      macro_temp_name_str.replace(QString(" "), QString("_"));
+      macros<<endl<<macro_temp_name_str.toLatin1().constData();
+    }
+    else macros<<endl<<(tableWidget_p->item(i, 2)->text()).toUtf8().constData();		//macro name  //TEST~~~//
+    
+    
+    //macros<<endl<<(tableWidget_p->item(i, 2)->text()).toUtf8().constData();		//macro name  //ORIGINAL~~~//
     macros<<endl<<(tableWidget_p->item(i, 3)->text()).toUtf8().constData();		//macro mask
     macros<<endl<<(tableWidget_p->item(i, 4)->text()).toUtf8().constData();		//macro function
   }
   macros.close();
   macros.clear();
-  
   centre_p->tm_macro_updated = false;
 }
 
 void macro_screen::cellSelected(int nRow, int nCol)	
 {
-  cout<<endl<<"Row: "<<nRow<<"	Column: "<<nCol;	//OMIT~~~
+  cout<<endl<<"Row: "<<nRow<<"	Column: "<<nCol;	//OMIT~~~//
   if(nCol == 0)
   {
     if(tableWidget_p->item(nRow, nCol)->checkState())
     {
       tableWidget_p->item(nRow, 0)->setCheckState ( Qt::Unchecked );
       store_macro_table();
+      
+      QLabel *on_off_label_p = new QLabel("OFF");
+      tableWidget_p->setCellWidget (nRow, nCol, on_off_label_p);
+      on_off_label_p->setAlignment(Qt::AlignCenter);
+                                    
+      tableWidget_p->item(nRow,0)->setBackground(QColor(255, 255, 255));
+      tableWidget_p->item(nRow,1)->setBackground(QColor(255, 255, 255));
+      tableWidget_p->item(nRow,2)->setBackground(QColor(255, 255, 255));
+      tableWidget_p->item(nRow,3)->setBackground(QColor(255, 255, 255));
+      tableWidget_p->item(nRow,4)->setBackground(QColor(255, 255, 255));
     }
     else
     {
       tableWidget_p->item(nRow, 0)->setCheckState ( Qt::Checked );
       store_macro_table();
+      
+      QLabel *on_off_label_p = new QLabel("ON");
+      tableWidget_p->setCellWidget (nRow, nCol, on_off_label_p);
+      on_off_label_p->setAlignment(Qt::AlignCenter);
+                                    
+      tableWidget_p->item(nRow,0)->setBackground(QColor(154, 229, 154));
+      tableWidget_p->item(nRow,1)->setBackground(QColor(154, 229, 154));
+      tableWidget_p->item(nRow,2)->setBackground(QColor(154, 229, 154));
+      tableWidget_p->item(nRow,3)->setBackground(QColor(154, 229, 154));
+      tableWidget_p->item(nRow,4)->setBackground(QColor(154, 229, 154));
     }
   }
   else if(nCol == 2)
   { 
-    bool ok;
-    QString text = QInputDialog::getMultiLineText(this, tr("macro-name"),
-                                                  tr("Enter name for macro:"),
-                                                  "macro name", &ok);
-    if (ok && !text.isEmpty())
-    {
-      tableWidget_p->item(nRow, 2)->setText(text);
-      store_macro_table();
-    }
-    else if(!ok) {}
-    else
-    {
-      tableWidget_p->item(nRow, 2)->setText("-");
-    }
+    centre_p -> macro_name_cell(nRow, nCol);
+    centre_p -> add_waiting_screen(27);
+	  centre_p -> screen_done=true;
   }
   else if(nCol == 3)
   {    
@@ -557,6 +690,9 @@ void macro_screen::cellSelected(int nRow, int nCol)
     macro_function_string.append("-");
 	
     QDialog dialog(this);
+    dialog.setMaximumSize(800, 360);      //defines size macro builder pop-up window//
+    dialog.setGeometry(0, 0, 800, 360);   //defines starting position and dimensions//
+    
     QFormLayout form(&dialog);
     dialog.setWindowTitle("Macro Builder");
 	
@@ -566,7 +702,7 @@ void macro_screen::cellSelected(int nRow, int nCol)
     lineEdit->setPlaceholderText("Click buttons to add preloaded values or type custom text here.");
     lineEdit->setAlignment(Qt::AlignCenter);
     lineEdit->setFixedWidth(650);
-    lineEdit->setFixedHeight(80);
+    lineEdit->setFixedHeight(50);
 	
     if(!tableWidget_p->item(nRow,3)->text().startsWith("-"))
     {
@@ -583,7 +719,7 @@ void macro_screen::cellSelected(int nRow, int nCol)
     QPushButton *barcode_button4 = new QPushButton(tr("Barcode 4"), this);
     QPushButton *weight_button = new QPushButton(tr("Weight"), this);		      //yet to be implemented
     QPushButton *lotcode_button = new QPushButton(tr("Lot Code"), this);
-    QPushButton *packcode_button = new QPushButton(tr("Pack Code"), this);	
+    QPushButton *packcode_button = new QPushButton(tr("Pack Code"), this);
     QPushButton *substitution_button = new QPushButton(tr("Substitution"), this);
     QPushButton *dump_count_button = new QPushButton(tr("Dump Count"), this);
     QPushButton *newline = new QPushButton(tr("Enter ↵"), this);
@@ -616,7 +752,8 @@ void macro_screen::cellSelected(int nRow, int nCol)
     arrow_left->setFixedSize(macro_button_width,macro_button_height);
     arrow_right->setFixedSize(macro_button_width,macro_button_height);
     clear_entry->setFixedSize(2*macro_button_width+6,macro_button_height);
-    remove_last->setFixedHeight(macro_button_height+35);
+    remove_last->setFixedHeight(macro_button_height+35);  //ORIGINAL~~~
+    remove_last->setFixedHeight(macro_button_height);     //TEST~~~
 	
     QHBoxLayout *input_line_modify = new QHBoxLayout;
     input_line_modify->addWidget(lineEdit);
@@ -672,7 +809,7 @@ void macro_screen::cellSelected(int nRow, int nCol)
     batchcodes->addWidget(lotcode_button);
     batchcodes->addWidget(packcode_button);
     batchcodes->addWidget(substitution_button);	//yet to be implemented
-    batchcodes->addWidget(dump_count_button);	  //yet to be implemented
+    batchcodes->addWidget(dump_count_button);
     
     batchmode_button_box->setLayout(batchcodes);
     batchmode_button_box->show();
@@ -717,7 +854,7 @@ void macro_screen::cellSelected(int nRow, int nCol)
 											 "border-radius: 4px;"
 											 "background-color: transparent;}");
 //==================================================================================================================//
-    QHBoxLayout *macro_menu_main_horizontal = new QHBoxLayout;			//all tabs side by side 
+    QHBoxLayout *macro_menu_main_horizontal = new QHBoxLayout;
     macro_menu_main_horizontal->addWidget(totalize_box);
     macro_menu_main_horizontal->addWidget(batchmode_button_box);
     macro_menu_main_horizontal->addWidget(accessibility_button_box);
@@ -775,10 +912,69 @@ void macro_screen::cellSelected(int nRow, int nCol)
     QObject::connect(&buttonBox, SIGNAL(rejected()), &dialog, SLOT(reject()));
     form.addRow(&buttonBox);
     
-    buttonBox.button(QDialogButtonBox::Save)->setStyleSheet("QPushButton { font: bold;}");
-    buttonBox.button(QDialogButtonBox::Cancel)->setStyleSheet("QPushButton { font: bold;}");
+    //buttonBox.button(QDialogButtonBox::Save)->setStyleSheet("QPushButton { font: bold;}");
+    //buttonBox.button(QDialogButtonBox::Cancel)->setStyleSheet("QPushButton { font: bold;}");
     buttonBox.button(QDialogButtonBox::Save)->setFixedSize(macro_button_width-20, macro_button_height);
     buttonBox.button(QDialogButtonBox::Cancel)->setFixedSize(macro_button_width-20, macro_button_height);
+    
+    //=============================================================//
+    //Style sheet specific for macro builder screen//
+      setStyleSheet(
+        "QPushButton {"
+            "border: 2px solid #8f8f91;"
+            "height: 25px;"
+            "font: 16px;"
+            "border-radius: 8px;"
+            "background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
+            "stop: 0 #f6f7fa, stop: 1 #dadbde);}"
+
+        "QLineEdit {"
+            "font-size: 14pt;}"
+        
+        "QTabWidget {"                    //macro-screen//
+            "font-size: 13pt;}"
+
+        "QTableView {"
+            "font-size: 13pt;"
+            "border: 2px solid #8f8f91;}"
+            
+        "QLabel {"
+            "font-size: 13pt;}"
+          
+    //==================================================================//            
+        "QScrollBar {"
+            "width: 60px;"
+            "border: 1px solid #404040;"
+            "background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
+            "stop: 0 #f6f7fa, stop: 1 #dadbde);}"
+        
+        "QScrollBar::handle {"
+            "border: 3px solid #595959;"
+              "min-height: 40px;"
+            "border-radius: 12px;"
+            "background: white;}"
+      
+        "QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {"
+            "width: 0;"
+            "height: 0;"
+            "border: none;"
+            "background: none;"
+            "color: none;}"
+        
+        "QScrollBar::add-line:vertical {"
+            "width: 0;"
+            "height: 0;"      
+            "border: none;"
+            "background: none;}"
+
+        "QScrollBar::sub-line:vertical {"
+            "width: 0;"
+            "height: 0;"
+            "border: none;"
+            "background: none;}"
+      );
+    
+    //=============================================================//
     
     if (dialog.exec() == QDialog::Accepted)
     {
@@ -787,6 +983,18 @@ void macro_screen::cellSelected(int nRow, int nCol)
         lineEdit->setText("-");
         macro_function_string.clear();
         macro_function_string.append("-");
+        
+        QLabel *placement_holder_text_label = new QLabel(this);                                            //TEST~~~
+        placement_holder_text_label->setText("< Click to edit/create macro >");                            //TEST~~~
+        tableWidget_p->setCellWidget (nRow, nCol, placement_holder_text_label);                            //TEST~~~
+        placement_holder_text_label->setAlignment(Qt::AlignCenter);                                        //TEST~~~
+        placement_holder_text_label->setStyleSheet("font: italic; color: grey; background-color: white;"); //TEST~~~       
+      }
+      else
+      {
+        QLabel *placement_holder_text_label = new QLabel(this);                   //TEST~~~
+        placement_holder_text_label->setText("");                                 //TEST~~~
+        tableWidget_p->setCellWidget (nRow, nCol, placement_holder_text_label);   //TEST~~~ 
       }
       if(macro_function_string.startsWith("-") && lineEdit->text().size() > 1)
       {
