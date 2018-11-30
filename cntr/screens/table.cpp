@@ -99,11 +99,6 @@ void table::keyPressEvent(QKeyEvent* event)
       ++model_column;
     }
     
-    //centre_p->totalize_barcode_1 = model_p->index(model_row, 0);	//OMIT~~~
-    //centre_p->totalize_barcode_2 = model_p->index(model_row, 1);	//OMIT~~~
-    //centre_p->totalize_barcode_3 = model_p->index(model_row, 2);	//OMIT~~~
-    //centre_p->totalize_barcode_4 = model_p->index(model_row, 3);	//OMIT~~~
-    
     QModelIndex next_index = model_p->index(model_row, model_column);
     setCurrentIndex(next_index);
     resizeColumnsToContents();

@@ -4,11 +4,12 @@
 #include "batch_table.hpp"
 #include "centre.hpp"
 #include "batch_mode_driver.hpp"
-#include "gpio_keyboard.hpp"	//TEST~~~ interfacing gpio_keyboard output, connect properly to "centre.cpp/hpp"
 #include "macro_screen.hpp"
 
-#include <QTextEdit>
 #include <QLabel>
+#include <QTextEdit>  //ORIGINAL~~~
+#include <QLineEdit>  //TEST~~~
+
 
 class button;
 class QGridLayout;
@@ -21,7 +22,8 @@ class QFileDialog;
 //class batch_mode_driver;
 class message_box;
 
-class barcode_line : public QTextEdit
+//class barcode_line : public QTextEdit   //ORIGINAL~~~
+class barcode_line : public QLineEdit     //TEST~~~
 {
   Q_OBJECT
   
@@ -87,12 +89,11 @@ class batch : public screen
   QGroupBox* control_box_p;
   QGroupBox* speed_box_p;
   QGroupBox* bottom_box_p;
-  
+    
   QGridLayout* top_layout_p;
   QGridLayout* control_layout_p;
   QGridLayout* speed_layout_p;
   QGridLayout* bottom_layout_p;
-  
   QGridLayout* main_layout_p;
   
   bool feeder_is_running;
@@ -119,8 +120,7 @@ class batch : public screen
   bool dump_flag;//true -> dumping
   barcode_entry_mode old_barcode_mode;
   
-  gpio_keyboard* gpio_keyboard_p;	//OMIT~~~
-  macro_screen* macro_screen_p;		//TEST~~~
+  macro_screen* macro_screen_p;
   QString count_string;				//seed count access from gpio_keyboard
   QTimer* run_timer_p;
 };

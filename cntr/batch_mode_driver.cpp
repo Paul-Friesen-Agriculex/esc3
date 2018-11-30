@@ -810,18 +810,27 @@ void batch_mode_driver::run()
 }
 void batch_mode_driver::set_high_feed_speed(int speed_s) 
 {
+  if(speed_s <= 500) speed_s = speed_s/2;         //~~~piece-wise linear, 2 parts~~~//
+  else speed_s = 1.5*speed_s-500;                 //
+  
   high_feed_speed = speed_s;
   centre_p->crops[0].high_feed_speed = speed_s;
 }
 
 void batch_mode_driver::set_low_feed_speed(int speed_s) 
 {
+  if(speed_s <= 500) speed_s = speed_s/2;         //~~~piece-wise linear, 2 parts~~~//
+  else speed_s = 1.5*speed_s-500;                 //
+  
   low_feed_speed = speed_s;
   centre_p->crops[0].low_feed_speed = speed_s;
 }
 
 void batch_mode_driver::set_dump_feed_speed(int speed_s) 
 {
+  if(speed_s <= 500) speed_s = speed_s/2;         //~~~piece-wise linear, 2 parts~~~//
+  else speed_s = 1.5*speed_s-500;                 //
+  
   dump_speed = speed_s;
   centre_p->crops[0].dump_speed = speed_s;
 }

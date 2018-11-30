@@ -6,6 +6,7 @@
 #include <QMetaType>
 #include <QThread>
 #include <QTextStream>
+#include <QList>  //add for modifying specific position in file// 11_14_2018
 #include <time.h>
 
 #include "centre.hpp"
@@ -184,6 +185,7 @@ centre::centre():
   
   diagnostics_console_p = new diagnostics_console(this);
   diagnostics_console_p -> show();
+
   connect(processor_p, SIGNAL(send_message(QString)), diagnostics_console_p, SLOT(receive_message1(QString)));
   connect(batch_mode_driver_p, SIGNAL(send_message2(QString)), diagnostics_console_p, SLOT(receive_message2(QString)));
   connect(batch_mode_driver_p, SIGNAL(send_message_time_to_end(QString)), diagnostics_console_p, SLOT(receive_message3(QString)));
@@ -427,8 +429,8 @@ void centre::run()
 //      case : screen_p=new (this); break;
 //      case : screen_p=new (this); break;
 //      case : screen_p=new (this); break;
-//      case : screen_p=new (this); break;
-      case 28: screen_p=new macro_screen(this); break;	//TEST~~~ macro_menu
+      case 27: screen_p=new macro_name_entry(this);  break;    //TEST~~~ 11_13_2018//
+      case 28: screen_p=new macro_screen(this); break;	    //TEST~~~ macro_menu
 //      case : screen_p=new (this); break;
 //      case : screen_p=new (this); break;
       default: screen_p=new start_screen(this);
@@ -692,36 +694,181 @@ screen::screen(centre* set_centre_p)
         "border-radius: 12px;"
         "background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
         "stop: 0 #f6f7fa, stop: 1 #dadbde);"
-        "min-width: 80px;}"
-    
+        "min-width: 40px;}"
+        
+    /*"QPushButton {"
+        "font-size: 13pt;}"*/
+        
     "QPushButton {"
         "border: 2px solid #8f8f91;"
-        "height: 50px;"
-        "font: 20px;"
-        "border-radius: 12px;"
+        //"height: 25px;"
+        "font: 16px;"
+        "border-radius: 8px;"
         "background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
-        "stop: 0 #f6f7fa, stop: 1 #dadbde);"
-        "min-width: 80px;}"
+        "stop: 0 #f6f7fa, stop: 1 #dadbde);}"
                                   
     ".QSlider::groove:horizontal {"
         "border:none;"
         "margin-top: 10px;"
         "margin-bottom: 10px;"
-        "height: 10px;}"
+        //"min-width: 140px;" //TEST~~~
+        "height: 5px;}"
     
     ".QSlider::sub-page {"
         "background: #009900;}"
 
     ".QSlider::add-page {"
-        "background: rgb(70, 70, 70);}"
+        "background: #8c8c8c;}"
 
     ".QSlider::handle {"
-        "background: e1e8a7;"
-        "border: 3px solid #8f8f91;"
+        //"background: e1e8a7;"
+        "background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
+        "stop: 0 #f6f7fa, stop: 1 #dadbde);"
+        "border: 3px solid #404040;"  //TEST~~~
+        //"border: 3px solid black;"
         "width: 60px;"
-        "margin: -30px 0;}"
+        "margin: -13px 0;"
+        "border-radius: 15px;}"
+        
+    "QGridLayout {"
+        "padding: 0px;"
+        "margin: 0px;"
+        "border: 0px;"
+        "max-height: 480px;}"
+    
+    /*"QTableWidget {"                    //macro-screen//
+        "font-size: 13pt;}"*/
+
+    "QTabWidget {"                    //macro-screen//
+        "font-size: 13pt;}"
+        
+    "QHeaderView {"
+        "font-size: 13pt;}"
+        
+    "QTableView {"
+        "font-size: 13pt;"
+        "border: 2px solid #8f8f91;}"
+        
+    "QScrollBar {"
+        "width: 60px;"
+        "border: 1px solid #404040;"
+        //"border: 3px solid white;"
+        //"border: 3px solid #595959;"
+        "background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
+        "stop: 0 #f6f7fa, stop: 1 #dadbde);}"
+        
+    "QScrollBar::handle {"
+        //"border: 3px solid black;"
+        "border: 3px solid #595959;"
+        "min-height: 40px;"
+        "border-radius: 12px;"
+        "background: white;"
+        /*"margin-top: 64px;"
+        "margin-bottom: 64px;*/"}"
+      
+    "QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {"
+        "width: 0;"
+        "height: 0;"
+        "border: none;"
+        "background: none;"
+        "color: none;}"
+        
+    "QScrollBar::add-line:vertical {"
+        "width: 0;"
+        "height: 0;"      
+        "border: none;"
+        "background: none;}"
+
+    "QScrollBar::sub-line:vertical {"
+        "width: 0;"
+        "height: 0;"
+        "border: none;"
+        "background: none;}"
+        
+    /*"QScrollBar::up-arrow:vertical {"
+        //"background: black;"
+        "height: 20px;"
+        "width: 60px;"
+        "border: 3px solid #595959;}"
+        
+    "QScrollBar::down-arrow:vertical: {"
+        //"background: black;"
+        "height: 20px;"
+        "width: 60px;"
+        "border: 3px solid #595959;}"*/
+        
+    /*"QCheckBox {"
+        "width: 100px;"
+        "height: 100px;}"*/
+        
+    "QRadioButton::indicator {"
+        "font-size: 15pt;"
+        "width: 45px;"
+        "height: 45px;}"
+        
+    "QSpinBox {"
+        "font-size: 20pt;"
+        "width: 120px;"
+        "height: 80px;}"
+    
+    "QSpinBox::down-arrow, QSpinBox::up-arrow {"
+        "width: 60px;"
+        "height: 15px;}"
+        
+    "QSpinBox::down-button, QSpinBox::up-button {"
+        "width: 80px;"
+        "height: 40px;}"
+    
+    "QLabel {"
+        "font-size: 13pt;}"
   );
+}
+//==============================================================================================================//  //TEST~~~ 11_14_2018
+void centre::macro_name_cell(int row, int col)  //FROM MACRO_SCREEN.CPP//
+{
+  nRow = row;
+  nCol = col;
+}
+
+void centre::macro_name_keyboard(QString macro_name) //FROM KEYBOARD.CPP//
+{
+  QList<QString> macro_file_list;
+  QString macro_strings;
+  char temp_name[300];
   
+  if(macro_name.isEmpty()) macro_name = "-";
+  if(macro_name.contains(" ")) macro_name.replace(" ", "_");
+  
+  ifstream macros_in("macro_table");  //INPUT FROM FILE//
+  
+  if(macros_in)
+  {
+    for(int i=1; i<=10; ++i)
+    {
+      for(int j=1; j<=5; ++j)
+      {        
+        macros_in>>temp_name;
+        macro_file_list << QString::fromLatin1(temp_name);
+      }
+      if(macros_in.eof()) break;
+    }
+    macros_in.close();
+  }
+  macro_file_list.replace((nRow*5+nCol), macro_name);
+      
+  std::ofstream macros_out("macro_table",(std::ofstream::out));   //OUTPUT TO FILE//
+  
+  for(int i=0; i<10; ++i)
+  {  
+    macros_out<<endl;
+    for(int j=0; j<5; ++j)
+    {
+      macros_out<<macro_file_list.at(i*5+j).toLatin1().data();
+      macros_out<<" ";
+    }
+  }
+  macros_out.close();
+  macros_out.clear();
 }
 //==============================================================================================================//
 void centre::load_macros()	//TEST~~~ connecting macros screen
@@ -740,7 +887,7 @@ void centre::load_macros()	//TEST~~~ connecting macros screen
   
   char lotcode[30];			//TEST~~~ batch_mode variables
   char packcode[30];
-  char substitution[30];
+  //char substitution[30];  //yet to be implemeneted//
   //char seed_count[30];
 //----------------------------------------------------------------------------------------------------------------//
 
@@ -750,43 +897,42 @@ void centre::load_macros()	//TEST~~~ connecting macros screen
 	
     while(!barcodes.eof())	//TEST~~~
     {
-	  barcodes>>barcode_1;
-	  barcodes>>barcode_2;
-	  barcodes>>barcode_3;
-	  barcodes>>barcode_4;
-	  barcodes>>seed_count;
+      barcodes>>barcode_1;
+      barcodes>>barcode_2;
+      barcodes>>barcode_3;
+      barcodes>>barcode_4;
+      barcodes>>seed_count;
     }
     
     cout<<endl<<endl<<"LOADING TOTALIZEMODE"<<endl;		//OMIT~~~
-    cout<<"\t"<<"barcode_1: "<<barcode_1<<endl		//
-		<<"\t"<<"barcode_2: "<<barcode_2<<endl		//
-		<<"\t"<<"barcode_3: "<<barcode_3<<endl		//
-		<<"\t"<<"barcode_4: "<<barcode_4<<endl		//
-		<<"\t"<<"seed_count: "<<seed_count<<endl;	//
+    cout<<"\t"<<"barcode_1: "<<barcode_1<<endl		    //
+		<<"\t"<<"barcode_2: "<<barcode_2<<endl		        //
+		<<"\t"<<"barcode_3: "<<barcode_3<<endl		        //
+		<<"\t"<<"barcode_4: "<<barcode_4<<endl		        //
+		<<"\t"<<"seed_count: "<<seed_count<<endl;	        //
     barcodes.close();
     
     for(int q=0; q<30; ++q)
-	{
-	  if(barcode_1[q] == ',')
-	  {
-	    barcode_1[q] = 0;
-	  }
-	  if(barcode_2[q] == ',')
-	  {
-	    barcode_2[q] = 0;
-	  }
-	  if(barcode_3[q] == ',')
-	  {
-	    barcode_3[q] = 0;
-	  }
-	  if(barcode_4[q] == ',')
-	  {
-	    barcode_4[q] = 0;
-	  }
-	}
+    {
+      if(barcode_1[q] == ',')
+      {
+        barcode_1[q] = 0;
+      }
+      if(barcode_2[q] == ',')
+      {
+        barcode_2[q] = 0;
+      }
+      if(barcode_3[q] == ',')
+      {
+        barcode_3[q] = 0;
+      }
+      if(barcode_4[q] == ',')
+      {
+        barcode_4[q] = 0;
+      }
+    }
   }
-//----------------------------------------------------------------------------------------------------------------//  
-  
+//----------------------------------------------------------------------------------------------------------------//
   {  
 	  ifstream batchcodes("settings/batch_backup");
 	
@@ -798,12 +944,12 @@ void centre::load_macros()	//TEST~~~ connecting macros screen
 	    //batchcodes>>substitution;
     }
     
-    cout<<endl<<endl<<"LOADING BATCHMODE"<<endl;			//OMIT~~~
-    cout<<"\t"<<"lotcode: "<<lotcode<<endl				//
-		    <<"\t"<<"packcode: "<<packcode<<endl			//
+    cout<<endl<<endl<<"LOADING BATCHMODE"<<endl;			  //OMIT~~~
+    cout<<"\t"<<"lotcode: "<<lotcode<<endl				      //
+		    <<"\t"<<"packcode: "<<packcode<<endl			      //
 		    //<<"\t"<<"substitution: "<<substitution<<endl	//
-        <<"\t"<<"seed_count: "<<seed_count<<endl;		//
-    batchcodes.close();									//
+        <<"\t"<<"seed_count: "<<seed_count<<endl;		    //
+    batchcodes.close();									                //
     
     for(int q=0; q<30; ++q)
 	  {
@@ -839,87 +985,69 @@ void centre::load_macros()	//TEST~~~ connecting macros screen
 		
       }
       else
-      { 
-        QString macro_string;							//TEST~~~
-        //macro_string = macro_function_char;			//TEST~~~
-        //combined_macro_functions = combined_macro_functions + macro_string;
-        //cout<<"bool:"<<macro_status_bool<<endl;			//OMIT~~~
-        //cout<<"int:"<<macro_numb_int<<endl;				//OMIT~~~
-        //cout<<"char:"<<macro_name_char<<endl;			//OMIT~~~
-        //cout<<"char:"<<macro_mask_char<<endl;			//OMIT~~~
-	    //cout<<"char:"<<macro_function_char<<endl;		//OMIT~~~
+      {
+        QString macro_string;
 	  
-	    for(int j=0; j<strlen(macro_function_char); ++j)
-	    {
-		    if(macro_function_char[j] == '\\')
-		    {
-		      if(macro_function_char[j+1] == 'C')
-	        {
-	          count_string = QString::number(count);
-	          macro_string = macro_string + count_string;
-	        }
-	        else if(macro_function_char[j+1] == '1')		//Barcodes
-	        {
-			      if(tm_barcode_columns >= 1)
-			      {
-			        macro_string = macro_string + barcode_1;
-			      }
-	        }
-	        else if(macro_function_char[j+1] == '2')
-	        {
-			      if(tm_barcode_columns >=2)
-			      {
-			        macro_string = macro_string + barcode_2;
-			      }
-	        }
-	        else if(macro_function_char[j+1] == '3')
-	        {
-            if(tm_barcode_columns >= 3)
-			      {
-			        macro_string = macro_string + barcode_3;
-			      }
-	        }
-	        else if(macro_function_char[j+1] == '4')
-	        {
-			      if(tm_barcode_columns >= 4)
-			      {
-			        macro_string = macro_string + barcode_4;
-			      }
-	        }
-	        else if(macro_function_char[j+1] == 'T')		//Lot code
-	        {
-			      if(tm_barcode_columns >= 1)
+        for(unsigned int j=0; j<strlen(macro_function_char); ++j)
+        {
+          if(macro_function_char[j] == '\\')
+          {
+            if(macro_function_char[j+1] == 'C')
+            {
+              count_string = QString::number(count);
+              macro_string = macro_string + count_string;
+            }
+            else if(macro_function_char[j+1] == '1')		//Barcodes
+            {
+              if(tm_barcode_columns >= 1)
+              {
+                macro_string = macro_string + barcode_1;
+              }
+            }
+            else if(macro_function_char[j+1] == '2')
+            {
+              if(tm_barcode_columns >=2)
+              {
+                macro_string = macro_string + barcode_2;
+              }
+            }
+            else if(macro_function_char[j+1] == '3')
+            {
+              if(tm_barcode_columns >= 3)
+              {
+                macro_string = macro_string + barcode_3;
+              }
+            }
+            else if(macro_function_char[j+1] == '4')
+            {
+              if(tm_barcode_columns >= 4)
+              {
+                macro_string = macro_string + barcode_4;
+              }
+            }
+            else if(macro_function_char[j+1] == 'T')		//Lot code
+            {
+              if(tm_barcode_columns >= 1)
 			      {
 			        macro_string = macro_string + lotcode;
 			      }
-	        }
-	        else if(macro_function_char[j+1] == 'P')		//Pack code
-	        {
-			      if(tm_barcode_columns >=2)
-			      {
-			        macro_string = macro_string + packcode;
-			      }
-	        }
-	        else
-	        {
-			      macro_string = macro_string + macro_function_char[j] + macro_function_char[j+1];
-	        }
-	        /*else if(macro_function_char[j+1] == 2 || macro_function_char[j+1] == 3 || macro_function_char[j+1] == 4)
-			    {
-			      cout<<"output error:"<<endl;
-			    }*/
-	      }
-	      /*else
-		  {
-		    macro_string = macro_string + macro_function_char[j] + macro_function_char[j+1];
-			//cout<<"mf[j]: "<<macro_function_char[j]<<"\t mf[j+1]: "<<macro_function_char[j+1]<<endl;	//OMIT~~~
-		  }*/
-	    }
-	    //cout<<"MACRO_STRING: "<<macro_string<<endl;	//OMIT~~~
-	    //macro_string = macro_function_char;				//TEST~~~
-      combined_macro_functions = combined_macro_functions + macro_string;
-	  }
-	  if(macros.eof()) break;
+            }
+            else if(macro_function_char[j+1] == 'P')		//Pack code
+            {
+              if(tm_barcode_columns >=2)
+              {
+                macro_string = macro_string + packcode;
+              } 
+            }
+            else
+            {
+              macro_string = macro_string + macro_function_char[j] + macro_function_char[j+1];
+            }
+          }
+        }
+        combined_macro_functions = combined_macro_functions + macro_string;
+      }
+      if(macros.eof()) break;
     }
     macros.close();
   }

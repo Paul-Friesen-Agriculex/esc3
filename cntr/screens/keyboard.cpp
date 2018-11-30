@@ -2,7 +2,6 @@
 #include <QGridLayout>
 #include <QVBoxLayout>
 #include <QGroupBox>
-//#include <QLabel>
 #include <QTextEdit>
 #include <QLineEdit>
 #include <QDir>
@@ -19,7 +18,8 @@ using namespace std;
 kb_key::kb_key(const QString & text, QWidget* parent)
 :QPushButton(text, parent)
 {
-  setMaximumWidth(50);
+  setMinimumSize(65,50);  //TEST~~~
+  setMaximumSize(65,50);  //
 }
   
 keyboard::keyboard(centre* set_centre_p)
@@ -27,9 +27,10 @@ keyboard::keyboard(centre* set_centre_p)
 {
 //  message_p=new QLabel;
   message_p=new QTextEdit;
-  message_p->setMaximumSize(500,100);
+  message_p->setMaximumSize(500,40);
   message_p->setFocusPolicy(Qt::NoFocus);
   entry_line_display_p=new QLineEdit;
+  entry_line_display_p -> setMinimumHeight(50);
   entry_line_display_p->setFocusPolicy(Qt::NoFocus);
   back_button_p=new button("BACK");
   entry_line_p=new QString;
@@ -77,6 +78,7 @@ keyboard::keyboard(centre* set_centre_p)
   N_key_p=new kb_key("N");
   M_key_p=new kb_key("M");
   space_key_p=new QPushButton("Space");
+  space_key_p-> setMinimumSize(130,65);
   enter_key_p=new kb_key("OK");
   backspace_key_p=new kb_key("<-X");
   
@@ -173,6 +175,8 @@ keyboard::keyboard(centre* set_centre_p)
   
   connect(this, SIGNAL(external_keyboard_enter()), enter_key_p, SIGNAL(clicked()));
   
+  entry_line_display_p -> setStyleSheet( "font-size: 15pt;");
+      
   setFocus();
 }
 
@@ -394,8 +398,23 @@ void keyboard::keyPressEvent(QKeyEvent* event)
   }
 }
 
+//===============================================================================================//TEST~~~ 11_13_2018//
+macro_name_entry::macro_name_entry(centre* centre_p)
+:keyboard(centre_p)
+{
+  QString message("Enter macro name.");
+  message_p->setText(message);
+  connect(enter_key_p, SIGNAL(clicked()), this, SLOT(macro_name_entered()));
+}
 
+void macro_name_entry::macro_name_entered()
+{
+  centre_p -> macro_name_keyboard(*entry_line_p);
 
+  centre_p->add_waiting_screen(centre_p->get_previous_screen());
+  centre_p->screen_done=true;
+}
+//===============================================================================================//
 
 crop_name_entry::crop_name_entry(centre* centre_p)
 :keyboard(centre_p)

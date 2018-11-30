@@ -140,6 +140,19 @@ class keyboard : public screen
   
 };
 
+//=======================================================================================// TEST~~~ 11_13_2018//
+class macro_name_entry : public keyboard
+{
+  Q_OBJECT
+  
+  public:
+  macro_name_entry(centre* set_centre_p);
+  
+  public slots:
+  void macro_name_entered();
+};
+//=======================================================================================//
+
 class crop_name_entry : public keyboard
 {
   Q_OBJECT

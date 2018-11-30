@@ -10,7 +10,9 @@
 #include "centre.hpp"
 #include "totalize.hpp"
 #include "button.hpp"
-#include <QString>				//for gpio_keyboard, send count to keyboardout
+#include <QString>
+
+//#include <QtMath> //exponential qslider// TEST~~~//
 
 using namespace std;
 
@@ -53,26 +55,28 @@ totalize::totalize(centre* set_centre_p)
   control_layout_p = new QGridLayout;
   speed_layout_p = new QGridLayout;
   bottom_layout_p = new QGridLayout;
-  
   main_layout_p = new QGridLayout;
 
-  top_layout_p -> addWidget(count_message_p, 0, 0);
+  top_layout_p -> addWidget(count_message_p, 0, 0);                      //NEW~~~ 11_16_2018//
   top_layout_p -> addWidget(options_button_p, 0, 1);
   top_layout_p -> addWidget(back_button_p, 0, 2);
   control_layout_p -> addWidget(zero_button_p, 0, 0);
   control_layout_p -> addWidget(endgate_button_p, 1, 0);
-  control_layout_p -> addWidget(speed_box_p, 2, 0);
-  speed_layout_p -> addWidget(speed_label_p, 0, 0);
-  speed_layout_p -> addWidget(startstop_button_p, 0, 1);
-  speed_layout_p -> addWidget(speed_set_p, 1, 0, 1, 2);
+  //control_layout_p -> addWidget(speed_box_p, 2, 0);
+  speed_layout_p -> addWidget(speed_label_p, 0, 1, 1, 3);
+  speed_layout_p -> addWidget(startstop_button_p, 0, 0, 2, 1);
+  speed_layout_p -> addWidget(speed_set_p, 1, 1, 1, 3);
   bottom_layout_p -> addWidget(status_box_p, 0, 0);
   bottom_layout_p -> addWidget(save_button_p, 0, 2);
   bottom_layout_p -> addWidget(clear_table_button_p, 0, 3);
   bottom_layout_p -> addWidget(quit_button_p, 0, 4);
+  
   main_layout_p -> addWidget(top_box_p, 0, 0, 1, 2);
-  main_layout_p -> addWidget(control_box_p, 1, 0);
-  main_layout_p -> addWidget(table_p, 1, 1);
-  main_layout_p -> addWidget(bottom_box_p, 2, 0, 1, 2);
+  main_layout_p -> addWidget(speed_box_p, 1, 0, 1, 4);
+  main_layout_p -> addWidget(control_box_p, 2, 0);
+  main_layout_p -> addWidget(table_p, 2, 1);
+  //main_layout_p -> addWidget(speed_box_p, 2, 0, 1, 4); //TEST~~~
+  main_layout_p -> addWidget(bottom_box_p, 3, 0, 1, 2); //TEST~~~
   
   top_box_p -> setLayout(top_layout_p);
   control_box_p -> setLayout(control_layout_p);
@@ -129,8 +133,12 @@ totalize::totalize(centre* set_centre_p)
     centre_p->tm_save_filename = "";
   }
   
-//  cout<<"end totalize::totalize\n";
-  
+  speed_label_p->setAlignment(Qt::AlignCenter);
+  top_layout_p->setContentsMargins(0,0,0,0);        //set layout margins to shrink to designated container dimensions//
+  control_layout_p->setContentsMargins(0,0,0,0);
+  speed_layout_p->setContentsMargins(0,0,0,0);
+  bottom_layout_p->setContentsMargins(0,0,0,0);
+  main_layout_p->setContentsMargins(0,0,10,10);
 }
 
 totalize::~totalize()
@@ -200,6 +208,13 @@ void totalize::change_speed(int value)
 {
   centre_p->totalize_feed_speed=value;
 //  cout<<"totalize_feed_speed set to "<<value<<endl;
+  
+  //~~~feeder speed behaviour~~~//
+  if(value <= 500) value = value/2;         //~~~piece-wise linear, 2 parts~~~//
+  else value = 1.5*value-500;
+  //value = pow(1.0069, value) - 1;          //~~~exponential~~~//
+  
+  
   if(feeder_is_running)
   {
     centre_p->set_speed(value);
@@ -229,16 +244,31 @@ void totalize::quit_clicked()
 void totalize::run()
 {
 
-  QString message=QString("Count: %1").arg(centre_p->count);
+  QString message=QString("Count:  %1").arg(centre_p->count);
   count_message_p->setText(message);
     centre_p->processor_display_blobs(false);
-    message=QString("Crop: %1.  Sensitivity: %2.\nGate should be set at %3.\nLine frequency %4\nDust Streak Prcnt %5") 
+    message=QString("Crop: %1.  Sensitivity: %2.\nGate should be set at %3.") 
     .arg(centre_p->crops[0].name) 
     .arg(centre_p->crops[0].sensitivity) 
-    .arg(centre_p->crops[0].gate_setting)
-    .arg(centre_p->measured_line_frequency)
-    .arg(centre_p->dust_streak_percentage(), 0, 'f', 3);
-  status_box_p->setText(message);
+    .arg(centre_p->crops[0].gate_setting);
+  status_box_p->setText(message);                           //NEW~~~ 11_16_2018//
+  
+  count_message_p->setStyleSheet("QLabel {"     //TEST~~~
+          "background-color: white;"            //
+          "border: 3px solid black;"            //
+          "font-size: 20pt;}");                 //
+
+  int slider_position_num;
+  if(speed_set_p->sliderPosition() <= 500) slider_position_num = (speed_set_p->sliderPosition())/2;      //piece-wise linear, 2 sections//
+  else slider_position_num = 1.5*(speed_set_p->sliderPosition())-500;
+  //slider_position_num = pow(1.0069, (speed_set_p->sliderPosition())) - 1;         //exponential function//
+
+  QString slider_position_message = QString("Speed:  %1 \%").arg(1.0*slider_position_num/10);    //TEST~~~
+  //QString slider_position_message = QString("Speed:  %1 \%").arg(1.0*speed_set_p->sliderPosition()/10);    //ORIGINAL~~~
+  speed_label_p->setText(slider_position_message);                                                         //TEST~~~
+  speed_label_p->setStyleSheet("QLabel {"
+          "font: bold;}");
+  
  
   if(screen_endgate==ENDGATE_OPEN)
   {
@@ -267,8 +297,6 @@ void totalize::run()
     }
     
     count_string = QString::number(old_count);
-    gpio_keyboard_p = new gpio_keyboard;
-    //macro_screen_p = new macro_screen;  //TEST~~~
     
     if(!(centre_p->tm_macro_updated))
     {
@@ -280,49 +308,18 @@ void totalize::run()
 	    cout<<"macros already loaded"<<endl;
 	  }
 	  
-//--------------------------------------------------------------------------------------------------------------------------//
     //load totalize table variables//
+    QString bar_str_1, bar_str_2, bar_str_3, bar_str_4, totalize_str_count, totalize_str_weight;      //modified to handle barcodes as characters instead of integers// 11_02_2018~~~//
     int current_totalize_table_row;    
-    int barcode_1, barcode_2, barcode_3, barcode_4, totalize_count, weight;
-    
     current_totalize_table_row = table_p -> model_row - 1;
-    barcode_1 = (table_p -> model_p -> item(current_totalize_table_row,0) -> text().toInt());       //Barcode 1
-    barcode_2 = (table_p -> model_p -> item(current_totalize_table_row,1) -> text().toInt());       //Barcode 2
-    barcode_3 = (table_p -> model_p -> item(current_totalize_table_row,2) -> text().toInt());       //Barcode 3
-    barcode_4 = (table_p -> model_p -> item(current_totalize_table_row,3) -> text().toInt());       //Barcode 4
-    totalize_count = (table_p -> model_p -> item(current_totalize_table_row,4) -> text().toInt());  //Count
-    weight = (table_p -> model_p -> item(current_totalize_table_row,5) -> text().toInt());          //Weight
-    
-    
-    //modified to handle barcodes as characters instead of integers// 11_02_2018~~~//
-    QString bar_str_1, bar_str_2, bar_str_3, bar_str_4, totalize_str_count, totalize_str_weight;
     
     bar_str_1 = (table_p -> model_p -> item(current_totalize_table_row,0) -> text());
     bar_str_2 = (table_p -> model_p -> item(current_totalize_table_row,1) -> text());
-    bar_str_3 = (table_p -> model_p -> item(current_totalize_table_row,2) -> text());
+    bar_str_3 = (table_p -> model_p -> item(current_totalize_table_row,2) -> text()); 
     bar_str_4 = (table_p -> model_p -> item(current_totalize_table_row,3) -> text());
     totalize_str_count = (table_p -> model_p -> item(current_totalize_table_row,4) -> text());
     totalize_str_weight = (table_p -> model_p -> item(current_totalize_table_row,5) -> text());
-    
-    //=============================================================================//
-    
-    
-    /*cout<<endl<<"bar1: "<<barcode_1<<endl;        //OMIT~~~
-    cout<<endl<<"bar2: "<<barcode_2<<endl;        //OMIT~~~
-    cout<<endl<<"bar3: "<<barcode_3<<endl;        //OMIT~~~
-    cout<<endl<<"bar4: "<<barcode_4<<endl;        //OMIT~~~
-    cout<<endl<<"count: "<<totalize_count<<endl;  //OMIT~~~
-    cout<<endl<<"weight: "<<weight<<endl;         //OMIT~~~*/
-//--------------------------------------------------------------------------------------------------------------------------//
-    //gpio_keyboard_p -> gpio_send(count_string+(centre_p->combined_macro_functions));
-	  //gpio_keyboard_p -> gpio_send((centre_p->combined_macro_functions));	//Original~~~
-    
-    //macro_screen_p = new macro_screen;  //TEST~~~
-    //macro_screen_p -> usb_serial_out(centre_p->combined_macro_functions);	//TEST~~~
-    
-    
-    //send strings instead of ints//
-    //macro_screen_p -> usb_serial_out(barcode_1, barcode_2, barcode_3, barcode_4, totalize_count, weight);	  //ORIGINAL~~~
+
     macro_screen_p -> usb_serial_out(bar_str_1, bar_str_2, bar_str_3, bar_str_4, totalize_str_count, totalize_str_weight);	  //TEST~~~ Strings instead of ints 11_02_2018~~~//
   }
 

@@ -19,7 +19,7 @@ class processor;
 class screen;
 class batch_mode_driver;
 class diagnostics_console;
-
+class macro_screen; //TEST~~~
 
 const int screen_wait_list_size=10;
 
@@ -102,9 +102,12 @@ class centre : public QObject
   void save_image(QString filename);
   void load_image(QString filename);
   void load_macros();	//original~~~
-  //void load_macros(QString count_num);	//just including count
-  //void load_macros(QString count_num, QString barcode_num);	//TEST~~~ 08_31_2018
   
+//=========================================================//  
+  void macro_name_cell(int row, int col);
+  void macro_name_keyboard(QString);
+  int nRow, nCol;
+//=========================================================//
   
   processor* processor_p;
   int count;
@@ -138,14 +141,12 @@ class centre : public QObject
   int tm_autosave_count;//counts how many counts were recorded;
   QString tm_save_filename;
   
-  bool macro_status_bool;			//temporary variable to transfer ifstream to tablewidget
-  int macro_numb_int;				//
+  bool macro_status_bool;			  //temporary variable to transfer ifstream to tablewidget
+  int macro_numb_int;				    //
   char macro_name_char[30];			//
   char macro_mask_char[30];			//
   char macro_function_char[30];		//
   QString combined_macro_functions;	//new char to combine all macros
-  //QStringList barcodes_count	//variable to hold barcodes and count values into stringlist	//need to append
-
   
   //batch mode
   bool block_endgate_opening;//true prevents endgate from opening.  Used if barcode test fails in batch.
@@ -153,7 +154,10 @@ class centre : public QObject
   //playback
   QImage qimage;
   
+  QString macro_name; //TEST~~~11_13_2018//
+  
   batch_mode_driver* batch_mode_driver_p;
+  macro_screen* macro_screen_p; //TEST~~~ 11_13_2018//
 };
 
 class screen : public QWidget

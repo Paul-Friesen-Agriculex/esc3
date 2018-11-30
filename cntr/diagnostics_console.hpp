@@ -29,6 +29,7 @@ class diagnostics_console : public QWidget
   private slots:
   void start_recording();
   void stop_recording();
+
   void run();
 //  void reset_time_tests_button_clicked();
   
@@ -40,6 +41,7 @@ class diagnostics_console : public QWidget
   QPushButton* start_button_p;
   QPushButton* stop_button_p;
   QPushButton* reset_time_tests_button_p;
+
   QLabel* message1_p;
   QLabel* message2_p;
   QLabel* message3_p;
