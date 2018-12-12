@@ -631,7 +631,10 @@ void processor::add_line(unsigned char* start_p)
   
 //        cout<<"add_line point 3.  current_crop.calibrated="<<current_crop.calibrated<<".  calibration_crop.calibrated="<<calibration_crop.calibrated<<endl;
   
-      }
+
+
+
+/*
       if(show_blob_bool)
       //if(show_blob_bool && blob_seed_count>1) //TEST~~~ //to disable and re-enable seed raster generation
       {
@@ -693,10 +696,13 @@ void processor::add_line(unsigned char* start_p)
             //  1.store_raw_image_rasters()
             //  2.store_rotated_rasters()
             //  3.remove_similar_rasters()
-        
-        /*if(blob_seed_count < 2) blob_list[blob_index]->store_raw_image_rasters(); 	//TEST~~	(more than 50 seeds)
+
+
+
+
+        if(blob_seed_count < 2) blob_list[blob_index]->store_raw_image_rasters(); 	//TEST~~	(more than 50 seeds)
           //blob_list[blob_index]->store_rotated_rasters();    //toggle rotation functions 
-        }*/
+        }
         
 
 
@@ -705,6 +711,10 @@ void processor::add_line(unsigned char* start_p)
         //------------------------------------------------------------------------------------//
         cout<<endl<<endl<<endl;
       }
+      */
+      }
+      
+      
       increment_count(blob_seed_count);
     
       delete blob_list[blob_index];
@@ -1103,6 +1113,8 @@ void blob::calculate_characteristics()
     if((inflection_peak>0) && (inflection<=0))//inflection peak has passed.  count and prepare for next peak
     //inflection_x and inflection_y for current inflection_count will now remain at last values recorded
     {
+
+      /*
       //ignore inflection if it is in a dust streak zone
       int inflection_x_global = inflection_x[inflection_count] + min_x - 1;//inflection_x is co-ordinate in the bool_raster.  We need the co-ordinate in the entire image width.
       if( (processor_p->dust_streak_list[inflection_x_global].in_streak_zone==false) && (inflection_count<100) )//if there is a dust streak zone at this point, do not increment inflection_count.  this allows inflection values to over-write this inflection next time inflection is increasing
@@ -1111,6 +1123,32 @@ void blob::calculate_characteristics()
         if(max_inflection<inflection_peak) max_inflection = inflection_peak;
       }
       inflection_peak = 0;
+      */
+
+
+      //calculate distances to other inflections (distances in outline_point_list index counts)
+      int separation_distance_back = 0;
+      int separation_distance_forward = 0;
+      bool separation_distance_too_small = false;
+      int separation_distance_minimum = ol_length/10;
+      if(inflection_count>0)//at least 1 other inflection was recorded.
+      {
+        separation_distance_back = i - inflection_i[inflection_count-1];
+        separation_distance_forward = ol_length-i + inflection_i[0];
+        if( (separation_distance_back<separation_distance_minimum) || (separation_distance_forward<separation_distance_minimum) ) separation_distance_too_small = true;
+      }
+      
+      //ignore inflection if it is in a dust streak zone or if it is too close to a previously found inflection
+      int inflection_x_global = inflection_x[inflection_count] + min_x - 1;//inflection_x is co-ordinate in the bool_raster.  We need the co-ordinate in the entire image width.
+      if( (processor_p->dust_streak_list[inflection_x_global].in_streak_zone==false) && (separation_distance_too_small==false) && (inflection_count<100) )//if there is a dust streak zone at this point, or if it is too close to another inflection, do not increment inflection_count.  this allows inflection values to over-write this inflection next time inflection is increasing
+      {
+        ++inflection_count;//note index of inflection in list is 1 less than inflection count
+        if(max_inflection<inflection_peak) max_inflection = inflection_peak;
+      }
+      inflection_peak = 0;
+
+
+
     }
     ++i;
     ++j;
@@ -1163,7 +1201,7 @@ int blob::seeds_in_blob()
 
 
     score_ic[i] = 120.0/((ic_estimate-float(i))*(ic_estimate-float(i))+1)/(1+ic_uncertainty);
-    score_likelihood[i] = -20*i;
+    score_likelihood[i] = -15*i;
   }
   score_mi[1] = 10 * (mi_n - max_inflection);//negative if single seed is unlikely
   int most_likely_number = 0;
@@ -1179,11 +1217,24 @@ int blob::seeds_in_blob()
   }
   
 //  if(processor_p -> show_blob_bool)
-  
   if(processor_p->show_blob_bool && most_likely_number>1)
+
   {
-    cout<<"\nseeds_in_blob\n";
-    cout<< "              number  expected_mean_area   expected_variance          score_area            score_mi            score_ic    score_likelihood         total score\n";
+    cout<<"\n\n\nseeds_in_blob\n";
+
+    cout<<"  "<<most_likely_number<<" most_likely_number\n";
+    cout<<"  area = "<<area<<endl;
+    cout<<"  detect_size "<<processor_p->get_detect_size()<<endl;
+    cout<<"  max_inflection = "<<max_inflection<<endl;
+//    cout<<"  inflection_count = "<<inflection_count<<endl;
+    
+    form_display_raster();
+    cout<<endl;
+    print_display_raster();
+
+
+
+    cout<< "\n              number  expected_mean_area   expected_variance          score_area            score_mi            score_ic    score_likelihood         total score\n";
     cout<<setprecision(4);
     for(int i=1;i<max_seeds;++i)
     {
@@ -1217,7 +1268,7 @@ void blob::form_display_raster()
       else display_raster_p[x+width*y]=' ';
     }
   } 
-  cout<<"inflection_count "<<inflection_count<<endl;
+  cout<<"\ninflection_count "<<inflection_count<<endl;
   
   for(int i=0; i<inflection_count; ++i)
   {

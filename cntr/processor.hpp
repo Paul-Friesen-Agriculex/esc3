@@ -51,7 +51,7 @@ class blob
   static const int direction_distance = 3;//number of positions forward and backward in outline to count to estimate outline direction.
   static const int inflection_distance = 3;//number of positions forward and backward in outline to count to estimate inflection
   static const float inflection_tolerance = 0.1;//min. inflection to count as an inflection during calibration.
-  static const float inflection_sensitivity_factor = 1.2;//values above 1 reduce the likelihood of detecting an inflection.
+  static const float inflection_sensitivity_factor = 1.8;//values above 1 reduce the likelihood of detecting an inflection.
   blob(int start, int end, processor* set_processor_p);
   ~blob();
   bool offer(int slice_start, int slice_end);//true indicates slice accepted
@@ -329,6 +329,9 @@ class processor : public QObject
     
   private slots:
   void run();//processes camera images
+  
+  public:
+  int get_detect_size() {return detect_size;};
   
 };
 

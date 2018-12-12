@@ -152,7 +152,7 @@ centre::centre():
   crop_list_changed = false;
   
   set_cutgate_state(CUTGATE_OPEN);
-  set_endgate_state(ENDGATE_OPEN);
+  set_endgate_state(ENDGATE_CLOSED);
   
   for(previous_screen_index=0; previous_screen_index<10; ++previous_screen_index)
   {

@@ -242,8 +242,8 @@ void macro_screen::usb_serial_out(QString bar_str_1, QString bar_str_2, QString 
   cout<<"\tbar_2: "<<bar_str_2.toUtf8().constData();                                    //
   cout<<"\tbar_3: "<<bar_str_3.toUtf8().constData();                                    //
   cout<<"\tbar_4: "<<bar_str_4.toUtf8().constData()<<endl;                              //
-  cout<<endl<<"totalize_str_count: "<<totalize_count_str.toUtf8().constData()<<endl;    //
-  cout<<endl<<"totalize_str_weight: "<<weight_str.toUtf8().constData()<<endl;           //
+//  cout<<endl<<"totalize_str_count: "<<totalize_count_str.toUtf8().constData()<<endl;    //
+//  cout<<endl<<"totalize_str_weight: "<<weight_str.toUtf8().constData()<<endl;           //
   //----------------------------------------------------------------------------------------//
   
   bool macro_status_bool;			      //temporary variable to transfer ifstream to tablewidget

@@ -9,6 +9,8 @@
 cntr/*
 !cntr/*.cpp
 !cntr/*.hpp
+!cntr/*.pro
+!cntr/Makefile
 moc*
 
 !cntr/screens/

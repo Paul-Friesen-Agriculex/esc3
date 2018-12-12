@@ -43,7 +43,7 @@ batch_mode_driver::batch_mode_driver(centre* centre_p_s)
 
 
 
-  print_message_count = 0;
+//  print_message_count = 0;
 }
   
 batch_mode_driver::~batch_mode_driver()
@@ -376,7 +376,7 @@ void batch_mode_driver::run()
   
   
   
-  
+  /*
   //testing
   if(print_message_count>=100)
   {
@@ -385,7 +385,7 @@ void batch_mode_driver::run()
     print_message_count = 0;
   }
   ++print_message_count;
-  
+  */
   
   
   

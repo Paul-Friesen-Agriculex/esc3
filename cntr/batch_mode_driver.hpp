@@ -67,7 +67,7 @@ class batch_mode_driver : public QObject
   int program_size;
   
   //testing
-  int print_message_count;
+//  int print_message_count;
   
   
   public:
