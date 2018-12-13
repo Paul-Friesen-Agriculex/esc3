@@ -4,6 +4,7 @@
 #whitelist in root:
 !.gitignore
 !cntr/
+!cntr/computer_setup
 
 #whitelist files in folder ending in .cpp or .hpp
 cntr/*
