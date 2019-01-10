@@ -137,6 +137,7 @@ class batch_mode_driver : public QObject
   
   public slots:
   void barcode_entered(QString value);
+  void cutgate_timing_error();
   
   signals:
   void dumping(bool value);

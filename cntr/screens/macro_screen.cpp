@@ -329,10 +329,10 @@ void macro_screen::usb_serial_out(QString bar_str_1, QString bar_str_2, QString 
   //int filedesc = open("/dev/usb2serial", O_WRONLY);
   int filedesc = open("/dev/ttyUSB0", O_WRONLY);  //if udev rules are not applied//
   //write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros) != size_string_macros;
-  //cout<<endl<<"serial string buffer length: "<<write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros)<<endl;
+  cout<<endl<<"serial string buffer length: "<<write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros)<<endl;
 //--------------------------------------------------------------------------------------------------------------------------------------------//
   //serial terminal write function with slight delay between commands//
-  int write_output = 0;         //TEST~~~
+  /*int write_output = 0;         //TEST~~~
   QString current_char_string;  //TEST~~~
   
   for(int xy = 0; xy< size_string_macros; ++xy)
@@ -363,7 +363,7 @@ void macro_screen::usb_serial_out(QString bar_str_1, QString bar_str_2, QString 
     }
   }
   cout<<current_char_string.toUtf8().constData();  //OMIT~~~
-  cout<<write_output<<endl; //TEST~~~
+  cout<<write_output<<endl; //TEST~~~*/
 //--------------------------------------------------------------------------------------------------------------------------------------------//
 }
 
@@ -450,10 +450,10 @@ void macro_screen::usb_serial_out(QString lotcode_str, QString packcode_str, QSt
   int filedesc = open("/dev/ttyUSB0", O_WRONLY);  //if udev rules are not applied//
   //write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros) != size_string_macros;
   //write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros);
-  //cout<<endl<<"serial string buffer length: "<<write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros)<<endl; //ORIGINAL~~~
+  cout<<endl<<"serial string buffer length: "<<write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros)<<endl; //ORIGINAL~~~
 //--------------------------------------------------------------------------------------------------------------------------------------------//
   //serial terminal write function with slight delay between commands//
-  int write_output = 0; //TEST~~~
+  /*int write_output = 0; //TEST~~~
   QString current_char_string;
   
   for(int xy = 0; xy< size_string_macros; ++xy)
@@ -484,7 +484,7 @@ void macro_screen::usb_serial_out(QString lotcode_str, QString packcode_str, QSt
     }
   }
   //cout<<current_char_string.toUtf8().constData();  //OMIT~~~
-  cout<<write_output<<endl; //TEST~~~
+  cout<<write_output<<endl; //TEST~~~*/
 //--------------------------------------------------------------------------------------------------------------------------------------------//
 }
 

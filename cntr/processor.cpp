@@ -309,7 +309,7 @@ void processor::set_to_record(bool record_now)//true - turn on.  false - turn of
   }
 }
 
-void processor::set_crop(crop current_crop_set)
+void processor::set_crop(crop current_crop_set)//this slot runs every time centre::run() runs to keep processor crop current with centre.
 {
   
 //  cout<<"processor::set_crop\n";
@@ -340,8 +340,7 @@ void processor::restart_calibration()//re-starts data collection for calibration
   
   cout<<"processor::restart_calibration\n";
   
-  current_crop.calibrated = false;
-//  calibration_crop.calibrated = false;
+  calibration_crop.calibrated = false;
   for(calibration_area_list_index = 0; calibration_area_list_index<50; ++calibration_area_list_index)
   {
     calibration_area_list[calibration_area_list_index] = 0;
@@ -350,11 +349,11 @@ void processor::restart_calibration()//re-starts data collection for calibration
   }
   calibration_area_list_index = 0;
   show_blob_bool = true;
-//  calibration_crop = current_crop;
+//  calibration_crop = centre_p->crops[0];
   
-  emit send_calibrated_crop(calibration_crop);//will set crops[0] in centre.
+//  emit send_calibrated_crop(calibration_crop);//will set crops[0] in centre.
   
-  cout<<"current_crop.calibrated="<<current_crop.calibrated<<endl;
+//  cout<<"current_crop.calibrated="<<current_crop.calibrated<<endl;
 }
 
 void processor::save_image(QString file_name)
@@ -416,6 +415,9 @@ void processor::reset_time_tests()
 void processor::calibrate()//does the calibration after data has been collected
 {
   calibration_crop.name = current_crop.name;
+  
+  cout<<"processor::calibrate.  current_crop.name "<<(current_crop.name).toStdString()<<endl;
+  
   int area_sum = 0;
   for(int i=0; i<50; ++i)
   {
@@ -465,6 +467,8 @@ void processor::calibrate()//does the calibration after data has been collected
   calibration_crop.area_stdev = pow(area_squared_deviations_sum/(blob_count-1), 0.5);
   calibration_crop.max_inflection = max_inflection;
   calibration_crop.inflection_count_mean = inflection_count_sum/float(blob_count);
+  
+  cout<<"end of processor::calibrate.  calibration_crop.name = "<<calibration_crop.name.toStdString()<<".  calibration_crop.calibrated = "<<calibration_crop.calibrated<<endl;
 }
 
 void processor::new_image(unsigned char* pixel_p)
@@ -620,8 +624,11 @@ void processor::add_line(unsigned char* start_p)
           calibrate();
           calibration_area_list_index = 0;
           calibration_crop.calibrated = true;
+          
+          cout<<"in processor::add_line.  calibration_crop.name = "<<calibration_crop.name.toStdString()<<".  calibration_crop.calibrated = "<<calibration_crop.calibrated<<endl;
+          
           emit send_calibrated_crop(calibration_crop);
-          current_crop = calibration_crop;
+//          current_crop = calibration_crop;
         }
       }
       else //already calibrated
@@ -1216,8 +1223,8 @@ int blob::seeds_in_blob()
     }
   }
   
-//  if(processor_p -> show_blob_bool)
-  if(processor_p->show_blob_bool && most_likely_number>1)
+  if(processor_p -> show_blob_bool)
+//  if(processor_p->show_blob_bool && most_likely_number>1)
 
   {
     cout<<"\n\n\nseeds_in_blob\n";

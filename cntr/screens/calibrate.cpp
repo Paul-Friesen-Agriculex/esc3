@@ -204,8 +204,8 @@ void calibrate::skip_clicked()
 
 void calibrate::done_clicked()
 {
-  centre_p->restart_calibration_f();
-  centre_p->set_speed(0);
+//  centre_p->restart_calibration_f();
+//  centre_p->set_speed(0);
   centre_p->count = 0;
   centre_p->screen_done = true;
   centre_p->recalibrating = false;

@@ -190,6 +190,8 @@ centre::centre():
   connect(batch_mode_driver_p, SIGNAL(send_message2(QString)), diagnostics_console_p, SLOT(receive_message2(QString)));
   connect(batch_mode_driver_p, SIGNAL(send_message_time_to_end(QString)), diagnostics_console_p, SLOT(receive_message3(QString)));
   connect(diagnostics_console_p, SIGNAL(reset_time_tests_signal()), processor_p, SLOT(reset_time_tests()));
+  connect(cutgate_p, SIGNAL(closed_while_opening()), batch_mode_driver_p, SLOT(cutgate_timing_error()));
+  connect(cutgate_p, SIGNAL(opened_while_closing()), batch_mode_driver_p, SLOT(cutgate_timing_error()));
   
   tm_macro_updated = 0; 
   
@@ -250,13 +252,13 @@ void centre::receive_qimage(QImage qimage_set)
 
 void centre::receive_calibrated_crop(crop calibrated_crop)
 {
-//  cout<<"centre::receive_calibrated_crop.\n";
-//  cout<<"  calibrated_crop.name="<<calibrated_crop.name.toStdString()<<endl;
+  cout<<"\ncentre::receive_calibrated_crop.\n";
+  cout<<"  calibrated_crop.name="<<calibrated_crop.name.toStdString()<<endl;
   
   crops[0] = calibrated_crop;
   
-//  cout<<"crops[0].calibrated="<<crops[0].calibrated<<endl;
-//  cout<<"end centre::receive_calibrated_crop\n";
+  cout<<"crops[0].calibrated="<<crops[0].calibrated<<endl;
+  cout<<"end centre::receive_calibrated_crop\n\n";
 }
 
 void centre::end_of_playback()

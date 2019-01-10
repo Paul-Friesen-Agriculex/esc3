@@ -3,6 +3,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <iomanip>
+#include <QMessageBox>
 
 using namespace std;
 
@@ -602,7 +603,7 @@ void batch_mode_driver::run()
         cout<<"mode wait_for_endgate_to_close. count "<<centre_p->count<<"\n";
         endgate_close_counter = 0;
       }
-      if(time_to_end<1.5)
+      if(time_to_end<1)
       {
         mode = wait_for_pack;
         cout<<"mode wait_for_pack. count "<<centre_p->count<<"\n";
@@ -645,6 +646,18 @@ void batch_mode_driver::run()
         mode = wait_for_endgate_to_close;
         cout<<"mode wait_for_endgate_to_close. count "<<centre_p->count<<"\n";
         endgate_close_counter = 0;
+      }
+      if(centre_p->count >= current_count_limit)//error.  Display message box.
+      {
+        QMessageBox msg_box;
+        msg_box.setText("ERROR.  COUNT WENT OVER LIMIT.");
+        msg_box.setInformativeText("This is probably because the speed is too high.  \
+                                  Hopper will dump out so you can re-start         \
+                                  this seed lot.");
+        msg_box.exec();
+        mode = dump_into_end;
+        dump_into_end_time.restart();
+        cout<<"mode dump_into_end\n";
       }
       break;
     case dump_into_cut_gate:
@@ -899,6 +912,20 @@ void batch_mode_driver::barcode_entered(QString value)
   }
 //  cout<<"end batch_mode_driver::barcode_entered\n";
 }
+
+void batch_mode_driver::cutgate_timing_error()
+{
+  centre_p -> set_speed(0);
+  QMessageBox msg_box;
+  msg_box.setText("CUT GATE TIMING ERROR.");
+  msg_box.setInformativeText("This is probably because the speed is too high.\n  \
+                            Hopper will dump out so you can re-start\n         \
+                            this seed lot.");
+  msg_box.exec();
+  mode = dump_into_end;
+  cout<<"mode dump_into_end\n";
+}
+
 
 count_rate_predictor::count_rate_predictor(centre* centre_p_s)
 {

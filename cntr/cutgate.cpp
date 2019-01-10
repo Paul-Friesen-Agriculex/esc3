@@ -30,6 +30,12 @@ cutgate::~cutgate()
 
 void cutgate::open()
 {
+  if(closing==true)
+  {
+    cout<<"cutgate opened while closing\n";
+    emit opened_while_closing();
+    return;
+  }
   FILE * fp;
   fp = fopen("/sys/class/gpio/gpio171/value", "w");
   fprintf(fp, "1");
@@ -37,16 +43,17 @@ void cutgate::open()
   open_pulse_timer_p -> start(700);
   state = CUTGATE_OPEN;
   opening = true;
-  if(closing==true)
-  {
-    cout<<"cutgate opened while closing\n";
-    emit opened_while_closing();
-  }
 }
 
 void cutgate::close()
 {
   
+  if(opening==true)
+  {
+    cout<<"cutgate closed while opening\n";
+    emit closed_while_opening();
+    return;
+  }
   FILE * fp;
   fp = fopen("/sys/class/gpio/gpio172/value", "w");
   fprintf(fp, "1");
@@ -54,11 +61,6 @@ void cutgate::close()
   close_pulse_timer_p -> start(300);
   state = CUTGATE_CLOSED;
   closing = true;
-  if(opening==true)
-  {
-    cout<<"cutgate closed while opening\n";
-    emit closed_while_opening();
-  }
 }
 
 void cutgate::end_open()
