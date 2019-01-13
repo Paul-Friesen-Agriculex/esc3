@@ -1074,7 +1074,7 @@ void blob::calculate_characteristics()
     if(inf_index_2 >= ol_length) inf_index_2 -= ol_length;
     for (int j=0; j<2*inflection_distance; ++j)
     {
-      if(outline_point_list[inf_index_1]->direction<-500 || outline_point_list[inf_index_2]->direction<-500)//invalid angle signaled by direction value -1000
+      if(outline_point_list[inf_index_1]->direction<-500 || outline_point_list[inf_index_2]->direction<-500)//invalid angle signaled by direction value -1000.  See processor_calcs.hpp.
       {
         inflection = -1000;//invalid inflection
         break;
