@@ -410,7 +410,6 @@ macro_name_entry::macro_name_entry(centre* centre_p)
 void macro_name_entry::macro_name_entered()
 {
   centre_p -> macro_name_keyboard(*entry_line_p);
-
   centre_p->add_waiting_screen(centre_p->get_previous_screen());
   centre_p->screen_done=true;
 }

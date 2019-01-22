@@ -1,7 +1,7 @@
 #include "processor.hpp"
 #include <iostream>
 #include <iomanip>
-#include <fstream>
+#include <fstream>  //TEST~~~ branching//
 #include <QString>
 #include <QPainter>
 #include "centre.hpp"
@@ -10,7 +10,7 @@
 #include "processor_calcs.hpp"
 #include </usr/include/SK91USB3.h>
 
-//#include "secondary_processor.hpp"  //TEST~~~ 11_21_2018//
+#include "secondary_processor.hpp"  //TEST~~~ 11_21_2018//
 
 #include <ctime>          //for srand function
 #include <QSet>     	    //Quicker lookup speed than QList
@@ -21,6 +21,9 @@
 
 using namespace std;
 
+extern int number_listed_rasters;           //defined in secondary_processor.cpp
+extern int calibration_seed_number;         //defined in secondary_processor.cpp //TEST~~~
+
 extern const int image_lines;   //defined in centre.cpp
 extern const int line_length;   //defined in centre.cpp
 extern const int images_to_record;
@@ -29,29 +32,29 @@ int valid_end;//ignore pixels outside valid range
 
 //=================================================================================//
 //------------- variables used in calculating standard deviation ------------ //
-float width_mean, height_mean, area_mean;								              //TEST~~~
-float std_deviation_width, std_deviation_height, std_deviation_area;	//TEST~~~
-float variability_score;												                      //TEST~~~
+//float width_mean, height_mean, area_mean;								              //TEST~~~
+//float std_deviation_width, std_deviation_height, std_deviation_area;	//TEST~~~
+//float variability_score;												                      //TEST~~~
 
 //int seed_number_overlap; //TEST~~~
 
 //----------------- display array -------------------//
 //rotated_raster* display_rotated_raster_p = new rotated_raster;
-rotated_raster* rotated_raster_p = new rotated_raster;
+//rotated_raster* rotated_raster_p = new rotated_raster;
 //-------------------rotated_raster_list-indexes-------------------//
-QList<int> index_list;	//save raster index values for first 50 seeds
-QList<int> index_zero_positions_list;	//save zero positions denoting end of raster
+//QList<int> index_list;	//save raster index values for first 50 seeds
+//QList<int> index_zero_positions_list;	//save zero positions denoting end of raster
 
-QList<int> raw_image_list;			  //TEST~~~
-QList<int> raw_image_zeroes_list;	//TEST~~~
-QList<int> raw_image_size_list;		//TEST~~~
+//QList<int> raw_image_list;			  //TEST~~~
+//QList<int> raw_image_zeroes_list;	//TEST~~~
+//QList<int> raw_image_size_list;		//TEST~~~
 
 //------------------- initialize starting position values -------------------//
-int number_listed_rasters = 0;
+//int number_listed_rasters = 0;
 
-float largest_dimension = 0;              //TEST~~~~	//Should be this
-//float average_calibration_seed_size = 0;	//TEST~~~
-static const int calibration_seed_number = 50;		//------------------------------- used to define the number of seeds to used for calibration data
+//float largest_dimension = 0;                      //TEST~~~~	//Should be this
+//float average_calibration_seed_size = 0;	      //TEST~~~
+//static const int calibration_seed_number = 50;		//------------------------------- used to define the number of seeds to used for calibration data
 
 //=================================================================================//
 
@@ -185,7 +188,7 @@ processor::processor()
   
   
   
-  
+  //secondary_processor* secondary_processor_p = new secondary_processor; //TEST~~~//
 
 }
 
@@ -632,7 +635,30 @@ void processor::add_line(unsigned char* start_p)
 //        cout<<"add_line point 3.  current_crop.calibrated="<<current_crop.calibrated<<".  calibration_crop.calibrated="<<calibration_crop.calibrated<<endl;
   
       }
-      if(show_blob_bool)
+      
+      //------------------------------------------------------------------------------------------------------------------//
+      //send only single seed rasters if calibration seed library is incomplete// //TEST~~~
+      /*if((blob_seed_count > 1) && (number_listed_rasters >= calibration_seed_number))
+      {
+        blob_list[blob_index]->form_display_raster();
+        secondary_processor* secondary_processor_p = new secondary_processor(blob_list[blob_index] -> width,
+                                                                             blob_list[blob_index] -> height,
+                                                                             blob_list[blob_index] -> area,
+                                                                             blob_list[blob_index] -> bool_raster_p);
+      }
+      else if((blob_seed_count == 1) && (number_listed_rasters <= calibration_seed_number))
+      {
+        blob_list[blob_index]->form_display_raster();
+        secondary_processor* secondary_processor_p = new secondary_processor(blob_list[blob_index] -> width,
+                                                                             blob_list[blob_index] -> height,
+                                                                             blob_list[blob_index] -> area,
+                                                                             blob_list[blob_index] -> bool_raster_p);
+        
+        cout<<"calibration seeds: "<<number_listed_rasters<<"/"<<calibration_seed_number<<endl;
+      }*/  
+      //------------------------------------------------------------------------------------------------------------------//
+              
+      //if(show_blob_bool)
       //if(show_blob_bool && blob_seed_count>1) //TEST~~~ //to disable and re-enable seed raster generation
       {
         cout<<blob_seed_count <<" seeds in blob\n";
@@ -649,7 +675,7 @@ void processor::add_line(unsigned char* start_p)
         //blob_list[blob_index]->kmeans_clustering(4);     //TEST~~~
         
         //------------------------------------------------------------------------------------//        
-        blob_list[blob_index]->print_display_raster();        //original image
+        //blob_list[blob_index]->print_display_raster();        //original image
 
 //===========================================================================================================================// //TEST~~~        
         
@@ -657,16 +683,36 @@ void processor::add_line(unsigned char* start_p)
         //secondary_processor_p->height = (blob_list[blob_index] -> height);
         //secondary_processor_p->test_variables();                          //TEST~~~
         
-        //secondary_processor_p->test_cout((blob_list[blob_index] -> width), (blob_list[blob_index] -> height), blob_seed_count);        //TEST~~~
+        
         //secondary_processor_p->send_raster(blob_list.size(), ); //TEST~~~
         //secondary_processor_p->send_raster(1, 2);               //TEST~~~
-        //secondary_processor_p->send_raster(1, 2, blob_list[blob_index] -> display_raster_p); //TEST~~~
+        //secondary_processor_p->send_raster(1, 2, blob_list[blob_index] -> display_raster_p); //OMIT~~~
+
+
+        //secondary_processor_p->test_cout((blob_list[blob_index] -> width), (blob_list[blob_index] -> height), blob_seed_count);        //TEST~~~        
+        //secondary_processor_p->send_raster((blob_list[blob_index] -> width), (blob_list[blob_index] -> height), blob_list[blob_index] -> display_raster_p); //TEST~~~
         
-        //secondary_processor_p->send_raster(&(blob_list[blob_index]->form_display_raster()));
+        //secondary_processor_p->send_overlap_test_data((blob_list[blob_index] -> width), (blob_list[blob_index] -> height), blob_list[blob_index] -> display_raster_p); //TEST~~~
         
-        //secondary_processor_p->overlap_test((blob_list[blob_index] -> width), (blob_list[blob_index] -> height));          //TEST~~~
-        //secondary_processor_p->print_display_raster((blob_list[blob_index] -> width), (blob_list[blob_index] -> height));  //TEST~~~
-        //secondary_processor_p->test_cout(1, 2);                                                                            //TEST~~~
+       
+        
+//===========================================================================================================================// //TEST~~~
+  //partly working//
+        //secondary_processor* secondary_processor_p = new secondary_processor; //ORIGINAL~~~//
+        
+        //secondary_processor::secondary_processor(int width, int heright, int area, processor* set_processor_p)
+        secondary_processor* secondary_processor_p = new secondary_processor(blob_list[blob_index] -> width,            //TEST~~~//
+                                                                             blob_list[blob_index] -> height,           //
+                                                                             blob_list[blob_index] -> area,             //
+                                                                             blob_list[blob_index] -> bool_raster_p);   //
+        
+        /*if(number_listed_rasters <= calibration_seed_number)                                      //OMIT~~~//
+        {                                                                                           //
+          cout<<"calibration seeds: "<<number_listed_rasters<<"/"<<calibration_seed_number<<endl;   //OMIT~~~//
+        }                                                                                           //*/
+        
+        //secondary_processor_p->store_raw_image_rasters((blob_list[blob_index] -> width), (blob_list[blob_index] -> height), blob_list[blob_index] -> bool_raster_p); //TEST~~~
+
 //===========================================================================================================================// //TEST~~~
         //blob_list[blob_index]->kmeans_clustering(blob_seed_count);     //ORIGINAL~~~
         //blob_list[blob_index]->overlap_test(blob_seed_count);          //TEST~~~
@@ -784,7 +830,7 @@ blob::blob(int start, int end, processor* set_processor_p)
   max_inflection = 0;
   finish_line = -1;//signal not to finish yet
   
-  average_calibration_seed_size = 0;  //TEST~~~//
+  //average_calibration_seed_size = 0;  //TEST~~~//
 }
 
 blob::~blob()
@@ -1675,7 +1721,7 @@ void blob::silhouette_scoring() //calculates and scores accuracy cluster configu
 }
 //==================================================================================================================================================//
 
-void::blob::overlap_test_multiple(int cluster_num)  //TEST~~~ 10_22_2018
+/*void::blob::overlap_test_multiple(int cluster_num)  //TEST~~~ 10_22_2018
 {
   //seed data variables//
   srand(time(NULL));      //same random number generated each time  //ORIGINAL~~~
@@ -1810,9 +1856,9 @@ void::blob::overlap_test_multiple(int cluster_num)  //TEST~~~ 10_22_2018
   }
 //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------//  
 }
-
+*/
 //==================================================================================================================================================//
-void blob::overlap_test(int cluster_num) //TEST~~~ 10_18_2018
+/*void blob::overlap_test(int cluster_num) //TEST~~~ 10_18_2018
 {
   cout<<"cluster_num: "<<cluster_num<<endl; //OMIT~~~
   
@@ -1862,7 +1908,7 @@ void blob::overlap_test(int cluster_num) //TEST~~~ 10_18_2018
 
 //===============================================================================================================//   //TEST~~~~~~~~~~
   //library seed retrieval//
-  /*
+  
   for(int i; i<cluster_num; ++i)
   {
     random_calibration_seed = rand() % (calibration_seed_number-1);             //select random library seed and retrieve raster image
@@ -1899,7 +1945,6 @@ void blob::overlap_test(int cluster_num) //TEST~~~ 10_18_2018
   
   display_raster_p = new char[(width+largest_library_seed_width)*(height+largest_library_seed_height)];      //define overlap raster container size
 
-  */
 
 //===============================================================================================================//    //TEST~~~~~~~~~~
   
@@ -1972,7 +2017,7 @@ void blob::overlap_test(int cluster_num) //TEST~~~ 10_18_2018
   }
   
   display_raster_p[c1_x+width*c1_y + static_x_shift + static_y_shift + width_expansion*c1_y]='1';  //centroid cluster 1
-  
+  */
   //---------------------------------------------------------------------------------------------------------------//  
   /*for (int y=larger_container_height-1; y>=0; --y)                          //print display_raster
   {
@@ -1985,7 +2030,7 @@ void blob::overlap_test(int cluster_num) //TEST~~~ 10_18_2018
   
   //---------------------------------------------------------------------------------------------------------------//  
 
-  //int centroid_x_1, centroid_x_2, centroid_x_3, centroid_x_4;
+  /*//int centroid_x_1, centroid_x_2, centroid_x_3, centroid_x_4;
   int centroid_x_1;
   //int centroid_y_1, centroid_y_2, centroid_y_3, centroid_y_4;
   int centroid_y_1;
@@ -2031,12 +2076,12 @@ void blob::overlap_test(int cluster_num) //TEST~~~ 10_18_2018
     }
     cout<<endl;
   }
-}
+}*/
 
 //==================================================================================================================================================//
 //===========================================================FUNCTIONS FOR OVERLAP ALGORITHM========================================================//
 //==================================================================================================================================================//
-void blob::store_raw_image_rasters()
+/*void blob::store_raw_image_rasters()
 {
   if(height > largest_dimension) largest_dimension = height;      //stores largest dimension size (used for normalized resizing//
   if(width > largest_dimension) largest_dimension = width;
@@ -2061,9 +2106,9 @@ void blob::store_raw_image_rasters()
 	  cout<<endl<<"largest_dimension: "<<largest_dimension<<endl;
 	  store_rotated_rasters();
   }
-}
+}*/
 
-void blob::store_rotated_rasters()	//function generates rotated raster images from the original raster image and stores into list
+/*void blob::store_rotated_rasters()	//function generates rotated raster images from the original raster image and stores into list
 {
   int y_scaling = 0;				        //variable for resizing raster after rotation
   int zero_pos;						          //zero positions in Qlist
@@ -2239,9 +2284,9 @@ void blob::store_rotated_rasters()	//function generates rotated raster images fr
   }    
   average_calibration_seed_size = average_calibration_seed_size/calibration_seed_number;	//TEST~~~
   remove_similar_rasters();		//compare calibration data library and removes similar rasters
-}
+}*/
 //---------------------------------------------------------------------------------------------------------------------------------//  
-void blob::remove_similar_rasters()	//compare and remove similar seeds in Qlist, link top 5 most similiar rasters to remaining
+/*void blob::remove_similar_rasters()	//compare and remove similar seeds in Qlist, link top 5 most similiar rasters to remaining
 {
   int segment_start = 0;
   int segment_end = 0;
@@ -2482,7 +2527,7 @@ void blob::remove_similar_rasters()	//compare and remove similar seeds in Qlist,
     {
       index_zero_positions_list.append(index_list.lastIndexOf(0,q));
     }
-  }
+  }*/
 //--------------------------Diagnostics-------------------------//
   /*cout<<endl<<"segment_num: "<<endl;            
   for(int g=0; g<segment_num.size(); ++g)
@@ -2494,7 +2539,7 @@ void blob::remove_similar_rasters()	//compare and remove similar seeds in Qlist,
   {
     cout<<segment_similarity[g]<<" ";
   }*/
-  cout<<endl<<"similar_raster_list: "<<"("<<similar_raster_list.size()<<" @ "<<similar_threshold<<")"<<endl;
+  /*cout<<endl<<"similar_raster_list: "<<"("<<similar_raster_list.size()<<" @ "<<similar_threshold<<")"<<endl;
   for(int g=0; g<similar_raster_list.size(); ++g)
   {
     cout<<similar_raster_list[g]<<" ";
@@ -2506,10 +2551,10 @@ void blob::remove_similar_rasters()	//compare and remove similar seeds in Qlist,
   }
 //---------------------------------------------------------------//
   cout<<endl<<"----------------------------Calibration Data Ready-----------------------------"<<endl;
-}
+}*/
 //==================================================================================================================================================//
 
-void blob::raster_comparison(int cluster_num)  //function for comparing raster library images to live/camera images
+/*void blob::raster_comparison(int cluster_num)  //function for comparing raster library images to live/camera images
 {
   int camera_seed_size;
   int calibration_seed_size;
@@ -2749,7 +2794,7 @@ void blob::raster_comparison(int cluster_num)  //function for comparing raster l
   if(cluster_num >= 1) display_rotated_raster_p[test_var] ='1';
   //if(cluster_num >= 1) display_rotated_raster_p[test_var] ='1';
   
-  print_rotated_rasters();	//TEST~~~
+  //print_rotated_rasters();	//TEST~~~
 //===========================================================================================================//
 //---------------------------------------------random function test------------------------------------------//
 //===========================================================================================================//
@@ -2811,7 +2856,7 @@ void blob::raster_comparison(int cluster_num)  //function for comparing raster l
   else if(display_height > rmax_y_store && display_height > display_width) 
   {
     display_rotated_raster_p = new char[display_height*display_height];
-  }
+  }*/
 //===================================================================================================================================//
 //---------------------------------------------------------All Random Shift Test-----------------------------------------------------//
 //===================================================================================================================================//
@@ -2821,7 +2866,7 @@ void blob::raster_comparison(int cluster_num)  //function for comparing raster l
   //while((best_score*larger_area/average_calibration_seed_size > 0.25) && (best_score > target_score) && (area>area_mean+2.0*std_deviation_area))		//TEST~~~ 07_23a	canola
   //while((best_score*larger_area/average_calibration_seed_size > 0.25) && (best_score > target_score) && (area>area_mean+2.0*std_deviation_area))		//TEST~~~ modify function to accomodate canola
   
-  cout<<"single target: "<<target_score<<"	";	//OMIT~~~
+  /*cout<<"single target: "<<target_score<<"	";	//OMIT~~~
   cout<<"best: "<<best_score<<"	larger: "<<larger_area<<"	average_size: "<<average_calibration_seed_size<<"	X= "<<best_score*larger_area/average_calibration_seed_size<<endl;			//OMIT~~~
   //cout<<"SD scale: "<<(5-60.0*variability_score)<<"	area:"<<area<<"	c.area:"<<(area_mean+((4-40.0*variability_score)*std_deviation_area))<<" ("<<(4-40.0*variability_score)<<")"<<endl;		//OMIT~~~
   cout<<"area:"<<area<<"	c.area:"<<(area_mean+(((((1-10.0*variability_score)-0.35)*10)-0.35)*std_deviation_area))<<" ("<<((((1-10.0*variability_score)-0.35)*10)-0.35)<<")"<<endl;		//OMIT~~~
@@ -3058,7 +3103,7 @@ void blob::raster_comparison(int cluster_num)  //function for comparing raster l
 	  
       cout<<"area_percent: "<<area_percent<<"	best_score: "<<best_score<<"	target_score: "<<target_score<<endl;	//OMIT~~~ 
       best_score = 1;	//TEST~~~
-    }
+    }*/
 //================================reverting function for oversensitivity on single rasters==========================//
 	/*if(num_seeds_tried == 2 && loop_iterations == 0) cout<<endl<<"NUM2 LOOP0"<<endl;		//OMIT~~~
 	if(num_seeds_tried == 21 && loop_iterations == 0) cout<<endl<<"NUM21 LOOP0"<<endl;		//OMIT~~~
@@ -3116,9 +3161,9 @@ void blob::raster_comparison(int cluster_num)  //function for comparing raster l
 	  }
 	}*/
 //==================================================================================================================//
-    if(best_score < target_score)
+  /*  if(best_score < target_score)
     {
-      print_resized_rasters();	//Visualization for resized overlap comparison images
+      //print_resized_rasters();	//Visualization for resized overlap comparison images
       cout<<"============================================================"<<endl;
       cout<<"best similarity: "<<best_score<<"		best score: "<<best_score*larger_area<<endl;
       cout<<"Current Similarity: "<<area_percent<<"	Score: "<<score<<endl;
@@ -3134,9 +3179,9 @@ void blob::raster_comparison(int cluster_num)  //function for comparing raster l
   cout<<"prev.: "<<previous_best_score<<"	curr.: "<<current_best_score<<"	Target_Score: "<<target_score<<endl;	//OMIT~~~
   cout<<"============================================================"<<endl;
 //=========================================================================================================================================//
-}
+}*/
 
-bool blob::read_calibration_data_file()
+/*bool blob::read_calibration_data_file()
 {
   char calibrated_crop_name[30];
   char user_crop_request[30];
@@ -3241,9 +3286,9 @@ bool blob::read_calibration_data_file()
     return_bool = 0;
   }
   return return_bool;
-}
+}*/
 
-bool blob::write_calibration_data_file() 
+/*bool blob::write_calibration_data_file() 
 {
   char calibrated_crop_name[30];
   cout<<endl<<"No existing calibration data file found. Creating new file."<<endl
@@ -3280,9 +3325,9 @@ bool blob::write_calibration_data_file()
   cout<<"...diagnostic data appended to file..."<<endl;
 //----------------------------------------------------------------------------------------------------------------------------------------------// 
   return 1;
-}
+}*/
 
-void blob::calculate_threshold_values()
+/*void blob::calculate_threshold_values()
 {
   int num_rasters;
   float width_sum = 0;
@@ -3327,11 +3372,11 @@ void blob::calculate_threshold_values()
 //--------------------------------------------variability calculation----------------------------------------//
   variability_score = (std_deviation_area/area_mean + std_deviation_height/height_mean + std_deviation_width/width_mean)/10;
   cout<<"variability_score: "<<variability_score<<endl;	//OMIT~~~
-}
+}*/
 
 //==========================================================DIAGNOSTIC OUTPUT FILE===========================================================//
 //just output to file the score, best_score, larger_area, best_fit_size
-bool blob::write_diagnostic_data_file(float seed_number_overlap_test, float score, float best_score, float camera_seed_size, float best_fit_size,
+/*bool blob::write_diagnostic_data_file(float seed_number_overlap_test, float score, float best_score, float camera_seed_size, float best_fit_size,
 									  float variability_score, float larger_area) 
 {
   {
@@ -3346,10 +3391,10 @@ bool blob::write_diagnostic_data_file(float seed_number_overlap_test, float scor
   }
   cout<<endl<<"Diagnostic data stored"<<endl;
   return 1;
-}
+}*/
 //===========================================================================================================================================//
 
-void blob::print_rotated_rasters()
+/*void blob::print_rotated_rasters()
 {
   for (int y=rmax_y-1; y>=0; --y)
   {
@@ -3371,5 +3416,5 @@ void blob::print_resized_rasters()
     }
     cout<<endl;
   }	
-}
+}*/
 

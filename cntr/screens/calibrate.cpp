@@ -41,21 +41,22 @@ calibrate::calibrate(centre* set_centre_p)
   
   main_layout_p = new QGridLayout;
 
-  top_layout_p -> addWidget(count_message_p, 0, 0);
+  top_layout_p -> addWidget(count_message_p, 0, 0);               //MODIFIED LAYOUT~~~12_14_2018//
   top_layout_p -> addWidget(gateset_button_p, 0, 1);
   top_layout_p -> addWidget(back_button_p, 0, 2);
   control_layout_p -> addWidget(zero_button_p, 0, 0);
   control_layout_p -> addWidget(endgate_button_p, 1, 0);
   control_layout_p -> addWidget(speed_box_p, 2, 0);
-  speed_layout_p -> addWidget(speed_label_p, 0, 0);
-  speed_layout_p -> addWidget(startstop_button_p, 0, 1);
-  speed_layout_p -> addWidget(speed_set_p, 1, 0, 1, 2);
+  speed_layout_p -> addWidget(speed_label_p, 0, 1, 1, 3);         //TEST~~~//
+  speed_layout_p -> addWidget(startstop_button_p, 0, 0, 2, 1);    //TEST~~~//
+  speed_layout_p -> addWidget(speed_set_p, 1, 1, 1, 3);           //TEST~~~//
   bottom_layout_p -> addWidget(skip_button_p, 0, 2);
   bottom_layout_p -> addWidget(done_button_p, 0, 3);
   main_layout_p -> addWidget(top_box_p, 0, 0, 1, 2);
-  main_layout_p -> addWidget(control_box_p, 1, 0);
-  main_layout_p -> addWidget(message_box_p, 1, 1);
-  main_layout_p -> addWidget(bottom_box_p, 2, 0, 1, 2);
+  main_layout_p -> addWidget(speed_box_p, 1, 0, 1, 4);            //TEST~~~//
+  main_layout_p -> addWidget(control_box_p, 2, 0);
+  main_layout_p -> addWidget(message_box_p, 2, 1);
+  main_layout_p -> addWidget(bottom_box_p, 3, 0, 1, 2);
   
   top_box_p -> setLayout(top_layout_p);
   control_box_p -> setLayout(control_layout_p);
@@ -128,6 +129,14 @@ calibrate::calibrate(centre* set_centre_p)
   
   centre_p->count = 0;
   calibration_message_posted = false;
+  
+  speed_label_p->setAlignment(Qt::AlignCenter);
+  top_layout_p->setContentsMargins(0,0,0,0);        //set layout margins to shrink to designated container dimensions//
+  control_layout_p->setContentsMargins(0,0,0,0);
+  speed_layout_p->setContentsMargins(0,0,0,0);
+  bottom_layout_p->setContentsMargins(0,0,0,0);
+  main_layout_p->setContentsMargins(0,0,10,10);
+  
 }
 
 calibrate::~calibrate()
@@ -188,6 +197,10 @@ void calibrate::startstop_clicked()
 
 void calibrate::change_speed(int value)
 {
+  //~~~feeder speed behaviour~~~//
+  if(value <= 25) value = value/2;         //~~~piece-wise linear, 2 parts~~~//
+  else value = 1.5*value-25;
+  
   if(feeder_is_running)
   {
     centre_p->set_speed(value);
@@ -215,6 +228,23 @@ void calibrate::run()
 {
   QString message=QString("Calibrating.  Count: %1").arg(centre_p->count);
   count_message_p->setText(message);
+  
+  
+    count_message_p->setStyleSheet("QLabel {"     //TEST~~~
+          "background-color: white;"            //
+          "border: 3px solid black;"            //
+          "font-size: 18pt;}");                 //
+
+  int slider_position_num;
+  if(speed_set_p->sliderPosition() <= 25) slider_position_num = (speed_set_p->sliderPosition())/2;      //piece-wise linear, 2 sections//
+  else slider_position_num = 1.5*(speed_set_p->sliderPosition())-25;
+
+  QString slider_position_message = QString("Speed:  %1 \%").arg(1.0*slider_position_num/10);           //TEST~~~
+  speed_label_p->setText(slider_position_message);                                                      //TEST~~~
+  speed_label_p->setStyleSheet("QLabel {"
+          "font: bold;}");
+  
+  
   
   if (centre_p->crops[0].calibrated)
   {

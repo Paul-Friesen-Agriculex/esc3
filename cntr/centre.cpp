@@ -32,7 +32,7 @@
 //#include "delete_program.hpp"
 #include "crop_name_exists.hpp"
 #include "diagnostics_console.hpp"
-#include "macro_screen.hpp"	//TEST~~~
+#include "macro_screen.hpp"	  //TEST~~~
 //#include "table.hpp"        //TEST~~~ //access barcodes and count from table
 
 
@@ -877,15 +877,15 @@ void centre::load_macros()	//TEST~~~ connecting macros screen
   QString count_string;
   
   //int char_array_it = 0;
-  char barcode_1[30];		//TEST~~~ totalize_mode variables
-  char barcode_2[30];
-  char barcode_3[30];
-  char barcode_4[30];
-  char seed_count[30];
+  char barcode_1[300];		//TEST~~~ totalize_mode variables
+  char barcode_2[300];
+  char barcode_3[300];
+  char barcode_4[300];
+  char seed_count[300];
   //char seed_weight[30];	//implement when scale is added to seed counter
   
-  char lotcode[30];			//TEST~~~ batch_mode variables
-  char packcode[30];
+  char lotcode[300];			//TEST~~~ batch_mode variables
+  char packcode[300];
   //char substitution[30];  //yet to be implemeneted//
   //char seed_count[30];
 //----------------------------------------------------------------------------------------------------------------//
@@ -911,7 +911,7 @@ void centre::load_macros()	//TEST~~~ connecting macros screen
 		<<"\t"<<"seed_count: "<<seed_count<<endl;	        //
     barcodes.close();
     
-    for(int q=0; q<30; ++q)
+    for(int q=0; q<300; ++q)
     {
       if(barcode_1[q] == ',')
       {
@@ -950,7 +950,7 @@ void centre::load_macros()	//TEST~~~ connecting macros screen
         <<"\t"<<"seed_count: "<<seed_count<<endl;		    //
     batchcodes.close();									                //
     
-    for(int q=0; q<30; ++q)
+    for(int q=0; q<300; ++q)
 	  {
 	    if(lotcode[q] == ',')
 	    {
@@ -964,7 +964,7 @@ void centre::load_macros()	//TEST~~~ connecting macros screen
 	    {
 	      seed_count[q] = 0;
 	    }
-	  }
+	  }    
   }
 //----------------------------------------------------------------------------------------------------------------//
   {
@@ -977,7 +977,7 @@ void centre::load_macros()	//TEST~~~ connecting macros screen
 	    macros>>macro_name_char;
 	    macros>>macro_mask_char;
 	    macros>>macro_function_char;
-	
+
       //if(macros.eof()) break;
 	    if(macro_status_bool == 0)
       { 

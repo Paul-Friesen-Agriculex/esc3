@@ -143,9 +143,9 @@ class centre : public QObject
   
   bool macro_status_bool;			  //temporary variable to transfer ifstream to tablewidget
   int macro_numb_int;				    //
-  char macro_name_char[30];			//
-  char macro_mask_char[30];			//
-  char macro_function_char[30];		//
+  char macro_name_char[300];			//
+  char macro_mask_char[300];			//
+  char macro_function_char[300];		//
   QString combined_macro_functions;	//new char to combine all macros
   
   //batch mode

@@ -325,7 +325,10 @@ void batch::dump_complete(int dump_count)
   
   //QString variant to integers//	11_02_2018//
   QString lotcode_str, packcode_str, batch_count_str, substitution_str, dump_count_str;
+  lotcode_str.clear(); packcode_str.clear(); batch_count_str.clear(); substitution_str.clear(); dump_count_str.clear(); //TEST~~~//
+  
   dump_count_str = QString::number(dump_count);
+  cout<<"DUMP_COUNT: "<<dump_count<<endl; //OMIT~~~//
   macro_screen_p -> usb_serial_out(lotcode_str, packcode_str, batch_count_str, substitution_str, dump_count_str);
 }
 
@@ -426,14 +429,7 @@ void batch::run()
   count_message_p->setText(message);
   centre_p->processor_display_blobs(false);
   
-  /*QString speed_label_string = (QString("Speeds:        H: %1%   L: %2%   D: %3%")
-    .arg(1.0*high_speed_set_p->sliderPosition()/10)
-    .arg(1.0*low_speed_set_p->sliderPosition()/10)
-    .arg(1.0*dump_speed_set_p->sliderPosition()/10));
-  speed_box_p -> setTitle(speed_label_string);*/
-  
   int high_speed_slider_position, low_speed_slider_position, dump_speed_slider_position;
-  
   if(high_speed_set_p->sliderPosition() <= 500) high_speed_slider_position = (high_speed_set_p->sliderPosition())/2;      //piece-wise linear, 2 sections//
   else high_speed_slider_position = 1.5*(high_speed_set_p->sliderPosition())-500;
   if(low_speed_set_p->sliderPosition() <= 50) low_speed_slider_position = (low_speed_set_p->sliderPosition())/2;          //piece-wise linear, 2 sections//

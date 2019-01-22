@@ -17,13 +17,14 @@
 #include <QSignalMapper>
 #include <QTabWidget>
 
-#include <fcntl.h>	//library used to use system call command "open()" used to check available serial
-#include <unistd.h>	//library to enable write() function
-
-#include <QtGui>  //included to implement delay in serial output//
-#include <QTime>  //
+#include <fcntl.h>	  //library used to use system call command "open()" used to check available serial
+#include <unistd.h>	  //library to enable write() function
+#include <QtGui>      //included to implement delay in serial output//
+#include <QTime>      //
   //explore some databases that may be used and spreadsheet programs, may need to include more features 
   //such as moving to or creating another sheet/file
+
+#include <QTimer>
 
 //#include <QSize>      //OMIT~~~
 //#include <QCheckBox>  //OMIT~~~
@@ -237,22 +238,22 @@ void macro_screen::help_button_clicked()
 //modified to handle barcodes as characters instead of integers// 11_02_2018~~~//
 void macro_screen::usb_serial_out(QString bar_str_1, QString bar_str_2, QString bar_str_3, QString bar_str_4, QString totalize_count_str, QString weight_str)
 {
-  cout<<endl<<"USB2SERIAL QStringVariant"<<endl;                                        //OMIT~~~
-  cout<<"bar_1: "<<bar_str_1.toUtf8().constData();                                      //OMIT~~~
-  cout<<"\tbar_2: "<<bar_str_2.toUtf8().constData();                                    //
-  cout<<"\tbar_3: "<<bar_str_3.toUtf8().constData();                                    //
-  cout<<"\tbar_4: "<<bar_str_4.toUtf8().constData()<<endl;                              //
-  cout<<endl<<"totalize_str_count: "<<totalize_count_str.toUtf8().constData()<<endl;    //
-  cout<<endl<<"totalize_str_weight: "<<weight_str.toUtf8().constData()<<endl;           //
-  //----------------------------------------------------------------------------------------//
+  cout<<endl<<"USB2SERIAL QStringVariant"<<endl;                                          //OMIT~~~
+  cout<<"bar_1: "<<bar_str_1.toUtf8().constData();                                        //OMIT~~~
+  cout<<"\tbar_2: "<<bar_str_2.toUtf8().constData();                                      //
+  cout<<"\tbar_3: "<<bar_str_3.toUtf8().constData();                                      //
+  cout<<"\tbar_4: "<<bar_str_4.toUtf8().constData()<<endl;                                //
+  //cout<<endl<<"totalize_str_count: "<<totalize_count_str.toUtf8().constData()<<endl;    //
+  //cout<<endl<<"totalize_str_weight: "<<weight_str.toUtf8().constData()<<endl;           //
+  //--------------------------------------------------------------------------------------//
   
   bool macro_status_bool;			      //temporary variable to transfer ifstream to tablewidget
   int macro_numb_int;				        //
-  char macro_name_char[30];			    //
-  char macro_mask_char[30];			    //
-  char macro_function_char[30];		  //
+  char macro_name_char[300];			    //
+  char macro_mask_char[300];			    //
+  char macro_function_char[300];		  //
  
-  //QString combined_macro_functions;	//new char to combine all macros 
+  //QString combined_macro_functions;	//new char to combine all macros
   QString macro_string;
   QString combined_macro_functions;
   QString count_string;
@@ -327,19 +328,22 @@ void macro_screen::usb_serial_out(QString bar_str_1, QString bar_str_2, QString 
 //--------------------------------------------------------------OUTPUT TO SERIAL--------------------------------------------------------------//
   int size_string_macros = combined_macro_functions.size();
   //int filedesc = open("/dev/usb2serial", O_WRONLY);
-  int filedesc = open("/dev/ttyUSB0", O_WRONLY);  //if udev rules are not applied//
+  //int filedesc = open("/dev/ttyUSB0", O_WRONLY);  //if udev rules are not applied// ftdi cable//
+  int filedesc = open("/dev/ttyACM1", O_WRONLY);  //arduino usb2serial connector//
+  
+  
   //write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros) != size_string_macros;
-  //cout<<endl<<"serial string buffer length: "<<write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros)<<endl;
-//--------------------------------------------------------------------------------------------------------------------------------------------//
+  cout<<endl<<"serial string buffer length: "<<write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros)<<endl;
+//--------------------------------------------------------------------------------------------------------------------------------------------//  //REPLACE BLOCK WITH SINGLE-SHOT QTIMER//
   //serial terminal write function with slight delay between commands//
-  int write_output = 0;         //TEST~~~
+  /*int write_output = 0;         //TEST~~~
   QString current_char_string;  //TEST~~~
   
   for(int xy = 0; xy< size_string_macros; ++xy)
   {
     if(combined_macro_functions.at(xy) == '\\')
     {
-      QTime dieTime= QTime::currentTime().addMSecs(250);
+      QTime dieTime= QTime::currentTime().addMSecs(100);
       while (QTime::currentTime() < dieTime)
       {
         QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
@@ -347,7 +351,7 @@ void macro_screen::usb_serial_out(QString bar_str_1, QString bar_str_2, QString 
       ++xy;
       if(combined_macro_functions.at(xy) == 'Q')
       {
-        QTime dieTime= QTime::currentTime().addMSecs(350);
+        QTime dieTime= QTime::currentTime().addMSecs(100);
         while (QTime::currentTime() < dieTime)
         {
           QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
@@ -363,8 +367,10 @@ void macro_screen::usb_serial_out(QString bar_str_1, QString bar_str_2, QString 
     }
   }
   cout<<current_char_string.toUtf8().constData();  //OMIT~~~
-  cout<<write_output<<endl; //TEST~~~
+  cout<<write_output<<endl; //TEST~~~*/
 //--------------------------------------------------------------------------------------------------------------------------------------------//
+  
+
 }
 
 void macro_screen::usb_serial_out(QString lotcode_str, QString packcode_str, QString batch_count_str, QString substitution_str, QString dump_count_str)
@@ -447,13 +453,15 @@ void macro_screen::usb_serial_out(QString lotcode_str, QString packcode_str, QSt
   //cout<<"Macros loaded"<<endl;  //OMIT~~~
   int size_string_macros = combined_macro_functions.size();
   //int filedesc = open("/dev/usb2serial", O_WRONLY);
-  int filedesc = open("/dev/ttyUSB0", O_WRONLY);  //if udev rules are not applied//
+  //int filedesc = open("/dev/ttyUSB0", O_WRONLY);  //if udev rules are not applied// ftdi cable//
+  int filedesc = open("/dev/ttyACM1", O_WRONLY);  //arduino usb2serial connector//
+  
   //write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros) != size_string_macros;
   //write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros);
-  //cout<<endl<<"serial string buffer length: "<<write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros)<<endl; //ORIGINAL~~~
+  cout<<endl<<"serial string buffer length: "<<write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros)<<endl; //ORIGINAL~~~
 //--------------------------------------------------------------------------------------------------------------------------------------------//
   //serial terminal write function with slight delay between commands//
-  int write_output = 0; //TEST~~~
+  /*int write_output = 0; //TEST~~~
   QString current_char_string;
   
   for(int xy = 0; xy< size_string_macros; ++xy)
@@ -484,7 +492,7 @@ void macro_screen::usb_serial_out(QString lotcode_str, QString packcode_str, QSt
     }
   }
   //cout<<current_char_string.toUtf8().constData();  //OMIT~~~
-  cout<<write_output<<endl; //TEST~~~
+  cout<<write_output<<endl; //TEST~~~*/
 //--------------------------------------------------------------------------------------------------------------------------------------------//
 }
 
@@ -633,9 +641,9 @@ void macro_screen::store_macro_table()
     else macros<<endl<<(tableWidget_p->item(i, 2)->text()).toUtf8().constData();		//macro name  //TEST~~~//
     
     
-    //macros<<endl<<(tableWidget_p->item(i, 2)->text()).toUtf8().constData();		//macro name  //ORIGINAL~~~//
-    macros<<endl<<(tableWidget_p->item(i, 3)->text()).toUtf8().constData();		//macro mask
-    macros<<endl<<(tableWidget_p->item(i, 4)->text()).toUtf8().constData();		//macro function
+    //macros<<endl<<(tableWidget_p->item(i, 2)->text()).toUtf8().constData();		  //macro name  //ORIGINAL~~~//
+    macros<<endl<<(tableWidget_p->item(i, 3)->text()).toUtf8().constData();		    //macro mask
+    macros<<endl<<(tableWidget_p->item(i, 4)->text()).toUtf8().constData();		    //macro function
   }
   macros.close();
   macros.clear();

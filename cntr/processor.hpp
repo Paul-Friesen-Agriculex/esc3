@@ -13,7 +13,7 @@
 
 class processor;
 class centre;
-//class secondary_processor;  //11_21_2018//
+class secondary_processor;  //11_21_2018//
 
 struct slice
 {
@@ -123,7 +123,7 @@ class blob
   //FUNCTIONS FOR OVERLAP ALGORITHM//
   void store_raw_image_rasters();		    //--- if no calibration data found, stores first 50 seeds to a QList	---//
   void store_rotated_rasters();			    //------------------------------------
-  void print_rotated_rasters(); 		    //--- functions same as print display rasters --- //
+  //void print_rotated_rasters(); 		    //--- functions same as print display rasters --- //
   void remove_similar_rasters();		    //--- compare and remove similar seeds ---//
   //void raster_comparison();				      //--- compares first 400 rasters to following 50 seeds	---//
   void raster_comparison(int cluster_num);				      //--TEST~~~~~~
@@ -133,7 +133,7 @@ class blob
                                   float best_fit_size, float variability_score, float larger_area);	                      //	===Generate Diagnostic Data File===	//	//OMIT~~~
   bool read_calibration_data_file();	  //--- reads calibration to QList for comparing camera images	---//
   //void resize_calibration_data();		  //--- resizes calibration data matrices to rmax_x_store dimensions ---// OMIT~~~
-  void print_resized_rasters();			    //--- prints resized rasters in 20x20	---//
+  //void print_resized_rasters();			    //--- prints resized rasters in 20x20	---//
   void print_resized_rasters_2(int display_width, int display_height);			//	---display to dynamic display container--//
   void calculate_threshold_values();	  //--- calculates thresholds and stores into file	---//
   
@@ -162,7 +162,7 @@ class blob
   int static_x_shift_l1[number_overlaps_to_test];
   
 //==============================================================================================================//
-
+/*
   static const float similar_threshold = 0.10; 	//-----------------------defines threshold for two rasters to be "similar"
   
   //------------- variables used in calculating standard deviation ------------ //
@@ -218,6 +218,7 @@ class blob
   QList<float> full_score_list;		      //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   //QList<int> camera_seed; 		        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   QList<int> similar_raster_list;       //list of very similar rasters to be removed
+  */
 //=====================================================================================================================================================================//  
   //moving overlap test to another file and class //11_21_2018//
 
@@ -245,7 +246,7 @@ class processor : public QObject
   bool dust_streak_present;//true value indicates dust on window.  should be cleaned.
   float dust_streak_percentage();//returns percentage of width in which inflections will not be counted due to dust streaks
   
-  //secondary_processor* secondary_processor_p; //TEST~~~ //11_21_2018//
+  secondary_processor* secondary_processor_p; //TEST~~~ //11_21_2018//
 
   
   public slots:
