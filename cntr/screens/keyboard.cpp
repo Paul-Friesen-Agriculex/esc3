@@ -457,8 +457,9 @@ void crop_name_entry::enter_clicked()
   centre_p->crops[0].gate_setting=0;
   centre_p->crops[0].area_mean=0;
   centre_p->crops[0].area_stdev=0;
-  centre_p->crops[0].max_inflection=0;
-  centre_p->crops[0].inflection_count_mean=0;
+  centre_p->crops[0].max_inflection_1=0;
+  centre_p->crops[0].max_inflection_3=0;
+  centre_p->crops[0].max_inflection_9=0;
   centre_p->crops[0].calibrated=0;
   centre_p->add_waiting_screen(10);
   centre_p->screen_done=true;

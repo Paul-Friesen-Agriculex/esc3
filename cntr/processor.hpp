@@ -22,12 +22,23 @@ struct slice
   int end;
 };
 
+struct end_line_point//points at the left and right ends of each horizontal line in blob
+{
+  int x;
+  int y;
+};
+
 struct outline_point
 {
   int x;
   int y;
-  float direction;//estimate of direction of curve in radians from horizontal
-  float inflection;//a measure of the degree of inflection.  positive values indicate curve is concave.  negative ones indicate convex.  
+  float direction;//direction of line segment after point in radians from horizontal
+  float distance;//to next point from this one.  measured in horizontal pixel spacings.
+  //inflection.  positive values indicate curve is concave.  negative ones indicate convex.  
+  float inflection_0;//inflection of the two lines that meet at the point
+//  float inflection_1;//measured with arms 1% of outline length
+//  float inflection_3;//measured with arms 3% of outline length
+//  float inflection_9;//measured with arms 9% of outline length
 };
 
 struct line_segment
@@ -48,18 +59,25 @@ struct rotated_raster
 class blob
 {
   public:
-  static const int direction_distance = 3;//number of positions forward and backward in outline to count to estimate outline direction.
-  static const int inflection_distance = 3;//number of positions forward and backward in outline to count to estimate inflection
-  static const float inflection_tolerance = 0.1;//min. inflection to count as an inflection during calibration.
-  static const float inflection_sensitivity_factor = 1.8;//values above 1 reduce the likelihood of detecting an inflection.
+//  static const int direction_distance = 3;//number of positions forward and backward in outline to count to estimate outline direction.
+//  static const int inflection_distance = 3;//number of positions forward and backward in outline to count to estimate inflection
+//  static const float inflection_tolerance = 0.1;//min. inflection to count as an inflection during calibration.
+//  static const float inflection_sensitivity_factor = 1.8;//values above 1 reduce the likelihood of detecting an inflection.
   blob(int start, int end, processor* set_processor_p);
   ~blob();
   bool offer(int slice_start, int slice_end);//true indicates slice accepted
   void combine(int combine_index);
   void form_raster_image();
+  void fill_end_line_point_list();
   void form_outline();
   void form_display_raster();
   void print_display_raster();
+  
+  float inflection_1_out;
+  float inflection_3_out;
+  float inflection_9_out;
+  void inflection_calc(int index);//calculates inflection values at outline point index and stores them in above variables.
+  
   void calculate_characteristics();
   int seeds_in_blob();
   
@@ -67,7 +85,9 @@ class blob
   bool remove;//true indicates this blob should be removed
   int area;
   int inflection_count;
-  float max_inflection;  
+  float max_inflection_1;  
+  float max_inflection_3;  
+  float max_inflection_9;  
   
   bool took_slice;//true indicates that this blob already took a slice on this line.
   //if a blob gets no slice on a line, it is complete
@@ -80,30 +100,35 @@ class blob
   int width;
   int height;
   
-
-  QList<outline_point*> outline_point_list;//holds a list of points tracing the outline of the blob.  Starts with the leftmost point of the bottom line.
+  QList<end_line_point*> end_line_point_list;//holds right and left ends of each horizontal line in blob
+  int el_x, el_y;
+  QList<outline_point*> outline_point_list;//holds a list of points tracing the outline of the blob.  Starts with the leftmost point of the bottom line.  Includes only points in end_line_point_list.  Other outline points eliminated.
   int ol_x, ol_y;
   int ol_angle;//while tracing around the blob, this holds the angle of the last move.
   int ol_try_x, ol_try_y;
   void ol_try_start(int start_angle);//try advancing 1 position in this direction.  If on outline, sets trace_x, trace_y, and advance_angle. 
     //tries other angles advancing counterclockwise in 45 degree steps.
   void ol_shift_point(int angle);//sets ol_try_x and ol_try_y 
-  int ol_length;//number of entries in outline_point_list
+  float ol_length;//outline length in units of the horizontal distance between neighbouring pixels
+  int opl_size;//final number of elements in outline_point_list
+  int opl_increment(int start);
+  int opl_decrement(int start);
+  void remove_inflection(int index);
   
   bool calibrating;
   static const int max_seeds = 5;
   float expected_mean_area[max_seeds];//a blob with i seeds is expected to have an area of expected_mean_area[i] on average
   float expected_variance_area[max_seeds];
   int score_area[max_seeds];
-  int score_mi[max_seeds];
+  int score_mi1[max_seeds];
+  int score_mi3[max_seeds];
+  int score_mi9[max_seeds];
   int score_ic[max_seeds];
   int score_likelihood[max_seeds];//high numbers of seeds in a blob are unlikely
   
-  //functions to check blobs identified as multiple seeds by previous algorithm, which can be fooled by debris
   int inflection_x[100];//x co-ordinates of inflection points
   int inflection_y[100];//y co-ordinates of inflection points
   int inflection_i[100];//indexes of inflection points in outline_point_list
-  
   //when line_count in processor reaches finish_line, it will finish this blob by determining number of seeds and deleting.
   //this allows a delay for dust streaks to be detected before the number of seeds is determined.
   long long finish_line;
@@ -298,8 +323,9 @@ class processor : public QObject
   
   int calibration_area_list[50];
   int calibration_area_list_index;
-  float calibration_max_inflection_list[50];
-  int calibration_inflection_count_list[50];
+  float calibration_max_inflection_1_list[50];
+  float calibration_max_inflection_3_list[50];
+  float calibration_max_inflection_9_list[50];
   crop calibration_crop;
   
   bool record_this_image;

@@ -111,8 +111,9 @@ centre::centre():
     crops[i].gate_setting=0;
     crops[i].area_mean=0;
     crops[i].area_stdev=0;
-    crops[i].max_inflection=0;
-    crops[i].inflection_count_mean=0;
+    crops[i].max_inflection_1=0;
+    crops[i].max_inflection_3=0;
+    crops[i].max_inflection_9=0;
     crops[i].calibrated=0;
     crops[i].high_feed_speed=0;
     crops[i].low_feed_speed=0;
@@ -130,8 +131,9 @@ centre::centre():
     f>>crops[i].gate_setting;
     f>>crops[i].area_mean;
     f>>crops[i].area_stdev;
-    f>>crops[i].max_inflection;
-    f>>crops[i].inflection_count_mean;
+    f>>crops[i].max_inflection_1;
+    f>>crops[i].max_inflection_3;
+    f>>crops[i].max_inflection_9;
     f>>crops[i].calibrated;
 //    f.get();
     f>>crops[i].high_feed_speed;
@@ -226,8 +228,9 @@ centre::~centre()
     f<<crops[i].gate_setting<<" ";
     f<<crops[i].area_mean<<" ";
     f<<crops[i].area_stdev<<" ";
-    f<<crops[i].max_inflection<<" ";
-    f<<crops[i].inflection_count_mean<<" ";
+    f<<crops[i].max_inflection_1<<" ";
+    f<<crops[i].max_inflection_3<<" ";
+    f<<crops[i].max_inflection_9<<" ";
     f<<crops[i].calibrated;
     f<<endl;
     f<<crops[i].high_feed_speed<<" ";
@@ -577,8 +580,9 @@ void centre::delete_crop(int crop_index)
     crops[99].gate_setting=0;
     crops[99].area_mean=0;
     crops[99].area_stdev=0;
-    crops[99].max_inflection=0;
-    crops[99].inflection_count_mean=0;
+    crops[99].max_inflection_1=0;
+    crops[99].max_inflection_3=0;
+    crops[99].max_inflection_9=0;
     crops[99].calibrated=0;
   }
 }

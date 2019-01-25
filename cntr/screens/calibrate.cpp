@@ -109,9 +109,11 @@ calibrate::calibrate(centre* set_centre_p)
     message_box_p->append(message);
     message=QString("Area Standard Deviation %1.") .arg(centre_p->crops[0].area_stdev);
     message_box_p->append(message);
-    message=QString("Maximum Inflection %1.") .arg(centre_p->crops[0].max_inflection);
+    message=QString("Maximum Inflection 1 %1.") .arg(centre_p->crops[0].max_inflection_1);
     message_box_p->append(message);
-    message=QString("Inflection Count Mean %1.") .arg(centre_p->crops[0].inflection_count_mean);
+    message=QString("Maximum Inflection 3 %1.") .arg(centre_p->crops[0].max_inflection_3);
+    message_box_p->append(message);
+    message=QString("Maximum Inflection 9 %1.") .arg(centre_p->crops[0].max_inflection_9);
     message_box_p->append(message);
     message=QString("Recalibrating.  Drop 50 seeds slowly.");
     message_box_p->append(message);
@@ -233,9 +235,11 @@ void calibrate::run()
       message_box_p->append(message);
       message=QString("Area Standard Deviation %1.") .arg(centre_p->crops[0].area_stdev);
       message_box_p->append(message);
-      message=QString("Maximum Inflection %1.") .arg(centre_p->crops[0].max_inflection);
+      message=QString("Maximum Inflection 1 %1.") .arg(centre_p->crops[0].max_inflection_1);
       message_box_p->append(message);
-      message=QString("Inflection Count Mean %1.") .arg(centre_p->crops[0].inflection_count_mean);
+      message=QString("Maximum Inflection 3 %1.") .arg(centre_p->crops[0].max_inflection_3);
+      message_box_p->append(message);
+      message=QString("Maximum Inflection 9 %1.") .arg(centre_p->crops[0].max_inflection_9);
       message_box_p->append(message);
     }
   }

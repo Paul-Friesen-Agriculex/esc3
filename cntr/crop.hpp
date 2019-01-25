@@ -9,8 +9,9 @@ struct crop
   int gate_setting;
   int area_mean;
   int area_stdev;
-  float max_inflection;
-  float inflection_count_mean;
+  float max_inflection_1;//measured with arms 1% of outline length
+  float max_inflection_3;//measured with arms 3% of outline length
+  float max_inflection_9;//measured with arms 9% of outline length
   bool calibrated;
   
   int high_feed_speed;
