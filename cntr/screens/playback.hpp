@@ -49,7 +49,7 @@ class playback : public screen
   button* quit_button_p;
   button* autoadvance_button_p;
   QSlider* autoadvance_slider_p;
-  button* save_image_button_p;
+//  button* save_image_button_p;
   QLineEdit* file_name_p;
   QGroupBox* autoadvance_box_p;
   QGridLayout* autoadvance_layout_p;

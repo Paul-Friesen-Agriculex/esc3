@@ -35,7 +35,7 @@ struct outline_point
   float direction;//direction of line segment after point in radians from horizontal
   float distance;//to next point from this one.  measured in horizontal pixel spacings.
   //inflection.  positive values indicate curve is concave.  negative ones indicate convex.  
-  float inflection_0;//inflection of the two lines that meet at the point
+  float inflection_score;
 //  float inflection_1;//measured with arms 1% of outline length
 //  float inflection_3;//measured with arms 3% of outline length
 //  float inflection_9;//measured with arms 9% of outline length

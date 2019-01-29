@@ -1021,7 +1021,7 @@ void blob::form_outline()
     outline_point_list[i]->distance = d;
     outline_point_list[i]->direction = anglexy(    outline_point_list[next_index]->x - outline_point_list[i]->x    ,   outline_point_list[next_index]->y - outline_point_list[i]->y    );
   }
-
+/*
   //fill in inflection_0.  This is the inflection of the two lines that meet at the point
   for(int i=0; i<opl_size; ++i)
   {
@@ -1038,7 +1038,7 @@ void blob::form_outline()
       outline_point_list[i] -> inflection_0 = inflection_temp;
     }
   }
-
+*/
 
 
 
@@ -1240,9 +1240,6 @@ void blob::inflection_calc(int index)
   float d9 = ol_length*.09;
   int forward_i = index;
   int back_i = opl_decrement(index);
-//  float ti1=0;//temporary inflection.
-//  float ti3=0;
-//  float ti9=0;
   float dist_total = 0;
   bool got_arm_end_1 = false;
   bool got_arm_end_3 = false;
@@ -1359,26 +1356,71 @@ void blob::calculate_characteristics()
   {
     for(int i=0; i<opl_size; ++i)
     {
-      if(outline_point_list[i]->inflection_0 > 0)
-      {
-        inflection_calc(i);//stores inflection values in inflection_1_out etc.
-        if(inflection_1_out > max_inflection_1)  max_inflection_1 = inflection_1_out;
-        if(inflection_3_out > max_inflection_3)  max_inflection_3 = inflection_3_out;
-        if(inflection_9_out > max_inflection_9)  max_inflection_9 = inflection_9_out;
-      }
+      inflection_calc(i);//stores inflection values in inflection_1_out etc.
+      if(inflection_1_out > max_inflection_1)  max_inflection_1 = inflection_1_out;
+      if(inflection_3_out > max_inflection_3)  max_inflection_3 = inflection_3_out;
+      if(inflection_9_out > max_inflection_9)  max_inflection_9 = inflection_9_out;
     }
   }
   else //not calibrating
   {
     
-//    cout<<"start calculate_characteristics when calibrated\n";
+    /*
+    if(processor_p->show_blob_bool)
+    {
+      cout<<"\n\n\ncalculate characteristics\n";
+    }
+    */
     
-    max_inflection_1 = -1000;
-    max_inflection_3 = -1000;
-    max_inflection_9 = -1000;
+    
+    
     float crop_max_inflection_1 = processor_p->current_crop.max_inflection_1;
     float crop_max_inflection_3 = processor_p->current_crop.max_inflection_3;
     float crop_max_inflection_9 = processor_p->current_crop.max_inflection_9;
+    max_inflection_1 = -1000;
+    max_inflection_3 = -1000;
+    max_inflection_9 = -1000;
+    //fill in inflection_scores in outline_point_list
+    for(int i=0; i<opl_size; ++i)
+    {
+      inflection_calc(i);//stores inflection values in inflection_1_out etc.
+      if(inflection_1_out > max_inflection_1)  max_inflection_1 = inflection_1_out;
+      if(inflection_3_out > max_inflection_3)  max_inflection_3 = inflection_3_out;
+      if(inflection_9_out > max_inflection_9)  max_inflection_9 = inflection_9_out;
+      float i_score_1 = inflection_1_out - crop_max_inflection_1;
+      if(i_score_1<0) i_score_1=0;
+      float i_score_3 = inflection_3_out - crop_max_inflection_3;
+      if(i_score_3<0) i_score_3=0;
+      float i_score_9 = inflection_9_out - crop_max_inflection_9;
+      if(i_score_9<0) i_score_9=0;
+      float inflection_score = 0.1*i_score_1 + 0.5*i_score_3 + i_score_9;
+      outline_point_list[i] -> inflection_score = inflection_score;
+
+
+
+/*
+      if(processor_p->show_blob_bool)
+      {
+        cout
+        <<setw(20)<<i
+        <<setw(20)<<std::fixed<<std::setprecision(2)<<crop_max_inflection_1
+        <<setw(20)<<std::fixed<<std::setprecision(2)<<inflection_1_out
+        <<setw(20)<<std::fixed<<std::setprecision(2)<<crop_max_inflection_3
+        <<setw(20)<<std::fixed<<std::setprecision(2)<<inflection_3_out
+        <<setw(20)<<std::fixed<<std::setprecision(2)<<crop_max_inflection_9
+        <<setw(20)<<std::fixed<<std::setprecision(2)<<inflection_9_out
+        <<setw(20)<<std::fixed<<std::setprecision(2)<<inflection_score
+        <<endl;
+      }
+*/
+
+
+
+
+
+
+    }
+    
     float inflection_peak = 0;
     inflection_count = 0;
     float inflection;
@@ -1386,15 +1428,9 @@ void blob::calculate_characteristics()
     int i=0;//outline_point_list subscript
     int j=0;//loop counter.  may exceed outline_point_list size.
     
-//    cout<<"p1\n";
-    
     while(1)
     {
-//      if(max_inflection_1 < outline_point_list[i]->inflection_1) max_inflection_1 = outline_point_list[i]->inflection_1;
-//      if(max_inflection_3 < outline_point_list[i]->inflection_3) max_inflection_3 = outline_point_list[i]->inflection_3;
-//      if(max_inflection_9 < outline_point_list[i]->inflection_9) max_inflection_9 = outline_point_list[i]->inflection_9;
-      
-      inflection = outline_point_list[i]->inflection_0;
+      inflection = outline_point_list[i]->inflection_score;
       if((inflection>0) && (inflection>inflection_peak)) 
       {
         inflection_peak = inflection;
@@ -1410,62 +1446,14 @@ void blob::calculate_characteristics()
       if((inflection_peak>0) && (inflection<=0))//inflection peak has passed.  process and prepare for next peak
       //inflection_x and inflection_y for current inflection_count will now remain at last values recorded
       {
-        /*
-        //calculate distances to other inflections (distances in outline_point_list index counts)
-        int separation_distance_back = 0;
-        int separation_distance_forward = 0;
-        bool separation_distance_too_small = false;
-        int separation_distance_minimum = opl_size/10;
-        if(inflection_count>0)//at least 1 other inflection was recorded.
-        {
-          separation_distance_back = i - inflection_i[inflection_count-1];
-          separation_distance_forward = ol_length-i + inflection_i[0];
-          if( (separation_distance_back<separation_distance_minimum) || (separation_distance_forward<separation_distance_minimum) ) separation_distance_too_small = true;
-        }
-        
-        //ignore inflection if it is in a dust streak zone or if it is too close to a previously found inflection
-        int inflection_x_global = inflection_x[inflection_count] + min_x - 1;//inflection_x is co-ordinate in the bool_raster.  We need the co-ordinate in the entire image width.
-        if( (processor_p->dust_streak_list[inflection_x_global].in_streak_zone==false) && (separation_distance_too_small==false) && (inflection_count<100) )//if there is a dust streak zone at this point, or if it is too close to another inflection, do not increment inflection_count.  this allows inflection values to over-write this inflection next time inflection is increasing
-        {
-          ++inflection_count;//note index of inflection in list is 1 less than inflection count
-          if(max_inflection<inflection_peak) max_inflection = inflection_peak;
-        }
-        */
-/*
-        float current_inflection_1 = outline_point_list[current_inflection_i]->inflection_1;
-        float current_inflection_3 = outline_point_list[current_inflection_i]->inflection_3;
-        float current_inflection_9 = outline_point_list[current_inflection_i]->inflection_9;
-        float inflection_score = current_inflection_1 - crop_max_inflection_1 + current_inflection_3 - crop_max_inflection_3 + current_inflection_9 - crop_max_inflection_9;
-*/        
-        
-        inflection_calc(current_inflection_i);//stores inflection values in inflection_1_out etc.
-//        float inflection_score = inflection_1_out - crop_max_inflection_1 + inflection_3_out - crop_max_inflection_3 + inflection_9_out - crop_max_inflection_9;
-        float i_score_1 = inflection_1_out - crop_max_inflection_1;
-        if(i_score_1<0) i_score_1=0;
-        float i_score_3 = inflection_3_out - crop_max_inflection_3;
-        if(i_score_3<0) i_score_3=0;
-        float i_score_9 = inflection_9_out - crop_max_inflection_9;
-        if(i_score_9<0) i_score_9=0;
-        float inflection_score = i_score_1+i_score_3+i_score_9;
-        
-//        cout<<"current_inflection_i="<<current_inflection_i<<"  inflection_1_out="<<inflection_1_out<<"  inflection_3_out="<<inflection_3_out<<"  inflection_9_out="<<inflection_9_out<<endl;
-//        cout<<"inflection_score="<<inflection_score<<endl;
-        
-//        if(max_inflection_1 < inflection_1_out) max_inflection_1 = inflection_1_out;
-//        if(max_inflection_3 < inflection_3_out) max_inflection_3 = inflection_3_out;
-//        if(max_inflection_9 < inflection_9_out) max_inflection_9 = inflection_9_out;
-        
         //ignore inflection if it is in a dust streak zone
         int inflection_x_global = inflection_x[inflection_count] + min_x - 1;//inflection_x is co-ordinate in the bool_raster.  We need the co-ordinate in the entire image width.
         if( (processor_p->dust_streak_list[inflection_x_global].in_streak_zone==false)
-          && (inflection_score>0.05)
+          && (outline_point_list[current_inflection_i]->inflection_score > 0.3)
           && (inflection_count<100) )//if there is a dust streak zone at this point, or if its score is too low, do not increment inflection_count.  
           //this allows inflection values to over-write this inflection next time inflection is increasing
         {
           ++inflection_count;//note index of inflection in list is 1 less than inflection count
-          if(max_inflection_1<inflection_1_out) max_inflection_1 = inflection_1_out;
-          if(max_inflection_3<inflection_3_out) max_inflection_3 = inflection_3_out;
-          if(max_inflection_9<inflection_9_out) max_inflection_9 = inflection_9_out;
         }
         
         inflection_peak = 0;
@@ -1473,9 +1461,6 @@ void blob::calculate_characteristics()
       }
       ++i;
       ++j;
-      
-//      cout<<"i="<<i<<endl;
-      
       if(i>=opl_size) i=0;
       if(j>=opl_size)//possibly might need to go beyond end (i.e. back to the beginning) to finish inflection peak
       {
@@ -1509,127 +1494,9 @@ void blob::calculate_characteristics()
         if(spacing>minimum_inflection_spacing) break;
       }
     }
-    
-        
-//    cout<<"end calculate_characteristics when calibrated\n";
-    
-
-    
-    
   }
 }
   
-/*
-void blob::calculate_characteristics()
-{
-  if(outline_point_list.size() < 5)
-  {
-    //do not try to process.  too small.
-    max_inflection = 0;
-    inflection_count = 0;
-    return;
-  }
-  for(int i=0; i<outline_point_list.size(); ++i)
-  {
-    //calculate inflections
-    int inf_index_b = i-inflection_distance;
-    if (inf_index_b < 0) inf_index_b += ol_length;//backward index of point to calculate direction
-    int inf_index_f = i+inflection_distance;
-    if (inf_index_f >= ol_length) inf_index_f -= ol_length;//forward index
-    float inflection = 0;
-    int inf_index_1 = inf_index_b;
-    int inf_index_2 = inf_index_1 + 1;
-    if(inf_index_2 >= ol_length) inf_index_2 -= ol_length;
-    for (int j=0; j<2*inflection_distance; ++j)
-    {
-      if(outline_point_list[inf_index_1]->direction<-500 || outline_point_list[inf_index_2]->direction<-500)//invalid angle signaled by direction value -1000.  See processor_calcs.hpp.
-      {
-        inflection = -1000;//invalid inflection
-        break;
-      }
-      float inflection_chunk = (outline_point_list[inf_index_1]->direction) - (outline_point_list[inf_index_2]->direction);
-      if(inflection_chunk<-M_PI) inflection_chunk += (2.0*M_PI);
-      if(inflection_chunk>M_PI) inflection_chunk -= (2.0*M_PI);
-      inflection += inflection_chunk;
-      ++inf_index_1;
-      if(inf_index_1 >= ol_length) inf_index_1 -= ol_length;
-      ++inf_index_2;
-      if(inf_index_2 >= ol_length) inf_index_2 -= ol_length;
-    }
-    outline_point_list[i] -> inflection = inflection;
-
-
-
-
-  }
-  max_inflection = 0;
-  float crop_max_inflection;
-  if(calibrating) crop_max_inflection = inflection_tolerance;
-  else crop_max_inflection = (processor_p->current_crop.max_inflection) * inflection_sensitivity_factor;
-  float inflection_peak = 0;
-  inflection_count = 0;
-  float inflection;
-  int i=0;//outline_point_list subscript
-  int j=0;//loop counter.  may exceed outline_point_list size.
-  while(1)
-  {
-    inflection = outline_point_list[i]->inflection;
-    if((inflection>crop_max_inflection) && (inflection>inflection_peak)) 
-    {
-      inflection_peak = inflection;
-      if(inflection_count<100)
-      //inflection_x and inflection_y for current inflection_count change with each outline_point until inflection_count is incremented
-      {
-        inflection_x[inflection_count] = outline_point_list[i]->x;
-        inflection_y[inflection_count] = outline_point_list[i]->y;
-        inflection_i[inflection_count] = i;
-      }
-    }
-    if((inflection_peak>0) && (inflection<=0))//inflection peak has passed.  count and prepare for next peak
-    //inflection_x and inflection_y for current inflection_count will now remain at last values recorded
-    {
-
-      //calculate distances to other inflections (distances in outline_point_list index counts)
-      int separation_distance_back = 0;
-      int separation_distance_forward = 0;
-      bool separation_distance_too_small = false;
-      int separation_distance_minimum = ol_length/10;
-      if(inflection_count>0)//at least 1 other inflection was recorded.
-      {
-        separation_distance_back = i - inflection_i[inflection_count-1];
-        separation_distance_forward = ol_length-i + inflection_i[0];
-        if( (separation_distance_back<separation_distance_minimum) || (separation_distance_forward<separation_distance_minimum) ) separation_distance_too_small = true;
-      }
-      
-      //ignore inflection if it is in a dust streak zone or if it is too close to a previously found inflection
-      int inflection_x_global = inflection_x[inflection_count] + min_x - 1;//inflection_x is co-ordinate in the bool_raster.  We need the co-ordinate in the entire image width.
-      if( (processor_p->dust_streak_list[inflection_x_global].in_streak_zone==false) && (separation_distance_too_small==false) && (inflection_count<100) )//if there is a dust streak zone at this point, or if it is too close to another inflection, do not increment inflection_count.  this allows inflection values to over-write this inflection next time inflection is increasing
-      {
-        ++inflection_count;//note index of inflection in list is 1 less than inflection count
-        if(max_inflection<inflection_peak) max_inflection = inflection_peak;
-      }
-      inflection_peak = 0;
-
-
-
-    }
-    ++i;
-    ++j;
-    if(i>=ol_length) i=0;
-    if(j>=ol_length)//possibly might need to go beyond end (i.e. back to the beginning) to finish inflection peak
-    {
-      if(inflection<=0) break;//from while(1) loop.  any inflection peak has been processed.
-      if(j>2*ol_length)//not expected
-      {
-        cout<<"in blob::calculate_characteristics, j exceeded expected bounds.\n";
-        cout<<"j="<<j<<".  ol_length="<<ol_length<<".  inflection="<<inflection<<".  inflection_count="<<inflection_count<<endl;
-        exit(1);
-      }
-    }
-  }
-}
-*/
-
 int blob::seeds_in_blob()
 {
   float area_n = processor_p->current_crop.area_mean;
@@ -1637,7 +1504,6 @@ int blob::seeds_in_blob()
   float mi1_n = processor_p->current_crop.max_inflection_1;
   float mi3_n = processor_p->current_crop.max_inflection_3;
   float mi9_n = processor_p->current_crop.max_inflection_9;
-//  float ic_n = processor_p->current_crop.inflection_count_mean;
   
   for(int i=0;i<max_seeds;++i)
   {
@@ -1655,13 +1521,14 @@ int blob::seeds_in_blob()
     expected_mean_area[i] = area_n + .8*(i-1)*area_n; //factor .8 is to allow for seeds overlapping, which will reduce area of entire blob
     expected_variance_area[i] = float(i) * area_sd * area_sd;
     float f = pow(2.0*3.14*expected_variance_area[i], -0.5) * exp(-pow(float(area)-expected_mean_area[i], 2.0)/2.0/expected_variance_area[i]);//height of normal dist
-    score_area[i] = f * expected_mean_area[i] * 6.0;
+//    score_area[i] = f * expected_mean_area[i] * 6.0;
+    score_area[i] = -0.002/(f*expected_mean_area[i]+.0001);
     score_ic[i] = 120.0/((ic_estimate-float(i))*(ic_estimate-float(i))+1)/(1+ic_uncertainty);
     score_likelihood[i] = -15*i;
   }
-  score_mi1[1] = 10 * (mi1_n - max_inflection_1);//negative if single seed is unlikely
-  score_mi3[1] = 10 * (mi3_n - max_inflection_3);//negative if single seed is unlikely
-  score_mi9[1] = 10 * (mi9_n - max_inflection_9);//negative if single seed is unlikely
+  score_mi1[1] = 2 * (mi1_n - max_inflection_1);//negative if single seed is unlikely
+  score_mi3[1] = 8 * (mi3_n - max_inflection_3);//negative if single seed is unlikely
+  score_mi9[1] = 32 * (mi9_n - max_inflection_9);//negative if single seed is unlikely
   int most_likely_number = 0;
   int max_score = -1000;
   for(int i=1;i<max_seeds;++i)//start at i=1 seed.  0 position in matrix is not used.
@@ -1674,8 +1541,8 @@ int blob::seeds_in_blob()
     }
   }
   
-//  if(processor_p -> show_blob_bool)
-  if(processor_p->show_blob_bool && most_likely_number>1)
+  if(processor_p -> show_blob_bool)
+//  if(processor_p->show_blob_bool && most_likely_number>1)
 
   {
     cout<<"\n\n\nseeds_in_blob\n";
@@ -1686,7 +1553,6 @@ int blob::seeds_in_blob()
     cout<<"  max_inflection_1 = "<<max_inflection_1<<endl;
     cout<<"  max_inflection_3 = "<<max_inflection_3<<endl;
     cout<<"  max_inflection_9 = "<<max_inflection_9<<endl;
-//    cout<<"  inflection_count = "<<inflection_count<<endl;
     
     form_display_raster();
     cout<<endl;
@@ -1703,9 +1569,9 @@ int blob::seeds_in_blob()
     }
     cout<<endl;
     
-    
+    /*
     cout<< "outline point list\n";
-    cout<<         "                   i                   x                   y           direction          inflection_0\n";
+    cout<<         "                   i                   x                   y           direction          inflection_score\n";
     for(int i=0; i<outline_point_list.size(); ++i)
     {
       cout
@@ -1713,11 +1579,11 @@ int blob::seeds_in_blob()
       <<setw(20)<<outline_point_list[i]->x
       <<setw(20)<<outline_point_list[i]->y
       <<setw(20)<<outline_point_list[i]->direction
-      <<setw(20)<<outline_point_list[i]->inflection_0
+      <<setw(20)<<std::fixed<<std::setprecision(2)<<outline_point_list[i]->inflection_score
       <<endl;
     }
     cout<<endl;
-    
+    */
     
     
   }
@@ -1741,9 +1607,121 @@ void blob::form_display_raster()
   {
     int x = inflection_x[i];
     int y = inflection_y[i];
-    cout<<"  inflection at ("<<inflection_x[i]<<", "<<inflection_y[i]<<")\n";
+    cout<<"  inflection at ("<<inflection_x[i]<<", "<<inflection_y[i]<<").  score "<<outline_point_list[inflection_i[i]]->inflection_score<<"\n";
     display_raster_p[x+width*y] = 'I';
+  
+
+
+
+
+
+    int index = inflection_i[i];//index of inflection point in outline_point_list
+
+    //arm lengths to calculate inflections
+    float d1 = ol_length*.01;
+    float d3 = ol_length*.03;
+    float d9 = ol_length*.09;
+    int forward_i = index;
+    int back_i = opl_decrement(index);
+    float dist_total = 0;
+    bool got_arm_end_1 = false;
+    bool got_arm_end_3 = false;
+    bool got_arm_end_9 = false;
+    //co-ordinates of forward and backward arm ends at 3 distances.  (distances measured along curve)
+    int xf1=0, yf1=0, xb1=0, yb1=0;
+    int xf3=0, yf3=0, xb3=0, yb3=0;
+    int xf9=0, yf9=0, xb9=0, yb9=0;
+    while(1)//loop until break.  move forward on curve until longest arm length reached
+    {
+      dist_total += outline_point_list[forward_i]->distance;
+      if(got_arm_end_1==false)
+      {
+        if(dist_total>=d1) 
+        {
+          got_arm_end_1=true;
+          int next_i = opl_increment(forward_i);
+          xf1 = outline_point_list[next_i]->x;
+          yf1 = outline_point_list[next_i]->y;
+        }
+      }
+      if(got_arm_end_3==false)
+      {
+        if(dist_total>=d3)
+        {
+          got_arm_end_3=true;
+          int next_i = opl_increment(forward_i);
+          xf3 = outline_point_list[next_i]->x;
+          yf3 = outline_point_list[next_i]->y;
+        }
+      }
+      if(got_arm_end_9==false)
+      {
+        if(dist_total>=d9)
+        {
+          got_arm_end_9=true;
+          int next_i = opl_increment(forward_i);
+          xf9 = outline_point_list[next_i]->x;
+          yf9 = outline_point_list[next_i]->y;
+        }
+      }
+      if(got_arm_end_9==true) break;
+      forward_i = opl_increment(forward_i);
+    }
+  
+    //repeat process, but move backward on curve, incrementing or decrementing start inflections until longest arm length reached
+    dist_total = 0;
+    got_arm_end_1 = false;
+    got_arm_end_3 = false;
+    got_arm_end_9 = false;
+    while(1)//loop until break.  
+    {
+      dist_total += outline_point_list[back_i]->distance;
+      if(got_arm_end_1==false)
+      {
+        if(dist_total>=d1) 
+        {
+          got_arm_end_1=true;
+          xb1 = outline_point_list[back_i]->x;
+          yb1 = outline_point_list[back_i]->y;
+        }
+      }
+      if(got_arm_end_3==false)
+      {
+        if(dist_total>=d3)
+        {
+          got_arm_end_3=true;
+          xb3 = outline_point_list[back_i]->x;
+          yb3 = outline_point_list[back_i]->y;
+        }
+      }
+      if(got_arm_end_9==false)
+      {
+        if(dist_total>=d9)
+        {
+          got_arm_end_9=true;
+          xb9 = outline_point_list[back_i]->x;
+          yb9 = outline_point_list[back_i]->y;
+        }
+      }
+      if(got_arm_end_9==true) break;
+      back_i = opl_decrement(back_i);
+    }
+  
+  
+    display_raster_p[xf9+width*yf9] = 'A';
+    display_raster_p[xb9+width*yb9] = 'A';
+    display_raster_p[xf3+width*yf3] = 'B';
+    display_raster_p[xb3+width*yb3] = 'B';
+    display_raster_p[xf1+width*yf1] = 'C';
+    display_raster_p[xb1+width*yb1] = 'C';
   }
+
+
+
+
+
+
+  
 }
 
 void blob::print_display_raster()

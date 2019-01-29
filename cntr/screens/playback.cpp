@@ -41,11 +41,11 @@ playback::playback(centre*set_centre_p)
   advance1_button_p=new button("Advance 1");
   advance10_button_p=new button("Advance 10");
   advance100_button_p=new button("Advance 100");
-  file_button_p=new button("File");
-  load_file_button_p=new button("Load file");
+  file_button_p=new button("Save File");
+  load_file_button_p=new button("Load File");
   quit_button_p=new button("Quit");
   display_p=new display(500, this);
-  save_image_button_p = new button("Save image");
+//  save_image_button_p = new button("Save image");
   file_name_p = new QLineEdit("image");
 
   main_layout_p=new QGridLayout;
@@ -112,7 +112,7 @@ void playback::autoadvance_clicked()
 playback::~playback()
 {
   centre_p->processor_display_blobs(false);
-  centre_p->set_camera_processing(false);
+  centre_p->set_camera_processing(true);
 }
 
 void playback::back_clicked()
