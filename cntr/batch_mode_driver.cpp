@@ -38,6 +38,8 @@ batch_mode_driver::batch_mode_driver(centre* centre_p_s)
   dump_into_end_time.start();
   dump_end_qtime.start();
   
+  force_dump_out = false;
+  
 //  high_feed_speed = centre_p->crops[0].high_feed_speed;
 //  low_feed_speed = centre_p->crops[0].low_feed_speed;
 //  dump_speed = centre_p->crops[0].dump_speed;
@@ -464,10 +466,19 @@ void batch_mode_driver::run()
   */
 
   //testing
-  int dump_elapsed;
+//  int dump_elapsed;
   QString message2;
 
+  message2 = QString("mode = %1").arg(mode);
+  send_message2(message2);
 
+  if(force_dump_out)
+  {
+    mode = dump_into_end;
+    dump_into_end_time.restart();
+    cout<<"mode dump_into_end\n";
+    force_dump_out = false;
+  }
 
   switch(mode)
   {
@@ -490,24 +501,24 @@ void batch_mode_driver::run()
       }
       break;
     case hi_open:
-//      cout<<"start case hi_open\n";
       barcode_mode = pack;
-      if(centre_p->feed_speed != high_feed_speed)
-      {
-//        cout<<"centre_p->feed_speed = "<<centre_p->feed_speed<<endl;
-        centre_p->set_speed(high_feed_speed);
-      }
       if(centre_p->get_cutgate_state() !=  CUTGATE_OPEN)
       {        
         centre_p->set_cutgate_state(CUTGATE_OPEN);
       }
-      centre_p->block_endgate_opening = !pack_barcode_ok;
-      if(time_to_end<0.4)
+      else 
       {
-        mode = low_open;
-        cout<<"mode low_open. count "<<centre_p->count<<"\n";
+        if(centre_p->feed_speed != high_feed_speed)
+        {
+          centre_p->set_speed(high_feed_speed);
+        }
+        centre_p->block_endgate_opening = !pack_barcode_ok;
+        if(time_to_end<0.4)
+        {
+          mode = low_open;
+          cout<<"mode low_open. count "<<centre_p->count<<"\n";
+        }
       }
-//      cout<<"end case hi_open\n";
       break;
     case low_open:
       barcode_mode = pack;
@@ -778,9 +789,7 @@ void batch_mode_driver::run()
       }
       centre_p->block_endgate_opening = false;
       
-      dump_elapsed = dump_end_qtime.elapsed();
-      message2 = QString("dump_end_qtime.elapsed = %1").arg(dump_elapsed);
-      send_message2(message2);
+//      dump_elapsed = dump_end_qtime.elapsed();
 //      cout<<"dump_end_qtime.elapsed = "<<dump_elapsed<<endl;
       
       if(dump_end_qtime.elapsed() >= dump_end_qtime_limit)//if count has not changed, dump is complete
@@ -922,8 +931,7 @@ void batch_mode_driver::cutgate_timing_error()
                             Hopper will dump out so you can re-start\n         \
                             this seed lot.");
   msg_box.exec();
-  mode = dump_into_end;
-  cout<<"mode dump_into_end\n";
+  force_dump_out = true;
 }
 
 
@@ -952,6 +960,8 @@ void count_rate_predictor::run()
 //    cout<<"    count_rate_multiplier "<<setw(15)<<count_rate_multiplier<<endl;
     count_rate_multiplier = (1.0-averaging_weight) * count_rate_multiplier   +   averaging_weight * current_count_rate_multiplier;
   }
+  
+  emit send_message(QString("count rate multiplier %1").arg(count_rate_multiplier));
 }
 
 float count_rate_predictor::get_rate()

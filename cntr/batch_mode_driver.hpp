@@ -65,6 +65,7 @@ class batch_mode_driver : public QObject
   QList<bm_set*> program;
   bm_set* set_p;
   int program_size;
+  bool force_dump_out;
   
   //testing
 //  int print_message_count;
@@ -171,6 +172,9 @@ class count_rate_predictor : public QObject
 //  void add_counts(int to_add, int feed_speed_s);
   void set_initial_count_rate_multiplier(float multiplier_s) {count_rate_multiplier = multiplier_s;};
   float get_rate();
+  
+  signals:
+  void send_message(QString message);
 };
 /*
 class count_rate_predictor : public QObject

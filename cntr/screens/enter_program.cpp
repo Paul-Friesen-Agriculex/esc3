@@ -153,6 +153,9 @@ void enter_program::done_clicked()
   {
     return;
   }
+  batch_mode_driver_p -> high_feed_speed = 100;
+  batch_mode_driver_p -> low_feed_speed = 10;
+  batch_mode_driver_p -> dump_speed = 1000;
   batch_mode_driver_p->list_program();
   batch_mode_driver_p->reset_program();
   cout<<"done reset_program\n";  

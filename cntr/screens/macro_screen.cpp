@@ -326,8 +326,8 @@ void macro_screen::usb_serial_out(QString bar_str_1, QString bar_str_2, QString 
   }
 //--------------------------------------------------------------OUTPUT TO SERIAL--------------------------------------------------------------//
   int size_string_macros = combined_macro_functions.size();
-  //int filedesc = open("/dev/usb2serial", O_WRONLY);
-  int filedesc = open("/dev/ttyUSB0", O_WRONLY);  //if udev rules are not applied//
+  int filedesc = open("/dev/usb2serial", O_WRONLY);
+  //int filedesc = open("/dev/ttyUSB0", O_WRONLY);  //if udev rules are not applied//
   //write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros) != size_string_macros;
   cout<<endl<<"serial string buffer length: "<<write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros)<<endl;
 //--------------------------------------------------------------------------------------------------------------------------------------------//
@@ -446,8 +446,8 @@ void macro_screen::usb_serial_out(QString lotcode_str, QString packcode_str, QSt
 //--------------------------------------------------------------OUTPUT TO SERIAL--------------------------------------------------------------//
   //cout<<"Macros loaded"<<endl;  //OMIT~~~
   int size_string_macros = combined_macro_functions.size();
-  //int filedesc = open("/dev/usb2serial", O_WRONLY);
-  int filedesc = open("/dev/ttyUSB0", O_WRONLY);  //if udev rules are not applied//
+  int filedesc = open("/dev/usb2serial", O_WRONLY);
+  //int filedesc = open("/dev/ttyUSB0", O_WRONLY);  //if udev rules are not applied//
   //write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros) != size_string_macros;
   //write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros);
   cout<<endl<<"serial string buffer length: "<<write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros)<<endl; //ORIGINAL~~~
