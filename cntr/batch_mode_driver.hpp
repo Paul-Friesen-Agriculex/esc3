@@ -6,6 +6,7 @@
 #include <QTime>
 
 #include "centre.hpp"
+#include "cutgate.hpp"
 
 class QTimer;
 class count_rate_predictor;
@@ -47,6 +48,7 @@ class batch_mode_driver : public QObject
 	private:
   QTimer* timer_p;
   centre* centre_p;
+  cutgate* cutgate_p;
   QTime cutoff_gate_close_time;
   static const int cutoff_gate_delay_time = 0;//milliseconds 
   static const int cutoff_gate_to_pack_removal_time = 2000;//milliseconds.  
@@ -72,7 +74,7 @@ class batch_mode_driver : public QObject
   
   
   public:
-  batch_mode_driver(centre* centre_p_s);
+  batch_mode_driver(centre* centre_p_s, cutgate* cutgate_p_s);
   ~batch_mode_driver();
 
   mode_enum mode;

@@ -30,6 +30,7 @@ cutgate::~cutgate()
 
 void cutgate::open()
 {
+  if( (state==CUTGATE_OPEN) || (state==CUTGATE_OPENING) ) return;
   if(closing==true)
   {
     cout<<"cutgate opened while closing\n";
@@ -41,14 +42,14 @@ void cutgate::open()
   fprintf(fp, "1");
   fclose(fp);
   open_pulse_timer_p -> start(700);
-//  state = CUTGATE_OPENING;
-  state = CUTGATE_OPEN;
+  state = CUTGATE_OPENING;
+//  state = CUTGATE_OPEN;
   opening = true;
 }
 
 void cutgate::close()
 {
-  
+  if( (state==CUTGATE_CLOSED) || (state==CUTGATE_CLOSING) ) return;
   if(opening==true)
   {
     cout<<"cutgate closed while opening\n";
@@ -60,8 +61,8 @@ void cutgate::close()
   fprintf(fp, "1");
   fclose(fp);
   close_pulse_timer_p -> start(300);
-//  state = CUTGATE_CLOSING;
-  state = CUTGATE_CLOSED;
+  state = CUTGATE_CLOSING;
+//  state = CUTGATE_CLOSED;
   closing = true;
 }
 
@@ -72,7 +73,7 @@ void cutgate::end_open()
   fprintf(fp, "0");
   fclose(fp);
   opening = false;
-//  state = CUTGATE_OPEN;
+  state = CUTGATE_OPEN;
 }
 
 void cutgate::end_close()
@@ -82,6 +83,6 @@ void cutgate::end_close()
   fprintf(fp, "0");
   fclose(fp);
   closing = false;
-//  state = CUTGATE_CLOSED;
+  state = CUTGATE_CLOSED;
 }
 

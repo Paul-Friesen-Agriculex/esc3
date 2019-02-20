@@ -84,7 +84,7 @@ calibrate::calibrate(centre* set_centre_p)
   endgate_button_p->setText("Open Endgate\nRelease Seed");
   startstop_button_p->setText("Stop");
   
-  centre_p->set_cutgate_state(CUTGATE_OPEN);
+  centre_p->cutgate_p->open();
   
   speed_set_p->setValue(10);
   centre_p->set_speed(speed_set_p->value());

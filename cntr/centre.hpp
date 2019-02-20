@@ -54,7 +54,6 @@ class centre : public QObject
 
   private:  
   QThread* processor_thread_p;
-  cutgate* cutgate_p;
   endgate* endgate_p;
   envelope_sensor* envelope_sensor_p;
   feeder* feeder_p;
@@ -63,7 +62,7 @@ class centre : public QObject
   int previous_screen_list[10];
   int previous_screen_index;
   bool previous_screen_going_back;
-  CUTGATE_STATE cutgate_state;
+//  CUTGATE_STATE cutgate_state;
   ENDGATE_STATE endgate_state;
   diagnostics_console* diagnostics_console_p;
   //table* table_p; //TEST~~~
@@ -87,9 +86,9 @@ class centre : public QObject
   int get_previous_screen();
   void select_crop(int crop_index);//moves the selected crop to position 0 in the array.  Crop in position 0 becomes the current crop.
   void delete_crop(int crop_index);
-  void set_cutgate_state(CUTGATE_STATE set_state);
+//  void set_cutgate_state(CUTGATE_STATE set_state);
   void set_endgate_state(ENDGATE_STATE set_state);
-  CUTGATE_STATE get_cutgate_state();
+//  CUTGATE_STATE get_cutgate_state();
   ENDGATE_STATE get_endgate_state();
   void set_speed(int speed_set);
   void set_camera_processing_f(bool state);
@@ -110,6 +109,7 @@ class centre : public QObject
 //=========================================================//
   
   processor* processor_p;
+  cutgate* cutgate_p;
   int count;
 //  CUTGATE_STATE cutgate_state;
 //  ENDGATE_STATE endgate_state;

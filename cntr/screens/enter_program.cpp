@@ -148,7 +148,7 @@ void enter_program::help_clicked()
 
 void enter_program::done_clicked()
 {
-  cout<<"enter_program::done_clicked\n";
+//  cout<<"enter_program::done_clicked\n";
   if(batch_mode_driver_p->program_is_empty())
   {
     return;
@@ -158,7 +158,7 @@ void enter_program::done_clicked()
   batch_mode_driver_p -> dump_speed = 1000;
   batch_mode_driver_p->list_program();
   batch_mode_driver_p->reset_program();
-  cout<<"done reset_program\n";  
+//  cout<<"done reset_program\n";  
   centre_p->add_waiting_screen(15);//batch
   centre_p->screen_done = true;
 }

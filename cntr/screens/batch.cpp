@@ -168,7 +168,7 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
   }
 //  endgate_button_p->setText("Open Endgate\nRelease Seed");
   
-  centre_p->set_cutgate_state(CUTGATE_OPEN);
+//  centre_p->set_cutgate_state(CUTGATE_OPEN);
   
   feeder_is_running = true;
   
@@ -476,14 +476,14 @@ void batch::run()
   if( (centre_p->envelope_present==false) && (pack_was_placed==true) && (centre_p->count>0) )
   {
     pack_was_removed = true;
-    if( (dump_flag==false) && (count>0) && (centre_p->get_cutgate_state()==CUTGATE_OPEN) && (pack_removed_too_soon==false) )
+    if( (dump_flag==false) && (count>0) && (centre_p->cutgate_p->get_state()==CUTGATE_OPEN) && (pack_removed_too_soon==false) )
     {
       
       cout<<"setting pack_removed_too_soon true\n";
       
       pack_removed_too_soon = true;
     }
-    if( (dump_flag==true) && (count>0) && (centre_p->get_cutgate_state()==CUTGATE_OPEN) && (dump_container_removed_too_soon==false) )
+    if( (dump_flag==true) && (count>0) && (centre_p->cutgate_p->get_state()==CUTGATE_OPEN) && (dump_container_removed_too_soon==false) )
     {
       dump_container_removed_too_soon = true;
     }

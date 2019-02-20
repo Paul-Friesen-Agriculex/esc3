@@ -153,7 +153,7 @@ centre::centre():
   
   crop_list_changed = false;
   
-  set_cutgate_state(CUTGATE_OPEN);
+  cutgate_p -> open();
   set_endgate_state(ENDGATE_CLOSED);
   
   for(previous_screen_index=0; previous_screen_index<10; ++previous_screen_index)
@@ -173,7 +173,7 @@ centre::centre():
   end_of_playback_flag = false;
   measured_line_frequency = 4700;
   
-  batch_mode_driver_p = new batch_mode_driver(this);
+  batch_mode_driver_p = new batch_mode_driver(this, cutgate_p);
   
   //totalize mode
   tm_barcode_columns = 0;
@@ -278,7 +278,7 @@ void centre::get_cycle_time(int value)//value is msec.
 void centre::run()
 {
   emit set_crop(crops[0]);
-  cutgate_state = cutgate_p->get_state();
+//  cutgate_state = cutgate_p->get_state();
   endgate_state = endgate_p->get_state();
   envelope_present = envelope_sensor_p->read();
 
@@ -587,7 +587,7 @@ void centre::delete_crop(int crop_index)
     crops[99].calibrated=0;
   }
 }
-  
+/*  
 void centre::set_cutgate_state(CUTGATE_STATE set_state)
 {
   if(set_state==CUTGATE_OPEN)
@@ -601,7 +601,7 @@ void centre::set_cutgate_state(CUTGATE_STATE set_state)
     cutgate_state = CUTGATE_CLOSED;
   }
 }
-
+*/
 void centre::set_endgate_state(ENDGATE_STATE set_state)
 {
   if(set_state==ENDGATE_OPEN)
@@ -615,12 +615,12 @@ void centre::set_endgate_state(ENDGATE_STATE set_state)
     endgate_p->close();
   }
 }
-
+/*
 CUTGATE_STATE centre::get_cutgate_state()
 {
   return cutgate_state;
 }
-
+*/
 ENDGATE_STATE centre::get_endgate_state()
 {
   return endgate_state;

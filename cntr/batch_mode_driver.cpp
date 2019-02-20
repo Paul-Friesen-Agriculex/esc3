@@ -7,9 +7,10 @@
 
 using namespace std;
 
-batch_mode_driver::batch_mode_driver(centre* centre_p_s)
+batch_mode_driver::batch_mode_driver(centre* centre_p_s, cutgate* cutgate_p_s)
 {
   centre_p = centre_p_s;
+  cutgate_p = cutgate_p_s;
   count_rate_predictor_p = new count_rate_predictor(centre_p);
   pack_present = old_pack_present = false;
   pack_changed = true;
@@ -200,6 +201,13 @@ void batch_mode_driver::reset_program()
   current_pack_limit = program[current_set]->packs;
   mode = wait_for_seed_lot_barcode;
   barcode_mode = seed_lot;
+
+  seed_lot_barcode_old = true;//need a new scan
+  pack_barcode_old = true;//need a new scan
+  seed_lot_barcode_ok = false;
+  pack_barcode_ok = false;
+
+
   dump_end_qtime.restart();
 //  cout<<"\n\nbatch_mode_driver::reset_program\n";
 //  for(int i=0; i<program_size; ++i)
@@ -277,7 +285,7 @@ void batch_mode_driver::program_remove_last()
 
 void batch_mode_driver::start()
 {
-  timer_p->start(10);
+  timer_p->start(1);
 }
 
 void batch_mode_driver::stop()
@@ -488,10 +496,7 @@ void batch_mode_driver::run()
       {
         centre_p->set_speed(0);
       }
-      if(centre_p->get_cutgate_state() !=  CUTGATE_OPEN)
-      {        
-        centre_p->set_cutgate_state(CUTGATE_OPEN);
-      }
+      cutgate_p -> open();
       centre_p->block_endgate_opening = !pack_barcode_ok;
       if(seed_lot_barcode_ok == true)
       {
@@ -502,11 +507,8 @@ void batch_mode_driver::run()
       break;
     case hi_open:
       barcode_mode = pack;
-      if(centre_p->get_cutgate_state() !=  CUTGATE_OPEN)
-      {        
-        centre_p->set_cutgate_state(CUTGATE_OPEN);
-      }
-      else 
+      cutgate_p -> open();
+      if(cutgate_p->get_state() ==  CUTGATE_OPEN) //if still opening, keep feeder stopped
       {
         if(centre_p->feed_speed != high_feed_speed)
         {
@@ -526,10 +528,7 @@ void batch_mode_driver::run()
       {
         centre_p->set_speed(low_feed_speed);
       }
-      if(centre_p->get_cutgate_state() !=  CUTGATE_OPEN)
-      {        
-        centre_p->set_cutgate_state(CUTGATE_OPEN);
-      }
+      cutgate_p -> open();
       centre_p->block_endgate_opening = !pack_barcode_ok;
       if(centre_p->count >= current_count_limit)
       {
@@ -545,14 +544,11 @@ void batch_mode_driver::run()
       {
         centre_p->set_speed(low_feed_speed);
       }
-      if(centre_p->get_cutgate_state() !=  CUTGATE_OPEN)
-      {        
-        centre_p->set_cutgate_state(CUTGATE_OPEN);
-      }
+      cutgate_p -> open();
       centre_p->block_endgate_opening = !pack_barcode_ok;
       if(cutoff_gate_close_time.elapsed() >= cutoff_gate_delay_time)
       {
-        centre_p->set_cutgate_state(CUTGATE_CLOSED);
+        cutgate_p -> close();
 
         //remember current numbers for display purposes
         pack_ready_pack = current_pack;
@@ -600,10 +596,7 @@ void batch_mode_driver::run()
       {
         centre_p->set_speed(high_feed_speed);
       }
-      if(centre_p->get_cutgate_state() !=  CUTGATE_CLOSED)
-      {        
-        centre_p->set_cutgate_state(CUTGATE_CLOSED);
-      }
+      cutgate_p -> close();
       centre_p->block_endgate_opening = !pack_barcode_ok;
       if( (old_pack_present==true) && (pack_present==false) && (pack_barcode_ok==true) )
       {
@@ -614,7 +607,10 @@ void batch_mode_driver::run()
         cout<<"mode wait_for_endgate_to_close. count "<<centre_p->count<<"\n";
         endgate_close_counter = 0;
       }
-      if(time_to_end<1)
+      
+//      cout<<"mode hi_closed.  time_to_end="<<time_to_end<<endl;
+      
+      if(time_to_end<2.0)
       {
         mode = wait_for_pack;
         cout<<"mode wait_for_pack. count "<<centre_p->count<<"\n";
@@ -626,10 +622,7 @@ void batch_mode_driver::run()
       {
         centre_p->set_speed(high_feed_speed);
       }
-      if(centre_p->get_cutgate_state() !=  CUTGATE_CLOSED)
-      {        
-        centre_p->set_cutgate_state(CUTGATE_CLOSED);
-      }
+      cutgate_p -> close();
       centre_p->block_endgate_opening = !pack_barcode_ok;
       ++endgate_close_counter;
       if(endgate_close_counter>=50)
@@ -644,10 +637,7 @@ void batch_mode_driver::run()
       {
         centre_p->set_speed(0);
       }
-      if(centre_p->get_cutgate_state() !=  CUTGATE_CLOSED)
-      {        
-        centre_p->set_cutgate_state(CUTGATE_CLOSED);
-      }
+      cutgate_p -> close();
       centre_p->block_endgate_opening = !pack_barcode_ok;
       if( (old_pack_present==true) && (pack_present==false) && (pack_barcode_ok==true) )
       {
@@ -677,10 +667,7 @@ void batch_mode_driver::run()
       {
         centre_p->set_speed(dump_speed);
       }
-      if(centre_p->get_cutgate_state() !=  CUTGATE_CLOSED)
-      {        
-        centre_p->set_cutgate_state(CUTGATE_CLOSED);
-      }
+      cutgate_p -> close();
       centre_p->block_endgate_opening = !pack_barcode_ok;
       if( (old_pack_present==true) && (pack_present==false) && (pack_barcode_ok==true) )//final pack was collected
       {
@@ -704,10 +691,7 @@ void batch_mode_driver::run()
       {
         centre_p->set_speed(dump_speed);
       }
-      if(centre_p->get_cutgate_state() !=  CUTGATE_CLOSED)
-      {        
-        centre_p->set_cutgate_state(CUTGATE_CLOSED);
-      }
+      cutgate_p -> close();
       centre_p->block_endgate_opening = !pack_barcode_ok;
       ++endgate_close_counter;
       if(endgate_close_counter>=50)      {
@@ -722,10 +706,7 @@ void batch_mode_driver::run()
       {
         centre_p->set_speed(0);
       }
-      if(centre_p->get_cutgate_state() !=  CUTGATE_CLOSED)
-      {        
-        centre_p->set_cutgate_state(CUTGATE_CLOSED);
-      }
+      cutgate_p -> close();
       centre_p->block_endgate_opening = !pack_barcode_ok;
       if( (old_pack_present==true) && (pack_present==false) && (pack_barcode_ok==true) )
       {
@@ -744,10 +725,7 @@ void batch_mode_driver::run()
       {
         centre_p->set_speed(dump_speed);
       }
-      if(centre_p->get_cutgate_state() !=  CUTGATE_OPEN)
-      {        
-        centre_p->set_cutgate_state(CUTGATE_OPEN);
-      }
+      cutgate_p -> open();
       centre_p->block_endgate_opening = false;
       if( pack_present==true )
       {
@@ -766,10 +744,7 @@ void batch_mode_driver::run()
       {
         centre_p->set_speed(0);
       }
-      if(centre_p->get_cutgate_state() !=  CUTGATE_OPEN)
-      {        
-        centre_p->set_cutgate_state(CUTGATE_OPEN);
-      }
+      cutgate_p -> open();
       centre_p->block_endgate_opening = false;
       if(pack_present == true)
       {
@@ -783,10 +758,7 @@ void batch_mode_driver::run()
       {
         centre_p->set_speed(dump_speed);
       }
-      if(centre_p->get_cutgate_state() !=  CUTGATE_OPEN)
-      {        
-        centre_p->set_cutgate_state(CUTGATE_OPEN);
-      }
+      cutgate_p -> open();
       centre_p->block_endgate_opening = false;
       
 //      dump_elapsed = dump_end_qtime.elapsed();
@@ -811,10 +783,7 @@ void batch_mode_driver::run()
       {
         centre_p->set_speed(dump_speed);
       }
-      if(centre_p->get_cutgate_state() !=  CUTGATE_OPEN)
-      {        
-        centre_p->set_cutgate_state(CUTGATE_OPEN);
-      }
+      cutgate_p -> open();
       centre_p->block_endgate_opening = false;
       if(centre_p->get_endgate_state()==ENDGATE_CLOSED)
       {
@@ -951,7 +920,7 @@ count_rate_predictor::~count_rate_predictor()
 
 void count_rate_predictor::run()
 {
-  float current_rate = (centre_p->count-old_count)*10.0;
+  float current_rate = float(centre_p->count-old_count)*10.0;
   old_count = centre_p->count;
   if(current_rate>0 && centre_p->feed_speed>0)//if rate is 0, feeder is empty.  do not calculate.
   {
@@ -961,12 +930,12 @@ void count_rate_predictor::run()
     count_rate_multiplier = (1.0-averaging_weight) * count_rate_multiplier   +   averaging_weight * current_count_rate_multiplier;
   }
   
-  emit send_message(QString("count rate multiplier %1").arg(count_rate_multiplier));
+  emit send_message(QString("count rate multiplier %1.  Predicted rate %2.").arg(count_rate_multiplier).arg(count_rate_multiplier*float(centre_p->feed_speed)));
 }
 
 float count_rate_predictor::get_rate()
 {
-  return (count_rate_multiplier * centre_p->feed_speed);
+  return (count_rate_multiplier * float(centre_p->feed_speed));
 }
 
     
