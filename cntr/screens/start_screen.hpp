@@ -19,6 +19,7 @@ class start_screen : public screen
   public slots:
   void totalize_clicked();
   void batch_clicked();
+  void batch_from_spreadsheet_clicked();
   void tools_clicked();
   void shutdown();
   void exit_program();
@@ -26,6 +27,7 @@ class start_screen : public screen
   private:
   button* totalize_button_p;
   button* batch_button_p;
+  button* batch_from_spreadsheet_button_p;
   button* tools_button_p;
   button* shutdown_button_p;
   button* exit_button_p;

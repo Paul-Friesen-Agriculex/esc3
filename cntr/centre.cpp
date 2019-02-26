@@ -32,6 +32,10 @@
 //#include "delete_program.hpp"
 #include "crop_name_exists.hpp"
 #include "diagnostics_console.hpp"
+#include "spreadsheet_choice.hpp"
+#include "ss_setup_choice.hpp"
+#include "ss_setup_entry.hpp"
+
 #include "macro_screen.hpp"	//TEST~~~
 //#include "table.hpp"        //TEST~~~ //access barcodes and count from table
 
@@ -425,9 +429,9 @@ void centre::run()
       case 18: screen_p=new program_delete(this, batch_mode_driver_p); break;
       case 19: screen_p=new crop_name_exists(this); break;
       case 20: screen_p=new batch_save_table(this, batch_mode_driver_p); break;
-//      case : screen_p=new (this); break;
-//      case : screen_p=new (this); break;
-//      case : screen_p=new (this); break;
+      case 21: screen_p=new spreadsheet_choice(this); break;
+      case 22: screen_p=new ss_setup_choice(this, batch_mode_driver_p); break;
+      case 23: screen_p=new ss_setup_entry(this, batch_mode_driver_p); break;
 //      case : screen_p=new (this); break;
 //      case : screen_p=new (this); break;
 //      case : screen_p=new (this); break;
@@ -440,6 +444,7 @@ void centre::run()
 //      case : screen_p=new (this); break;
 //      case : screen_p=new (this); break;
       default: screen_p=new start_screen(this);
+               cout<<"default screen_p case\n";
     }
     screen_p->show();
   }

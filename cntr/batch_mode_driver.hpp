@@ -2,11 +2,13 @@
 #define BATCH_MODE_DRIVER_HPP
 
 #include <QString>
+#include <QList>
 #include <QWidget>
 #include <QTime>
 
 #include "centre.hpp"
 #include "cutgate.hpp"
+#include "envelope.hpp"
 
 class QTimer;
 class count_rate_predictor;
@@ -40,6 +42,24 @@ enum barcode_entry_mode
   seed_lot,
   pack
 };
+
+struct spreadsheet_column
+{
+  QString heading;
+  QList <QString> data_list;
+  spreadsheet_column* next;
+};
+
+struct ss_setup
+{
+  int material_id_column;
+  int required_count_column;
+  int actual_count_column;
+  int print_time_column;
+  int fill_time_column;
+  QString envelope_setup_file;
+};
+  
 
 class batch_mode_driver : public QObject
 {
@@ -130,6 +150,24 @@ class batch_mode_driver : public QObject
   QString bm_save_table_filename;//new filename just entered.  Set back to blank when file is saved.
   void save_program(QString filename);
   
+  //spreadsheet handling
+  bool use_spreadsheet;
+  QString spreadsheet_filename;
+  void load_spreadsheet(QString filename);
+  spreadsheet_column* ss_first_column_p;
+  spreadsheet_column* ss_material_id_p;
+  spreadsheet_column* ss_required_count_p;
+  spreadsheet_column* ss_actual_count_p;
+  spreadsheet_column* ss_print_time_p;
+  spreadsheet_column* ss_fill_time_p;
+  spreadsheet_column* get_spreadsheet_column_pointer(int column_number);
+  ss_setup* ss_setup_p;
+  envelope* envelope_p;
+  QString ss_setup_path;
+  void load_ss_setup();
+  void clear_ss_setup();
+  
+  
   void list_program();//in terminal - diagnostics
   
   private slots:
@@ -178,26 +216,4 @@ class count_rate_predictor : public QObject
   signals:
   void send_message(QString message);
 };
-/*
-class count_rate_predictor : public QObject
-{
-  Q_OBJECT
-  
-  int count;
-  QTimer timer;
-  float smoothed_rate;
-  int feed_speed;
-  int old_feed_speed;
-  const static float averaging_weight = .01;
-  
-  private slots:
-  void run();
-  
-  public:
-  count_rate_predictor();
-  ~count_rate_predictor();
-  void add_counts(int to_add, int feed_speed_s);
-  int get_rate();
-};
-*/
 #endif

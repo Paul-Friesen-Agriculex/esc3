@@ -12,6 +12,7 @@ start_screen::start_screen(centre* set_centre_p)
 { 
   totalize_button_p = new button("Totalize Mode");
   batch_button_p = new button("Batch Mode");
+  batch_from_spreadsheet_button_p = new button("Batch From Spreadsheet Mode");
   tools_button_p = new button("Tools");
   shutdown_button_p = new button("Shut Down");
   exit_button_p = new button("Exit Program");
@@ -24,7 +25,8 @@ start_screen::start_screen(centre* set_centre_p)
 
   modebox_layout_p->addWidget(totalize_button_p, 0, 0);
   modebox_layout_p->addWidget(batch_button_p, 0, 1);
-  modebox_layout_p->addWidget(tools_button_p, 0, 2);
+  modebox_layout_p->addWidget(batch_from_spreadsheet_button_p, 0, 2);
+  modebox_layout_p->addWidget(tools_button_p, 1, 0);
   shutdownbox_layout_p->addWidget(shutdown_button_p, 0, 0);
   shutdownbox_layout_p->addWidget(exit_button_p, 0, 1);
   main_layout_p -> addWidget(modebox_p,0,0);
@@ -36,6 +38,7 @@ start_screen::start_screen(centre* set_centre_p)
 
   connect(totalize_button_p, SIGNAL(clicked()), this, SLOT(totalize_clicked()));
   connect(batch_button_p, SIGNAL(clicked()), this, SLOT(batch_clicked()));
+  connect(batch_from_spreadsheet_button_p, SIGNAL(clicked()), this, SLOT(batch_from_spreadsheet_clicked()));
   connect(tools_button_p, SIGNAL(clicked()), this, SLOT(tools_clicked()));
   connect(shutdown_button_p, SIGNAL(clicked()), this, SLOT(shutdown()));
   connect(exit_button_p, SIGNAL(clicked()), this, SLOT(exit_program()));
@@ -51,6 +54,13 @@ void start_screen::totalize_clicked()
 void start_screen::batch_clicked()
 {
   centre_p->add_waiting_screen(13);//program_choice
+  centre_p->add_waiting_screen(1);//crop_choice
+  centre_p->screen_done=true;
+}
+
+void start_screen::batch_from_spreadsheet_clicked()
+{
+  centre_p->add_waiting_screen(21);//spreadsheet_choice
   centre_p->add_waiting_screen(1);//crop_choice
   centre_p->screen_done=true;
 }

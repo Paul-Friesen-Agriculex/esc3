@@ -40,14 +40,11 @@ batch_mode_driver::batch_mode_driver(centre* centre_p_s, cutgate* cutgate_p_s)
   dump_end_qtime.start();
   
   force_dump_out = false;
-  
-//  high_feed_speed = centre_p->crops[0].high_feed_speed;
-//  low_feed_speed = centre_p->crops[0].low_feed_speed;
-//  dump_speed = centre_p->crops[0].dump_speed;
 
-
-
-//  print_message_count = 0;
+  use_spreadsheet = false;
+  ss_setup_p = new ss_setup;
+  clear_ss_setup();
+  envelope_p = new envelope;
 }
   
 batch_mode_driver::~batch_mode_driver()
@@ -59,6 +56,14 @@ batch_mode_driver::~batch_mode_driver()
   timer_p -> stop();
   delete timer_p;
   if(set_p) delete set_p;
+  spreadsheet_column* ss_column_p_1 = ss_first_column_p;
+  spreadsheet_column* ss_column_p_2 = 0;
+  while (ss_column_p_1 != 0)
+  {
+    ss_column_p_2 = ss_column_p_1;
+    ss_column_p_1 = ss_column_p_1->next;
+    delete ss_column_p_2;
+  }
 }
 
 void batch_mode_driver::load_program()//load the program indicated by program_path
@@ -337,20 +342,51 @@ void batch_mode_driver::save_program(QString filename)
   stream<<record_only<<endl;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+void batch_mode_driver::load_spreadsheet(QString filename)
+{
+  cout<<"p1\n";
+  QFile infile(filename);
+  infile.open(QIODevice::ReadOnly);
+  QTextStream stream(&infile);
+  QString line;
+  QStringList list;
+  ss_first_column_p = 0;
+  spreadsheet_column* ss_column_p;
+  stream.readLineInto(&line);
+  list = line.split(",");
+  cout<<"p2\n";
+  for(int i=list.size()-1; i>=0; --i)
+  {
+    ss_column_p = ss_first_column_p;
+    ss_first_column_p = new spreadsheet_column;
+    ss_first_column_p->heading = list[i];
+    ss_first_column_p->next = ss_column_p;
+  }
+  cout<<"p3\n";
+  while(stream.readLineInto(&line))
+  {
+    list = line.split(",");
+    ss_column_p = ss_first_column_p;
+    for(int i=0; i<list.size(); ++i)
+    {
+      ss_column_p->data_list.append(list[i]);
+      ss_column_p = ss_column_p->next;
+    }
+  }
+  infile.close();
+  
+  ss_column_p = ss_first_column_p;
+  for(int i=0; i<8; ++i) 
+  {
+    ss_column_p = ss_column_p->next;
+  }
+  cout<<"heading "<<(ss_column_p->heading).toStdString()<<endl;
+  cout<<"p4\n";
+  for(int i=0; i<10; ++i)
+  {
+    cout<<"  i"<<i<<"   "<<(ss_column_p->data_list[i]).toStdString()<<endl;
+  }
+}
 
 void batch_mode_driver::list_program()
 {
@@ -903,6 +939,33 @@ void batch_mode_driver::cutgate_timing_error()
   force_dump_out = true;
 }
 
+spreadsheet_column* batch_mode_driver::get_spreadsheet_column_pointer(int column_number)
+{
+  spreadsheet_column* column_p = ss_first_column_p;
+  for(int i=0; i<column_number; ++i)
+  {
+    if(column_p == 0)
+    {
+      return 0;//invalid column number
+    }
+    column_p = column_p->next;
+  }
+  return(column_p);
+}
+
+void batch_mode_driver::load_ss_setup()
+{
+}
+
+void batch_mode_driver::clear_ss_setup()
+{
+  ss_setup_p -> material_id_column = 0;
+  ss_setup_p -> required_count_column = 0;
+  ss_setup_p -> actual_count_column = 0;
+  ss_setup_p -> print_time_column = 0;
+  ss_setup_p -> fill_time_column = 0;
+  ss_setup_p -> envelope_setup_file = "";
+}
 
 count_rate_predictor::count_rate_predictor(centre* centre_p_s)
 {

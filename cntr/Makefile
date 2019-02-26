@@ -12,10 +12,10 @@ MAKEFILE      = Makefile
 
 CC            = gcc
 CXX           = g++
-DEFINES       = -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB
+DEFINES       = -DQT_NO_DEBUG -DQT_PRINTSUPPORT_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB
 CFLAGS        = -pipe -O2 -Wall -W -D_REENTRANT -fPIC $(DEFINES)
 CXXFLAGS      = -pipe -O2 -Wall -W -D_REENTRANT -fPIC $(DEFINES)
-INCPATH       = -I. -I. -Iscreens -isystem /usr/include/arm-linux-gnueabihf/qt5 -isystem /usr/include/arm-linux-gnueabihf/qt5/QtWidgets -isystem /usr/include/arm-linux-gnueabihf/qt5/QtGui -isystem /usr/include/arm-linux-gnueabihf/qt5/QtCore -I. -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++
+INCPATH       = -I. -I. -Iscreens -isystem /usr/include/arm-linux-gnueabihf/qt5 -isystem /usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -isystem /usr/include/arm-linux-gnueabihf/qt5/QtWidgets -isystem /usr/include/arm-linux-gnueabihf/qt5/QtGui -isystem /usr/include/arm-linux-gnueabihf/qt5/QtCore -I. -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++
 QMAKE         = /usr/lib/arm-linux-gnueabihf/qt5/bin/qmake
 DEL_FILE      = rm -f
 CHK_DIR_EXISTS= test -d
@@ -36,7 +36,7 @@ DISTNAME      = cntr1.0.0
 DISTDIR = /home/odroid/Documents/github_repo/cntr/.tmp/cntr1.0.0
 LINK          = g++
 LFLAGS        = -Wl,-O1
-LIBS          = $(SUBLIBS) -L/usr/lib -lSK91USB3-LX -lQt5Widgets -lQt5Gui -lQt5Core -lGLESv2 -lpthread 
+LIBS          = $(SUBLIBS) -L/usr/lib -lSK91USB3-LX -lQt5PrintSupport -lQt5Widgets -lQt5Gui -lQt5Core -lGLESv2 -lpthread 
 AR            = ar cqs
 RANLIB        = 
 SED           = sed
@@ -51,11 +51,13 @@ OBJECTS_DIR   = ./
 SOURCES       = batch_mode_driver.cpp \
 		button.cpp \
 		centre.cpp \
+		code_39_writer.cpp \
 		cutgate.cpp \
 		diagnostics_console.cpp \
 		display.cpp \
 		dust_streak.cpp \
 		endgate.cpp \
+		envelope.cpp \
 		envelope_sensor.cpp \
 		feeder.cpp \
 		main.cpp \
@@ -76,6 +78,9 @@ SOURCES       = batch_mode_driver.cpp \
 		screens/playback.cpp \
 		screens/program_choice.cpp \
 		screens/program_delete.cpp \
+		screens/spreadsheet_choice.cpp \
+		screens/ss_setup_choice.cpp \
+		screens/ss_setup_entry.cpp \
 		screens/start_screen.cpp \
 		screens/table.cpp \
 		screens/tool_choice.cpp \
@@ -87,6 +92,7 @@ SOURCES       = batch_mode_driver.cpp \
 		moc_diagnostics_console.cpp \
 		moc_display.cpp \
 		moc_endgate.cpp \
+		moc_envelope.cpp \
 		moc_envelope_sensor.cpp \
 		moc_feeder.cpp \
 		moc_processor.cpp \
@@ -106,6 +112,9 @@ SOURCES       = batch_mode_driver.cpp \
 		moc_playback.cpp \
 		moc_program_choice.cpp \
 		moc_program_delete.cpp \
+		moc_spreadsheet_choice.cpp \
+		moc_ss_setup_choice.cpp \
+		moc_ss_setup_entry.cpp \
 		moc_start_screen.cpp \
 		moc_table.cpp \
 		moc_tool_choice.cpp \
@@ -114,11 +123,13 @@ SOURCES       = batch_mode_driver.cpp \
 OBJECTS       = batch_mode_driver.o \
 		button.o \
 		centre.o \
+		code_39_writer.o \
 		cutgate.o \
 		diagnostics_console.o \
 		display.o \
 		dust_streak.o \
 		endgate.o \
+		envelope.o \
 		envelope_sensor.o \
 		feeder.o \
 		main.o \
@@ -139,6 +150,9 @@ OBJECTS       = batch_mode_driver.o \
 		playback.o \
 		program_choice.o \
 		program_delete.o \
+		spreadsheet_choice.o \
+		ss_setup_choice.o \
+		ss_setup_entry.o \
 		start_screen.o \
 		table.o \
 		tool_choice.o \
@@ -151,6 +165,7 @@ OBJECTS       = batch_mode_driver.o \
 		moc_diagnostics_console.o \
 		moc_display.o \
 		moc_endgate.o \
+		moc_envelope.o \
 		moc_envelope_sensor.o \
 		moc_feeder.o \
 		moc_processor.o \
@@ -170,6 +185,9 @@ OBJECTS       = batch_mode_driver.o \
 		moc_playback.o \
 		moc_program_choice.o \
 		moc_program_delete.o \
+		moc_spreadsheet_choice.o \
+		moc_ss_setup_choice.o \
+		moc_ss_setup_entry.o \
 		moc_start_screen.o \
 		moc_table.o \
 		moc_tool_choice.o \
@@ -238,12 +256,14 @@ DIST          = /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/spec_pre.prf \
 		cntr.pro batch_mode_driver.hpp \
 		button.hpp \
 		centre.hpp \
+		code_39_writer.hpp \
 		crop.hpp \
 		cutgate.hpp \
 		diagnostics_console.hpp \
 		display.hpp \
 		dust_streak.hpp \
 		endgate.hpp \
+		envelope.hpp \
 		envelope_sensor.hpp \
 		feeder.hpp \
 		processor.hpp \
@@ -264,6 +284,9 @@ DIST          = /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/spec_pre.prf \
 		screens/playback.hpp \
 		screens/program_choice.hpp \
 		screens/program_delete.hpp \
+		screens/spreadsheet_choice.hpp \
+		screens/ss_setup_choice.hpp \
+		screens/ss_setup_entry.hpp \
 		screens/start_screen.hpp \
 		screens/table.hpp \
 		screens/tool_choice.hpp \
@@ -271,11 +294,13 @@ DIST          = /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/spec_pre.prf \
 		screens/totalize_options.hpp batch_mode_driver.cpp \
 		button.cpp \
 		centre.cpp \
+		code_39_writer.cpp \
 		cutgate.cpp \
 		diagnostics_console.cpp \
 		display.cpp \
 		dust_streak.cpp \
 		endgate.cpp \
+		envelope.cpp \
 		envelope_sensor.cpp \
 		feeder.cpp \
 		main.cpp \
@@ -296,6 +321,9 @@ DIST          = /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/spec_pre.prf \
 		screens/playback.cpp \
 		screens/program_choice.cpp \
 		screens/program_delete.cpp \
+		screens/spreadsheet_choice.cpp \
+		screens/ss_setup_choice.cpp \
+		screens/ss_setup_entry.cpp \
 		screens/start_screen.cpp \
 		screens/table.cpp \
 		screens/tool_choice.cpp \
@@ -392,6 +420,7 @@ Makefile: cntr.pro /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++/qmake.conf
 		/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/yacc.prf \
 		/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/lex.prf \
 		cntr.pro \
+		/usr/lib/arm-linux-gnueabihf/libQt5PrintSupport.prl \
 		/usr/lib/arm-linux-gnueabihf/libQt5Widgets.prl \
 		/usr/lib/arm-linux-gnueabihf/libQt5Gui.prl \
 		/usr/lib/arm-linux-gnueabihf/libQt5Core.prl
@@ -457,6 +486,7 @@ Makefile: cntr.pro /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++/qmake.conf
 /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/yacc.prf:
 /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/lex.prf:
 cntr.pro:
+/usr/lib/arm-linux-gnueabihf/libQt5PrintSupport.prl:
 /usr/lib/arm-linux-gnueabihf/libQt5Widgets.prl:
 /usr/lib/arm-linux-gnueabihf/libQt5Gui.prl:
 /usr/lib/arm-linux-gnueabihf/libQt5Core.prl:
@@ -474,8 +504,8 @@ dist: distdir FORCE
 distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
-	$(COPY_FILE) --parents batch_mode_driver.hpp button.hpp centre.hpp crop.hpp cutgate.hpp diagnostics_console.hpp display.hpp dust_streak.hpp endgate.hpp envelope_sensor.hpp feeder.hpp processor.hpp processor_calcs.hpp screens/batch.hpp screens/batch_options.hpp screens/batch_table.hpp screens/calibrate.hpp screens/crop_choice.hpp screens/crop_delete.hpp screens/crop_edit.hpp screens/crop_name_exists.hpp screens/enter_program.hpp screens/keyboard.hpp screens/keypad.hpp screens/macro_screen.hpp screens/message_box.hpp screens/playback.hpp screens/program_choice.hpp screens/program_delete.hpp screens/start_screen.hpp screens/table.hpp screens/tool_choice.hpp screens/totalize.hpp screens/totalize_options.hpp $(DISTDIR)/
-	$(COPY_FILE) --parents batch_mode_driver.cpp button.cpp centre.cpp cutgate.cpp diagnostics_console.cpp display.cpp dust_streak.cpp endgate.cpp envelope_sensor.cpp feeder.cpp main.cpp processor.cpp screens/batch.cpp screens/batch_options.cpp screens/batch_table.cpp screens/calibrate.cpp screens/crop_choice.cpp screens/crop_delete.cpp screens/crop_edit.cpp screens/crop_name_exists.cpp screens/enter_program.cpp screens/keyboard.cpp screens/keypad.cpp screens/macro_screen.cpp screens/message_box.cpp screens/playback.cpp screens/program_choice.cpp screens/program_delete.cpp screens/start_screen.cpp screens/table.cpp screens/tool_choice.cpp screens/totalize.cpp screens/totalize_options.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents batch_mode_driver.hpp button.hpp centre.hpp code_39_writer.hpp crop.hpp cutgate.hpp diagnostics_console.hpp display.hpp dust_streak.hpp endgate.hpp envelope.hpp envelope_sensor.hpp feeder.hpp processor.hpp processor_calcs.hpp screens/batch.hpp screens/batch_options.hpp screens/batch_table.hpp screens/calibrate.hpp screens/crop_choice.hpp screens/crop_delete.hpp screens/crop_edit.hpp screens/crop_name_exists.hpp screens/enter_program.hpp screens/keyboard.hpp screens/keypad.hpp screens/macro_screen.hpp screens/message_box.hpp screens/playback.hpp screens/program_choice.hpp screens/program_delete.hpp screens/spreadsheet_choice.hpp screens/ss_setup_choice.hpp screens/ss_setup_entry.hpp screens/start_screen.hpp screens/table.hpp screens/tool_choice.hpp screens/totalize.hpp screens/totalize_options.hpp $(DISTDIR)/
+	$(COPY_FILE) --parents batch_mode_driver.cpp button.cpp centre.cpp code_39_writer.cpp cutgate.cpp diagnostics_console.cpp display.cpp dust_streak.cpp endgate.cpp envelope.cpp envelope_sensor.cpp feeder.cpp main.cpp processor.cpp screens/batch.cpp screens/batch_options.cpp screens/batch_table.cpp screens/calibrate.cpp screens/crop_choice.cpp screens/crop_delete.cpp screens/crop_edit.cpp screens/crop_name_exists.cpp screens/enter_program.cpp screens/keyboard.cpp screens/keypad.cpp screens/macro_screen.cpp screens/message_box.cpp screens/playback.cpp screens/program_choice.cpp screens/program_delete.cpp screens/spreadsheet_choice.cpp screens/ss_setup_choice.cpp screens/ss_setup_entry.cpp screens/start_screen.cpp screens/table.cpp screens/tool_choice.cpp screens/totalize.cpp screens/totalize_options.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -498,20 +528,21 @@ check: first
 
 compiler_rcc_make_all:
 compiler_rcc_clean:
-compiler_moc_header_make_all: moc_batch_mode_driver.cpp moc_button.cpp moc_centre.cpp moc_cutgate.cpp moc_diagnostics_console.cpp moc_display.cpp moc_endgate.cpp moc_envelope_sensor.cpp moc_feeder.cpp moc_processor.cpp moc_batch.cpp moc_batch_options.cpp moc_batch_table.cpp moc_calibrate.cpp moc_crop_choice.cpp moc_crop_delete.cpp moc_crop_edit.cpp moc_crop_name_exists.cpp moc_enter_program.cpp moc_keyboard.cpp moc_keypad.cpp moc_macro_screen.cpp moc_message_box.cpp moc_playback.cpp moc_program_choice.cpp moc_program_delete.cpp moc_start_screen.cpp moc_table.cpp moc_tool_choice.cpp moc_totalize.cpp moc_totalize_options.cpp
+compiler_moc_header_make_all: moc_batch_mode_driver.cpp moc_button.cpp moc_centre.cpp moc_cutgate.cpp moc_diagnostics_console.cpp moc_display.cpp moc_endgate.cpp moc_envelope.cpp moc_envelope_sensor.cpp moc_feeder.cpp moc_processor.cpp moc_batch.cpp moc_batch_options.cpp moc_batch_table.cpp moc_calibrate.cpp moc_crop_choice.cpp moc_crop_delete.cpp moc_crop_edit.cpp moc_crop_name_exists.cpp moc_enter_program.cpp moc_keyboard.cpp moc_keypad.cpp moc_macro_screen.cpp moc_message_box.cpp moc_playback.cpp moc_program_choice.cpp moc_program_delete.cpp moc_spreadsheet_choice.cpp moc_ss_setup_choice.cpp moc_ss_setup_entry.cpp moc_start_screen.cpp moc_table.cpp moc_tool_choice.cpp moc_totalize.cpp moc_totalize_options.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) moc_batch_mode_driver.cpp moc_button.cpp moc_centre.cpp moc_cutgate.cpp moc_diagnostics_console.cpp moc_display.cpp moc_endgate.cpp moc_envelope_sensor.cpp moc_feeder.cpp moc_processor.cpp moc_batch.cpp moc_batch_options.cpp moc_batch_table.cpp moc_calibrate.cpp moc_crop_choice.cpp moc_crop_delete.cpp moc_crop_edit.cpp moc_crop_name_exists.cpp moc_enter_program.cpp moc_keyboard.cpp moc_keypad.cpp moc_macro_screen.cpp moc_message_box.cpp moc_playback.cpp moc_program_choice.cpp moc_program_delete.cpp moc_start_screen.cpp moc_table.cpp moc_tool_choice.cpp moc_totalize.cpp moc_totalize_options.cpp
+	-$(DEL_FILE) moc_batch_mode_driver.cpp moc_button.cpp moc_centre.cpp moc_cutgate.cpp moc_diagnostics_console.cpp moc_display.cpp moc_endgate.cpp moc_envelope.cpp moc_envelope_sensor.cpp moc_feeder.cpp moc_processor.cpp moc_batch.cpp moc_batch_options.cpp moc_batch_table.cpp moc_calibrate.cpp moc_crop_choice.cpp moc_crop_delete.cpp moc_crop_edit.cpp moc_crop_name_exists.cpp moc_enter_program.cpp moc_keyboard.cpp moc_keypad.cpp moc_macro_screen.cpp moc_message_box.cpp moc_playback.cpp moc_program_choice.cpp moc_program_delete.cpp moc_spreadsheet_choice.cpp moc_ss_setup_choice.cpp moc_ss_setup_entry.cpp moc_start_screen.cpp moc_table.cpp moc_tool_choice.cpp moc_totalize.cpp moc_totalize_options.cpp
 moc_batch_mode_driver.cpp: centre.hpp \
 		cutgate.hpp \
 		endgate.hpp \
 		envelope_sensor.hpp \
 		feeder.hpp \
 		crop.hpp \
+		envelope.hpp \
 		batch_mode_driver.hpp
-	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include batch_mode_driver.hpp -o moc_batch_mode_driver.cpp
+	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include batch_mode_driver.hpp -o moc_batch_mode_driver.cpp
 
 moc_button.cpp: button.hpp
-	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include button.hpp -o moc_button.cpp
+	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include button.hpp -o moc_button.cpp
 
 moc_centre.cpp: cutgate.hpp \
 		endgate.hpp \
@@ -519,30 +550,33 @@ moc_centre.cpp: cutgate.hpp \
 		feeder.hpp \
 		crop.hpp \
 		centre.hpp
-	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include centre.hpp -o moc_centre.cpp
+	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include centre.hpp -o moc_centre.cpp
 
 moc_cutgate.cpp: cutgate.hpp
-	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include cutgate.hpp -o moc_cutgate.cpp
+	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include cutgate.hpp -o moc_cutgate.cpp
 
 moc_diagnostics_console.cpp: diagnostics_console.hpp
-	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include diagnostics_console.hpp -o moc_diagnostics_console.cpp
+	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include diagnostics_console.hpp -o moc_diagnostics_console.cpp
 
 moc_display.cpp: display.hpp
-	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include display.hpp -o moc_display.cpp
+	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include display.hpp -o moc_display.cpp
 
 moc_endgate.cpp: endgate.hpp
-	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include endgate.hpp -o moc_endgate.cpp
+	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include endgate.hpp -o moc_endgate.cpp
+
+moc_envelope.cpp: envelope.hpp
+	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include envelope.hpp -o moc_envelope.cpp
 
 moc_envelope_sensor.cpp: envelope_sensor.hpp
-	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include envelope_sensor.hpp -o moc_envelope_sensor.cpp
+	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include envelope_sensor.hpp -o moc_envelope_sensor.cpp
 
 moc_feeder.cpp: feeder.hpp
-	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include feeder.hpp -o moc_feeder.cpp
+	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include feeder.hpp -o moc_feeder.cpp
 
 moc_processor.cpp: crop.hpp \
 		dust_streak.hpp \
 		processor.hpp
-	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include processor.hpp -o moc_processor.cpp
+	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include processor.hpp -o moc_processor.cpp
 
 moc_batch.cpp: screens/batch_table.hpp \
 		centre.hpp \
@@ -552,10 +586,11 @@ moc_batch.cpp: screens/batch_table.hpp \
 		feeder.hpp \
 		crop.hpp \
 		batch_mode_driver.hpp \
+		envelope.hpp \
 		screens/macro_screen.hpp \
 		screens/table.hpp \
 		screens/batch.hpp
-	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/batch.hpp -o moc_batch.cpp
+	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/batch.hpp -o moc_batch.cpp
 
 moc_batch_options.cpp: centre.hpp \
 		cutgate.hpp \
@@ -564,10 +599,10 @@ moc_batch_options.cpp: centre.hpp \
 		feeder.hpp \
 		crop.hpp \
 		screens/batch_options.hpp
-	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/batch_options.hpp -o moc_batch_options.cpp
+	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/batch_options.hpp -o moc_batch_options.cpp
 
 moc_batch_table.cpp: screens/batch_table.hpp
-	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/batch_table.hpp -o moc_batch_table.cpp
+	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/batch_table.hpp -o moc_batch_table.cpp
 
 moc_calibrate.cpp: centre.hpp \
 		cutgate.hpp \
@@ -576,7 +611,7 @@ moc_calibrate.cpp: centre.hpp \
 		feeder.hpp \
 		crop.hpp \
 		screens/calibrate.hpp
-	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/calibrate.hpp -o moc_calibrate.cpp
+	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/calibrate.hpp -o moc_calibrate.cpp
 
 moc_crop_choice.cpp: centre.hpp \
 		cutgate.hpp \
@@ -585,7 +620,7 @@ moc_crop_choice.cpp: centre.hpp \
 		feeder.hpp \
 		crop.hpp \
 		screens/crop_choice.hpp
-	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/crop_choice.hpp -o moc_crop_choice.cpp
+	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/crop_choice.hpp -o moc_crop_choice.cpp
 
 moc_crop_delete.cpp: centre.hpp \
 		cutgate.hpp \
@@ -594,7 +629,7 @@ moc_crop_delete.cpp: centre.hpp \
 		feeder.hpp \
 		crop.hpp \
 		screens/crop_delete.hpp
-	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/crop_delete.hpp -o moc_crop_delete.cpp
+	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/crop_delete.hpp -o moc_crop_delete.cpp
 
 moc_crop_edit.cpp: centre.hpp \
 		cutgate.hpp \
@@ -603,7 +638,7 @@ moc_crop_edit.cpp: centre.hpp \
 		feeder.hpp \
 		crop.hpp \
 		screens/crop_edit.hpp
-	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/crop_edit.hpp -o moc_crop_edit.cpp
+	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/crop_edit.hpp -o moc_crop_edit.cpp
 
 moc_crop_name_exists.cpp: centre.hpp \
 		cutgate.hpp \
@@ -612,7 +647,7 @@ moc_crop_name_exists.cpp: centre.hpp \
 		feeder.hpp \
 		crop.hpp \
 		screens/crop_name_exists.hpp
-	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/crop_name_exists.hpp -o moc_crop_name_exists.cpp
+	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/crop_name_exists.hpp -o moc_crop_name_exists.cpp
 
 moc_enter_program.cpp: centre.hpp \
 		cutgate.hpp \
@@ -621,8 +656,9 @@ moc_enter_program.cpp: centre.hpp \
 		feeder.hpp \
 		crop.hpp \
 		batch_mode_driver.hpp \
+		envelope.hpp \
 		screens/enter_program.hpp
-	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/enter_program.hpp -o moc_enter_program.cpp
+	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/enter_program.hpp -o moc_enter_program.cpp
 
 moc_keyboard.cpp: centre.hpp \
 		cutgate.hpp \
@@ -631,11 +667,12 @@ moc_keyboard.cpp: centre.hpp \
 		feeder.hpp \
 		crop.hpp \
 		batch_mode_driver.hpp \
+		envelope.hpp \
 		screens/keyboard.hpp
-	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/keyboard.hpp -o moc_keyboard.cpp
+	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/keyboard.hpp -o moc_keyboard.cpp
 
 moc_keypad.cpp: screens/keypad.hpp
-	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/keypad.hpp -o moc_keypad.cpp
+	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/keypad.hpp -o moc_keypad.cpp
 
 moc_macro_screen.cpp: screens/table.hpp \
 		centre.hpp \
@@ -645,10 +682,10 @@ moc_macro_screen.cpp: screens/table.hpp \
 		feeder.hpp \
 		crop.hpp \
 		screens/macro_screen.hpp
-	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/macro_screen.hpp -o moc_macro_screen.cpp
+	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/macro_screen.hpp -o moc_macro_screen.cpp
 
 moc_message_box.cpp: screens/message_box.hpp
-	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/message_box.hpp -o moc_message_box.cpp
+	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/message_box.hpp -o moc_message_box.cpp
 
 moc_playback.cpp: centre.hpp \
 		cutgate.hpp \
@@ -657,7 +694,7 @@ moc_playback.cpp: centre.hpp \
 		feeder.hpp \
 		crop.hpp \
 		screens/playback.hpp
-	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/playback.hpp -o moc_playback.cpp
+	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/playback.hpp -o moc_playback.cpp
 
 moc_program_choice.cpp: centre.hpp \
 		cutgate.hpp \
@@ -666,7 +703,7 @@ moc_program_choice.cpp: centre.hpp \
 		feeder.hpp \
 		crop.hpp \
 		screens/program_choice.hpp
-	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/program_choice.hpp -o moc_program_choice.cpp
+	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/program_choice.hpp -o moc_program_choice.cpp
 
 moc_program_delete.cpp: centre.hpp \
 		cutgate.hpp \
@@ -675,7 +712,34 @@ moc_program_delete.cpp: centre.hpp \
 		feeder.hpp \
 		crop.hpp \
 		screens/program_delete.hpp
-	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/program_delete.hpp -o moc_program_delete.cpp
+	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/program_delete.hpp -o moc_program_delete.cpp
+
+moc_spreadsheet_choice.cpp: centre.hpp \
+		cutgate.hpp \
+		endgate.hpp \
+		envelope_sensor.hpp \
+		feeder.hpp \
+		crop.hpp \
+		screens/spreadsheet_choice.hpp
+	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/spreadsheet_choice.hpp -o moc_spreadsheet_choice.cpp
+
+moc_ss_setup_choice.cpp: centre.hpp \
+		cutgate.hpp \
+		endgate.hpp \
+		envelope_sensor.hpp \
+		feeder.hpp \
+		crop.hpp \
+		screens/ss_setup_choice.hpp
+	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/ss_setup_choice.hpp -o moc_ss_setup_choice.cpp
+
+moc_ss_setup_entry.cpp: centre.hpp \
+		cutgate.hpp \
+		endgate.hpp \
+		envelope_sensor.hpp \
+		feeder.hpp \
+		crop.hpp \
+		screens/ss_setup_entry.hpp
+	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/ss_setup_entry.hpp -o moc_ss_setup_entry.cpp
 
 moc_start_screen.cpp: centre.hpp \
 		cutgate.hpp \
@@ -684,10 +748,10 @@ moc_start_screen.cpp: centre.hpp \
 		feeder.hpp \
 		crop.hpp \
 		screens/start_screen.hpp
-	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/start_screen.hpp -o moc_start_screen.cpp
+	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/start_screen.hpp -o moc_start_screen.cpp
 
 moc_table.cpp: screens/table.hpp
-	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/table.hpp -o moc_table.cpp
+	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/table.hpp -o moc_table.cpp
 
 moc_tool_choice.cpp: centre.hpp \
 		cutgate.hpp \
@@ -696,7 +760,7 @@ moc_tool_choice.cpp: centre.hpp \
 		feeder.hpp \
 		crop.hpp \
 		screens/tool_choice.hpp
-	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/tool_choice.hpp -o moc_tool_choice.cpp
+	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/tool_choice.hpp -o moc_tool_choice.cpp
 
 moc_totalize.cpp: screens/table.hpp \
 		centre.hpp \
@@ -707,7 +771,7 @@ moc_totalize.cpp: screens/table.hpp \
 		crop.hpp \
 		screens/macro_screen.hpp \
 		screens/totalize.hpp
-	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/totalize.hpp -o moc_totalize.cpp
+	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/totalize.hpp -o moc_totalize.cpp
 
 moc_totalize_options.cpp: centre.hpp \
 		cutgate.hpp \
@@ -716,7 +780,7 @@ moc_totalize_options.cpp: centre.hpp \
 		feeder.hpp \
 		crop.hpp \
 		screens/totalize_options.hpp
-	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/totalize_options.hpp -o moc_totalize_options.cpp
+	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/totalize_options.hpp -o moc_totalize_options.cpp
 
 compiler_moc_source_make_all:
 compiler_moc_source_clean:
@@ -738,7 +802,8 @@ batch_mode_driver.o: batch_mode_driver.cpp batch_mode_driver.hpp \
 		endgate.hpp \
 		envelope_sensor.hpp \
 		feeder.hpp \
-		crop.hpp
+		crop.hpp \
+		envelope.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o batch_mode_driver.o batch_mode_driver.cpp
 
 button.o: button.cpp button.hpp
@@ -758,6 +823,7 @@ centre.o: centre.cpp centre.hpp \
 		screens/crop_delete.hpp \
 		screens/keyboard.hpp \
 		batch_mode_driver.hpp \
+		envelope.hpp \
 		screens/totalize.hpp \
 		screens/table.hpp \
 		screens/macro_screen.hpp \
@@ -772,8 +838,13 @@ centre.o: centre.cpp centre.hpp \
 		screens/batch_options.hpp \
 		screens/program_delete.hpp \
 		screens/crop_name_exists.hpp \
-		diagnostics_console.hpp
+		diagnostics_console.hpp \
+		screens/spreadsheet_choice.hpp \
+		screens/ss_setup_choice.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o centre.o centre.cpp
+
+code_39_writer.o: code_39_writer.cpp code_39_writer.hpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o code_39_writer.o code_39_writer.cpp
 
 cutgate.o: cutgate.cpp cutgate.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o cutgate.o cutgate.cpp
@@ -795,6 +866,10 @@ dust_streak.o: dust_streak.cpp dust_streak.hpp
 
 endgate.o: endgate.cpp endgate.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o endgate.o endgate.cpp
+
+envelope.o: envelope.cpp envelope.hpp \
+		code_39_writer.hpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o envelope.o envelope.cpp
 
 envelope_sensor.o: envelope_sensor.cpp envelope_sensor.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o envelope_sensor.o envelope_sensor.cpp
@@ -830,6 +905,7 @@ batch.o: screens/batch.cpp centre.hpp \
 		screens/batch.hpp \
 		screens/batch_table.hpp \
 		batch_mode_driver.hpp \
+		envelope.hpp \
 		screens/macro_screen.hpp \
 		screens/table.hpp \
 		button.hpp \
@@ -844,6 +920,7 @@ batch_options.o: screens/batch_options.cpp button.hpp \
 		envelope_sensor.hpp \
 		feeder.hpp \
 		crop.hpp \
+		envelope.hpp \
 		screens/batch_options.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o batch_options.o screens/batch_options.cpp
 
@@ -914,6 +991,7 @@ enter_program.o: screens/enter_program.cpp centre.hpp \
 		crop.hpp \
 		screens/enter_program.hpp \
 		batch_mode_driver.hpp \
+		envelope.hpp \
 		button.hpp \
 		screens/keypad.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o enter_program.o screens/enter_program.cpp
@@ -927,7 +1005,8 @@ keyboard.o: screens/keyboard.cpp centre.hpp \
 		screens/crop_choice.hpp \
 		button.hpp \
 		screens/keyboard.hpp \
-		batch_mode_driver.hpp
+		batch_mode_driver.hpp \
+		envelope.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o keyboard.o screens/keyboard.cpp
 
 keypad.o: screens/keypad.cpp screens/keypad.hpp
@@ -968,7 +1047,8 @@ program_choice.o: screens/program_choice.cpp centre.hpp \
 		crop.hpp \
 		screens/program_choice.hpp \
 		button.hpp \
-		batch_mode_driver.hpp
+		batch_mode_driver.hpp \
+		envelope.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o program_choice.o screens/program_choice.cpp
 
 program_delete.o: screens/program_delete.cpp centre.hpp \
@@ -979,8 +1059,44 @@ program_delete.o: screens/program_delete.cpp centre.hpp \
 		crop.hpp \
 		screens/program_delete.hpp \
 		button.hpp \
-		batch_mode_driver.hpp
+		batch_mode_driver.hpp \
+		envelope.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o program_delete.o screens/program_delete.cpp
+
+spreadsheet_choice.o: screens/spreadsheet_choice.cpp centre.hpp \
+		cutgate.hpp \
+		endgate.hpp \
+		envelope_sensor.hpp \
+		feeder.hpp \
+		crop.hpp \
+		screens/spreadsheet_choice.hpp \
+		batch_mode_driver.hpp \
+		envelope.hpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o spreadsheet_choice.o screens/spreadsheet_choice.cpp
+
+ss_setup_choice.o: screens/ss_setup_choice.cpp centre.hpp \
+		cutgate.hpp \
+		endgate.hpp \
+		envelope_sensor.hpp \
+		feeder.hpp \
+		crop.hpp \
+		screens/ss_setup_choice.hpp \
+		button.hpp \
+		batch_mode_driver.hpp \
+		envelope.hpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o ss_setup_choice.o screens/ss_setup_choice.cpp
+
+ss_setup_entry.o: screens/ss_setup_entry.cpp centre.hpp \
+		cutgate.hpp \
+		endgate.hpp \
+		envelope_sensor.hpp \
+		feeder.hpp \
+		crop.hpp \
+		screens/ss_setup_entry.hpp \
+		button.hpp \
+		batch_mode_driver.hpp \
+		envelope.hpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o ss_setup_entry.o screens/ss_setup_entry.cpp
 
 start_screen.o: screens/start_screen.cpp centre.hpp \
 		cutgate.hpp \
@@ -1054,6 +1170,9 @@ moc_display.o: moc_display.cpp
 moc_endgate.o: moc_endgate.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_endgate.o moc_endgate.cpp
 
+moc_envelope.o: moc_envelope.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_envelope.o moc_envelope.cpp
+
 moc_envelope_sensor.o: moc_envelope_sensor.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_envelope_sensor.o moc_envelope_sensor.cpp
 
@@ -1110,6 +1229,15 @@ moc_program_choice.o: moc_program_choice.cpp
 
 moc_program_delete.o: moc_program_delete.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_program_delete.o moc_program_delete.cpp
+
+moc_spreadsheet_choice.o: moc_spreadsheet_choice.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_spreadsheet_choice.o moc_spreadsheet_choice.cpp
+
+moc_ss_setup_choice.o: moc_ss_setup_choice.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_ss_setup_choice.o moc_ss_setup_choice.cpp
+
+moc_ss_setup_entry.o: moc_ss_setup_entry.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_ss_setup_entry.o moc_ss_setup_entry.cpp
 
 moc_start_screen.o: moc_start_screen.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_start_screen.o moc_start_screen.cpp
