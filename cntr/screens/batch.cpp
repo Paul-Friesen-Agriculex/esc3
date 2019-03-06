@@ -37,8 +37,8 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
 //  cout<<"batch::batch 1\n";
   batch_mode_driver_p = set_batch_mode_driver_p;
 
-  cout<<"batch::batch 1.  listing program\n";  
-  batch_mode_driver_p->list_program();
+//  cout<<"batch::batch 1.  listing program\n";  
+//  batch_mode_driver_p->list_program();
 
 
   
@@ -85,7 +85,14 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
   status_box_p = new message_box;
 //  cout<<"after new message_box\n";
   status_box_p -> setMinimumSize(250,100);
-  save_program_button_p = new button("Save Program");
+  if(batch_mode_driver_p->use_spreadsheet == true)
+  {
+    save_program_button_p = new button("Save Spreadsheet\nSetup");
+  }
+  else
+  {
+    save_program_button_p = new button("Save Program");
+  }
   save_table_button_p = new button("Save Table");
   clear_table_button_p = new button("Clear Table");
   quit_button_p = new button("Quit");
@@ -193,6 +200,7 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
   dump_container_needed_message = "Place Dump\nContainer";
   dump_container_ready_message = "Finished Dumping";
   dump_container_removed_too_soon_message = "Dumping Not\nFinished";
+  bad_seed_lot_message = "Count went over limit.\nDiscard seed lot.\nReduce feed speed.";
   dump_flag = false;
   old_barcode_mode = pack;
   connect(batch_mode_driver_p, SIGNAL(pack_collected(int)), this, SLOT(pack_collected(int)));
@@ -213,7 +221,7 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
 //  diagnostics_box_p -> show();
 
   cout<<"batch::batch end.  listing program\n";  
-  batch_mode_driver_p->list_program();
+//  batch_mode_driver_p->list_program();
 
   table_p->load_file("settings/batch_backup");
   
@@ -222,6 +230,12 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
     batch_mode_driver_p->save_program(batch_mode_driver_p->bm_save_program_filename);
 //    batch_mode_driver_p->save_program(batch_mode_driver_p->bm_save_program_filename + "test");
     batch_mode_driver_p->bm_save_program_filename = "";
+  }
+
+  if(batch_mode_driver_p->bm_save_ss_setup_filename != "")//returning from batch_save_ss_setup screen with name of file to save
+  {
+    batch_mode_driver_p->save_ss_setup(batch_mode_driver_p->bm_save_ss_setup_filename);
+    batch_mode_driver_p->bm_save_ss_setup_filename = "";
   }
   
   if(batch_mode_driver_p->bm_save_table_filename != "")//returning from batch_save_table_file screen with name of file to save
@@ -232,6 +246,16 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
     table_p->save_file(batch_mode_driver_p->bm_save_table_filename);
     batch_mode_driver_p->bm_save_table_filename = "";
   }
+  
+  
+  
+  if(batch_mode_driver_p -> use_spreadsheet)
+  {
+    batch_mode_driver_p ->fill_ss_column_pointers();
+  }  
+  
+  
+  
   
   barcode_line_p->setFocus();
 //  batch_mode_driver_p->list_program();
@@ -400,7 +424,14 @@ void batch::save_program_clicked()
 {
   batch_mode_driver_p -> stop();
   centre_p->set_speed(0);
-  centre_p->add_waiting_screen(17);//batch_save_program
+  if(batch_mode_driver_p->use_spreadsheet == true)
+  {
+    centre_p->add_waiting_screen(29);//batch_save_ss_setup
+  }
+  else
+  {
+    centre_p->add_waiting_screen(17);//batch_save_program
+  }
   centre_p->screen_done = true;
 }
 
@@ -470,12 +501,14 @@ void batch::run()
   
   if( (centre_p->envelope_present==true) && (pack_was_placed==false) && (centre_p->count>0) )
   {
-//    cout<<"setting pack_was_placed true\n";
+    cout<<"setting pack_was_placed true\n";
     pack_was_placed = true;
   }
   if( (centre_p->envelope_present==false) && (pack_was_placed==true) && (centre_p->count>0) )
   {
+    cout<<"setting pack_was_removed true\n";
     pack_was_removed = true;
+    pack_was_placed = false;
     if( (dump_flag==false) && (count>0) && (centre_p->cutgate_p->get_state()==CUTGATE_OPEN) && (pack_removed_too_soon==false) )
     {
       
@@ -541,13 +574,22 @@ void batch::run()
   if( (pack_can_be_removed==true) && (pack_removed_too_soon==false) && (dump_flag==false) )
   {
     QString number;
-    pack_ready_message = "PACK READY\nPackage ";
-    pack_ready_message.append(number.setNum(batch_mode_driver_p->pack_ready_pack+1));
-    pack_ready_message.append(" of ");
-    pack_ready_message.append(number.setNum(batch_mode_driver_p->pack_ready_pack_limit));
-    pack_ready_message.append("\n");
-    pack_ready_message.append(number.setNum(batch_mode_driver_p->pack_ready_count_limit));
-    pack_ready_message.append(" seeds");
+    if(batch_mode_driver_p->use_spreadsheet==false)
+    {
+      pack_ready_message = "PACK READY.\nPackage ";
+      pack_ready_message.append(number.setNum(batch_mode_driver_p->pack_ready_pack+1));
+      pack_ready_message.append(" of ");
+      pack_ready_message.append(number.setNum(batch_mode_driver_p->pack_ready_pack_limit));
+      pack_ready_message.append("\n");
+      pack_ready_message.append(number.setNum(batch_mode_driver_p->pack_ready_count_limit));
+      pack_ready_message.append(" seeds");
+    }
+    else
+    {
+      pack_ready_message = "PACK READY.\n";
+      pack_ready_message.append(number.setNum(batch_mode_driver_p->lines_left_to_fill));
+      pack_ready_message.append(" packs left for \nthis seed lot.");
+    }
     status_box_p->set_text(pack_ready_message);
     status_box_p->set_text_size(20);
     status_box_p->set_background(0, 255, 0);
@@ -574,6 +616,13 @@ void batch::run()
     status_box_p->set_background(255, 0, 0);
     status_box_p->update();
   }
+  else if(batch_mode_driver_p->mode == wait_for_bad_lot_cleanout)
+  {
+    status_box_p->set_text(bad_seed_lot_message);
+    status_box_p->set_text_size(15);
+    status_box_p->set_background(255, 0, 0);
+    status_box_p->update();
+  }    
   else
   {
     if(dump_flag == true)
@@ -585,14 +634,26 @@ void batch::run()
     }  
     else
     {
-      message=QString("Crop: %1.  Sensitivity: %2.\nGate should be set at %3.\nPack %4 of %5.\n%6 seeds/pack.\nfile %7") 
-        .arg(centre_p->crops[0].name) 
-        .arg(centre_p->crops[0].sensitivity) 
-        .arg(centre_p->crops[0].gate_setting)
-        .arg(batch_mode_driver_p->current_pack+1)
-        .arg(batch_mode_driver_p->current_pack_limit)
-        .arg(batch_mode_driver_p->current_count_limit)
-        .arg(batch_mode_driver_p->program_path);
+      if(batch_mode_driver_p->use_spreadsheet==false)
+      {
+        message=QString("Crop: %1.  Sensitivity: %2.\nGate should be set at %3.\nPack %4 of %5.\n%6 seeds/pack.\nfile %7") 
+          .arg(centre_p->crops[0].name) 
+          .arg(centre_p->crops[0].sensitivity) 
+          .arg(centre_p->crops[0].gate_setting)
+          .arg(batch_mode_driver_p->current_pack+1)
+          .arg(batch_mode_driver_p->current_pack_limit)
+          .arg(batch_mode_driver_p->current_count_limit)
+          .arg(batch_mode_driver_p->program_path);
+      }  
+      else
+      {
+        message=QString("Crop: %1.  Sensitivity: %2.\nGate should be set at %3.\n%4 packs left\nfor this seed lot.\n%5 seeds in this pack.") 
+          .arg(centre_p->crops[0].name) 
+          .arg(centre_p->crops[0].sensitivity) 
+          .arg(centre_p->crops[0].gate_setting)
+          .arg(batch_mode_driver_p->lines_left_to_fill)
+          .arg(batch_mode_driver_p->current_count_limit);
+      }  
       status_box_p->set_text(message);
       status_box_p->set_text_size(16);
       status_box_p->set_background(30, 200, 255);
@@ -664,6 +725,13 @@ void batch::run()
       barcode_status_p->set_background(0, 255, 0);
       barcode_status_p->update();
     }
+  }
+  if(batch_mode_driver_p->mode == wait_for_bad_lot_cleanout)
+  {
+    barcode_status_p->set_text("Remove over-counted seed lot.");
+    barcode_status_p->set_text_size(20); 
+    barcode_status_p->set_background(255, 0, 0);
+    barcode_status_p->update();
   }
     
   old_barcode_mode = batch_mode_driver_p->barcode_mode;

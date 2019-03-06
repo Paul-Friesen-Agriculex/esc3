@@ -616,3 +616,66 @@ void batch_save_table::enter_clicked()
   //returning to batch with bm_save_table_filename not blank will trigger save.  see batch constructor.
 }
   
+batch_save_ss_setup::batch_save_ss_setup(centre* centre_p, batch_mode_driver* batch_mode_driver_p_s)
+:keyboard(centre_p)
+{
+  batch_mode_driver_p = batch_mode_driver_p_s;
+  QString message("Enter file name. Spreadsheet setups already saved for ");
+  message.append(centre_p->crops[0].name);
+  message.append(":\n");
+  QDir program_dir("./ss_setups");
+  program_dir.cd(centre_p->crops[0].name);
+  program_dir.setFilter(QDir::Files);
+  QStringList program_list = program_dir.entryList();
+  for(int i=0; i<program_list.size(); ++i)
+  {
+    QString name = program_list[i];
+    name.remove(".ESC3sss");
+    message.append(name);
+    message.append("\n");
+  }
+  message_p->setText(message);
+  
+  QString path(batch_mode_driver_p->ss_setup_path);
+  int slash_index = path.lastIndexOf("/");
+  int chars_to_take = path.length() - slash_index - 1;
+  QString file_name = path.right(chars_to_take);
+  file_name.remove(".ESC3sss");
+  *entry_line_p = file_name;
+  entry_line_display_p->setText(*entry_line_p);
+
+  connect(enter_key_p, SIGNAL(clicked()), this, SLOT(enter_clicked()));
+}
+
+
+void batch_save_ss_setup::enter_clicked()
+{
+  QDir qdir("ss_setups");
+  if(!qdir.exists())
+  {
+    
+    cout<<"making directory ss_setups\n";
+    
+    qdir.cd(qdir.currentPath());
+    qdir.mkdir("ss_setups");
+  }
+  qdir.cd("ss_setups");
+  QString crop_name = centre_p->crops[0].name;
+  if(!qdir.exists(crop_name))
+  {
+    qdir.mkdir(crop_name);
+  }
+  
+  QString outfile_name("ss_setups/");
+  outfile_name.append(crop_name);
+  outfile_name.append("/");
+  outfile_name.append(*entry_line_p);
+  outfile_name.append(".ESC3sss");
+  
+  cout<<"outfile_name "<<outfile_name.toLatin1().data()<<endl;
+  
+  batch_mode_driver_p->bm_save_ss_setup_filename = outfile_name;
+  centre_p->add_waiting_screen(15);//batch
+  centre_p->screen_done=true;
+  //returning to batch with bm_save_ss_setup filename not blank will trigger save.  see batch constructor.
+}

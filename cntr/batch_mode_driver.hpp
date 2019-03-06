@@ -28,6 +28,7 @@ enum mode_enum
   hi_closed,
   wait_for_endgate_to_close,
   wait_for_pack,
+  wait_for_bad_lot_cleanout,
   dump_into_cut_gate,
   dump_wait_for_endgate_to_close,
   wait_for_final_pack,
@@ -54,6 +55,7 @@ struct ss_setup
 {
   int material_id_column;
   int required_count_column;
+  int envelope_id_column;
   int actual_count_column;
   int print_time_column;
   int fill_time_column;
@@ -134,7 +136,9 @@ class batch_mode_driver : public QObject
   bool pack_match_lot;
   bool pack_contain_lot;
   bool lot_contain_pack;
+  bool pack_match_spreadsheet;
   bool record_only;
+  bool next_seed_lot_bad;//used to signal count went over limit
   
   //batch barcode matching data
   barcode_entry_mode barcode_mode;
@@ -152,20 +156,35 @@ class batch_mode_driver : public QObject
   
   //spreadsheet handling
   bool use_spreadsheet;
+  int spreadsheet_line;//line corresponding to pack currently being filled
   QString spreadsheet_filename;
   void load_spreadsheet(QString filename);
   spreadsheet_column* ss_first_column_p;
   spreadsheet_column* ss_material_id_p;
   spreadsheet_column* ss_required_count_p;
+  spreadsheet_column* ss_envelope_id_p;
   spreadsheet_column* ss_actual_count_p;
   spreadsheet_column* ss_print_time_p;
   spreadsheet_column* ss_fill_time_p;
   spreadsheet_column* get_spreadsheet_column_pointer(int column_number);
+  int spreadsheet_number_of_lines;//does not include heading line
+  int spreadsheet_line_number;//number of the line for the packet being filled
+  int get_next_spreadsheet_line_number();//look for next line number not filled for current seed_lot_barcode.  Return -1 if no more.
+  int lines_left_to_fill;//number of packs for current seed_lot_bar_code still to be filled.  set by get_next_spreadsheet_line_number().
+  QList<bool> pack_filled;//used to mark when a packet has been filled
   ss_setup* ss_setup_p;
   envelope* envelope_p;
   QString ss_setup_path;
   void load_ss_setup();
   void clear_ss_setup();
+  void fill_ss_column_pointers();
+  QString envelope_layout_path;
+  void load_envelope_layout();
+  void clear_envelope_layout();
+
+  //saving spreadsheet setup files
+  QString bm_save_ss_setup_filename;//new filename just entered.  Set back to blank when file is saved.
+  void save_ss_setup(QString filename);
   
   
   void list_program();//in terminal - diagnostics

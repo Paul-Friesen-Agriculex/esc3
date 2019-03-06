@@ -120,7 +120,7 @@ void enter_program::number_entered(int value)
     enter_flag = 's';
     prompt_p -> setText("Enter number of \nseeds per package");
     cout<<"enter_program::number_entered packs\n";
-    batch_mode_driver_p->list_program();
+//    batch_mode_driver_p->list_program();
     update_program_string();
     return;
   }
@@ -134,7 +134,7 @@ void enter_program::number_entered(int value)
     enter_flag = 'p';
     prompt_p -> setText("Enter number of packages");
     cout<<"enter_program::number_entered seeds\n";
-    batch_mode_driver_p->list_program();
+//    batch_mode_driver_p->list_program();
     update_program_string();
     return;
   }
@@ -156,7 +156,7 @@ void enter_program::done_clicked()
   batch_mode_driver_p -> high_feed_speed = 100;
   batch_mode_driver_p -> low_feed_speed = 10;
   batch_mode_driver_p -> dump_speed = 1000;
-  batch_mode_driver_p->list_program();
+//  batch_mode_driver_p->list_program();
   batch_mode_driver_p->reset_program();
 //  cout<<"done reset_program\n";  
   centre_p->add_waiting_screen(15);//batch
@@ -170,7 +170,7 @@ void enter_program::update_program_string()
   cout<<"update_program_string 2\n";
   program_string_p = new QString;
   cout<<"update_program_string 3\n";
-  batch_mode_driver_p->list_program();
+//  batch_mode_driver_p->list_program();
   for(int i=0; i<batch_mode_driver_p->get_program_size(); ++i)
   {
     cout<<"  i "<<i<<endl;

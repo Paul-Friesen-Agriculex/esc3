@@ -35,6 +35,7 @@ class batch_options : public screen
   QRadioButton* pack_match_lot_p;
   QRadioButton* pack_contain_lot_p;
   QRadioButton* lot_contain_pack_p;
+  QRadioButton* pack_match_spreadsheet_p;
   QRadioButton* record_only_p;
   button* done_button_p;
   button* macro_menu_button_p;

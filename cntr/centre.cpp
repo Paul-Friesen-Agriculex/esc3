@@ -35,6 +35,7 @@
 #include "spreadsheet_choice.hpp"
 #include "ss_setup_choice.hpp"
 #include "ss_setup_entry.hpp"
+#include "envelope_layout_choice.hpp"
 
 #include "macro_screen.hpp"	//TEST~~~
 //#include "table.hpp"        //TEST~~~ //access barcodes and count from table
@@ -432,7 +433,7 @@ void centre::run()
       case 21: screen_p=new spreadsheet_choice(this); break;
       case 22: screen_p=new ss_setup_choice(this, batch_mode_driver_p); break;
       case 23: screen_p=new ss_setup_entry(this, batch_mode_driver_p); break;
-//      case : screen_p=new (this); break;
+      case 24: screen_p=new envelope_layout_choice(this, batch_mode_driver_p); break;
 //      case : screen_p=new (this); break;
 //      case : screen_p=new (this); break;
 //      case : screen_p=new (this); break;
@@ -441,7 +442,7 @@ void centre::run()
 //      case : screen_p=new (this); break;
       case 27: screen_p=new macro_name_entry(this);  break;    //TEST~~~ 11_13_2018//
       case 28: screen_p=new macro_screen(this); break;	    //TEST~~~ macro_menu
-//      case : screen_p=new (this); break;
+      case 29: screen_p=new batch_save_ss_setup(this, batch_mode_driver_p); break;
 //      case : screen_p=new (this); break;
       default: screen_p=new start_screen(this);
                cout<<"default screen_p case\n";

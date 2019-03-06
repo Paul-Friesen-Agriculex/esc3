@@ -200,5 +200,19 @@ class batch_save_table : public keyboard
   public slots:
   void enter_clicked();
 };
+
+class batch_save_ss_setup : public keyboard
+{
+  Q_OBJECT
+  
+  batch_mode_driver* batch_mode_driver_p;
+  
+  public:
+  batch_save_ss_setup(centre* set_centre_p, batch_mode_driver* batch_mode_driver_p_s);
+  
+  public slots:
+  void enter_clicked();
+};
+
 #endif
 

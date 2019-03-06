@@ -117,6 +117,7 @@ class batch : public screen
   int dump_container_ready_count;
   bool dump_container_removed_too_soon;
   QString dump_container_removed_too_soon_message;
+  QString bad_seed_lot_message;
   bool dump_flag;//true -> dumping
   barcode_entry_mode old_barcode_mode;
   

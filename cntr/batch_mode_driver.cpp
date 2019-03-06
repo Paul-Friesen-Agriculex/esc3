@@ -20,6 +20,9 @@ batch_mode_driver::batch_mode_driver(centre* centre_p_s, cutgate* cutgate_p_s)
   old_count = 0;
   endgate_close_counter = 0;
   program_size = 0;
+  high_feed_speed = 100;
+  low_feed_speed = 10;
+  dump_speed = 1000;
   
   //batch options
   require_seed_lot_barcode = true;
@@ -27,6 +30,7 @@ batch_mode_driver::batch_mode_driver(centre* centre_p_s, cutgate* cutgate_p_s)
   pack_match_lot = true;
   pack_contain_lot = false;
   lot_contain_pack = false;
+  pack_match_spreadsheet = false;
   record_only = false;
   
   barcode_mode = seed_lot;
@@ -40,11 +44,16 @@ batch_mode_driver::batch_mode_driver(centre* centre_p_s, cutgate* cutgate_p_s)
   dump_end_qtime.start();
   
   force_dump_out = false;
+  next_seed_lot_bad = false;
 
   use_spreadsheet = false;
   ss_setup_p = new ss_setup;
   clear_ss_setup();
+  clear_envelope_layout();
+  ss_setup_path = "";
+  envelope_layout_path = "";
   envelope_p = new envelope;
+  spreadsheet_line = 0;
 }
   
 batch_mode_driver::~batch_mode_driver()
@@ -163,6 +172,16 @@ void batch_mode_driver::load_program()//load the program indicated by program_pa
     {
       stream.readLineInto(&subline);
       lot_contain_pack = subline.toInt(&conversion_ok_flag);
+      if(conversion_ok_flag==false)
+      {
+        cout<<"failed to convert   "<<subline.toStdString()<<"   to int\n";
+        return;
+      }
+    }
+    else if(line == "pack_match_spreadsheet")
+    {
+      stream.readLineInto(&subline);
+      pack_match_spreadsheet = subline.toInt(&conversion_ok_flag);
       if(conversion_ok_flag==false)
       {
         cout<<"failed to convert   "<<subline.toStdString()<<"   to int\n";
@@ -338,13 +357,15 @@ void batch_mode_driver::save_program(QString filename)
   stream<<pack_contain_lot<<endl;
   stream<<"lot_contain_pack\n";
   stream<<lot_contain_pack<<endl;
+  stream<<"pack_match_spreadsheet\n";
+  stream<<pack_match_spreadsheet<<endl;
   stream<<"record_only\n";
   stream<<record_only<<endl;
 }
 
 void batch_mode_driver::load_spreadsheet(QString filename)
 {
-  cout<<"p1\n";
+//  cout<<"p1\n";
   QFile infile(filename);
   infile.open(QIODevice::ReadOnly);
   QTextStream stream(&infile);
@@ -354,7 +375,7 @@ void batch_mode_driver::load_spreadsheet(QString filename)
   spreadsheet_column* ss_column_p;
   stream.readLineInto(&line);
   list = line.split(",");
-  cout<<"p2\n";
+//  cout<<"p2\n";
   for(int i=list.size()-1; i>=0; --i)
   {
     ss_column_p = ss_first_column_p;
@@ -362,9 +383,11 @@ void batch_mode_driver::load_spreadsheet(QString filename)
     ss_first_column_p->heading = list[i];
     ss_first_column_p->next = ss_column_p;
   }
-  cout<<"p3\n";
+//  cout<<"p3\n";
+  spreadsheet_number_of_lines=0;
   while(stream.readLineInto(&line))
   {
+    spreadsheet_number_of_lines++;
     list = line.split(",");
     ss_column_p = ss_first_column_p;
     for(int i=0; i<list.size(); ++i)
@@ -375,17 +398,22 @@ void batch_mode_driver::load_spreadsheet(QString filename)
   }
   infile.close();
   
-  ss_column_p = ss_first_column_p;
-  for(int i=0; i<8; ++i) 
+  for(int i=0; i<spreadsheet_number_of_lines; ++i)
   {
-    ss_column_p = ss_column_p->next;
+    pack_filled.append(false);
   }
-  cout<<"heading "<<(ss_column_p->heading).toStdString()<<endl;
-  cout<<"p4\n";
-  for(int i=0; i<10; ++i)
-  {
-    cout<<"  i"<<i<<"   "<<(ss_column_p->data_list[i]).toStdString()<<endl;
-  }
+  mode = wait_for_seed_lot_barcode;
+//  ss_column_p = ss_first_column_p;
+//  for(int i=0; i<8; ++i) 
+//  {
+//    ss_column_p = ss_column_p->next;
+//  }
+//  cout<<"heading "<<(ss_column_p->heading).toStdString()<<endl;
+//  cout<<"p4\n";
+//  for(int i=0; i<10; ++i)
+//  {
+//    cout<<"  i"<<i<<"   "<<(ss_column_p->data_list[i]).toStdString()<<endl;
+//  }
 }
 
 void batch_mode_driver::list_program()
@@ -420,43 +448,11 @@ void batch_mode_driver::run()
   {
     time_to_end = 1000;
   }
-  
-  
-  
-  /*
-  //testing
-  if(print_message_count>=100)
-  {
-    cout<<"count "<<centre_p->count<<".  time_to_end "<<time_to_end<<".  predicted count rate "<<predicted_count_rate<<endl;
-    emit send_message_time_to_end(QString("time_to_end %1.  predicted count rate %2\n").arg(time_to_end).arg(predicted_count_rate));
-    print_message_count = 0;
-  }
-  ++print_message_count;
-  */
-  
-  
-  
   old_pack_present = pack_present;
   pack_present = centre_p->envelope_present;
-/*
-  if(centre_p->endgate_state == ENDGATE_CLOSED)
-  {
-    if(force_endgate_open==true || pack_present==true)
-    {
-      centre_p -> set_endgate_state(ENDGATE_OPEN);
-    }
-  }
-  else //endgate is open
-  {
-    if(force_endgate_open==false && pack_present==false)
-    {
-      centre_p -> set_endgate_state(ENDGATE_CLOSED);
-    }
-  }
-  */
+
   //barcode checking
   
-//  seed_lot_barcode_ok = false;
   if(require_seed_lot_barcode == false)
   {
     seed_lot_barcode_ok = true;
@@ -466,51 +462,9 @@ void batch_mode_driver::run()
     pack_barcode_ok = true;
   }
   
-  /*
-  if(require_seed_lot_barcode == true)
-  {
-    if(seed_lot_barcode_old == false)
-    {
-      seed_lot_barcode_ok = true;
-    }
-  }
-  
-  if(require_pack_barcode == false)
-  {
-    pack_barcode_ok = true;
-  }
-  if(require_pack_barcode == true)
-  {
-    if(pack_match_lot == true)
-    {
-      if( (pack_barcode_old==false) && (pack_barcode==seed_lot_barcode) )
-      {
-        pack_barcode_old = true;
-        pack_barcode_ok = true;
-//        cout<<"set pack_barcode_ok true.  pack_barcode="<<pack_barcode.toStdString()<<".  seed_barcode="<<seed_lot_barcode.toStdString()<<endl;
-      }
-    }
-    if(pack_contain_lot == true)
-    {
-      if( (pack_barcode_old==false) && (pack_barcode.contains(seed_lot_barcode)==true) )
-      {
-        pack_barcode_old = true;
-        pack_barcode_ok = true;
-      }
-    }
-    if(lot_contain_pack == true)
-    {
-      if( (pack_barcode_old==false) && (seed_lot_barcode.contains(pack_barcode)==true) )
-      {
-        pack_barcode_old = true;
-        pack_barcode_ok = true;
-      }
-    }
-  }
-  */
+
 
   //testing
-//  int dump_elapsed;
   QString message2;
 
   message2 = QString("mode = %1").arg(mode);
@@ -534,9 +488,54 @@ void batch_mode_driver::run()
       }
       cutgate_p -> open();
       centre_p->block_endgate_opening = !pack_barcode_ok;
+
+
+
+      if(use_spreadsheet == true)
+      {
+        if(seed_lot_barcode_ok == true)
+        {
+          spreadsheet_line_number = get_next_spreadsheet_line_number();
+          
+          cout<<"spreadsheet_line_number = "<<spreadsheet_line_number<<endl;
+          
+          if(spreadsheet_line_number==-1)//-1 value signals no more lines for this seed_lot_barcode
+          {
+            QMessageBox box;
+            box.setText("No unfilled rows for this seed lot.  Dumping out.");
+            box.exec();
+            mode = dump_into_cut_gate;
+            cout<<"mode dump_into_cut_gate. count "<<centre_p->count<<"\n";
+            dump_into_cut_gate_time.restart();
+            old_count = centre_p -> count;
+            dump_end_qtime.restart();
+          }
+          else //have valid line number to fill
+          {
+            bool conversion_ok_flag;
+            current_count_limit = ss_required_count_p->data_list[spreadsheet_line_number].toInt(&conversion_ok_flag);
+            if(conversion_ok_flag==false)
+            {
+              QString string("Problem with entry in required count column.  Unable to convert *");
+              string.append(ss_required_count_p->data_list[spreadsheet_line_number]);
+              string.append("* to integer.  Stopping processing.");
+              QMessageBox box;
+              box.setText(string);
+              centre_p->add_waiting_screen(0);
+              centre_p->screen_done = true;
+            }
+            mode = hi_closed;
+            cout<<"mode hi_closed. count "<<centre_p->count<<"\n";
+          }
+        }
+      }
+
+
+
+
+
       if(seed_lot_barcode_ok == true)
       {
-        
         mode = hi_open;
         cout<<"mode hi_open\n";
       }
@@ -592,18 +591,42 @@ void batch_mode_driver::run()
         pack_ready_pack_limit = current_pack_limit;
           
         emit pack_ready();
-        ++current_pack;
-  
-//        cout<<"current_pack = "<<current_pack<<"   current_pack_limit = "<<current_pack_limit<<endl;
-  
-        if(current_pack >= current_pack_limit)
+        
+        
+        if(use_spreadsheet==false)//control by ESC-3 program
         {
-          current_pack = 0;
-          ++current_set;
-  
-//          cout<<"current_set = "<<current_set<<"  program.size() = "<<program.size()<<endl;
-  
-          if(current_set >= program_size)
+          ++current_pack;
+          if(current_pack >= current_pack_limit)
+          {
+            current_pack = 0;
+            ++current_set;
+            if(current_set >= program_size)
+            {
+              mode = dump_into_cut_gate;
+              cout<<"mode dump_into_cut_gate. count "<<centre_p->count<<"\n";
+              dump_into_cut_gate_time.restart();
+              old_count = centre_p -> count;
+              dump_end_qtime.restart();
+            }
+            else
+            {
+              current_count_limit = program[current_set]->seeds;
+              current_pack_limit = program[current_set]->packs;
+              mode = hi_closed;
+              cout<<"mode hi_closed. count "<<centre_p->count<<"\n";
+            }
+          }
+          else
+          {
+            mode = hi_closed;
+            cout<<"mode hi_closed. count "<<centre_p->count<<"\n";
+          }
+        }
+        else//use_spreadsheet true
+        {
+          pack_filled[spreadsheet_line_number] = true;
+          spreadsheet_line_number = get_next_spreadsheet_line_number();
+          if(spreadsheet_line_number==-1)//-1 value signals no more lines for this seed_lot_barcode
           {
             mode = dump_into_cut_gate;
             cout<<"mode dump_into_cut_gate. count "<<centre_p->count<<"\n";
@@ -611,18 +634,23 @@ void batch_mode_driver::run()
             old_count = centre_p -> count;
             dump_end_qtime.restart();
           }
-          else
+          else //have another valid line number to fill
           {
-            current_count_limit = program[current_set]->seeds;
-            current_pack_limit = program[current_set]->packs;
+            bool conversion_ok_flag;
+            current_count_limit = ss_required_count_p->data_list[spreadsheet_line_number].toInt(&conversion_ok_flag);
+            if(conversion_ok_flag==false)
+            {
+              QString string("Problem with entry in required count column.  Unable to convert *");
+              string.append(ss_required_count_p->data_list[spreadsheet_line_number]);
+              string.append("* to integer.  Stopping processing.");
+              QMessageBox box;
+              box.setText(string);
+              centre_p->add_waiting_screen(0);
+              centre_p->screen_done = true;
+            }
             mode = hi_closed;
             cout<<"mode hi_closed. count "<<centre_p->count<<"\n";
           }
-        }
-        else
-        {
-          mode = hi_closed;
-          cout<<"mode hi_closed. count "<<centre_p->count<<"\n";
         }
       }
       break;
@@ -680,21 +708,37 @@ void batch_mode_driver::run()
         emit pack_collected(pack_ready_count_limit);
         pack_barcode_ok = false;
         pack_barcode_old = true;
-        mode = wait_for_endgate_to_close;
-        cout<<"mode wait_for_endgate_to_close. count "<<centre_p->count<<"\n";
-        endgate_close_counter = 0;
+        if(next_seed_lot_bad==true)//count went over limit in next batch
+        {
+          mode = wait_for_bad_lot_cleanout;
+          cout<<"mode wait_for_bad_lot_cleanout\n";
+        }
+        else
+        {
+          mode = wait_for_endgate_to_close;
+          cout<<"mode wait_for_endgate_to_close. count "<<centre_p->count<<"\n";
+          endgate_close_counter = 0;
+        }
       }
-      if(centre_p->count >= current_count_limit)//error.  Display message box.
+      if(centre_p->count >= current_count_limit)//error.  over limit.
       {
-        QMessageBox msg_box;
-        msg_box.setText("ERROR.  COUNT WENT OVER LIMIT.");
-        msg_box.setInformativeText("This is probably because the speed is too high.  \
-                                  Hopper will dump out so you can re-start         \
-                                  this seed lot.");
-        msg_box.exec();
-        mode = dump_into_end;
-        dump_into_end_time.restart();
-        cout<<"mode dump_into_end\n";
+        next_seed_lot_bad = true;
+      }
+      break;
+    case wait_for_bad_lot_cleanout:
+      barcode_mode = pack;
+      next_seed_lot_bad = false;
+      if(centre_p->feed_speed != 0)
+      {
+        centre_p->set_speed(0);
+      }
+      cutgate_p -> open();
+      centre_p->block_endgate_opening = false;
+      if( (old_pack_present==true) && (pack_present==false) )
+      {
+        centre_p->count = 0;
+        mode = hi_open;
+        cout<<"mode hi_open\n";
       }
       break;
     case dump_into_cut_gate:
@@ -889,27 +933,26 @@ void batch_mode_driver::barcode_entered(QString value)
         if(pack_barcode==seed_lot_barcode) 
         {
           pack_barcode_ok = true;
-  //        cout<<"set pack_barcode_ok true.  pack_barcode="<<pack_barcode.toStdString()<<".  seed_barcode="<<seed_lot_barcode.toStdString()<<endl;
         }
       }
       if(pack_contain_lot == true)
       {
-//        cout<<"pack must contain lot\n";
-//        cout<<"pack_barcode = "<<pack_barcode.toStdString()<<endl;
-//        cout<<"seed_lot_barcode = "<<seed_lot_barcode.toStdString()<<endl;
         if(pack_barcode.contains(seed_lot_barcode)==true) 
         {
-//          cout<<"pack contains lot\n";
           pack_barcode_ok = true;
         }
-//        else
-//        {
-//          cout<<"pack does not contain lot\n";
-//        }
       }
       if(lot_contain_pack == true)
       {
         if(seed_lot_barcode.contains(pack_barcode)==true) 
+        {
+          pack_barcode_ok = true;
+        }
+      }
+      if(pack_match_spreadsheet == true)
+      {
+        QString spreadsheet_pack_barcode  = ss_envelope_id_p->data_list[spreadsheet_line];
+        if(pack_barcode == spreadsheet_pack_barcode)
         {
           pack_barcode_ok = true;
         }
@@ -941,6 +984,10 @@ void batch_mode_driver::cutgate_timing_error()
 
 spreadsheet_column* batch_mode_driver::get_spreadsheet_column_pointer(int column_number)
 {
+  if(column_number<0)//-1 used to indicate invalid data.
+  {
+    return 0;
+  }
   spreadsheet_column* column_p = ss_first_column_p;
   for(int i=0; i<column_number; ++i)
   {
@@ -953,18 +1000,341 @@ spreadsheet_column* batch_mode_driver::get_spreadsheet_column_pointer(int column
   return(column_p);
 }
 
-void batch_mode_driver::load_ss_setup()
+void batch_mode_driver::clear_ss_setup()
+{
+  ss_setup_p -> material_id_column = -1;
+  ss_setup_p -> required_count_column = -1;
+  ss_setup_p -> envelope_id_column = -1;
+  ss_setup_p -> actual_count_column = -1;
+  ss_setup_p -> print_time_column = -1;
+  ss_setup_p -> fill_time_column = -1;
+  ss_setup_p -> envelope_setup_file = "";
+}
+
+void batch_mode_driver::fill_ss_column_pointers()
+{
+  ss_material_id_p = get_spreadsheet_column_pointer(ss_setup_p -> material_id_column);
+  ss_required_count_p = get_spreadsheet_column_pointer(ss_setup_p -> required_count_column);
+  ss_envelope_id_p = get_spreadsheet_column_pointer(ss_setup_p -> envelope_id_column);
+  ss_actual_count_p = get_spreadsheet_column_pointer(ss_setup_p -> actual_count_column);
+  ss_print_time_p = get_spreadsheet_column_pointer(ss_setup_p -> print_time_column);
+  ss_fill_time_p = get_spreadsheet_column_pointer(ss_setup_p -> fill_time_column);
+}
+
+void batch_mode_driver::load_envelope_layout()
 {
 }
 
-void batch_mode_driver::clear_ss_setup()
+void batch_mode_driver::clear_envelope_layout()
 {
-  ss_setup_p -> material_id_column = 0;
-  ss_setup_p -> required_count_column = 0;
-  ss_setup_p -> actual_count_column = 0;
-  ss_setup_p -> print_time_column = 0;
-  ss_setup_p -> fill_time_column = 0;
-  ss_setup_p -> envelope_setup_file = "";
+}
+
+void batch_mode_driver::save_ss_setup(QString filename)
+{
+  QFile file(filename);
+  if(!file.open(QIODevice::WriteOnly | QIODevice::Text))
+  {
+    cout<<"batch_mode_driver::save_ss_setup.  File open failure\n";
+    return;
+  }
+  QTextStream stream(&file);
+  
+  stream<<"material_id_column\n";
+  stream<<ss_setup_p->material_id_column<<endl;
+  stream<<"required_count_column\n";
+  stream<<ss_setup_p->required_count_column<<endl;
+  stream<<"envelope_id_column\n";
+  stream<<ss_setup_p->envelope_id_column<<endl;
+  stream<<"actual_count_column\n";
+  stream<<ss_setup_p->actual_count_column<<endl;
+  stream<<"print_time_column\n";
+  stream<<ss_setup_p->print_time_column<<endl;
+  stream<<"fill_time_column\n";
+  stream<<ss_setup_p->fill_time_column<<endl;
+  stream<<"envelope_setup_file\n";
+  stream<<ss_setup_p->envelope_setup_file<<endl;
+
+  stream<<"high_feed_speed\n";
+  stream<<high_feed_speed<<endl;
+  stream<<"low_feed_speed\n";
+  stream<<low_feed_speed<<endl;
+  stream<<"dump_speed\n";
+  stream<<dump_speed<<endl;
+  stream<<"require_seed_lot_barcode\n";
+  stream<<require_seed_lot_barcode<<endl;
+  stream<<"require_pack_barcode\n";
+  stream<<require_pack_barcode<<endl;
+  stream<<"pack_match_lot\n";
+  stream<<pack_match_lot<<endl;
+  stream<<"pack_contain_lot\n";
+  stream<<pack_contain_lot<<endl;
+  stream<<"lot_contain_pack\n";
+  stream<<lot_contain_pack<<endl;
+  stream<<"pack_match_spreadsheet\n";
+  stream<<pack_match_spreadsheet<<endl;
+  stream<<"record_only\n";
+  stream<<record_only<<endl;
+}
+
+void batch_mode_driver::load_ss_setup()//load the ss_setup indicated by ss_setup_path
+{
+  
+//  cout<<"start load_ss_setup\n";
+  
+  QFile infile(ss_setup_path);
+  infile.open(QIODevice::ReadOnly);
+  QTextStream stream(&infile);
+  QString line;
+  QString subline;
+  bool conversion_ok_flag = true;
+  clear_ss_setup();
+  while(stream.readLineInto(&line))
+  {
+    if(line == "material_id_column")
+    {
+
+//      cout<<"     a\n";
+
+      stream.readLineInto(&subline);
+      ss_setup_p->material_id_column = subline.toInt(&conversion_ok_flag);
+      if(conversion_ok_flag==false)
+      {
+        cout<<"failed to convert   "<<subline.toStdString()<<"   to int\n";
+        return;
+      }
+    }
+    else if(line == "required_count_column")
+    {
+
+//      cout<<"     b\n";
+
+      stream.readLineInto(&subline);
+      ss_setup_p->required_count_column = subline.toInt(&conversion_ok_flag);
+      if(conversion_ok_flag==false)
+      {
+        cout<<"failed to convert   "<<subline.toStdString()<<"   to int\n";
+        return;
+      }
+    }
+    else if(line == "envelope_id_column")
+    {
+
+//      cout<<"     c\n";
+
+      stream.readLineInto(&subline);
+      ss_setup_p->envelope_id_column = subline.toInt(&conversion_ok_flag);
+      if(conversion_ok_flag==false)
+      {
+        cout<<"failed to convert   "<<subline.toStdString()<<"   to int\n";
+        return;
+      }
+    }
+    else if(line == "actual_count_column")
+    {
+
+//      cout<<"     d\n";
+
+      stream.readLineInto(&subline);
+      ss_setup_p->actual_count_column = subline.toInt(&conversion_ok_flag);
+      if(conversion_ok_flag==false)
+      {
+        cout<<"failed to convert   "<<subline.toStdString()<<"   to int\n";
+        return;
+      }
+    }
+    else if(line == "print_time_column")
+    {
+
+//      cout<<"     e\n";
+
+      stream.readLineInto(&subline);
+      ss_setup_p->print_time_column = subline.toInt(&conversion_ok_flag);
+      if(conversion_ok_flag==false)
+      {
+        cout<<"failed to convert   "<<subline.toStdString()<<"   to int\n";
+        return;
+      }
+    }
+    else if(line == "fill_time_column")
+    {
+
+//      cout<<"     f\n";
+
+      stream.readLineInto(&subline);
+      ss_setup_p->fill_time_column = subline.toInt(&conversion_ok_flag);
+      if(conversion_ok_flag==false)
+      {
+        cout<<"failed to convert   "<<subline.toStdString()<<"   to int\n";
+        return;
+      }
+    }
+    else if(line == "envelope_setup_file")
+    {
+
+//      cout<<"     g\n";
+
+      stream.readLineInto(&subline);
+      ss_setup_p->envelope_setup_file = subline;
+    }
+
+
+    
+    else if(line == "high_feed_speed")
+    {
+
+//      cout<<"     h\n";
+
+      stream.readLineInto(&subline);
+      high_feed_speed = subline.toInt(&conversion_ok_flag);
+      if(conversion_ok_flag==false)
+      {
+        cout<<"failed to convert   "<<subline.toStdString()<<"   to int\n";
+        return;
+      }
+    }
+    else if(line == "low_feed_speed")
+    {
+
+//      cout<<"     i\n";
+
+      stream.readLineInto(&subline);
+      low_feed_speed = subline.toInt(&conversion_ok_flag);
+      if(conversion_ok_flag==false)
+      {
+        cout<<"failed to convert   "<<subline.toStdString()<<"   to int\n";
+        return;
+      }
+    }
+    else if(line == "dump_speed")
+    {
+
+//      cout<<"     j\n";
+
+      stream.readLineInto(&subline);
+      dump_speed = subline.toInt(&conversion_ok_flag);
+      if(conversion_ok_flag==false)
+      {
+        cout<<"failed to convert   "<<subline.toStdString()<<"   to int\n";
+        return;
+      }
+    }
+    else if(line == "require_seed_lot_barcode")
+    {
+
+//      cout<<"     j\n";
+
+      stream.readLineInto(&subline);
+      require_seed_lot_barcode = subline.toInt(&conversion_ok_flag);
+      if(conversion_ok_flag==false)
+      {
+        cout<<"failed to convert   "<<subline.toStdString()<<"   to int\n";
+        return;
+      }
+    }
+    else if(line == "require_pack_barcode")
+    {
+
+//      cout<<"     k\n";
+
+      stream.readLineInto(&subline);
+      require_pack_barcode = subline.toInt(&conversion_ok_flag);
+      if(conversion_ok_flag==false)
+      {
+        cout<<"failed to convert   "<<subline.toStdString()<<"   to int\n";
+        return;
+      }
+    }
+    else if(line == "pack_match_lot")
+    {
+
+//      cout<<"     l\n";
+
+      stream.readLineInto(&subline);
+      pack_match_lot = subline.toInt(&conversion_ok_flag);
+      if(conversion_ok_flag==false)
+      {
+        cout<<"failed to convert   "<<subline.toStdString()<<"   to int\n";
+        return;
+      }
+    }
+    else if(line == "pack_contain_lot")
+    {
+
+//      cout<<"     m\n";
+
+      stream.readLineInto(&subline);
+      pack_contain_lot = subline.toInt(&conversion_ok_flag);
+      if(conversion_ok_flag==false)
+      {
+        cout<<"failed to convert   "<<subline.toStdString()<<"   to int\n";
+        return;
+      }
+    }
+    else if(line == "lot_contain_pack")
+    {
+
+//      cout<<"     n\n";
+
+      stream.readLineInto(&subline);
+      lot_contain_pack = subline.toInt(&conversion_ok_flag);
+      if(conversion_ok_flag==false)
+      {
+        cout<<"failed to convert   "<<subline.toStdString()<<"   to int\n";
+        return;
+      }
+    }
+    else if(line == "pack_match_spreadsheet")
+    {
+
+//      cout<<"     o\n";
+
+      stream.readLineInto(&subline);
+      pack_match_spreadsheet = subline.toInt(&conversion_ok_flag);
+      if(conversion_ok_flag==false)
+      {
+        cout<<"failed to convert   "<<subline.toStdString()<<"   to int\n";
+        return;
+      }
+    }
+    else if(line == "record_only")
+    {
+
+//      cout<<"     p\n";
+
+      stream.readLineInto(&subline);
+      record_only = subline.toInt(&conversion_ok_flag);
+      if(conversion_ok_flag==false)
+      {
+        cout<<"failed to convert   "<<subline.toStdString()<<"   to int\n";
+        return;
+      }
+    }
+
+    else
+    {
+      cout<<"batch_mode_driver::load_file.  data type identifier not found.\n";
+    }
+  }
+
+//      cout<<"     q\n";
+  
+//  cout<<"end load_ss_setup\n";
+  
+}
+
+int batch_mode_driver::get_next_spreadsheet_line_number()//look for next line number not filled for current seed_lot_barcode.  Return -1 if no more.
+{
+  int ret_val = -1;
+  lines_left_to_fill = 0;
+  for(int i=0; i<spreadsheet_number_of_lines; ++i)
+  {
+    if(   (ss_material_id_p->data_list[i] == seed_lot_barcode)     &&     (pack_filled[i] == false)     )
+    {
+      if(ret_val == -1) ret_val = i;
+      ++lines_left_to_fill;
+    }
+  }
+  return(ret_val);
 }
 
 count_rate_predictor::count_rate_predictor(centre* centre_p_s)
