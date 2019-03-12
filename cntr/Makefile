@@ -1101,6 +1101,7 @@ spreadsheet_choice.o: screens/spreadsheet_choice.cpp centre.hpp \
 		feeder.hpp \
 		crop.hpp \
 		screens/spreadsheet_choice.hpp \
+		button.hpp \
 		batch_mode_driver.hpp \
 		envelope.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o spreadsheet_choice.o screens/spreadsheet_choice.cpp

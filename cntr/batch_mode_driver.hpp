@@ -139,6 +139,7 @@ class batch_mode_driver : public QObject
   bool pack_match_spreadsheet;
   bool record_only;
   bool next_seed_lot_bad;//used to signal count went over limit
+  bool pack_complete;//used by batch screen to signal when it is finished
   
   //batch barcode matching data
   barcode_entry_mode barcode_mode;
@@ -200,12 +201,13 @@ class batch_mode_driver : public QObject
   void cutgate_timing_error();
   
   signals:
-  void dumping(bool value);
-  void pack_ready();
+  void dumping();
+//  void pack_ready();
   void pack_collected(int count);
   void dump_complete(int dump_count);
   void seed_lot_barcode_entered(QString barcode);
   void pack_barcode_entered(QString barcode);
+  void bad_lot_signal();//issued if count went over limit on this batch
   
   //testing
   void send_message2(QString);

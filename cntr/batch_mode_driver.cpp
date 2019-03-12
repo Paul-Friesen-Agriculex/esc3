@@ -403,17 +403,17 @@ void batch_mode_driver::load_spreadsheet(QString filename)
     pack_filled.append(false);
   }
   mode = wait_for_seed_lot_barcode;
-//  ss_column_p = ss_first_column_p;
-//  for(int i=0; i<8; ++i) 
-//  {
-//    ss_column_p = ss_column_p->next;
-//  }
-//  cout<<"heading "<<(ss_column_p->heading).toStdString()<<endl;
-//  cout<<"p4\n";
-//  for(int i=0; i<10; ++i)
-//  {
-//    cout<<"  i"<<i<<"   "<<(ss_column_p->data_list[i]).toStdString()<<endl;
-//  }
+  ss_column_p = ss_first_column_p;
+  for(int i=0; i<12; ++i) 
+  {
+    ss_column_p = ss_column_p->next;
+  }
+  cout<<"heading "<<(ss_column_p->heading).toStdString()<<endl;
+  cout<<"p4\n";
+  for(int i=0; i<10; ++i)
+  {
+    cout<<"  i"<<i<<"   "<<(ss_column_p->data_list[i]).toStdString()<<endl;
+  }
 }
 
 void batch_mode_driver::list_program()
@@ -478,6 +478,8 @@ void batch_mode_driver::run()
     force_dump_out = false;
   }
 
+  bool restart_flag = false;
+
   switch(mode)
   {
     case wait_for_seed_lot_barcode:
@@ -504,11 +506,12 @@ void batch_mode_driver::run()
             QMessageBox box;
             box.setText("No unfilled rows for this seed lot.  Dumping out.");
             box.exec();
-            mode = dump_into_cut_gate;
-            cout<<"mode dump_into_cut_gate. count "<<centre_p->count<<"\n";
-            dump_into_cut_gate_time.restart();
-            old_count = centre_p -> count;
-            dump_end_qtime.restart();
+            restart_flag = true;
+//            mode = dump_into_cut_gate;
+//            cout<<"mode dump_into_cut_gate. count "<<centre_p->count<<"\n";
+//            dump_into_cut_gate_time.restart();
+//            old_count = centre_p -> count;
+//            dump_end_qtime.restart();
           }
           else //have valid line number to fill
           {
@@ -539,6 +542,7 @@ void batch_mode_driver::run()
         mode = hi_open;
         cout<<"mode hi_open\n";
       }
+      if(restart_flag==true) restart();
       break;
     case hi_open:
       barcode_mode = pack;
@@ -590,7 +594,7 @@ void batch_mode_driver::run()
         pack_ready_count_limit = current_count_limit;
         pack_ready_pack_limit = current_pack_limit;
           
-        emit pack_ready();
+//        emit pack_ready();
         
         
         if(use_spreadsheet==false)//control by ESC-3 program
@@ -677,6 +681,13 @@ void batch_mode_driver::run()
       if(time_to_end<2.0)
       {
         mode = wait_for_pack;
+        
+        
+        
+        pack_complete = false;
+        
+        
+        
         cout<<"mode wait_for_pack. count "<<centre_p->count<<"\n";
       }      
       break;
@@ -703,14 +714,24 @@ void batch_mode_driver::run()
       }
       cutgate_p -> close();
       centre_p->block_endgate_opening = !pack_barcode_ok;
-      if( (old_pack_present==true) && (pack_present==false) && (pack_barcode_ok==true) )
+//      if( (old_pack_present==true) && (pack_present==false) && (pack_barcode_ok==true) && (pack_complete==true) )
+      if(pack_complete==true) 
       {
         emit pack_collected(pack_ready_count_limit);
+
+
+
         pack_barcode_ok = false;
+        
+
+
+
+
         pack_barcode_old = true;
         if(next_seed_lot_bad==true)//count went over limit in next batch
         {
           mode = wait_for_bad_lot_cleanout;
+          emit bad_lot_signal();
           cout<<"mode wait_for_bad_lot_cleanout\n";
         }
         else
@@ -777,7 +798,7 @@ void batch_mode_driver::run()
       if(endgate_close_counter>=50)      {
         mode = dump_into_end;
         cout<<"mode dump_into_end\n";
-        emit dumping(true);        
+        emit dumping();        
       }
       break;
     case wait_for_final_pack:
@@ -871,7 +892,7 @@ void batch_mode_driver::run()
         cout<<"mode wait_for_seed_lot_barcode\n";
         seed_lot_barcode_ok = false;
         seed_lot_barcode_old = true;
-        emit dumping(false);
+//        emit dumping(false);
         reset_program();
       }      
       break;
@@ -879,6 +900,7 @@ void batch_mode_driver::run()
     default: cout<<"mode not found\n";
   }
 }
+
 void batch_mode_driver::set_high_feed_speed(int speed_s) 
 {
   if(speed_s <= 500) speed_s = speed_s/2;         //~~~piece-wise linear, 2 parts~~~//

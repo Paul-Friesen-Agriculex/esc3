@@ -15,15 +15,12 @@ class button;
 class QGridLayout;
 class QGroupBox;
 class QVBoxLayout;
-//class QLabel;
 class QSlider;
 class QTimer;
 class QFileDialog;
-//class batch_mode_driver;
 class message_box;
 
-//class barcode_line : public QTextEdit   //ORIGINAL~~~
-class barcode_line : public QLineEdit     //TEST~~~
+class barcode_line : public QLineEdit  
 {
   Q_OBJECT
   
@@ -32,6 +29,26 @@ class barcode_line : public QLineEdit     //TEST~~~
   
   signals:
   void barcode_entered(QString barcode);
+};
+
+enum end_valve_mode_enum
+{
+  closed_empty,
+  opened_while_empty,
+  closed_filling,
+  closed_full,
+  open_emptying,
+  open_pass_through,
+  open_empty,
+  pack_removed_too_soon,
+  closed_bad_lot,
+  open_emptying_bad_lot,
+  dump_closed_empty,
+  dump_opened_while_empty,
+  dump_closed_filling,
+  dump_pass_through,
+  dump_open_empty,
+  dump_container_removed_too_soon
 };
 
 class batch : public screen
@@ -44,17 +61,17 @@ class batch : public screen
   batch_mode_driver* batch_mode_driver_p;
   
   public slots:
-  void pack_ready();
+//  void pack_ready();
   void pack_collected(int count);
   void dump_complete(int dump_count);
-  void dumping(bool value);
+  void dumping();
   void focus_on_barcode();
+  void bad_lot_slot();
   
   private slots:
   void options_clicked();
   void back_clicked();
-//  void zero_clicked();
-//  void endgate_clicked();
+  void rescan_clicked();
   void restart_clicked();
   void save_program_clicked();
   void save_table_clicked();
@@ -67,8 +84,7 @@ class batch : public screen
   button* options_button_p;
   button* back_button_p;
   barcode_line* barcode_line_p;
-//  button* zero_button_p;
-//  button* endgate_button_p;
+  button* rescan_button_p;
   button* restart_button_p;
   QLabel* high_speed_label_p;
   QLabel* low_speed_label_p;
@@ -83,7 +99,6 @@ class batch : public screen
   button* clear_table_button_p;
   button* quit_button_p;
   message_box* barcode_status_p;
-//  message_box* diagnostics_box_p;
   
   QGroupBox* top_box_p;
   QGroupBox* control_box_p;
@@ -102,23 +117,32 @@ class batch : public screen
     //If this is closed, it will be over-ridden by presence of an envelope
   
   int count;
-  bool pack_was_placed;
-  bool pack_was_removed;
-  bool seed_for_pack_ready;
-  bool pack_can_be_removed;
+  
+  mode_enum mode;
+  mode_enum old_mode;
+  end_valve_mode_enum end_valve_mode;
+  end_valve_mode_enum old_end_valve_mode;
+  int end_valve_empty_counter;//use to time valve emptying
+  
+  
+  
+//  bool pack_was_placed;
+//  bool pack_was_removed;
+//  bool seed_for_pack_ready;
+//  bool pack_can_be_removed;
   QString pack_ready_message;
-//  int pack_ready_count;
-  bool pack_removed_too_soon;
+//  bool pack_removed_too_soon;
   QString pack_removed_too_soon_message;
-  bool dump_container_was_placed;
-  bool dump_container_can_be_removed;
+//  bool dump_container_was_placed;
+//  bool dump_container_can_be_removed;
   QString dump_container_needed_message;
   QString dump_container_ready_message;
-  int dump_container_ready_count;
-  bool dump_container_removed_too_soon;
+//  int dump_container_ready_count;
+//  bool dump_container_removed_too_soon;
   QString dump_container_removed_too_soon_message;
   QString bad_seed_lot_message;
-  bool dump_flag;//true -> dumping
+//  bool dump_flag;//true -> dumping
+  
   barcode_entry_mode old_barcode_mode;
   
   macro_screen* macro_screen_p;

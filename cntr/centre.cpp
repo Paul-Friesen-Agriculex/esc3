@@ -430,7 +430,7 @@ void centre::run()
       case 18: screen_p=new program_delete(this, batch_mode_driver_p); break;
       case 19: screen_p=new crop_name_exists(this); break;
       case 20: screen_p=new batch_save_table(this, batch_mode_driver_p); break;
-      case 21: screen_p=new spreadsheet_choice(this); break;
+      case 21: screen_p=new spreadsheet_choice(this, batch_mode_driver_p); break;
       case 22: screen_p=new ss_setup_choice(this, batch_mode_driver_p); break;
       case 23: screen_p=new ss_setup_entry(this, batch_mode_driver_p); break;
       case 24: screen_p=new envelope_layout_choice(this, batch_mode_driver_p); break;
