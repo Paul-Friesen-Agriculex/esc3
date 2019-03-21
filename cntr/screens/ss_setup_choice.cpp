@@ -115,7 +115,7 @@ void ss_setup_choice::choice1_clicked()
     
     batch_mode_driver_p->ss_setup_path = ss_setup_path;
     batch_mode_driver_p->load_ss_setup();
-    centre_p->add_waiting_screen(15);
+    centre_p->add_waiting_screen(33);
     centre_p->screen_done=true;
   }
 }
@@ -128,7 +128,7 @@ void ss_setup_choice::choice2_clicked()
     ss_setup_path.append(".ESC3sss");
     batch_mode_driver_p->ss_setup_path = ss_setup_path;
     batch_mode_driver_p->load_ss_setup();
-    centre_p->add_waiting_screen(15);
+    centre_p->add_waiting_screen(33);
     centre_p->screen_done=true;
   }
 }
@@ -141,7 +141,7 @@ void ss_setup_choice::choice3_clicked()
     ss_setup_path.append(".ESC3sss");
     batch_mode_driver_p->ss_setup_path = ss_setup_path;
     batch_mode_driver_p->load_ss_setup();
-    centre_p->add_waiting_screen(15);
+    centre_p->add_waiting_screen(33);
     centre_p->screen_done=true;
   }
 }
@@ -154,7 +154,7 @@ void ss_setup_choice::choice4_clicked()
     ss_setup_path.append(".ESC3sss");
     batch_mode_driver_p->ss_setup_path = ss_setup_path;
     batch_mode_driver_p->load_ss_setup();
-    centre_p->add_waiting_screen(15);
+    centre_p->add_waiting_screen(33);
     centre_p->screen_done=true;
   }
 }
@@ -167,7 +167,7 @@ void ss_setup_choice::choice5_clicked()
     ss_setup_path.append(".ESC3sss");
     batch_mode_driver_p->ss_setup_path = ss_setup_path;
     batch_mode_driver_p->load_ss_setup();
-    centre_p->add_waiting_screen(15);
+    centre_p->add_waiting_screen(33);
     centre_p->screen_done=true;
   }
 }
@@ -180,7 +180,7 @@ void ss_setup_choice::choice6_clicked()
     ss_setup_path.append(".ESC3sss");
     batch_mode_driver_p->ss_setup_path = ss_setup_path;
     batch_mode_driver_p->load_ss_setup();
-    centre_p->add_waiting_screen(15);
+    centre_p->add_waiting_screen(33);
     centre_p->screen_done=true;
   }
 }

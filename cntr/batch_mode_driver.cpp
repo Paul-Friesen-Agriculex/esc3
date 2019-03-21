@@ -53,7 +53,7 @@ batch_mode_driver::batch_mode_driver(centre* centre_p_s, cutgate* cutgate_p_s)
   ss_setup_path = "";
   envelope_layout_path = "";
   envelope_p = new envelope;
-  spreadsheet_line = 0;
+//  spreadsheet_line = 0;
 }
   
 batch_mode_driver::~batch_mode_driver()
@@ -366,6 +366,7 @@ void batch_mode_driver::save_program(QString filename)
 void batch_mode_driver::load_spreadsheet(QString filename)
 {
 //  cout<<"p1\n";
+  spreadsheet_filename = filename;
   QFile infile(filename);
   infile.open(QIODevice::ReadOnly);
   QTextStream stream(&infile);
@@ -376,44 +377,100 @@ void batch_mode_driver::load_spreadsheet(QString filename)
   stream.readLineInto(&line);
   list = line.split(",");
 //  cout<<"p2\n";
+  spreadsheet_number_of_columns = 0;
   for(int i=list.size()-1; i>=0; --i)
   {
     ss_column_p = ss_first_column_p;
     ss_first_column_p = new spreadsheet_column;
     ss_first_column_p->heading = list[i];
     ss_first_column_p->next = ss_column_p;
+    ++spreadsheet_number_of_columns;
   }
 //  cout<<"p3\n";
   spreadsheet_number_of_lines=0;
   while(stream.readLineInto(&line))
   {
+//  cout<<"p4\n";
     spreadsheet_number_of_lines++;
     list = line.split(",");
     ss_column_p = ss_first_column_p;
+//  cout<<"p5\n";
     for(int i=0; i<list.size(); ++i)
     {
       ss_column_p->data_list.append(list[i]);
       ss_column_p = ss_column_p->next;
     }
+//  cout<<"p6\n";
+    for(int i=list.size(); i<spreadsheet_number_of_columns; ++i)//in case of empty columns, append null strings.  Not expected to execute normally
+    {
+      ss_column_p->data_list.append("");
+      ss_column_p = ss_column_p->next;
+    }
   }
   infile.close();
+//  cout<<"p7\n";
   
-  for(int i=0; i<spreadsheet_number_of_lines; ++i)
+  if(ss_first_column_p->heading != "Filled")//if spreadsheet does not have this column, create it
   {
-    pack_filled.append(false);
+    ss_column_p = ss_first_column_p;
+    ss_first_column_p = new spreadsheet_column;
+    ss_first_column_p->heading = "Filled";
+    ss_first_column_p->next = ss_column_p;
+    for(int i=0; i<spreadsheet_number_of_lines; ++i)
+    {
+      ss_first_column_p->data_list.append("N");
+    }
   }
+    
+    
+  
+//  for(int i=0; i<spreadsheet_number_of_lines; ++i)
+//  {
+//    pack_filled.append(false);
+//  }
+  
+  
   mode = wait_for_seed_lot_barcode;
   ss_column_p = ss_first_column_p;
-  for(int i=0; i<12; ++i) 
+  for(int i=0; i<13; ++i) 
   {
     ss_column_p = ss_column_p->next;
   }
   cout<<"heading "<<(ss_column_p->heading).toStdString()<<endl;
-  cout<<"p4\n";
+  cout<<"p8\n";
   for(int i=0; i<10; ++i)
   {
     cout<<"  i"<<i<<"   "<<(ss_column_p->data_list[i]).toStdString()<<endl;
   }
+}
+
+int batch_mode_driver::save_spreadsheet(QString filename)
+{
+  QFile outfile(filename);
+  if(!outfile.open(QIODevice::WriteOnly)) return 0;
+  QTextStream stream(&outfile);
+  spreadsheet_column* ss_column_p = ss_first_column_p;
+  while(ss_column_p->next != 0)
+  {
+    stream<<ss_column_p->heading;
+    stream<<',';
+    ss_column_p = ss_column_p->next;
+  }
+  stream<<ss_column_p->heading;
+  stream<<'\n';
+  for(int i=0; i<spreadsheet_number_of_lines; ++i)
+  {
+    ss_column_p = ss_first_column_p;
+    while(ss_column_p->next != 0)
+    {
+      stream<<ss_column_p->data_list[i];
+      stream<<',';
+      ss_column_p = ss_column_p->next;
+    }
+    stream<<ss_column_p->data_list[i];
+    stream<<'\n';
+  }
+  return 1;
 }
 
 void batch_mode_driver::list_program()
@@ -479,6 +536,8 @@ void batch_mode_driver::run()
   }
 
   bool restart_flag = false;
+  
+//  cout<<"centre_p->block_endgate_opening = "<<centre_p->block_endgate_opening<<endl;
 
   switch(mode)
   {
@@ -497,7 +556,11 @@ void batch_mode_driver::run()
       {
         if(seed_lot_barcode_ok == true)
         {
+          
+          cout<<"before get_next_spreadsheet_line_number\n";
+          
           spreadsheet_line_number = get_next_spreadsheet_line_number();
+          emit refresh_screen();
           
           cout<<"spreadsheet_line_number = "<<spreadsheet_line_number<<endl;
           
@@ -524,6 +587,7 @@ void batch_mode_driver::run()
               string.append("* to integer.  Stopping processing.");
               QMessageBox box;
               box.setText(string);
+              box.exec();
               centre_p->add_waiting_screen(0);
               centre_p->screen_done = true;
             }
@@ -628,8 +692,10 @@ void batch_mode_driver::run()
         }
         else//use_spreadsheet true
         {
-          pack_filled[spreadsheet_line_number] = true;
+          ss_first_column_p->data_list[spreadsheet_line_number] = "Y";
+//          pack_filled[spreadsheet_line_number] = true;
           spreadsheet_line_number = get_next_spreadsheet_line_number();
+//          emit refresh_screen();
           if(spreadsheet_line_number==-1)//-1 value signals no more lines for this seed_lot_barcode
           {
             mode = dump_into_cut_gate;
@@ -931,7 +997,7 @@ void batch_mode_driver::set_dump_feed_speed(int speed_s)
 void batch_mode_driver::barcode_entered(QString value)
 {
 //  cout<<"start batch_mode_driver::barcode_entered\n";
-//  cout<<"barcode_entered value "<<value.toStdString()<<endl;
+  cout<<"barcode_entered value "<<value.toStdString()<<endl;
   QString value_trimmed = value.trimmed();//remove whitespace at start and end
   if(barcode_mode == seed_lot)
   {
@@ -973,7 +1039,7 @@ void batch_mode_driver::barcode_entered(QString value)
       }
       if(pack_match_spreadsheet == true)
       {
-        QString spreadsheet_pack_barcode  = ss_envelope_id_p->data_list[spreadsheet_line];
+        QString spreadsheet_pack_barcode  = ss_envelope_id_p->data_list[spreadsheet_line_number];
         if(pack_barcode == spreadsheet_pack_barcode)
         {
           pack_barcode_ok = true;
@@ -989,7 +1055,7 @@ void batch_mode_driver::barcode_entered(QString value)
     }
     emit pack_barcode_entered(value_trimmed);
   }
-//  cout<<"end batch_mode_driver::barcode_entered\n";
+  cout<<"end batch_mode_driver::barcode_entered\n";
 }
 
 void batch_mode_driver::cutgate_timing_error()
@@ -1096,13 +1162,16 @@ void batch_mode_driver::save_ss_setup(QString filename)
   stream<<pack_match_spreadsheet<<endl;
   stream<<"record_only\n";
   stream<<record_only<<endl;
+  for(int i=0; i<display_column_numbers.size(); ++i)
+  {
+    stream<<"display_column\n";
+    stream<<display_column_numbers[i]<<endl;
+  }
+  file.close();
 }
 
 void batch_mode_driver::load_ss_setup()//load the ss_setup indicated by ss_setup_path
 {
-  
-//  cout<<"start load_ss_setup\n";
-  
   QFile infile(ss_setup_path);
   infile.open(QIODevice::ReadOnly);
   QTextStream stream(&infile);
@@ -1114,9 +1183,6 @@ void batch_mode_driver::load_ss_setup()//load the ss_setup indicated by ss_setup
   {
     if(line == "material_id_column")
     {
-
-//      cout<<"     a\n";
-
       stream.readLineInto(&subline);
       ss_setup_p->material_id_column = subline.toInt(&conversion_ok_flag);
       if(conversion_ok_flag==false)
@@ -1127,9 +1193,6 @@ void batch_mode_driver::load_ss_setup()//load the ss_setup indicated by ss_setup
     }
     else if(line == "required_count_column")
     {
-
-//      cout<<"     b\n";
-
       stream.readLineInto(&subline);
       ss_setup_p->required_count_column = subline.toInt(&conversion_ok_flag);
       if(conversion_ok_flag==false)
@@ -1140,9 +1203,6 @@ void batch_mode_driver::load_ss_setup()//load the ss_setup indicated by ss_setup
     }
     else if(line == "envelope_id_column")
     {
-
-//      cout<<"     c\n";
-
       stream.readLineInto(&subline);
       ss_setup_p->envelope_id_column = subline.toInt(&conversion_ok_flag);
       if(conversion_ok_flag==false)
@@ -1153,9 +1213,6 @@ void batch_mode_driver::load_ss_setup()//load the ss_setup indicated by ss_setup
     }
     else if(line == "actual_count_column")
     {
-
-//      cout<<"     d\n";
-
       stream.readLineInto(&subline);
       ss_setup_p->actual_count_column = subline.toInt(&conversion_ok_flag);
       if(conversion_ok_flag==false)
@@ -1166,9 +1223,6 @@ void batch_mode_driver::load_ss_setup()//load the ss_setup indicated by ss_setup
     }
     else if(line == "print_time_column")
     {
-
-//      cout<<"     e\n";
-
       stream.readLineInto(&subline);
       ss_setup_p->print_time_column = subline.toInt(&conversion_ok_flag);
       if(conversion_ok_flag==false)
@@ -1179,9 +1233,6 @@ void batch_mode_driver::load_ss_setup()//load the ss_setup indicated by ss_setup
     }
     else if(line == "fill_time_column")
     {
-
-//      cout<<"     f\n";
-
       stream.readLineInto(&subline);
       ss_setup_p->fill_time_column = subline.toInt(&conversion_ok_flag);
       if(conversion_ok_flag==false)
@@ -1192,20 +1243,11 @@ void batch_mode_driver::load_ss_setup()//load the ss_setup indicated by ss_setup
     }
     else if(line == "envelope_setup_file")
     {
-
-//      cout<<"     g\n";
-
       stream.readLineInto(&subline);
       ss_setup_p->envelope_setup_file = subline;
     }
-
-
-    
     else if(line == "high_feed_speed")
     {
-
-//      cout<<"     h\n";
-
       stream.readLineInto(&subline);
       high_feed_speed = subline.toInt(&conversion_ok_flag);
       if(conversion_ok_flag==false)
@@ -1216,9 +1258,6 @@ void batch_mode_driver::load_ss_setup()//load the ss_setup indicated by ss_setup
     }
     else if(line == "low_feed_speed")
     {
-
-//      cout<<"     i\n";
-
       stream.readLineInto(&subline);
       low_feed_speed = subline.toInt(&conversion_ok_flag);
       if(conversion_ok_flag==false)
@@ -1229,9 +1268,6 @@ void batch_mode_driver::load_ss_setup()//load the ss_setup indicated by ss_setup
     }
     else if(line == "dump_speed")
     {
-
-//      cout<<"     j\n";
-
       stream.readLineInto(&subline);
       dump_speed = subline.toInt(&conversion_ok_flag);
       if(conversion_ok_flag==false)
@@ -1242,9 +1278,6 @@ void batch_mode_driver::load_ss_setup()//load the ss_setup indicated by ss_setup
     }
     else if(line == "require_seed_lot_barcode")
     {
-
-//      cout<<"     j\n";
-
       stream.readLineInto(&subline);
       require_seed_lot_barcode = subline.toInt(&conversion_ok_flag);
       if(conversion_ok_flag==false)
@@ -1255,9 +1288,6 @@ void batch_mode_driver::load_ss_setup()//load the ss_setup indicated by ss_setup
     }
     else if(line == "require_pack_barcode")
     {
-
-//      cout<<"     k\n";
-
       stream.readLineInto(&subline);
       require_pack_barcode = subline.toInt(&conversion_ok_flag);
       if(conversion_ok_flag==false)
@@ -1268,9 +1298,6 @@ void batch_mode_driver::load_ss_setup()//load the ss_setup indicated by ss_setup
     }
     else if(line == "pack_match_lot")
     {
-
-//      cout<<"     l\n";
-
       stream.readLineInto(&subline);
       pack_match_lot = subline.toInt(&conversion_ok_flag);
       if(conversion_ok_flag==false)
@@ -1281,9 +1308,6 @@ void batch_mode_driver::load_ss_setup()//load the ss_setup indicated by ss_setup
     }
     else if(line == "pack_contain_lot")
     {
-
-//      cout<<"     m\n";
-
       stream.readLineInto(&subline);
       pack_contain_lot = subline.toInt(&conversion_ok_flag);
       if(conversion_ok_flag==false)
@@ -1294,9 +1318,6 @@ void batch_mode_driver::load_ss_setup()//load the ss_setup indicated by ss_setup
     }
     else if(line == "lot_contain_pack")
     {
-
-//      cout<<"     n\n";
-
       stream.readLineInto(&subline);
       lot_contain_pack = subline.toInt(&conversion_ok_flag);
       if(conversion_ok_flag==false)
@@ -1307,9 +1328,6 @@ void batch_mode_driver::load_ss_setup()//load the ss_setup indicated by ss_setup
     }
     else if(line == "pack_match_spreadsheet")
     {
-
-//      cout<<"     o\n";
-
       stream.readLineInto(&subline);
       pack_match_spreadsheet = subline.toInt(&conversion_ok_flag);
       if(conversion_ok_flag==false)
@@ -1320,11 +1338,18 @@ void batch_mode_driver::load_ss_setup()//load the ss_setup indicated by ss_setup
     }
     else if(line == "record_only")
     {
-
-//      cout<<"     p\n";
-
       stream.readLineInto(&subline);
       record_only = subline.toInt(&conversion_ok_flag);
+      if(conversion_ok_flag==false)
+      {
+        cout<<"failed to convert   "<<subline.toStdString()<<"   to int\n";
+        return;
+      }
+    }
+    else if(line == "display_column")
+    {
+      stream.readLineInto(&subline);
+      display_column_numbers.append(subline.toInt(&conversion_ok_flag));
       if(conversion_ok_flag==false)
       {
         cout<<"failed to convert   "<<subline.toStdString()<<"   to int\n";
@@ -1337,11 +1362,6 @@ void batch_mode_driver::load_ss_setup()//load the ss_setup indicated by ss_setup
       cout<<"batch_mode_driver::load_file.  data type identifier not found.\n";
     }
   }
-
-//      cout<<"     q\n";
-  
-//  cout<<"end load_ss_setup\n";
-  
 }
 
 int batch_mode_driver::get_next_spreadsheet_line_number()//look for next line number not filled for current seed_lot_barcode.  Return -1 if no more.
@@ -1350,7 +1370,12 @@ int batch_mode_driver::get_next_spreadsheet_line_number()//look for next line nu
   lines_left_to_fill = 0;
   for(int i=0; i<spreadsheet_number_of_lines; ++i)
   {
-    if(   (ss_material_id_p->data_list[i] == seed_lot_barcode)     &&     (pack_filled[i] == false)     )
+//    cout<<"p1\n";
+//    cout<<"heading "<<ss_material_id_p->heading.toStdString()<<endl;
+//    cout<<"ss_material_id_p->data_list[i] "<<ss_material_id_p->data_list[i].toStdString()<<endl;
+//    cout<<"   ss_first_column_p->data_list[i]  "<<ss_first_column_p->data_list[i].toStdString()<<endl;
+    
+    if(   (ss_material_id_p->data_list[i] == seed_lot_barcode)     &&     (ss_first_column_p->data_list[i]!="Y")     )
     {
       if(ret_val == -1) ret_val = i;
       ++lines_left_to_fill;

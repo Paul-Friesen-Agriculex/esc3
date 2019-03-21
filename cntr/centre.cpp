@@ -36,7 +36,9 @@
 #include "ss_setup_choice.hpp"
 #include "ss_setup_entry.hpp"
 #include "envelope_layout_choice.hpp"
-
+#include "ss_options.hpp"
+#include "ss_column_display_options.hpp"
+#include "ss_batch.hpp"
 #include "macro_screen.hpp"	//TEST~~~
 //#include "table.hpp"        //TEST~~~ //access barcodes and count from table
 
@@ -335,7 +337,7 @@ void centre::run()
     }
   }
   */
-  else if(current_screen==15)//batch
+  else if( (current_screen==15) || (current_screen==33) )//batch or ss_batch
   {
     if(endgate_state == ENDGATE_CLOSED)
     {
@@ -444,6 +446,24 @@ void centre::run()
       case 28: screen_p=new macro_screen(this); break;	    //TEST~~~ macro_menu
       case 29: screen_p=new batch_save_ss_setup(this, batch_mode_driver_p); break;
 //      case : screen_p=new (this); break;
+      case 31: screen_p=new ss_options(this, batch_mode_driver_p); break;
+      case 32: screen_p=new ss_column_display_options(this, batch_mode_driver_p); break;
+      case 33: screen_p=new ss_batch(this, batch_mode_driver_p); break;
+//      case : screen_p=new (this); break;
+//      case : screen_p=new (this); break;
+//      case : screen_p=new (this); break;
+//      case : screen_p=new (this); break;
+//      case : screen_p=new (this); break;
+//      case : screen_p=new (this); break;
+//      case : screen_p=new (this); break;
+//      case : screen_p=new (this); break;
+//      case : screen_p=new (this); break;
+//      case : screen_p=new (this); break;
+//      case : screen_p=new (this); break;
+//      case : screen_p=new (this); break;
+//      case : screen_p=new (this); break;
+//      case : screen_p=new (this); break;
+//      case : screen_p=new (this); break;
       default: screen_p=new start_screen(this);
                cout<<"default screen_p case\n";
     }
@@ -514,7 +534,7 @@ bool centre::load_settings(QString file_name)
 void centre::add_waiting_screen(int screen_to_add)
 {
   
-//  cout<<"add_waiting_screen("<<screen_to_add<<")\n";
+  cout<<"add_waiting_screen("<<screen_to_add<<")\n";
 //  cout<<"screen_wait_list_size="<<screen_wait_list_size<<endl;
   
   for(int i=screen_wait_list_size-1; i>0; --i)

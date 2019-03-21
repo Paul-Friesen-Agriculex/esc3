@@ -675,7 +675,7 @@ void batch_save_ss_setup::enter_clicked()
   cout<<"outfile_name "<<outfile_name.toLatin1().data()<<endl;
   
   batch_mode_driver_p->bm_save_ss_setup_filename = outfile_name;
-  centre_p->add_waiting_screen(15);//batch
+  centre_p->add_waiting_screen(33);//ss_batch
   centre_p->screen_done=true;
-  //returning to batch with bm_save_ss_setup filename not blank will trigger save.  see batch constructor.
+  //returning to ss_batch with bm_save_ss_setup filename not blank will trigger save.  see ss_batch constructor.
 }

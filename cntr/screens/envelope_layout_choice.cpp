@@ -115,7 +115,7 @@ void envelope_layout_choice::choice1_clicked()
     envelope_layout_path.append(".ESC3");
     batch_mode_driver_p->envelope_layout_path = envelope_layout_path;
     batch_mode_driver_p->load_envelope_layout();
-    centre_p->add_waiting_screen(15);
+    centre_p->add_waiting_screen(33);//ss_batch
     centre_p->screen_done=true;
   }
 }
@@ -128,7 +128,7 @@ void envelope_layout_choice::choice2_clicked()
     envelope_layout_path.append(".ESC3");
     batch_mode_driver_p->envelope_layout_path = envelope_layout_path;
     batch_mode_driver_p->load_envelope_layout();
-    centre_p->add_waiting_screen(15);
+    centre_p->add_waiting_screen(33);
     centre_p->screen_done=true;
   }
 }
@@ -141,7 +141,7 @@ void envelope_layout_choice::choice3_clicked()
     envelope_layout_path.append(".ESC3");
     batch_mode_driver_p->envelope_layout_path = envelope_layout_path;
     batch_mode_driver_p->load_envelope_layout();
-    centre_p->add_waiting_screen(15);
+    centre_p->add_waiting_screen(33);
     centre_p->screen_done=true;
   }
 }
@@ -154,7 +154,7 @@ void envelope_layout_choice::choice4_clicked()
     envelope_layout_path.append(".ESC3");
     batch_mode_driver_p->envelope_layout_path = envelope_layout_path;
     batch_mode_driver_p->load_envelope_layout();
-    centre_p->add_waiting_screen(15);
+    centre_p->add_waiting_screen(33);
     centre_p->screen_done=true;
   }
 }
@@ -167,7 +167,7 @@ void envelope_layout_choice::choice5_clicked()
     envelope_layout_path.append(".ESC3");
     batch_mode_driver_p->envelope_layout_path = envelope_layout_path;
     batch_mode_driver_p->load_envelope_layout();
-    centre_p->add_waiting_screen(15);
+    centre_p->add_waiting_screen(33);
     centre_p->screen_done=true;
   }
 }
@@ -180,7 +180,7 @@ void envelope_layout_choice::choice6_clicked()
     envelope_layout_path.append(".ESC3");
     batch_mode_driver_p->envelope_layout_path = envelope_layout_path;
     batch_mode_driver_p->load_envelope_layout();
-    centre_p->add_waiting_screen(15);
+    centre_p->add_waiting_screen(33);
     centre_p->screen_done=true;
   }
 }
@@ -207,7 +207,7 @@ void envelope_layout_choice::delete_envelope_layout_clicked()
 
 void envelope_layout_choice::no_envelope_layout_clicked()
 {
-  centre_p->add_waiting_screen(15);//batch
+  centre_p->add_waiting_screen(33);//ss_batch
   centre_p->screen_done=true;
 }
 

@@ -157,9 +157,10 @@ class batch_mode_driver : public QObject
   
   //spreadsheet handling
   bool use_spreadsheet;
-  int spreadsheet_line;//line corresponding to pack currently being filled
+//  int spreadsheet_line;//line corresponding to pack currently being filled
   QString spreadsheet_filename;
   void load_spreadsheet(QString filename);
+  int save_spreadsheet(QString filename);
   spreadsheet_column* ss_first_column_p;
   spreadsheet_column* ss_material_id_p;
   spreadsheet_column* ss_required_count_p;
@@ -169,16 +170,18 @@ class batch_mode_driver : public QObject
   spreadsheet_column* ss_fill_time_p;
   spreadsheet_column* get_spreadsheet_column_pointer(int column_number);
   int spreadsheet_number_of_lines;//does not include heading line
+  int spreadsheet_number_of_columns;
   int spreadsheet_line_number;//number of the line for the packet being filled
   int get_next_spreadsheet_line_number();//look for next line number not filled for current seed_lot_barcode.  Return -1 if no more.
   int lines_left_to_fill;//number of packs for current seed_lot_bar_code still to be filled.  set by get_next_spreadsheet_line_number().
-  QList<bool> pack_filled;//used to mark when a packet has been filled
+//  QList<bool> pack_filled;//used to mark when a packet has been filled
   ss_setup* ss_setup_p;
   envelope* envelope_p;
   QString ss_setup_path;
   void load_ss_setup();
   void clear_ss_setup();
   void fill_ss_column_pointers();
+  QList<int> display_column_numbers;
   QString envelope_layout_path;
   void load_envelope_layout();
   void clear_envelope_layout();
@@ -208,6 +211,7 @@ class batch_mode_driver : public QObject
   void seed_lot_barcode_entered(QString barcode);
   void pack_barcode_entered(QString barcode);
   void bad_lot_signal();//issued if count went over limit on this batch
+  void refresh_screen();
   
   //testing
   void send_message2(QString);
