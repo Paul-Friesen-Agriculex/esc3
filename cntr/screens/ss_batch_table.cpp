@@ -76,7 +76,7 @@ ss_batch_table::ss_batch_table(centre* c_p, batch_mode_driver* batch_mode_driver
     
   );
   
-  refresh();
+//  refresh();
   
 //  cout<<"bt5\n";
   
@@ -102,7 +102,7 @@ void ss_batch_table::enter_data(int column, QString data)
 */
 void ss_batch_table::refresh()
 {
-  cout<<"ss_batch_table::refresh()\n";
+  cout<<"ss_batch_table::refresh() 0\n";
   
   if(model_p!=0) delete model_p;
   model_p = 0;
@@ -118,18 +118,28 @@ void ss_batch_table::refresh()
     display_column_pointers.append(col_p);
     model_p -> setHeaderData(j, Qt::Horizontal, col_p->heading);
   }
+
+  cout<<"ss_batch_table::refresh() 1\n";
+  cout<<"batch_mode_driver_p->spreadsheet_number_of_lines = "<<batch_mode_driver_p->spreadsheet_number_of_lines<<endl;
   
   for(int i=0; i<batch_mode_driver_p->spreadsheet_number_of_lines; ++i)
   {
+//    cout<<"p1\n";
     QColor row_colour(255,255,255);
-    if(display_column_pointers[0]->data_list[i] == "Y")//packet for this row is filled.  colour red
+//    cout<<"p2\n";
+//    cout<<"display_column_pointers[0]->data_list[i] "<<display_column_pointers[0]->data_list[i].toStdString()<<endl;
+//    if(display_column_pointers[0]->data_list[i] == "Y")//packet for this row is filled.  colour red
+    if(batch_mode_driver_p->ss_first_column_p->data_list[i] == "Y")//packet for this row is filled.  colour red
     {
       row_colour = QColor(255,100,100);
     }
+//    cout<<"p3\n";
     if(i==current_row)//colour yellow
     {
       row_colour = QColor(255,255,100);
     }
+//    cout<<"p4\n";
+//    cout<<"number_of_columns "<<number_of_columns<<endl;
     
     for(int j=0; j<number_of_columns; ++j)
     {
@@ -139,6 +149,9 @@ void ss_batch_table::refresh()
       model_p -> setItem(i, j, item_p);
     }
   }
+
+  cout<<"ss_batch_table::refresh() 2\n";
+
   
   //to position current row near middle of screen, set current row first to row_back, then to row_forward, then to current_row, which is between them
   int row_back = current_row-4;
@@ -151,6 +164,8 @@ void ss_batch_table::refresh()
   setCurrentIndex(forward_index);
   selectionModel()->setCurrentIndex(model_p->index(current_row, 0), QItemSelectionModel::NoUpdate);
   setCurrentIndex(model_p->index(current_row, 0));
+
+  cout<<"ss_batch_table::refresh() 3\n";
   
   /*
   for(int i=0; i<batch_mode_driver_p->spreadsheet_number_of_lines; ++i)

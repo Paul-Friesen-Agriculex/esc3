@@ -227,6 +227,11 @@ ss_batch::ss_batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_drive
 //  }
   
   batch_mode_driver_p ->fill_ss_column_pointers();
+  ss_table_p -> refresh();
+  
+  
+  
+   
   cout<<"p0\n";
   cout<<"heading "<<batch_mode_driver_p->ss_material_id_p->heading.toStdString()<<endl;
 

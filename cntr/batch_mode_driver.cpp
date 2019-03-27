@@ -560,7 +560,13 @@ void batch_mode_driver::run()
           cout<<"before get_next_spreadsheet_line_number\n";
           
           spreadsheet_line_number = get_next_spreadsheet_line_number();
+          
+          cout<<"about to emit refresh_screen\n";
+          
           emit refresh_screen();
+          
+          cout<<"after emit refresh_screen\n";
+          
           
           cout<<"spreadsheet_line_number = "<<spreadsheet_line_number<<endl;
           
