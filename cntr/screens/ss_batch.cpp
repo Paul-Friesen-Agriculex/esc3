@@ -21,7 +21,9 @@ void ss_barcode_line::keyPressEvent(QKeyEvent* event)
   QLineEdit::keyPressEvent(event); //TEST~~~
   if(event->key() == Qt::Key_Return)
   {
+//    cout<<"about to emit barcode_entered("<<displayText().toStdString()<<")\n";
     emit barcode_entered(displayText());  //TEST~~~
+//    cout<<"emitted barcode_entered("<<displayText().toStdString()<<")\n";
     clear();
   }
 }
@@ -105,6 +107,8 @@ ss_batch::ss_batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_drive
   top_layout_p -> addWidget(options_button_p, 0, 1);
   top_layout_p -> addWidget(back_button_p, 0, 2);
   bottom_layout_p -> addWidget(barcode_line_p, 1, 4);   
+  barcode_line_p -> setText("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");  
+  barcode_line_p -> clear();  
   control_layout_p -> addWidget(rescan_button_p, 0, 0);
   control_layout_p -> addWidget(restart_button_p, 0, 1);
   control_layout_p -> addWidget(speed_box_p, 1, 0, 1, 2);     
@@ -766,15 +770,21 @@ void ss_batch::run()
       }
       if( (batch_mode_driver_p->pack_barcode_old==false) && (batch_mode_driver_p->pack_barcode_ok==true) )
       {
-        barcode_status_p->set_text("Barcode OK");
-        barcode_status_p->set_text_size(30); 
+        QString msg = "Barcore OK\nSeed Lot: ";
+        msg.append(batch_mode_driver_p->seed_lot_barcode);
+        barcode_status_p->set_text(msg);
+        barcode_status_p->set_text_size(15); 
         barcode_status_p->set_background(0, 255, 0);
         barcode_status_p->update();
       }
       if( (batch_mode_driver_p->pack_barcode_old==false) && (batch_mode_driver_p->pack_barcode_ok==false) )
       {
-        barcode_status_p->set_text("Incorrect Barcode");
-        barcode_status_p->set_text_size(30); 
+        QString msg = "Incorrect Barcore\nSeed Lot: ";
+        msg.append(batch_mode_driver_p->seed_lot_barcode);
+        barcode_status_p->set_text(msg);
+        barcode_status_p->set_text_size(15); 
+//        barcode_status_p->set_text("Incorrect Barcode");
+//        barcode_status_p->set_text_size(30); 
         barcode_status_p->set_background(255, 0, 0);
         barcode_status_p->update();
       }

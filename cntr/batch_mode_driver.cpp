@@ -573,7 +573,7 @@ void batch_mode_driver::run()
           if(spreadsheet_line_number==-1)//-1 value signals no more lines for this seed_lot_barcode
           {
             QMessageBox box;
-            box.setText("No unfilled rows for this seed lot.  Dumping out.");
+            box.setText(QString("No unfilled rows for seed lot %1.  Dumping out.").arg(seed_lot_barcode));
             box.exec();
             restart_flag = true;
 //            mode = dump_into_cut_gate;

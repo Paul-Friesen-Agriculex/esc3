@@ -21,7 +21,9 @@ void barcode_line::keyPressEvent(QKeyEvent* event)
   QLineEdit::keyPressEvent(event); //TEST~~~
   if(event->key() == Qt::Key_Return)
   {
+//    cout<<"about to emit barcode_entered("<<displayText().toStdString()<<")\n";
     emit barcode_entered(displayText());  //TEST~~~
+//    cout<<"emitted barcode_entered("<<displayText().toStdString()<<")\n";
     clear();
   }
 }
@@ -93,7 +95,9 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
   top_layout_p -> addWidget(count_message_p, 0, 0);
   top_layout_p -> addWidget(options_button_p, 0, 1);
   top_layout_p -> addWidget(back_button_p, 0, 2);
-  bottom_layout_p -> addWidget(barcode_line_p, 1, 4);   
+  bottom_layout_p -> addWidget(barcode_line_p, 1, 4); 
+  barcode_line_p -> setText("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");  
+  barcode_line_p -> clear();  
   control_layout_p -> addWidget(rescan_button_p, 0, 0);
   control_layout_p -> addWidget(restart_button_p, 0, 1);
   control_layout_p -> addWidget(speed_box_p, 1, 0, 1, 2);     
