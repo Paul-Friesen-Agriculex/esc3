@@ -11,7 +11,6 @@
 
 using namespace std;
 
-
 //=================================================================================//
 //------------- variables used in calculating standard deviation ------------ //
 float width_mean, height_mean, area_mean;								              //TEST~~~
@@ -19,7 +18,6 @@ float std_deviation_width, std_deviation_height, std_deviation_area;	//TEST~~~
 float variability_score;												                      //TEST~~~
 
 //----------------- display array -------------------//
-//rotated_raster* display_rotated_raster_p = new rotated_raster;
 rotated_raster* rotated_raster_p = new rotated_raster;
 //-------------------rotated_raster_list-indexes-------------------//
 QList<int> index_list;	                  //save raster index values for first 50 seeds
@@ -31,15 +29,15 @@ QList<int> raw_image_size_list;
       
 QList<int> rotated_image_list;            //01_10_2019 same implementation as storing raw raster images//
 QList<int> rotated_image_zeroes_list;     //01_10_2019 store start/end points of rasters in rotated_image_list//
-QList<float> rotated_image_dimensions;      //01_11_2019 store dimensions + area of rasters//
-QList<int> rotated_image_centroids;   //01_14_2019 list of centroids//
+QList<float> rotated_image_dimensions;    //01_11_2019 store dimensions + area of rasters//
+QList<int> rotated_image_centroids;       //01_14_2019 list of centroids//
 
-float largest_dimension = 0;              //TEST~~~~	//Should be this
-int number_listed_rasters = 0;
+float largest_dimension = 0;              //TEST~~~~	//
+extern int number_listed_rasters = 0;
 
 float average_calibration_seed_size = 0;	      //TEST~~~
 //const int calibration_seed_number = 50;		    //used to define the number of seeds to used for calibration data//
-const int calibration_seed_number = 10;         //TEST~~~//
+extern const int calibration_seed_number = 10;         //TEST~~~//
 
 //---------------------------------DIAGNOSTICS---------------------------------//
 int average_area, average_width, average_height;      //means
@@ -58,17 +56,20 @@ float area_variance, width_variance, height_variance;     //calculate rolling va
 float area_std_dev, width_std_dev, height_std_dev;        //calculate standard deviations
 
 //============================================================================================================//
-//global lists//
-QList<int> global_list_test;                  //TEST~~~//
-
-QList<int> secondary_raw_image_list;          //TEST~~~
-QList<int> secondary_raw_image_zeroes_list;	  //TEST~~~
-QList<int> secondary_raw_image_size_list;		  //TEST~~~
-
-QList<int> secondary_index_list;
-QList<int> secondary_index_zero_positions_list;
-
+//===============================================Global Lists=================================================//
 //============================================================================================================//
+
+/*QList<int> global_list_test;                      //TEST~~~ unused variables//
+QList<int> secondary_raw_image_list;                //
+QList<int> secondary_raw_image_zeroes_list;	        //
+QList<int> secondary_raw_image_size_list;		        //
+QList<int> secondary_index_list;                    //
+QList<int> secondary_index_zero_positions_list;*/   //
+
+QList<int> rotated_centroid_x;
+QList<int> rotated_centroid_y;
+//============================================================================================================//
+
 secondary_processor::secondary_processor(int raster_width, int raster_height, int raster_area, bool* bool_raster_p)
 {  
   width = raster_width; 
@@ -78,7 +79,8 @@ secondary_processor::secondary_processor(int raster_width, int raster_height, in
   seed_number_overlap_test = 1;   //OMIT~~~ placement holder, may need to retrieve number of seeds detected by inflection test//
   
   if(number_listed_rasters < calibration_seed_number) store_raw_image_rasters(bool_raster_p);
-  else raster_comparison(seed_number_overlap_test, bool_raster_p);
+  //else raster_comparison(seed_number_overlap_test, bool_raster_p);  //Original~~~//
+  else raster_comparison_2(seed_number_overlap_test, bool_raster_p);  //TEST~~~//
 }
 //=============================================================================================================================================//
 //=======================================================FUNCTIONS FROM PROCESSOR - BLOB=======================================================//
@@ -180,8 +182,8 @@ void secondary_processor::store_raw_image_rasters(bool* bool_raster_p)
 }
 
 void secondary_processor::store_rotated_rasters_2()
-{  
-  int y_scaling = 0;
+{
+  //int y_scaling = 0;
   int zero_pos;
   int rotated_raster_index = 0;		  //remapped index for rasters after shifts and rotation  
 
@@ -189,10 +191,10 @@ void secondary_processor::store_rotated_rasters_2()
   
   int line_start;					          //define start + end positions of lines for gap fill functions
   int line_end;	
-  int prev_start = 0;				        //gap fill - variables for extending shorter lines
-  int prev_end = 0;
-  int prev2_start = 0;
-  int prev2_end = 0;
+  //int prev_start = 0;				        //gap fill - variables for extending shorter lines
+  //int prev_end = 0;
+  //int prev2_start = 0;
+  //int prev2_end = 0;
 
   bool use_scaling_factor;			    //separate between 0,90,180,270 from 45,135,225,315
   int segment_start = 0;
@@ -217,8 +219,8 @@ void secondary_processor::store_rotated_rasters_2()
     width = raw_image_zeroes_list[q+1];						          //retrieve width + height
     height = raw_image_zeroes_list[q+2];
     
-    if(1.0*width/x_scale_factor > 1.0*height/y_scale_factor) larger_dimension = 1.0*width/x_scale_factor + 1;   //TEST~~~ 01_10_2019//
-    else larger_dimension = 1.0*height/y_scale_factor + 1;                                                      //TEST~~~ 01_10_2019//
+    if(1.0*width/x_scale_factor > 1.0*height/y_scale_factor) larger_dimension = 1.0*width/x_scale_factor + 1;
+    else larger_dimension = 1.0*height/y_scale_factor + 1;
     
     half_width = width/2;						   //determine center position of raster in bitmap container
     half_height = height/2;
@@ -241,7 +243,7 @@ void secondary_processor::store_rotated_rasters_2()
 
       if(use_scaling_factor != 1)	  //form rasters for angles: 45, 135, 225, 315
       {
-        for (double y=start_raster_y; y<end_raster_y; ++y)	
+        for (double y=start_raster_y; y<end_raster_y; ++y)
         {
           for (double x=start_raster_x; x<end_raster_x; ++x)
           {  
@@ -251,14 +253,15 @@ void secondary_processor::store_rotated_rasters_2()
               //shifted_x = x;  //no compression//
               shifted_y = y;    //
               shifted_x = 1.0*x/x_scale_factor;   //apply horizontal compression//
-              //shifted_y = 1.0*y/x_scale_factor; //no applications for vertical compression//
+              //shifted_y = 1.0*y/y_scale_factor; //no applications for vertical compression//
               
 	            rotated_x = (shifted_x*qCos(theta)-shifted_y*qSin(theta));
 	            rotated_y = (shifted_x*qSin(theta)+shifted_y*qCos(theta));
               unshifted_x = rotated_x + larger_dimension/2;       //TEST~~~//
               unshifted_y = rotated_y + larger_dimension/2;       //TEST~~~//
-              rotated_raster_index = unshifted_x+width*unshifted_y;              
-              index_segment.append(rotated_raster_index);              
+              //rotated_raster_index = unshifted_x+width*unshifted_y;             
+              rotated_raster_index = round(unshifted_x+width*unshifted_y); //TEST~~~//
+              index_segment.append(rotated_raster_index);
             }
           }
         }
@@ -275,13 +278,14 @@ void secondary_processor::store_rotated_rasters_2()
               //shifted_x = x;  //unprocessed from camera//
 	            shifted_y = y;    //
               shifted_x = 1.0*x/x_scale_factor;     //horizontal compression//
-              //shifted_y = 1.0*y/x_scale_factor;   //
+              //shifted_y = 1.0*y/y_scale_factor;   //
                             
 	            rotated_x = (shifted_x*qCos(theta)-shifted_y*qSin(theta));
 	            rotated_y = (shifted_x*qSin(theta)+shifted_y*qCos(theta));
               unshifted_x = rotated_x + larger_dimension/2;       //TEST~~~//
               unshifted_y = rotated_y + larger_dimension/2;       //TEST~~~//
-              rotated_raster_index = unshifted_x+width*unshifted_y;
+              //rotated_raster_index = unshifted_x+width*unshifted_y;
+              rotated_raster_index = round(unshifted_x+width*unshifted_y); //TEST~~~//
               index_segment.append(rotated_raster_index);              
             }
           }
@@ -291,10 +295,10 @@ void secondary_processor::store_rotated_rasters_2()
       QSet<int> segment_set = index_segment.toSet();
       index_segment.clear();
       //-------------------------------------------------------------------------------------------------------------------------//
-      prev_start = width;		//Gap Fill - variables for extending shorter lines
-      prev_end = 0;
-      prev2_start = width;
-      prev2_end = 0;
+      //prev_start = width;		//Gap Fill - variables for extending shorter lines
+      //prev_end = 0;
+      //prev2_start = width;
+      //prev2_end = 0;
       
       //Gap Fill - columns
       {
@@ -338,7 +342,8 @@ void secondary_processor::store_rotated_rasters_2()
       {
         for (int r=0; r<larger_dimension; ++r)
         {
-          if(index_segment.contains(r + width*q))
+          if((r + width*q) == 0) {} //TEST~~~//
+          else if(index_segment.contains(r + width*q))
           {
             rotated_image_list.append(r+width*q);    //TEST~~~ 01_16_2019b
           }
@@ -623,18 +628,20 @@ void secondary_processor::remove_similar_rasters()	//compare and remove similar 
       //index_segment_1;
       //b - raster 1 selected, a - raster 2 selected
       
-      int seed_width_1, seed_width_2, larger_width;
-      int seed_height_1, seed_height_2, larger_height;
+      //int seed_width_1, seed_width_2, larger_width;
+      //int seed_height_1, seed_height_2, larger_height;
+      /*int seed_width_1, seed_width_2;
+      int seed_height_1, seed_height_2;
       
       seed_width_1 = rotated_image_dimensions.at(b*3 + 1);
       seed_height_1 = rotated_image_dimensions.at(b*3 + 2);
       seed_width_2 = rotated_image_dimensions.at(a*3 + 1);
-      seed_height_2 = rotated_image_dimensions.at(a*3 + 2);
+      seed_height_2 = rotated_image_dimensions.at(a*3 + 2);*/
       
-      if(seed_width_1 > seed_width_2) larger_width = seed_width_1;
+      /*if(seed_width_1 > seed_width_2) larger_width = seed_width_1;
       else larger_width = seed_width_2;
       if(seed_height_1 > seed_height_2) larger_height = seed_height_1;
-      else larger_height = seed_height_2;
+      else larger_height = seed_height_2;*/
       
 //========================================================================================================================================//      
 //---------------------calculate scores method----------------------//
@@ -873,16 +880,23 @@ void secondary_processor::remove_similar_rasters_3()	//compare and remove simila
   int seed_height_1, seed_height_2, larger_height;
   int larger_dimension_1, larger_dimension_2, larger_dimension;
   
-  int seed_start_1, seed_start_2;
-  int seed_end_1, seed_end_2;
+  //int seed_start_1, seed_start_2;
+  //int seed_end_1, seed_end_2;
   int raster_selected_1, raster_selected_2;
   
   int segment_start_1, segment_start_2;
   int segment_end_1, segment_end_2;
   
-  float rotated_seg_1_centroid_x, rotated_seg_2_centroid_x;   //for centroid calculations//
-  float rotated_seg_1_centroid_y, rotated_seg_2_centroid_y;   //
-  int rotated_seg_1_size, rotated_seg_2_size;                 //
+  float rotated_seg_1_centroid_x = 0;           //for centroid calculations//
+  float rotated_seg_2_centroid_x = 0;           //
+  float rotated_seg_1_centroid_y = 0;           //
+  float rotated_seg_2_centroid_y = 0;           //
+  int rotated_seg_1_size, rotated_seg_2_size;   //
+  //-----------------------------------------------------------------------------------------//
+  //QLISTS//
+  QList<int> segment_num;
+  QList<float> segment_similarity;
+  
   //-----------------------------------------------------------------------------------------//
   int larger_rotated_seg;
   
@@ -932,6 +946,9 @@ void secondary_processor::remove_similar_rasters_3()	//compare and remove simila
     rotated_seg_1_centroid_x = round(rotated_seg_1_centroid_x/rotated_seg_1_size);  //
     rotated_seg_1_centroid_y = round(rotated_seg_1_centroid_y/rotated_seg_1_size);  //
     
+    rotated_centroid_x.append(rotated_seg_1_centroid_x);  //append to QList for raster_comparison transformations//
+    rotated_centroid_y.append(rotated_seg_1_centroid_y);  //
+    
     //function for shifting raster image centroid to 0,0//
     QSet<int> seg_1_temp_set;                               //shift raster image centroid to 0.0//
     seg_1_temp_set.clear();                                 //
@@ -970,6 +987,8 @@ void secondary_processor::remove_similar_rasters_3()	//compare and remove simila
       cout<<endl;                                                         //
     }                                                                     //*/
   
+    //int loop_counter;   //OMIT~~~//
+    //cin>>loop_counter;  //OMIT~~~//
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Inner Loop~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
     for(int a=b+1; a<rotated_image_zeroes_list.size(); ++a)
     {
@@ -1102,8 +1121,8 @@ void secondary_processor::remove_similar_rasters_3()	//compare and remove simila
     cout<<similar_raster_list.at(j)<<" ";
   }
   
-  int loop_counter;   //OMIT~~~//
-  cin>>loop_counter;  //OMIT~~~//
+  //int loop_counter;   //OMIT~~~//
+  //cin>>loop_counter;  //OMIT~~~//
   
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~TEST~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
   int segment_start;
@@ -1134,7 +1153,6 @@ void secondary_processor::remove_similar_rasters_3()	//compare and remove simila
   {
     while(similar_raster_list.contains(g)) ++g;
     raster_position = g;
-    
     //score range in descending series// (n*(n+1)/2)
     segment_start = (rasters_in_list*(rasters_in_list+1))/2 - (rasters_in_list-raster_position)*((rasters_in_list-raster_position)+1)/2;
     segment_end = (rasters_in_list*(rasters_in_list+1))/2 - (rasters_in_list-raster_position-1)*((rasters_in_list-raster_position))/2;
@@ -1144,7 +1162,8 @@ void secondary_processor::remove_similar_rasters_3()	//compare and remove simila
     for(int h=segment_start+1; h<segment_end; ++h)
     {
       while(similar_raster_list.contains(h)) ++h;
-      while(full_score_list.at(h)<similar_threshold) ++h;
+      //while(full_score_list.at(h)<similar_threshold) ++h;                     //ORIGINAL~~~//
+      while(full_score_list.at(h)<similar_threshold && h < segment_end) ++h;    //TEST~~~//
       area_percent = full_score_list.at(h);
       
       if(area_percent < score_array[0])
@@ -1192,25 +1211,136 @@ void secondary_processor::remove_similar_rasters_3()	//compare and remove simila
         score_array[4] = area_percent;
         num_array[4] = h-segment_start+g;
       }
+      /*//TEST~~~//
+      for(int jkl=0; jkl<link_num; ++jkl)
+      {
+        cout<<"<";
+        cout<<score_array[jkl]<<","<<num_array[jkl];
+        cout<<"> ";
+      }
+      cout<<endl;
+      //TEST~~~//*/
     }
-    //segment_num.append(g);
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~DIAGNOSTICS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-    cout<<"start: "<<segment_start<<"\t\tend: "<<segment_end<<endl;
-    cout<<"G: "<<g<<endl;
-    cin>>loop_counter;  //omit~~~
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+    segment_num.append(g);
+    segment_similarity.append(g);
+    for(int q=0; q<link_num; ++q)
+    {
+      segment_num.append(num_array[q]);
+      segment_similarity.append(score_array[q]);
+    }
+  }
+//---------------------------------reverse comparison--------------------------------//
+  for(int i = segment_num.size()-(link_num+1); i>=0; i-=(link_num+1))
+  {
+    for(int j=0; j<i; j+=(link_num+1))
+    {
+      for(int n=1; n<(link_num+1); ++n)
+      {
+        if(segment_num.at(j+n)==segment_num.at(i))
+        {
+          if(segment_similarity.at(j+n) < segment_similarity.at(i+1))         //Replace if statements with for loops later  (or check remove and pushback functions)
+          {      
+            segment_num.replace((i+5),(segment_num.at(i+4)));
+            segment_num.replace((i+4),(segment_num.at(i+3)));
+            segment_num.replace((i+3),(segment_num.at(i+2)));
+            segment_num.replace((i+2),(segment_num.at(i+1)));
+            segment_num.replace((i+1),(segment_num.at(j)));
+            segment_similarity.replace((i+5),(segment_similarity.at(i+4)));
+            segment_similarity.replace((i+4),(segment_similarity.at(i+3)));
+            segment_similarity.replace((i+3),(segment_similarity.at(i+2)));
+            segment_similarity.replace((i+2),(segment_similarity.at(i+1)));
+            segment_similarity.replace((i+1),(segment_similarity.at(j+n)));
+          }
+          else if(segment_similarity.at(j+n) < segment_similarity.at(i+2))
+          {
+            segment_num.replace((i+5),(segment_num.at(i+4)));
+            segment_num.replace((i+4),(segment_num.at(i+3)));
+            segment_num.replace((i+3),(segment_num.at(i+2)));
+            segment_num.replace((i+2),(segment_num.at(j)));
+            segment_similarity.replace((i+5),(segment_similarity.at(i+4)));
+            segment_similarity.replace((i+4),(segment_similarity.at(i+3)));
+            segment_similarity.replace((i+3),(segment_similarity.at(i+2)));
+            segment_similarity.replace((i+2),(segment_similarity.at(j+n)));
+          }
+          else if(segment_similarity.at(j+n) < segment_similarity.at(i+3))
+          {
+            segment_num.replace((i+5),(segment_num.at(i+4)));
+            segment_num.replace((i+4),(segment_num.at(i+3)));
+            segment_num.replace((i+3),(segment_num.at(j)));
+            segment_similarity.replace((i+5),(segment_similarity.at(i+4)));
+            segment_similarity.replace((i+4),(segment_similarity.at(i+3)));
+            segment_similarity.replace((i+3),(segment_similarity.at(j+n)));
+          }
+          else if(segment_similarity.at(j+n) < segment_similarity.at(i+4))
+          {
+            segment_num.replace((i+5),(segment_num.at(i+4)));
+            segment_num.replace((i+4),(segment_num.at(j)));
+            segment_similarity.replace((i+5),(segment_similarity.at(i+4)));
+            segment_similarity.replace((i+4),(segment_similarity.at(j+n)));
+          }
+          else if(segment_similarity.at(j+n) < segment_similarity.at(i+5))
+          {
+            segment_num.replace((i+5),(segment_num.at(j)));
+            segment_similarity.replace((i+5),(segment_similarity.at(j+n)));
+          }
+        }
+      }
+    }
   }
   
+  /*cout<<endl<<"segment_num: ("<<segment_num.size()<<")"<<endl;                  //OMIT~~~//
+  for(int g=0; g<segment_num.size(); ++g)
+  {
+    cout<<segment_num.at(g)<<" ";
+  }
+  cout<<endl<<"segment_similarity: ("<<segment_similarity.size()<<")"<<endl;    //OMIT~~~//
+  for(int g=0; g<segment_similarity.size(); ++g)
+  {
+    cout<<segment_similarity.at(g)<<" ";
+  }
+  cout<<endl;*/
+  
+  
+  /*cout<<endl<<"zero_positions_list: before("<<index_zero_positions_list.size()<<")"<<endl;  //OMIT~~~//
+  for(int g=0; g<index_zero_positions_list.size(); ++g)
+  {
+    cout<<index_zero_positions_list[g]<<" ";
+  }
+  //--------------------------------Remove Similar Rasters from List----------------------------//
+  qSort(similar_raster_list.begin(), similar_raster_list.end());
+  for(int h=similar_raster_list.size()-1; h>=0; --h)	//similar_raster_list
+  {
+    segment_start = index_zero_positions_list[(similar_raster_list[h])-1]+1;
+    segment_end = index_zero_positions_list[(similar_raster_list[h])];
+    for(int f=segment_end; f>segment_start; --f)
+    {
+      index_list.removeAt(f);	  //removes similar_raster zero position index from list
+    }
+  }
+  int previous_zero_position = 0;
+  index_zero_positions_list.clear();
+  for(int q=0; q<index_list.size(); ++q)
+  {
+    previous_zero_position = index_list.indexOf(0,q-1);
+    if(index_list.indexOf(0,q) > previous_zero_position)
+    {
+      index_zero_positions_list.append(index_list.lastIndexOf(0,q));
+    }
+  }
+  
+  //------------------------------------------diagnostics---------------------------------------//
+  cout<<endl<<"zero_positions_list: ("<<index_zero_positions_list.size()<<")"<<endl;  //OMIT~~~//
+  for(int g=0; g<index_zero_positions_list.size(); ++g)
+  {
+    cout<<index_zero_positions_list[g]<<" ";
+  }*/
   //==================================================================================================//
 }
 //==================================================================================================================================================//
 void secondary_processor::remove_similar_rasters_2()	//compare and remove similar seeds in Qlist, link top 5 most similiar rasters to remaining
 {
   for(int jkl=0; jkl<rotated_image_zeroes_list.size(); ++jkl)
-  {
-    cout<<"Removing: "<<jkl<<endl;  //OMIT~~~
-    
+  {    
     int test_start;
     int test_end;
     int test_width;
@@ -1227,9 +1357,7 @@ void secondary_processor::remove_similar_rasters_2()	//compare and remove simila
     raster_selected = 3*raster_selected;
     test_width = raw_image_zeroes_list.at(raster_selected+1);              //unprocessed original dimensions
     test_height = raw_image_zeroes_list.at(raster_selected+2);
-    //cout<<endl<<"TEST_WIDTH: "<<test_width<<"\traster selected: "<<raster_selected+1<<endl;     //OMIT~~~
-    //cout<<endl<<"TEST_HEIGHT: "<<test_height<<"\traster_selected: "<<raster_selected+2<<endl;   //OMIT~~~
-    
+
     if(rotated_image_dimensions.at(jkl*3+1) > rotated_image_dimensions.at(jkl*3+2)) larger_dimension = rotated_image_dimensions.at(jkl*3+1);  //TEST~~~//
     else larger_dimension = rotated_image_dimensions.at(jkl*3+2);                                                                             //TEST~~~//
     
@@ -1237,18 +1365,8 @@ void secondary_processor::remove_similar_rasters_2()	//compare and remove simila
     {
       test_segment_print.insert(rotated_image_list.at(x));
     }
-    
-    //for(int x=larger_dimension+2; x>=0; --x)      //print test segment//
-    //{
-        //for(int y=0; y<larger_dimension+2; ++y)
-      //{
-        //if(test_segment_print.contains(x+test_width*y)) cout<<"o ";
-        //else cout<<". ";
-      //}
-      //cout<<endl;
-    //}
   
-    //-------------------------------------------------------------------// //TEST~~~//
+    //-------------------------------------------------------------------//
     //centroid calculation//
     float rotated_segment_centroid_x = 0;
     float rotated_segment_centroid_y = 0;
@@ -1267,15 +1385,9 @@ void secondary_processor::remove_similar_rasters_2()	//compare and remove simila
         }
       }
     }
-    
-    cout<<"centroid sum: ("<<rotated_segment_centroid_x<<","<<rotated_segment_centroid_y<<")"<<endl;    //OMIT~~~//
-    cout<<"centroid coordinates (new): ("<<float(rotated_segment_centroid_x/rotated_segment_size)       //OMIT~~~//
-        <<","<<float(rotated_segment_centroid_y/rotated_segment_size)<<")"<<endl;                       //OMIT~~~//
-    cout<<"centroid coordinates (rounded): ("<<round(rotated_segment_centroid_x/rotated_segment_size)   //OMIT~~~//
-        <<","<<round(rotated_segment_centroid_y/rotated_segment_size)<<")"<<endl;                       //OMIT~~~//
         
-    rotated_segment_centroid_x = round(rotated_segment_centroid_x/rotated_segment_size); //TEST~~~//
-    rotated_segment_centroid_y = round(rotated_segment_centroid_y/rotated_segment_size); //TEST~~~//
+    rotated_segment_centroid_x = round(rotated_segment_centroid_x/rotated_segment_size);
+    rotated_segment_centroid_y = round(rotated_segment_centroid_y/rotated_segment_size);
     cout<<"centroid coordinates (old): ("<<rotated_segment_centroid_x<<","<<rotated_segment_centroid_y<<")"<<endl;
     
     for(int x=larger_dimension+2; x>=0; --x)      //print test segment//
@@ -1290,7 +1402,6 @@ void secondary_processor::remove_similar_rasters_2()	//compare and remove simila
     }
     
     cout<<"re-centred raster about origin"<<endl;
-    //cout<<"centroid: ("<<rotated_segment_centroid_x<<","<<rotated_segment_centroid_y<<")"<<endl;
     for(int x=larger_dimension/2+1; x>=-larger_dimension/2-1; --x)
     {
       for(int y=-larger_dimension/2-1; y<larger_dimension/2+1; ++y)
@@ -1301,19 +1412,6 @@ void secondary_processor::remove_similar_rasters_2()	//compare and remove simila
       }
       cout<<endl;
     }
-    
-    //-------------------------------------------------------------------// //print out raster index values//
-    //cout<<endl<<"test_segment: "<<endl;
-    
-    //QList<int> test_segment_print_list = test_segment_print.toList();
-    //qSort(test_segment_print_list);
-    
-    //for(int asd=0; asd<test_segment_print_list.size(); ++asd)
-    //{
-      //cout<<test_segment_print_list.at(asd)<<" ";
-    //}
-    //cout<<endl<<endl;
-    //-------------------------------------------------------------------//
   
     //DIAGNOSTICS//
     cout<<"w: "<<test_width<<"\tH:" <<test_height<<endl;      //OMIT~~~
@@ -1323,9 +1421,6 @@ void secondary_processor::remove_similar_rasters_2()	//compare and remove simila
     //DIAGNOSTICS//    
     
     test_segment_print.clear();
-  
-    //int loop_counter;
-    //cin>>loop_counter;
   }
   
   //==================================================================================================//
@@ -1737,7 +1832,7 @@ void secondary_processor::remove_similar_rasters_2()	//compare and remove simila
   cout<<endl<<"Removing: "<<similar_raster_list.size()<<"/"<<calibration_seed_number*8<<endl;     //OMIT~~~//
   cout<<"Similarity Threshold: "<<100-100*similar_threshold<<"%"<<endl;                            //OMIT~~~//
 //--------------------------------------------------------------//
-  /*cout<<endl<<"segment_num: "<<endl;            
+  /*cout<<endl<<"segment_num: "<<endl;
   for(int g=0; g<segment_num.size(); ++g)
   {
     cout<<segment_num[g]<<" ";
@@ -1760,6 +1855,635 @@ void secondary_processor::remove_similar_rasters_2()	//compare and remove simila
 //---------------------------------------------------------------//
   cout<<endl<<"----------------------------Calibration Data Ready-----------------------------"<<endl;
 }
+//==================================================================================================================================================//
+void secondary_processor::raster_comparison_2(int cluster_num, bool* bool_raster_p)  //function for comparing raster library images to live/camera images
+{
+  cout<<endl<<"<Random Function Test>"<<endl<<endl; //OMIT~~~//
+//==================================================================================================================================================//
+  //initializations//
+  int camera_seed_size;
+  int calibration_seed_size;
+  int combined_raster_size;
+
+  float larger_area = 0;
+  float area_percent;
+  int score = 0;
+  
+  QList<int> calibration_seed;
+  QList<int> camera_seed;
+  
+  float best_score = 1;
+  int best_raster = 0;        //raster # with best fit to raster from camera
+  int best_raster_size = 0;
+  float y_scaling;
+  int yfactor = 1;            //TEST?~~~//
+  
+  QSet<int> calibrated_seed_set;
+  QSet<int> random_seed_set;
+  QSet<int> random_seed_set_2;
+  QSet<int> random_seed_set_3;
+  QSet<int> random_seed_set_4;
+  QSet<int> similar_raster_set = similar_raster_list.toSet();
+
+  int rotated_raster_index = 0;		//remapped index for rasters after shifts and rotation
+
+//==================================================================================================================================================//
+  //transformation of camera seed image//
+  half_width = width/2;
+  half_height = height/2;
+
+  start_raster_x = -half_width;   //define boundaries of raster image in enlarged raster
+  start_raster_y = -half_height;
+  end_raster_x = half_width;
+  end_raster_y = half_height;
+  
+  x_scale_factor = 1.0*average_width/average_height;
+  y_scale_factor = 1.0;
+
+  for (double y=start_raster_y; y<end_raster_y; ++y)	//performs transformations on seeds from camera//
+  {
+    for (double x=start_raster_x; x<end_raster_x; ++x)
+    {  
+      raster_position_in_container = (x-start_raster_x)+width*(y-start_raster_y);
+      if(bool_raster_p[raster_position_in_container])
+      {
+        shifted_x = round(x/x_scale_factor);
+        shifted_y = round(y/y_scale_factor);
+        unshifted_x = shifted_x;
+        unshifted_y = shifted_y;
+
+        rotated_raster_index = round(unshifted_x+width*unshifted_y); //TEST~~~//
+        camera_seed.append(rotated_raster_index);
+      }
+    }
+  }
+//==================================================================================================================================================//
+  //single seed raster comparisons, for testing//
+  /*int library_seed_width, library_seed_height, larger_library_dimension;
+  int library_seed_start, library_seed_end;
+  int raster_selected;
+  QSet<int> library_raster;
+  int centroid_x, centroid_y;   //calcs stored in <rotated_centroid_x, rotated_centroid_y//
+    
+  for(int library_seed_number=0; library_seed_number<rotated_image_zeroes_list.size()-1; ++library_seed_number)
+  {
+    centroid_x = rotated_centroid_x.at(library_seed_number);
+    centroid_y = rotated_centroid_y.at(library_seed_number);
+    
+    raster_selected = library_seed_number/8;                              //retrieve raster variables//
+    raster_selected = 3*raster_selected;                                  //
+    library_seed_width = raw_image_zeroes_list.at(raster_selected + 1);   //
+    library_seed_height = raw_image_zeroes_list.at(raster_selected + 2);  //
+    
+    if(library_seed_number != 0) library_seed_start = rotated_image_zeroes_list[library_seed_number-1]+1;  //define start + end of rasters//
+    else library_seed_start = 0;                                                                           //
+    library_seed_end = rotated_image_zeroes_list[library_seed_number]-1;                                   //
+    
+    if(rotated_image_dimensions.at(library_seed_number*3+1) > rotated_image_dimensions.at(library_seed_number*3+2)) //determine printout container dimensions//
+    {                                                                                                               //
+      larger_library_dimension = rotated_image_dimensions.at(library_seed_number*3+1);                              //
+    }                                                                                                               //
+    else larger_library_dimension = rotated_image_dimensions.at(library_seed_number*3+2);                           //
+    
+    for(int i=library_seed_start; i<library_seed_end; ++i)                                              //retrieve raster into QSet//
+    {                                                                                                   //
+      //library_raster.insert(rotated_image_list.at(i));                                                //
+      library_raster.insert(rotated_image_list.at(i) - (centroid_x + library_seed_width*centroid_y));   //
+    }                                                                                                   //
+    
+    QSet<int> camera_seed_to_set = camera_seed.toSet();   //removing doubles//
+    camera_seed.clear();                                  //
+    camera_seed = camera_seed_to_set.toList();            //
+    camera_seed_to_set.clear();                           //
+    
+    //print library image and camera image//
+    int raster_area_count = 0;
+    for(int q=end_raster_y; q>=start_raster_y; --q)
+    {
+      for(int r=start_raster_x/x_scale_factor-2; r<end_raster_x/x_scale_factor+2; ++r)
+      {
+        //if((r+width*q) == 0) cout<<"X ";
+        //else if(camera_seed.contains(r+width*q) && library_raster.contains(r+library_seed_width*q))
+        if(camera_seed.contains(r+width*q) && library_raster.contains(r+library_seed_width*q))
+        {
+          //cout<<"o ";
+        }
+        else if(library_raster.contains(r+library_seed_width*q))
+        {
+          //cout<<"b ";
+          ++raster_area_count;
+        }
+        else if(camera_seed.contains(r+width*q))
+        {
+          //cout<<"a ";
+          ++raster_area_count;
+        }
+        //else cout<<". ";
+      }
+      //cout<<endl;
+    }
+    
+    //finding best single seed overlap//
+    camera_seed_size = camera_seed.size();
+    calibration_seed_size = library_raster.size();
+    if(camera_seed_size > calibration_seed_size) larger_area = camera_seed_size;
+    else larger_area = calibration_seed_size;
+    area_percent = raster_area_count/larger_area;
+    if(area_percent < best_score) 
+    {
+      best_score = area_percent;
+      best_raster = library_seed_number;
+      best_raster_size = calibration_seed_size;
+    }
+    library_raster.clear();
+  }*/
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//  
+  QSet<int> camera_seed_set = camera_seed.toSet();  	//might be able to omit this section entirely
+  qSort(camera_seed.begin(), camera_seed.end());		  //sort single raster in ascending order
+  camera_seed.clear();
+  camera_seed = camera_seed_set.toList();     			  //TEST~~~//
+  qSort(camera_seed.begin(), camera_seed.end());		  //sort single raster in ascending order
+  camera_seed_size = camera_seed.size();
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+  
+//===========================================================================================================//
+//---------------------------------------------random function test------------------------------------------//
+//===========================================================================================================//
+  
+  seed_number_overlap_test = 4; //initialized as global//
+  
+  int loop_iterations;
+  int redundancy_score;   //overlap between library rasters//
+  srand(time(NULL));
+       
+  int row_start = round(-(width/x_scale_factor)/2);           //define raster container boundaries based on camera seed dimensions//
+  int row_end = round((width/x_scale_factor)/2);
+  int column_start = round(-(height/y_scale_factor)/2);
+  int column_end = round((height/y_scale_factor)/2);
+  
+  int overlap_seed_number = 4;
+  int random_raster[overlap_seed_number];                     //random library seed
+  int random_x[overlap_seed_number] = {0};                    //random shift amounts
+  int random_y[overlap_seed_number] = {0};
+  int total_shift[overlap_seed_number] = {0};
+  
+  int random_raster_selected[overlap_seed_number];
+  int rotated_raster_container_width[overlap_seed_number];    //compressed image dimensions
+  int rotated_raster_container_height[overlap_seed_number];
+  int rotated_raster_index_width[overlap_seed_number];        //raw image dimensions
+  int rotated_raster_index_height[overlap_seed_number];
+  int library_centroid_x[overlap_seed_number];                //centroids - rotated image rasters
+  int library_centroid_y[overlap_seed_number];
+  
+  int segment_start[overlap_seed_number];                     //start and end of random raster selected//
+  int segment_end[overlap_seed_number];
+  
+  int overlap_score;
+  float current_score;
+  
+  //approximate number of seeds present in library raster image//
+  float best_score_array[overlap_seed_number] = {0};
+  
+//========================================================================================================================================================// latest test //
+  
+  seed_number_overlap_test = 4; //value should be given from primary processor//
+  
+  for(int overlap_number=0; overlap_number<seed_number_overlap_test; ++overlap_number)   //multiple random//
+  {
+    //---------------------------------------------------------------//    
+    best_score = 100;
+    loop_iterations = 0;
+    //---------------------------------------------------------------//
+    
+    while(loop_iterations < 25)
+    {
+      score = 0;
+      overlap_score = 0;
+      redundancy_score = 0;
+      current_score = 1;
+      
+//--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
+      
+      if(loop_iterations == 0)  //selects new random library raster//
+      {
+        //select random raster from library//
+        random_raster[overlap_number] = rand() % index_zero_positions_list.size();
+        random_raster_selected[overlap_number] = random_raster[overlap_number]/8;
+      
+        //retrieve raster dimensions and other variables//
+        rotated_raster_container_width[overlap_number] = rotated_image_dimensions.at(random_raster[overlap_number]*3+1);
+        rotated_raster_container_height[overlap_number] = rotated_image_dimensions.at(random_raster[overlap_number]*3+2);
+        rotated_raster_index_width[overlap_number] = raw_image_zeroes_list.at(random_raster_selected[overlap_number]*3+1);
+        rotated_raster_index_height[overlap_number] = raw_image_zeroes_list.at(random_raster_selected[overlap_number]*3+2);
+        library_centroid_x[overlap_number] = rotated_centroid_x.at(random_raster_selected[overlap_number]);
+        library_centroid_y[overlap_number] = rotated_centroid_y.at(random_raster_selected[overlap_number]);
+      }
+      
+      //define start and end points of selected rasters//
+      if(random_raster[overlap_number] > 0) segment_start[overlap_number] = index_zero_positions_list[random_raster[overlap_number]-1]+2;	//define start and end points of raster selected
+      else segment_start[overlap_number] = 0;
+      segment_end[overlap_number] = index_zero_positions_list[random_raster[overlap_number]]-1;
+      //if(!random_seed_set.empty()) random_seed_set.clear(); //need to create code to clear and replace seeds if matches are not close enough//
+      
+      //retrieve images and apply shifts//
+      if(overlap_number >= 0)
+      {
+        random_x[0] = rand() % 5 + (-2);
+        random_y[0] = (rand() % 5 + (-2))*rotated_raster_index_width[0];
+        for(int j=segment_start[0]; j<segment_end[0]; ++j) random_seed_set.insert(rotated_image_list[j] + random_x[0] + random_y[0] + total_shift[0]);
+      }
+      if(overlap_number >= 1)
+      {
+        random_x[1] = rand() % 5 + (-2);
+        random_y[1] = (rand() % 5 + (-2))*rotated_raster_index_width[1];
+        for(int j=segment_start[1]; j<segment_end[1]; ++j) random_seed_set_2.insert(rotated_image_list[j] + random_x[1] + random_y[1] + total_shift[1]);
+      }
+      if(overlap_number >= 2)
+      {
+        random_x[2] = rand() % 5 + (-2);
+        random_y[2] = (rand() % 5 + (-2))*rotated_raster_index_width[2];
+        for(int j=segment_start[2]; j<segment_end[2]; ++j) random_seed_set_3.insert(rotated_image_list[j] + random_x[2] + random_y[2] + total_shift[2]);
+      }
+      if(overlap_number >= 3)
+      {
+        random_x[3] = rand() % 5 + (-2);
+        random_y[3] = (rand() % 5 + (-2))*rotated_raster_index_width[3];
+        for(int j=segment_start[3]; j<segment_end[3]; ++j) random_seed_set_4.insert(rotated_image_list[j] + random_x[3] + random_y[3] + total_shift[3]);
+      }
+      
+//--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
+      //Just for calculating scores//
+      int unique_library_area = 0;
+      int unique_camera_area = 0;
+      int redundancy_area = 0;
+      int camera_library_area = 0; //TEST~~~//
+      
+      int image_size_buffer = 5;
+      for(int q=column_end+image_size_buffer; q>=column_start-image_size_buffer; --q)
+      {
+        for(int r=row_start-image_size_buffer; r<row_end+image_size_buffer; ++r)
+        {
+          {
+            if((random_seed_set.contains((r+rotated_raster_index_width[0]*q)+(library_centroid_x[0]+rotated_raster_index_width[0]*library_centroid_y[0]))        //region of overlaps with camera image//
+               || random_seed_set_2.contains((r+rotated_raster_index_width[1]*q)+(library_centroid_x[1]+rotated_raster_index_width[1]*library_centroid_y[1]))
+               || random_seed_set_3.contains((r+rotated_raster_index_width[2]*q)+(library_centroid_x[2]+rotated_raster_index_width[2]*library_centroid_y[2]))
+               || random_seed_set_4.contains((r+rotated_raster_index_width[3]*q)+(library_centroid_x[3]+rotated_raster_index_width[3]*library_centroid_y[3])))
+               && (camera_seed.contains(r+width*q)))
+            {
+              ++camera_library_area;
+            }
+            if((random_seed_set.contains((r+rotated_raster_index_width[0]*q)+(library_centroid_x[0]+rotated_raster_index_width[0]*library_centroid_y[0]))        //region of overlaps between library rasters//
+               && (random_seed_set_2.contains((r+rotated_raster_index_width[1]*q)+(library_centroid_x[1]+rotated_raster_index_width[1]*library_centroid_y[1]))
+               || random_seed_set_3.contains((r+rotated_raster_index_width[2]*q)+(library_centroid_x[2]+rotated_raster_index_width[2]*library_centroid_y[2]))
+               || random_seed_set_4.contains((r+rotated_raster_index_width[3]*q)+(library_centroid_x[3]+rotated_raster_index_width[3]*library_centroid_y[3])))))
+            {
+              ++redundancy_area;
+            }
+            if((random_seed_set_2.contains((r+rotated_raster_index_width[1]*q)+(library_centroid_x[1]+rotated_raster_index_width[1]*library_centroid_y[1]))
+               && (random_seed_set_3.contains((r+rotated_raster_index_width[2]*q)+(library_centroid_x[2]+rotated_raster_index_width[2]*library_centroid_y[2]))
+               || random_seed_set_4.contains((r+rotated_raster_index_width[3]*q)+(library_centroid_x[3]+rotated_raster_index_width[3]*library_centroid_y[3])))))
+            {
+              ++redundancy_area;
+            }
+            if((random_seed_set_3.contains((r+rotated_raster_index_width[2]*q)+(library_centroid_x[2]+rotated_raster_index_width[2]*library_centroid_y[2]))
+               && random_seed_set_4.contains((r+rotated_raster_index_width[3]*q)+(library_centroid_x[3]+rotated_raster_index_width[3]*library_centroid_y[3]))))
+            {
+              ++redundancy_area;
+            }
+            
+            if(!(random_seed_set.contains((r+rotated_raster_index_width[0]*q)+(library_centroid_x[0]+rotated_raster_index_width[0]*library_centroid_y[0]))  //region of non-overlaps with camera//
+               || random_seed_set_2.contains((r+rotated_raster_index_width[1]*q)+(library_centroid_x[1]+rotated_raster_index_width[1]*library_centroid_y[1]))
+               || random_seed_set_3.contains((r+rotated_raster_index_width[2]*q)+(library_centroid_x[2]+rotated_raster_index_width[2]*library_centroid_y[2]))
+               || random_seed_set_4.contains((r+rotated_raster_index_width[3]*q)+(library_centroid_x[3]+rotated_raster_index_width[3]*library_centroid_y[3])))
+               && (camera_seed.contains(r+width*q)))
+            {
+              ++unique_camera_area;
+            }
+            
+            else if(random_seed_set.contains((r+rotated_raster_index_width[0]*q)+(library_centroid_x[0]+rotated_raster_index_width[0]*library_centroid_y[0])))   //region of non-overlaps between library rasters//
+            {
+              ++unique_library_area;
+            }
+            else if(random_seed_set_2.contains((r+rotated_raster_index_width[1]*q)+(library_centroid_x[1]+rotated_raster_index_width[1]*library_centroid_y[1])))
+            {
+              ++unique_library_area;
+            }
+            else if(random_seed_set_3.contains((r+rotated_raster_index_width[2]*q)+(library_centroid_x[2]+rotated_raster_index_width[2]*library_centroid_y[2])))
+            {
+              ++unique_library_area;
+            }
+            else if(random_seed_set_4.contains((r+rotated_raster_index_width[3]*q)+(library_centroid_x[3]+rotated_raster_index_width[3]*library_centroid_y[3])))
+            {
+              ++unique_library_area;
+            }
+          }
+        }
+      }
+      
+      //testing ideal scoring formula to determine overlap scoring//
+      //current_score = 1.0*(unique_library_area+unique_camera_area)/(unique_camera_area+unique_library_area+redundancy_area);                                //TEST~~~//
+      //current_score = 1.0*(unique_library_area+unique_camera_area+redundancy_area*0.50)/(unique_camera_area+unique_library_area+redundancy_area);           //TEST~~~//
+      //current_score = 1.0*(unique_library_area+unique_camera_area*1.00+redundancy_area*0.50)/(unique_camera_area+unique_library_area+camera_library_area);  //TEST~~~//
+      //current_score = 1.0*(unique_library_area+unique_camera_area*1.00+redundancy_area*1.00)/(unique_camera_area+unique_library_area+camera_library_area);  //TEST~~~//
+      //current_score = 1.0*(unique_library_area+unique_camera_area*1.00+redundancy_area*1.50)/(unique_camera_area+unique_library_area+camera_library_area);  //TEST~~~//
+      //current_score = 1.0*(unique_library_area+unique_camera_area*1.00+redundancy_area*2.00)/(unique_camera_area+unique_library_area+camera_library_area);  //TEST~~~//
+      //current_score = 1.0*(unique_library_area+unique_camera_area*1.00+redundancy_area*4.00)/(unique_camera_area+unique_library_area+camera_library_area);  //TEST~~~//
+      //current_score = 1.0*(unique_library_area+unique_camera_area*1.50+redundancy_area*4.00)/(unique_camera_area+unique_library_area+camera_library_area);  //TEST~~~//
+      //current_score = 1.0*(unique_library_area+unique_camera_area*1.50+redundancy_area*6.00)/(unique_camera_area+unique_library_area+camera_library_area);  //TEST~~~//
+      
+      //current_score = 1.0*(unique_library_area+unique_camera_area*2.00+redundancy_area*1.00)/(camera_seed.size());    //TEST~~~// 02_06_2019
+      //current_score = 1.0*(unique_library_area+unique_camera_area*2.00+redundancy_area*3.00)/(camera_seed.size());    //TEST~~~// 02_06_2019
+      current_score = 1.0*(unique_library_area+unique_camera_area*1.00+redundancy_area*1.00)/(camera_seed.size());    //TEST~~~// 02_06_2019
+      
+      cout<<"unique_library_area: "<<unique_library_area<<"\tunique_camera_area: "
+          <<unique_camera_area<<"\tredundancy_area: "<<redundancy_area<<endl;
+      //cout<<"effective_area: "<<unique_library_area+unique_camera_area+redundancy_area<<endl;
+      cout<<"camera_seed_size: "<<camera_seed.size()<<endl;
+      cout<<"score %: "<<1.0*(unique_library_area+unique_camera_area)/(unique_camera_area+unique_library_area+redundancy_area)
+          <<"\tscore %: "<<current_score<<"\toverlap_number: "<<overlap_number<<endl;
+      
+      unique_library_area = 0;
+      unique_camera_area = 0;
+      redundancy_area = 0;
+      
+//--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
+      
+      //TEST - Visualization//
+      
+      for(int q=column_end+image_size_buffer; q>=column_start-image_size_buffer; --q)
+      {
+        for(int r=row_start-image_size_buffer; r<row_end+image_size_buffer; ++r)
+        { 
+          //if((r+width*q) == 0) cout<<"X "; //OMIT~~~//
+          if(overlap_number == 3)
+          {
+            if((random_seed_set.contains((r+rotated_raster_index_width[0]*q)+(library_centroid_x[0]+rotated_raster_index_width[0]*library_centroid_y[0]))            //overlap with camera seed//
+               || random_seed_set_2.contains((r+rotated_raster_index_width[1]*q)+(library_centroid_x[1]+rotated_raster_index_width[1]*library_centroid_y[1]))
+               || random_seed_set_3.contains((r+rotated_raster_index_width[2]*q)+(library_centroid_x[2]+rotated_raster_index_width[2]*library_centroid_y[2]))
+               || random_seed_set_4.contains((r+rotated_raster_index_width[3]*q)+(library_centroid_x[3]+rotated_raster_index_width[3]*library_centroid_y[3])))
+               && (camera_seed.contains(r+width*q)))
+            {
+              cout<<"o ";
+              ++overlap_score;
+            }
+            else if(((random_seed_set.contains((r+rotated_raster_index_width[0]*q)+(library_centroid_x[0]+rotated_raster_index_width[0]*library_centroid_y[0]))        //overlaps with library seeds//
+                    || random_seed_set_2.contains((r+rotated_raster_index_width[1]*q)+(library_centroid_x[1]+rotated_raster_index_width[1]*library_centroid_y[1]))
+                    || random_seed_set_3.contains((r+rotated_raster_index_width[2]*q)+(library_centroid_x[2]+rotated_raster_index_width[2]*library_centroid_y[2])))
+                    && (random_seed_set_4.contains((r+rotated_raster_index_width[3]*q)+(library_centroid_x[3]+rotated_raster_index_width[3]*library_centroid_y[3]))))
+                    
+                    || ((random_seed_set.contains((r+rotated_raster_index_width[0]*q)+(library_centroid_x[0]+rotated_raster_index_width[0]*library_centroid_y[0]))
+                    || random_seed_set_2.contains((r+rotated_raster_index_width[1]*q)+(library_centroid_x[1]+rotated_raster_index_width[1]*library_centroid_y[1])))
+                    && random_seed_set_3.contains((r+rotated_raster_index_width[2]*q)+(library_centroid_x[2]+rotated_raster_index_width[2]*library_centroid_y[2])))
+                    
+                    || (random_seed_set.contains((r+rotated_raster_index_width[0]*q)+(library_centroid_x[0]+rotated_raster_index_width[0]*library_centroid_y[0]))
+                    && random_seed_set_2.contains((r+rotated_raster_index_width[1]*q)+(library_centroid_x[1]+rotated_raster_index_width[1]*library_centroid_y[1]))))
+            {
+              cout<<"- ";
+              ++redundancy_score;
+            }
+            else if(random_seed_set.contains((r+rotated_raster_index_width[0]*q)+(library_centroid_x[0]+rotated_raster_index_width[0]*library_centroid_y[0])))         //no overlapping//
+            {
+              cout<<"1 ";
+              ++score;
+            }
+            else if(random_seed_set_2.contains((r+rotated_raster_index_width[1]*q)+(library_centroid_x[1]+rotated_raster_index_width[1]*library_centroid_y[1])))
+            {
+              cout<<"2 ";
+              ++score;
+            }
+            else if(random_seed_set_3.contains((r+rotated_raster_index_width[2]*q)+(library_centroid_x[2]+rotated_raster_index_width[2]*library_centroid_y[2])))
+            {
+              cout<<"3 ";
+              ++score;
+            }
+            else if(random_seed_set_4.contains((r+rotated_raster_index_width[3]*q)+(library_centroid_x[3]+rotated_raster_index_width[3]*library_centroid_y[3])))
+            {
+              cout<<"4 ";
+              ++score;
+            }
+            else if(camera_seed.contains(r+width*q))
+            {
+              cout<<"c ";
+              ++score;
+            }
+            else cout<<". ";
+          }
+
+          if(overlap_number == 2)
+          {
+            if((random_seed_set.contains((r+rotated_raster_index_width[0]*q)+(library_centroid_x[0]+rotated_raster_index_width[0]*library_centroid_y[0]))            //overlap with camera seed//
+               || random_seed_set_2.contains((r+rotated_raster_index_width[1]*q)+(library_centroid_x[1]+rotated_raster_index_width[1]*library_centroid_y[1]))
+               || random_seed_set_3.contains((r+rotated_raster_index_width[2]*q)+(library_centroid_x[2]+rotated_raster_index_width[2]*library_centroid_y[2])))
+               && (camera_seed.contains(r+width*q)))
+            {
+              cout<<"o ";
+              ++overlap_score;
+            }
+            else if(((random_seed_set.contains((r+rotated_raster_index_width[0]*q)+(library_centroid_x[0]+rotated_raster_index_width[0]*library_centroid_y[0]))           //overlaps with library seeds//
+                    || random_seed_set_2.contains((r+rotated_raster_index_width[1]*q)+(library_centroid_x[1]+rotated_raster_index_width[1]*library_centroid_y[1])))
+                    && random_seed_set_3.contains((r+rotated_raster_index_width[2]*q)+(library_centroid_x[2]+rotated_raster_index_width[2]*library_centroid_y[2])))
+                    
+                    || (random_seed_set.contains((r+rotated_raster_index_width[0]*q)+(library_centroid_x[0]+rotated_raster_index_width[0]*library_centroid_y[0]))
+                    && random_seed_set_2.contains((r+rotated_raster_index_width[1]*q)+(library_centroid_x[1]+rotated_raster_index_width[1]*library_centroid_y[1]))))
+            {
+              cout<<"- ";
+              ++redundancy_score;
+            }
+            else if(random_seed_set.contains((r+rotated_raster_index_width[0]*q)+(library_centroid_x[0]+rotated_raster_index_width[0]*library_centroid_y[0])))            //no overlapping//
+            {
+              cout<<"1 ";
+              ++score;
+            }
+            else if(random_seed_set_2.contains((r+rotated_raster_index_width[1]*q)+(library_centroid_x[1]+rotated_raster_index_width[1]*library_centroid_y[1])))
+            {
+              cout<<"2 ";
+              ++score;
+            }
+            else if(random_seed_set_3.contains((r+rotated_raster_index_width[2]*q)+(library_centroid_x[2]+rotated_raster_index_width[2]*library_centroid_y[2])))
+            {
+              cout<<"3 ";
+              ++score;
+            }
+            else if(camera_seed.contains(r+width*q))
+            {
+              cout<<"c ";
+              ++score;
+            }
+            else cout<<". ";
+          }
+          
+          if(overlap_number == 1)
+          {
+            if((random_seed_set.contains((r+rotated_raster_index_width[0]*q)+(library_centroid_x[0]+rotated_raster_index_width[0]*library_centroid_y[0]))            //overlap with camera seed//
+               || random_seed_set_2.contains((r+rotated_raster_index_width[1]*q)+(library_centroid_x[1]+rotated_raster_index_width[1]*library_centroid_y[1])))
+               && (camera_seed.contains(r+width*q))) 
+            {
+              cout<<"o ";
+              ++overlap_score;
+            }
+            else if(random_seed_set.contains((r+rotated_raster_index_width[0]*q)+(library_centroid_x[0]+rotated_raster_index_width[0]*library_centroid_y[0]))            //overlaps with library seeds//
+                    && random_seed_set_2.contains((r+rotated_raster_index_width[1]*q)+(library_centroid_x[1]+rotated_raster_index_width[1]*library_centroid_y[1])))
+            {
+              cout<<"- ";
+              ++redundancy_score;
+            }
+            else if(random_seed_set.contains((r+rotated_raster_index_width[0]*q)+(library_centroid_x[0]+rotated_raster_index_width[0]*library_centroid_y[0])))            //no overlapping//
+            {
+              cout<<"1 ";
+              ++score;
+            }
+            else if(random_seed_set_2.contains((r+rotated_raster_index_width[1]*q)+(library_centroid_x[1]+rotated_raster_index_width[1]*library_centroid_y[1])))
+            {
+              cout<<"2 ";
+              ++score;
+            }
+            else if(camera_seed.contains(r+width*q))
+            {
+              cout<<"c ";
+              ++score;
+            }
+            else cout<<". ";
+          }
+          
+          if(overlap_number == 0)
+          {
+            if(random_seed_set.contains((r+rotated_raster_index_width[0]*q)+(library_centroid_x[0]+rotated_raster_index_width[0]*library_centroid_y[0]))         //overlap with camera seed//
+               && (camera_seed.contains(r+width*q)))
+            {
+              cout<<"o ";
+              ++overlap_score;
+            }
+            else if(random_seed_set.contains((r+rotated_raster_index_width[0]*q)+(library_centroid_x[0]+rotated_raster_index_width[0]*library_centroid_y[0])))   //no overlapping//
+            {
+              cout<<"1 ";
+              ++score;
+            }
+            else if(camera_seed.contains(r+width*q))
+            {
+              cout<<"c ";
+              ++score;
+            }
+            else cout<<". ";
+          }
+        }
+        cout<<endl;
+      }
+      //TEST - Visualization//
+//--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
+      
+      //scoring and shifting//
+      if(!random_seed_set.isEmpty()) random_seed_set.clear();
+      if(!random_seed_set_2.isEmpty()) random_seed_set_2.clear();
+      if(!random_seed_set_3.isEmpty()) random_seed_set_3.clear();
+      if(!random_seed_set_4.isEmpty()) random_seed_set_4.clear();
+      
+      //store shift if current score is better than best score so far//
+      if(current_score < best_score)
+      {
+        if(overlap_number >= 0)
+        {
+          best_score = current_score;
+          total_shift[0] = random_x[0] + random_y[0] + total_shift[0];
+        }
+        if(overlap_number >= 1)
+        {
+          best_score = current_score;
+          total_shift[1] = random_x[1] + random_y[1] + total_shift[1];
+        }
+        if(overlap_number >= 2)
+        {
+          best_score = current_score;
+          total_shift[2] = random_x[2] + random_y[2] + total_shift[2];
+        }
+        if(overlap_number >= 3)
+        {
+          best_score = current_score;
+          total_shift[3] = random_x[3] + random_y[3] + total_shift[3];
+        }
+      }
+      ++loop_iterations;
+      int loop_counter;   //OMIT~~~//
+      cin>>loop_counter;  //OMIT~~~//
+    }
+    best_score_array[overlap_number] = best_score; //TEST~~~//
+  }
+  
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//  //OMIT~~~//
+  for(int q=column_end; q>=column_start; --q)
+  {
+    for(int r=row_start; r<row_end; ++r)
+    {
+      if(camera_seed.contains(r+width*q)) cout<<"o ";
+      else cout<<". ";
+    }
+    cout<<endl;
+  }
+  
+  cout<<endl<<endl<<"best_score_array: "<<endl;   //OMIT~~~//
+  for(int asda=0; asda<4; ++asda)                 //
+  {                                               //
+    cout<<best_score_array[asda]<<" ";            //
+  }                                               //
+  
+  int loop_counter;
+  cin>>loop_counter;
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~// //OMIT~~~//
+//========================================================================================================================================================//  latest test //
+  
+//===========================================================================================================//
+//------------------------------------------random calibration overlap---------------------------------------//
+//===========================================================================================================//
+}
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//  determine centroids within camera_image
+  //determining number of centroids seeds to use//
+  //have access to all library_seed centroids//
+  
+  /*if(best_score < 0.1)  //threshold value should be a dynamic variable value//
+  {
+    cluster_num = 1;
+  }
+  else
+  {
+    //perform k-means clustering//
+  }
+  
+  cout<<"expected seed #"<<endl<<"inflection: ("<<cluster_num<<")\toverlap: ("<<seed_number_overlap_test<<")"<<endl;*/
+  
+  //arbitrary selection of cluster seed locations//
+  
+  //if(cluster_num >= 1) cout<<"c1_x: "<<c1_x<<"  c1_y: "<<c1_y<<endl;  //OMIT~~~
+  //if(cluster_num >= 2) cout<<"c2_x: "<<c2_x<<"  c2_y: "<<c2_y<<endl;  //OMIT~~~
+  //if(cluster_num >= 3) cout<<"c3_x: "<<c3_x<<"  c3_y: "<<c3_y<<endl;  //OMIT~~~
+  //if(cluster_num >= 4) cout<<"c4_x: "<<c4_x<<"  c4_y: "<<c4_y<<endl;  //OMIT~~~
+  
+  //display_raster_p[c2_mean_x+width*c2_mean_y]='~';      //centroid
+  
+  //temporary: calculate percentage of centroid relative to centre//
+  //float percentage_c1_x, percentage_c2_x, percentage_c3_x, percentage_c4_x;
+  //float percentage_c1_y, percentage_c2_y, percentage_c3_y, percentage_c4_y;
+  
+  //percentage_c1_x = 1.0*c1_x/(width);
+  //percentage_c2_x = 1.0*c2_x/(width);
+  //percentage_c3_x = 1.0*c3_x/(width);
+  //percentage_c4_x = 1.0*c4_x/(width);
+  //percentage_c1_y = 1.0*c1_y/(height);
+  //percentage_c2_y = 1.0*c2_y/(height);
+  //percentage_c3_y = 1.0*c3_y/(height);
+  //percentage_c4_y = 1.0*c4_y/(height);
+  
+  //if(cluster_num >= 1) cout<<"c1x_%: "<<percentage_c1_x<<"  c1y_%: "<<percentage_c1_y<<endl;  //OMIT~~~
+  //if(cluster_num >= 2) cout<<"c2x_%: "<<percentage_c2_x<<"  c2y_%: "<<percentage_c2_y<<endl;  //OMIT~~~
+  //if(cluster_num >= 3) cout<<"c3x_%: "<<percentage_c3_x<<"  c3y_%: "<<percentage_c3_y<<endl;  //OMIT~~~
+  //if(cluster_num >= 4) cout<<"c4x_%: "<<percentage_c4_x<<"  c4y_%: "<<percentage_c4_y<<endl;  //OMIT~~~
+
+  //int loop_counter;   //OMIT~~~//
+  //cin>>loop_counter;  //OMIT~~~//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//  determine centroids within camera_image
+
+
 //==================================================================================================================================================//
 
 void secondary_processor::raster_comparison(int cluster_num, bool* bool_raster_p)  //function for comparing raster library images to live/camera images
@@ -1894,8 +2618,9 @@ void secondary_processor::raster_comparison(int cluster_num, bool* bool_raster_p
   //int library_seed_centroid = 0;
   //-----------------------------------------------------------------------------------------------------------// //TEST~~~//
   //TEST=================================================================~~~//visualization - printout to terminal
-      /*int raster_area_count = 0;      //OMIT~~~//
+      int raster_area_count = 0;      //OMIT~~~//
       
+      cout<<endl<<"\033[1;4;37mCamera Seed Image\033[0m\n"<<endl; //OMIT~~~//
       for (int q=height; q>=0; --q)   //TEST~~~//
       {
         for(int r=(width/2-width/x_scale_factor/2-1); r<(width/2 + width/x_scale_factor/2+1); ++r)       //TEST~~~//
@@ -1910,7 +2635,7 @@ void secondary_processor::raster_comparison(int cluster_num, bool* bool_raster_p
           //if((r + width*q) == camera_seed_centroid) cout<<"X "; //OMIT~~~//
         }
         cout<<endl;
-      }*/
+      }
   //========================================================================//
 //------------------------------------------------------------------------------------------------------------------------------------------//
   QSet<int> camera_seed_set = camera_seed.toSet();
@@ -1940,7 +2665,7 @@ void secondary_processor::raster_comparison(int cluster_num, bool* bool_raster_p
   //QSet<int> camera_seed_set = camera_seed.toSet();  	//might be able to omit this section entirely
   qSort(camera_seed.begin(), camera_seed.end());		    //sort single raster in ascending order
   camera_seed.clear();
-  camera_seed = camera_seed_set.toList();     			    //TEST~~
+  camera_seed = camera_seed_set.toList();     			    //TEST~~~//
   qSort(camera_seed.begin(), camera_seed.end());		    //sort single raster in ascending order
   camera_seed_size = camera_seed.size();
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -1959,7 +2684,7 @@ void secondary_processor::raster_comparison(int cluster_num, bool* bool_raster_p
       calibration_seed.append(index_list[j]);
     }
     calibration_seed_size = calibration_seed.size();
-      
+    
     score = 0;    
     i = 0;
     j = 0;

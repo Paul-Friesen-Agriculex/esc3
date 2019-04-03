@@ -660,6 +660,7 @@ void processor::add_line(unsigned char* start_p)
               
       //if(show_blob_bool)
       //if(show_blob_bool && blob_seed_count>1) //TEST~~~ //to disable and re-enable seed raster generation
+      //if(blob_seed_count > 1)
       {
         cout<<blob_seed_count <<" seeds in blob\n";
         cout<<"  area = "<<blob_list[blob_index]->area<<endl;
@@ -701,10 +702,15 @@ void processor::add_line(unsigned char* start_p)
         //secondary_processor* secondary_processor_p = new secondary_processor; //ORIGINAL~~~//
         
         //secondary_processor::secondary_processor(int width, int heright, int area, processor* set_processor_p)
-        secondary_processor* secondary_processor_p = new secondary_processor(blob_list[blob_index] -> width,            //TEST~~~//
-                                                                             blob_list[blob_index] -> height,           //
-                                                                             blob_list[blob_index] -> area,             //
-                                                                             blob_list[blob_index] -> bool_raster_p);   //
+        
+        if(((number_listed_rasters < calibration_seed_number) && (blob_seed_count == 1)) || ((number_listed_rasters >= calibration_seed_number) && (blob_seed_count > 1)))  //Toggle for multiple seeds only~~~//
+        {
+          secondary_processor* secondary_processor_p = new secondary_processor(blob_list[blob_index] -> width,            //TEST~~~//
+                                                                               blob_list[blob_index] -> height,           //
+                                                                               blob_list[blob_index] -> area,             //
+                                                                               blob_list[blob_index] -> bool_raster_p);   //
+        }
+        
         
         /*if(number_listed_rasters <= calibration_seed_number)                                      //OMIT~~~//
         {                                                                                           //

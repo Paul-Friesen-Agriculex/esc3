@@ -35,6 +35,10 @@
 #include "macro_screen.hpp"	  //TEST~~~
 //#include "table.hpp"        //TEST~~~ //access barcodes and count from table
 
+//01_30_2019//
+#include <QDir>       //checks if file directory exists//
+#include <QFileInfo>  //checks if file exists//
+
 
 Q_DECLARE_METATYPE(crop)
 
@@ -191,7 +195,27 @@ centre::centre():
   connect(diagnostics_console_p, SIGNAL(reset_time_tests_signal()), processor_p, SLOT(reset_time_tests()));
   
   tm_macro_updated = 0; 
-  
+ 
+ //----------------------------------------------------------------------------------------------------------------// 01_30_2019
+  //checks if settings folder contains backup files//
+  if(!(QDir("settings").exists()))
+  {
+    QDir().mkdir("settings");
+    cout<<endl<<"...missing \"settings\" folder, creating new..."<<endl;
+  }
+  bool fileExists = QFileInfo::exists("settings/batch_backup") && QFileInfo("settings/batch_backup").isFile();
+  if(!fileExists)
+  {
+    std::ofstream macros("settings/batch_backup",(std::ofstream::out));
+    cout<<endl<<"missing file: \"batch_backup\", creating new"<<endl;
+  }
+  fileExists = QFileInfo::exists("settings/totalize_backup") && QFileInfo("settings/totalize_backup").isFile();
+  if(!fileExists)
+  {
+    std::ofstream macros("settings/totalize_backup",(std::ofstream::out));
+    cout<<endl<<"missing file: \"totalize_backup\", creating new"<<endl;
+  }
+//----------------------------------------------------------------------------------------------------------------//
 }
 
 centre::~centre()
@@ -889,7 +913,6 @@ void centre::load_macros()	//TEST~~~ connecting macros screen
   //char substitution[30];  //yet to be implemeneted//
   //char seed_count[30];
 //----------------------------------------------------------------------------------------------------------------//
-
   {
     //table_p = new table;
 	  ifstream barcodes("settings/totalize_backup");

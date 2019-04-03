@@ -110,6 +110,7 @@ class secondary_processor
   void remove_similar_rasters_3();   //TEST~~~ just for printout
 
   void raster_comparison(int cluster_num, bool* bool_raster_p);  //--TEST~~~~~~ troubles with persistance and pointer to array defined in main processor
+  void raster_comparison_2(int cluster_num, bool* bool_raster_p);  //--TEST~~~~~~ re-implementation attempt//
   //void raster_comparison(int cluster_num);                     //--TEST~~~~~~ ideal minimal number of parameters to pass
  
   bool write_calibration_data_file();	      //--- writes calibration data to file if none exist	---//
