@@ -4,49 +4,65 @@
 
 #include <QWidget>
 #include <QString>
+#include <QList>
 
 class QImage;
+struct spreadsheet_column;
 
 enum envelope_field_type{Ubuntu_mono, code_39};
 
 struct envelope_field
 {
-  int column;
+  spreadsheet_column* column_p;
   envelope_field_type type;
-  QString text;
   int x;
   int y;
-  int height;
-  envelope_field* next;
+  int h;
 };
 
-class envelope : public QWidget
+class envelope : public QObject
 {
   Q_OBJECT
 
   private:
-  QImage* image_p;
-  envelope_field* first_field;
+  QList<envelope_field> field_list;
+  int selected_field;
   static const float pixels_per_mm = 25;
-  
-  
-  protected:
-  void paintEvent(QPaintEvent* event);
+  void refresh_image();
 
-  public:
-  envelope(QWidget *parent = 0);
-  ~envelope();
-  void set_size(int width, int height);//dimensions mm
-  //values to be entered in next field. measurements mm
-  int column;
-  envelope_field_type type;
-  QString text;
-  int x;
-  int y;
+  //envelope dimensions mm
+  int width;
   int height;
 
-  public slots:
-  void enter_field();
+  //default values for next field entry
+  int x;
+  int y;
+  int h;
+  envelope_field_type type;
+
+  int sample_row;//row number of spreadsheet line to use as sample
+  
+  public:
+  envelope();
+  ~envelope();
+  QImage* image_p;
+  void set_size(int width, int height);//dimensions mm - printed size
+  int get_width();
+  int get_height();
+  
+  //position of selected field
+  int get_selected_x();
+  int get_selected_y();
+  int get_selected_h();
+  envelope_field_type get_selected_type();
+  
+  void move_selected_x(int val);
+  void move_selected_y(int val);
+  void move_selected_h(int val);
+  void change_selected_type(envelope_field_type val);
+  
+  void enter_field(spreadsheet_column* column_p_s);
+  int delete_field(QString heading);//return 1 on success, 0 on failure
   void print();
 };
 

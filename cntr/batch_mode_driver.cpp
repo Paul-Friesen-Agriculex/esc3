@@ -53,11 +53,17 @@ batch_mode_driver::batch_mode_driver(centre* centre_p_s, cutgate* cutgate_p_s)
   ss_setup_path = "";
   envelope_layout_path = "";
   envelope_p = new envelope;
+//  column_for_next_field_p = 0;
+  sample_row = 0;
+  print_envelope = false;
 //  spreadsheet_line = 0;
 }
   
 batch_mode_driver::~batch_mode_driver()
 {
+
+  cout<<"\n\n*********************batch_mode_driver destructor\n\n";
+
   delete count_rate_predictor_p;
   count_rate_predictor_p = 0;
   for(int i=0; i<program_size; ++i) delete program[i];

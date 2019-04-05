@@ -20,12 +20,12 @@ void code_39_writer::draw_bars(char w1, char w2, char w3, char w4, char w5, char
 {
   if(w1 == 'w')
   {
-    target_p -> drawRect(x, y, wide_width, height);
+    target_p -> drawRect(x, y, wide_width, -height);
     x += wide_width;
   }
   else
   {
-    target_p -> drawRect(x, y, narrow_width, height);
+    target_p -> drawRect(x, y, narrow_width, -height);
     x += narrow_width;
   }
   if(w2 == 'w')
@@ -38,12 +38,12 @@ void code_39_writer::draw_bars(char w1, char w2, char w3, char w4, char w5, char
   }
   if(w3 == 'w')
   {
-    target_p -> drawRect(x, y, wide_width, height);
+    target_p -> drawRect(x, y, wide_width, -height);
     x += wide_width;
   }
   else
   {
-    target_p -> drawRect(x, y, narrow_width, height);
+    target_p -> drawRect(x, y, narrow_width, -height);
     x += narrow_width;
   }
   if(w4 == 'w')
@@ -56,12 +56,12 @@ void code_39_writer::draw_bars(char w1, char w2, char w3, char w4, char w5, char
   }
   if(w5 == 'w')
   {
-    target_p -> drawRect(x, y, wide_width, height);
+    target_p -> drawRect(x, y, wide_width, -height);
     x += wide_width;
   }
   else
   {
-    target_p -> drawRect(x, y, narrow_width, height);
+    target_p -> drawRect(x, y, narrow_width, -height);
     x += narrow_width;
   }
   if(w6 == 'w')
@@ -74,12 +74,12 @@ void code_39_writer::draw_bars(char w1, char w2, char w3, char w4, char w5, char
   }
   if(w7 == 'w')
   {
-    target_p -> drawRect(x, y, wide_width, height);
+    target_p -> drawRect(x, y, wide_width, -height);
     x += wide_width;
   }
   else
   {
-    target_p -> drawRect(x, y, narrow_width, height);
+    target_p -> drawRect(x, y, narrow_width, -height);
     x += narrow_width;
   }
   if(w8 == 'w')
@@ -92,12 +92,12 @@ void code_39_writer::draw_bars(char w1, char w2, char w3, char w4, char w5, char
   }
   if(w9 == 'w')
   {
-    target_p -> drawRect(x, y, wide_width, height);
+    target_p -> drawRect(x, y, wide_width, -height);
     x += wide_width;
   }
   else
   {
-    target_p -> drawRect(x, y, narrow_width, height);
+    target_p -> drawRect(x, y, narrow_width, -height);
     x += narrow_width;
   }
   x += narrow_width;

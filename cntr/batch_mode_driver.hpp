@@ -12,6 +12,7 @@
 
 class QTimer;
 class count_rate_predictor;
+class envelope;
 
 struct bm_set //batch mode set of packs
 {
@@ -176,7 +177,6 @@ class batch_mode_driver : public QObject
   int lines_left_to_fill;//number of packs for current seed_lot_bar_code still to be filled.  set by get_next_spreadsheet_line_number().
 //  QList<bool> pack_filled;//used to mark when a packet has been filled
   ss_setup* ss_setup_p;
-  envelope* envelope_p;
   QString ss_setup_path;
   void load_ss_setup();
   void clear_ss_setup();
@@ -189,6 +189,12 @@ class batch_mode_driver : public QObject
   //saving spreadsheet setup files
   QString bm_save_ss_setup_filename;//new filename just entered.  Set back to blank when file is saved.
   void save_ss_setup(QString filename);
+  
+  //envelope
+  envelope* envelope_p;
+//  spreadsheet_column* column_for_next_field_p;
+  int sample_row;//row to be used for a sample during envelope setup
+  bool print_envelope;
   
   
   void list_program();//in terminal - diagnostics
