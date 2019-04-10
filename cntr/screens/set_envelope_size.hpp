@@ -7,6 +7,7 @@ class button;
 class QGridLayout;
 class QLabel;
 class QSlider;
+class QTimer;
 
 class set_envelope_size : public screen
 {
@@ -14,10 +15,12 @@ class set_envelope_size : public screen
   
   public:
   set_envelope_size(centre*set_centre_p, batch_mode_driver* batch_mode_driver_p_s);
+  ~set_envelope_size();
   
   private slots:
 	  void back_button_clicked();
     void ok_button_clicked();
+    void run();
   
   private:
     batch_mode_driver* batch_mode_driver_p;
@@ -29,5 +32,6 @@ class set_envelope_size : public screen
     QSlider* height_slider_p;
 	  button* ok_button_p;
 	  QGridLayout* layout_p;
+    QTimer* timer_p;
 };
 #endif

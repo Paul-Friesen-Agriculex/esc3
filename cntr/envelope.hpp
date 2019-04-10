@@ -8,8 +8,10 @@
 
 class QImage;
 struct spreadsheet_column;
+class envelope_feeder_brother;
+class QTimer;
 
-enum envelope_field_type{Ubuntu_mono, code_39};
+enum envelope_field_type{Ubuntu_mono, code_39, none};
 
 struct envelope_field
 {
@@ -25,10 +27,11 @@ class envelope : public QObject
   Q_OBJECT
 
   private:
-  QList<envelope_field> field_list;
   int selected_field;
-  static const float pixels_per_mm = 25;
+  static const float pixels_per_mm = 47;
   void refresh_image();
+  envelope_feeder_brother* e_f_brother_p;
+  QTimer* timer_p;
 
   //envelope dimensions mm
   int width;
@@ -43,6 +46,7 @@ class envelope : public QObject
   int sample_row;//row number of spreadsheet line to use as sample
   
   public:
+  QList<envelope_field> field_list;
   envelope();
   ~envelope();
   QImage* image_p;
@@ -63,7 +67,11 @@ class envelope : public QObject
   
   void enter_field(spreadsheet_column* column_p_s);
   int delete_field(QString heading);//return 1 on success, 0 on failure
+  void select_previous_field();
+  void select_next_field();
+  
   void print();
+  void print(int line_number);
 };
 
 #endif

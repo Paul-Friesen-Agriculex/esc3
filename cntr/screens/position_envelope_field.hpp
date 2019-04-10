@@ -20,9 +20,11 @@ class envelope_picture : public QWidget
   
   public:
   envelope_picture(QImage* qimage_s);
+  void set_current_position(int x, int y);
   
   private:
   QImage* envelope_qimage_p;
+  int current_x, current_y;
   
   protected: 
   void paintEvent(QPaintEvent* event);
@@ -34,10 +36,14 @@ class position_envelope_field : public screen
   
   public:
   position_envelope_field(centre*set_centre_p, batch_mode_driver* batch_mode_driver_p_s);
+  ~position_envelope_field();
   
   private slots:
 	  void back_button_clicked();
-    void next_field_button_clicked();
+    void select_previous_button_clicked();
+    void select_next_button_clicked();
+    void test_print_button_clicked();
+    void new_field_button_clicked();
     void done_button_clicked();
     void text_button_toggled(bool val);
     void code39_button_toggled(bool val);
@@ -50,6 +56,9 @@ class position_envelope_field : public screen
     batch_mode_driver* batch_mode_driver_p;
 	  QLabel* message_p;
     button* back_button_p;
+    button* select_previous_button_p;
+    button* select_next_button_p;
+    button* test_print_button_p;
     QGroupBox* type_box_p;
     QVBoxLayout* type_box_layout_p;
     QRadioButton* text_button_p;
@@ -60,7 +69,7 @@ class position_envelope_field : public screen
     QSlider* y_slider_p;
     QLabel* h_label_p;
     QSlider* h_slider_p;
-	  button* next_field_button_p;
+	  button* new_field_button_p;
 	  button* done_button_p;
     envelope* envelope_p;
     envelope_picture* envelope_picture_p;

@@ -6,6 +6,7 @@
 #include "set_envelope_size.hpp"
 #include "button.hpp"
 #include "batch_mode_driver.hpp"
+#include <QTimer>
 
 using namespace std;
 
@@ -37,6 +38,17 @@ set_envelope_size::set_envelope_size(centre* set_centre_p, batch_mode_driver* ba
   connect(back_button_p, SIGNAL(clicked()), this, SLOT(back_button_clicked()));
   connect(ok_button_p, SIGNAL(clicked()), this, SLOT(ok_button_clicked()));
   setLayout(layout_p);
+  
+  timer_p = new QTimer;
+  connect(timer_p, SIGNAL(timeout()), this, SLOT(run()));
+  timer_p -> start(10);
+}
+
+set_envelope_size::~set_envelope_size()
+{
+  timer_p -> stop();
+  delete timer_p;
+  timer_p = 0;
 }
 
 void set_envelope_size::back_button_clicked()
@@ -52,5 +64,12 @@ void set_envelope_size::ok_button_clicked()
   centre_p -> screen_done = true;
 }
 
-
+void set_envelope_size::run()
+{
+  QString width_slider_string = QString("Width = %1").arg(width_slider_p->value());
+  width_label_p -> setText(width_slider_string);
+  QString height_slider_string = QString("Height = %1").arg(height_slider_p->value());
+  height_label_p -> setText(height_slider_string);
+}
+  
 

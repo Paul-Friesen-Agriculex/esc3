@@ -857,6 +857,11 @@ screen::screen(centre* set_centre_p)
     
     "QLabel {"
         "font-size: 13pt;}"
+        
+    "QGroupBox{"
+//        "background: white}"
+        "border: 1px solid black}"
+        "margin: 2px"
   );
 }
 //==============================================================================================================//  //TEST~~~ 11_14_2018

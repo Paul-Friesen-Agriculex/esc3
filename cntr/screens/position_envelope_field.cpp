@@ -20,10 +20,19 @@ envelope_picture::envelope_picture(QImage* qimage_s)
   envelope_qimage_p = qimage_s;
 }
 
+void envelope_picture::set_current_position(int x, int y)
+{
+  current_x = x;
+  current_y = y;
+}
+
 void envelope_picture::paintEvent(QPaintEvent*)
 {
   QPainter painter(this);
   painter.drawImage(rect(), *envelope_qimage_p, envelope_qimage_p->rect() );
+//  painter.setBrush(QBrush(Qt::red));
+//  painter.drawEllipse(current_x-5, current_y-5, 10, 10);
+//  painter.setBrush(QBrush(Qt::black));
 }
   
 position_envelope_field::position_envelope_field(centre* set_centre_p, batch_mode_driver* batch_mode_driver_p_s)
@@ -35,6 +44,9 @@ position_envelope_field::position_envelope_field(centre* set_centre_p, batch_mod
   batch_mode_driver_p = batch_mode_driver_p_s;
   message_p = new QLabel("Position the field");
   back_button_p = new button("Back");
+  select_previous_button_p = new button("Select\nprevious field");
+  select_next_button_p = new button("Select\nnext field");
+  test_print_button_p = new button("Test print");
   type_box_p = new QGroupBox("Field Type");
   text_button_p = new QRadioButton("Text");
   code39_button_p = new QRadioButton("Code 39");
@@ -42,16 +54,16 @@ position_envelope_field::position_envelope_field(centre* set_centre_p, batch_mod
   type_box_layout_p -> addWidget(text_button_p);
   type_box_layout_p -> addWidget(code39_button_p);
   type_box_p -> setLayout(type_box_layout_p);
-  x_label_p = new QLabel("X");
+  x_label_p = new QLabel("X ");
   x_slider_p = new QSlider(Qt::Horizontal);
   x_slider_p -> setMinimum(0);
   x_slider_p -> setMaximum(batch_mode_driver_p->envelope_p->get_width());
-  y_label_p = new QLabel("Y");
+  y_label_p = new QLabel("Y ");
   y_slider_p = new QSlider(Qt::Horizontal);
   y_slider_p -> setMinimum(0);
   cout<<"y_slider_p setMaximum "<<batch_mode_driver_p->envelope_p->get_height()<<endl;
   y_slider_p -> setMaximum(batch_mode_driver_p->envelope_p->get_height());
-  h_label_p = new QLabel("Height");
+  h_label_p = new QLabel("Height ");
   h_slider_p = new QSlider(Qt::Horizontal);
   h_slider_p -> setMinimum(0);
   cout<<"h_slider_p setMaximum "<<batch_mode_driver_p->envelope_p->get_height()/5<<endl;
@@ -60,28 +72,35 @@ position_envelope_field::position_envelope_field(centre* set_centre_p, batch_mod
   envelope_picture_p = new envelope_picture(envelope_p->image_p);
   envelope_picture_p -> setMinimumSize(envelope_p->get_width()*2, envelope_p->get_height()*2);
   envelope_picture_p -> setMaximumSize(envelope_p->get_width()*2, envelope_p->get_height()*2);
-  next_field_button_p = new button("Next field");
+  new_field_button_p = new button("New field");
   done_button_p = new button("Done");
   layout_p = new QGridLayout;
   layout_p->addWidget(message_p, 0, 0, 1, 2);
-  layout_p->addWidget(back_button_p, 0, 2);
-  layout_p->addWidget(type_box_p, 1, 0, 1, 2);
-  layout_p->addWidget(x_label_p, 2, 0);
-  layout_p->addWidget(x_slider_p, 2, 1);
-  layout_p->addWidget(y_label_p, 3, 0);
-  layout_p->addWidget(y_slider_p, 3, 1);
-  layout_p->addWidget(h_label_p, 4, 0);
-  layout_p->addWidget(h_slider_p, 4, 1);
-  layout_p->addWidget(envelope_picture_p, 1, 2, 2, 2);
-  layout_p->addWidget(next_field_button_p, 3, 2);
-  layout_p->addWidget(done_button_p, 3, 3);
+  layout_p->addWidget(back_button_p, 0, 3);
+  layout_p->addWidget(select_previous_button_p, 1, 1);
+  layout_p->addWidget(select_next_button_p, 1, 2);
+  layout_p->addWidget(test_print_button_p, 3, 1);
+  layout_p->addWidget(type_box_p, 1, 0, 3, 1);
+  type_box_p->setBackgroundRole(QPalette::AlternateBase);
+  layout_p->addWidget(x_label_p, 4, 0);
+  layout_p->addWidget(x_slider_p, 4, 1, 1, 2);
+  layout_p->addWidget(y_label_p, 5, 0);
+  layout_p->addWidget(y_slider_p, 5, 1, 1, 2);
+  layout_p->addWidget(h_label_p, 6, 0);
+  layout_p->addWidget(h_slider_p, 6, 1, 1, 2);
+  layout_p->addWidget(envelope_picture_p, 1, 3, 4, 2);
+  layout_p->addWidget(new_field_button_p, 6, 3);
+  layout_p->addWidget(done_button_p, 6, 4);
   setLayout(layout_p);
 
   cout<<"p1\n";
 
   
   connect(back_button_p, SIGNAL(clicked()), this, SLOT(back_button_clicked()));
-  connect(next_field_button_p, SIGNAL(clicked()), this, SLOT(next_field_button_clicked()));
+  connect(select_previous_button_p, SIGNAL(clicked()), this, SLOT(select_previous_button_clicked()));
+  connect(select_next_button_p, SIGNAL(clicked()), this, SLOT(select_next_button_clicked()));
+  connect(test_print_button_p, SIGNAL(clicked()), this, SLOT(test_print_button_clicked()));
+  connect(new_field_button_p, SIGNAL(clicked()), this, SLOT(new_field_button_clicked()));
   connect(done_button_p, SIGNAL(clicked()), this, SLOT(done_button_clicked()));
   connect(x_slider_p, SIGNAL(valueChanged(int)), this, SLOT(set_x(int)));
   connect(y_slider_p, SIGNAL(valueChanged(int)), this, SLOT(set_y(int)));
@@ -109,13 +128,35 @@ position_envelope_field::position_envelope_field(centre* set_centre_p, batch_mod
 
 }
 
+position_envelope_field::~position_envelope_field()
+{
+  timer_p -> stop();
+  delete timer_p;
+  timer_p = 0;
+}
+
 void position_envelope_field::back_button_clicked()
 {
   centre_p->add_waiting_screen(centre_p->get_previous_screen());
   centre_p->screen_done=true;
 }
 
-void position_envelope_field::next_field_button_clicked()
+void position_envelope_field::select_previous_button_clicked()
+{
+  envelope_p -> select_previous_field();
+}
+
+void position_envelope_field::select_next_button_clicked()
+{
+  envelope_p -> select_next_field();
+}
+
+void position_envelope_field::test_print_button_clicked()
+{
+  envelope_p -> print();
+}
+
+void position_envelope_field::new_field_button_clicked()
 {
   centre_p->add_waiting_screen(34);//select_envelope_field
   centre_p->screen_done = true;
@@ -164,4 +205,10 @@ void position_envelope_field::set_h(int h_s)
 void position_envelope_field::run()
 {
   envelope_picture_p -> update();
+  QString x_slider_string = QString("X = %1").arg(envelope_p->get_selected_x());
+  x_label_p -> setText(x_slider_string);
+  QString y_slider_string = QString("Y = %1").arg(envelope_p->get_selected_y());
+  y_label_p -> setText(y_slider_string);
+  QString h_slider_string = QString("Height = %1").arg(envelope_p->get_selected_h());
+  h_label_p -> setText(h_slider_string);
 }

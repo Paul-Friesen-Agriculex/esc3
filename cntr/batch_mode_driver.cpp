@@ -79,6 +79,7 @@ batch_mode_driver::~batch_mode_driver()
     ss_column_p_1 = ss_column_p_1->next;
     delete ss_column_p_2;
   }
+  delete envelope_p;
 }
 
 void batch_mode_driver::load_program()//load the program indicated by program_path
@@ -603,6 +604,10 @@ void batch_mode_driver::run()
               centre_p->add_waiting_screen(0);
               centre_p->screen_done = true;
             }
+//            cout<<"print_envelope = "<<print_envelope<<endl;
+            
+            if(print_envelope) envelope_p -> print(spreadsheet_line_number);
+            
             mode = hi_closed;
             cout<<"mode hi_closed. count "<<centre_p->count<<"\n";
           }
@@ -730,6 +735,7 @@ void batch_mode_driver::run()
               centre_p->add_waiting_screen(0);
               centre_p->screen_done = true;
             }
+            if(print_envelope) envelope_p -> print(spreadsheet_line_number);
             mode = hi_closed;
             cout<<"mode hi_closed. count "<<centre_p->count<<"\n";
           }
@@ -779,7 +785,9 @@ void batch_mode_driver::run()
       centre_p->block_endgate_opening = !pack_barcode_ok;
       ++endgate_close_counter;
       if(endgate_close_counter>=50)
+  
       {
+//        if(print_envelope) envelope_p -> print(spreadsheet_line_number);
         mode = hi_open;
         cout<<"mode hi_open. count "<<centre_p->count<<"\n";
       }
@@ -1100,6 +1108,21 @@ spreadsheet_column* batch_mode_driver::get_spreadsheet_column_pointer(int column
   return(column_p);
 }
 
+spreadsheet_column* batch_mode_driver::get_spreadsheet_column_pointer(QString column_heading)
+{
+  spreadsheet_column* column_p = ss_first_column_p;
+  while(column_p)
+  {
+    if(column_p->heading == column_heading)
+    {
+      return column_p;
+    }
+    column_p = column_p->next;
+  }
+  cout<<"get_spreadsheet_column_pointer failed\n";
+  return 0;//failed to find
+}
+
 void batch_mode_driver::clear_ss_setup()
 {
   ss_setup_p -> material_id_column = -1;
@@ -1108,7 +1131,7 @@ void batch_mode_driver::clear_ss_setup()
   ss_setup_p -> actual_count_column = -1;
   ss_setup_p -> print_time_column = -1;
   ss_setup_p -> fill_time_column = -1;
-  ss_setup_p -> envelope_setup_file = "";
+//  ss_setup_p -> envelope_setup_file = "";
 }
 
 void batch_mode_driver::fill_ss_column_pointers()
@@ -1151,8 +1174,6 @@ void batch_mode_driver::save_ss_setup(QString filename)
   stream<<ss_setup_p->print_time_column<<endl;
   stream<<"fill_time_column\n";
   stream<<ss_setup_p->fill_time_column<<endl;
-  stream<<"envelope_setup_file\n";
-  stream<<ss_setup_p->envelope_setup_file<<endl;
 
   stream<<"high_feed_speed\n";
   stream<<high_feed_speed<<endl;
@@ -1179,7 +1200,38 @@ void batch_mode_driver::save_ss_setup(QString filename)
     stream<<"display_column\n";
     stream<<display_column_numbers[i]<<endl;
   }
+
+  stream<<"print_envelope\n";
+  stream<<print_envelope<<endl;
+  if(envelope_p)
+  {
+    stream<<"envelope_p->get_width\n";
+    stream<<envelope_p->get_width()<<endl;
+    stream<<"envelope_p->get_height\n";
+    stream<<envelope_p->get_height()<<endl;
+    for(int i=0; i<envelope_p->field_list.size(); ++i)
+    {
+      stream<<"field heading\n";
+      stream<<envelope_p->field_list[i].column_p->heading<<endl;
+      stream<<"field type\n";
+      stream<<envelope_p->field_list[i].type<<endl;
+      stream<<"field x\n";
+      stream<<envelope_p->field_list[i].x<<endl;
+      stream<<"field y\n";
+      stream<<envelope_p->field_list[i].y<<endl;
+      stream<<"field h\n";
+      stream<<envelope_p->field_list[i].h<<endl;
+    }
+  }
+  
   file.close();
+}
+
+envelope_field_type envelope_field_type_convert(int val)
+{
+  if (val==0) return Ubuntu_mono;
+  if (val==1) return code_39;
+  return none;
 }
 
 void batch_mode_driver::load_ss_setup()//load the ss_setup indicated by ss_setup_path
@@ -1253,11 +1305,11 @@ void batch_mode_driver::load_ss_setup()//load the ss_setup indicated by ss_setup
         return;
       }
     }
-    else if(line == "envelope_setup_file")
-    {
-      stream.readLineInto(&subline);
-      ss_setup_p->envelope_setup_file = subline;
-    }
+//    else if(line == "envelope_setup_file")
+//    {
+//      stream.readLineInto(&subline);
+//      ss_setup_p->envelope_setup_file = subline;
+//    }
     else if(line == "high_feed_speed")
     {
       stream.readLineInto(&subline);
@@ -1368,10 +1420,87 @@ void batch_mode_driver::load_ss_setup()//load the ss_setup indicated by ss_setup
         return;
       }
     }
+    else if(line == "print_envelope")
+    {
+      stream.readLineInto(&subline);
+      print_envelope = subline.toInt(&conversion_ok_flag);
+      if(conversion_ok_flag==false)
+      {
+        cout<<"failed to convert   "<<subline.toStdString()<<"   to int\n";
+        return;
+      }
+    }
+    else if(line == "envelope_p->get_width")
+    {
+      stream.readLineInto(&subline);
+      envelope_p->set_size(subline.toInt(&conversion_ok_flag), envelope_p->get_height());
+      if(conversion_ok_flag==false)
+      {
+        cout<<"failed to convert   "<<subline.toStdString()<<"   to int\n";
+        return;
+      }
+    }
+    else if(line == "envelope_p->get_height")
+    {
+      stream.readLineInto(&subline);
+      envelope_p->set_size(envelope_p->get_width(), subline.toInt(&conversion_ok_flag));
+      if(conversion_ok_flag==false)
+      {
+        cout<<"failed to convert   "<<subline.toStdString()<<"   to int\n";
+        return;
+      }
+    }
+    else if(line == "field heading")
+    {
+      stream.readLineInto(&subline);
+      envelope_field field;
+      field.column_p = get_spreadsheet_column_pointer(subline);
+      envelope_p->field_list.append(field);
+    }
+    else if(line == "field type")
+    {
+      stream.readLineInto(&subline);
+      envelope_p->field_list[envelope_p->field_list.size()-1].type = envelope_field_type_convert(subline.toInt(&conversion_ok_flag));
+      if(conversion_ok_flag==false)
+      {
+        cout<<"failed to convert   "<<subline.toStdString()<<"   to int\n";
+        return;
+      }
+    }
+    else if(line == "field x")
+    {
+      stream.readLineInto(&subline);
+      envelope_p->field_list[envelope_p->field_list.size()-1].x = subline.toInt(&conversion_ok_flag);
+      if(conversion_ok_flag==false)
+      {
+        cout<<"failed to convert   "<<subline.toStdString()<<"   to int\n";
+        return;
+      }
+    }
+    else if(line == "field y")
+    {
+      stream.readLineInto(&subline);
+      envelope_p->field_list[envelope_p->field_list.size()-1].y = subline.toInt(&conversion_ok_flag);
+      if(conversion_ok_flag==false)
+      {
+        cout<<"failed to convert   "<<subline.toStdString()<<"   to int\n";
+        return;
+      }
+    }
+    else if(line == "field h")
+    {
+      stream.readLineInto(&subline);
+      envelope_p->field_list[envelope_p->field_list.size()-1].h = subline.toInt(&conversion_ok_flag);
+      if(conversion_ok_flag==false)
+      {
+        cout<<"failed to convert   "<<subline.toStdString()<<"   to int\n";
+        return;
+      }
+    }
 
     else
     {
-      cout<<"batch_mode_driver::load_file.  data type identifier not found.\n";
+      cout<<"batch_mode_driver::load_file.  data type identifier not found.  "<<line.toStdString()<<"\n";
     }
   }
 }
