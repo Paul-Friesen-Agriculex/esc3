@@ -72,6 +72,7 @@ class envelope : public QObject
   
   void print();
   void print(int line_number);
+  void feed();
 };
 
 #endif

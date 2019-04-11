@@ -77,8 +77,7 @@ class ss_batch : public screen
   void rescan_clicked();
   void restart_clicked();
   void save_program_clicked();
-//  void save_table_clicked();
-//  void clear_table_clicked();
+  void reprint_clicked();
   void quit_clicked();
   void run();
   
@@ -99,8 +98,7 @@ class ss_batch : public screen
   ss_batch_table* ss_table_p;
   message_box* status_box_p;
   button* save_program_button_p;
-//  button* save_table_button_p;
-//  button* clear_table_button_p;
+  button* reprint_button_p;
   button* quit_button_p;
   message_box* barcode_status_p;
   

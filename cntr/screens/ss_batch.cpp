@@ -83,8 +83,7 @@ ss_batch::ss_batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_drive
   status_box_p = new message_box;
   status_box_p -> setMinimumSize(250,100);
   save_program_button_p = new button("Save Spreadsheet\nSetup");
-//  save_table_button_p = new button("Save Table");
-//  clear_table_button_p = new button("Clear Table");
+  reprint_button_p = new button("Reprint\nenvelope");
   quit_button_p = new button("Quit");
   barcode_status_p = new message_box;
   
@@ -120,8 +119,7 @@ ss_batch::ss_batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_drive
   speed_layout_p -> addWidget(dump_speed_set_p, 2, 1);
   bottom_layout_p -> addWidget(status_box_p, 0, 0, 2, 1);
   bottom_layout_p -> addWidget(save_program_button_p, 0, 2);
-//  bottom_layout_p -> addWidget(save_table_button_p, 0, 3);
-//  bottom_layout_p -> addWidget(clear_table_button_p, 0, 4);
+  bottom_layout_p -> addWidget(reprint_button_p, 0, 3);
   bottom_layout_p -> addWidget(quit_button_p, 0, 5);
   bottom_layout_p -> addWidget(barcode_status_p, 1, 2, 1, 3);
   main_layout_p -> addWidget(top_box_p, 0, 0, 1, 2);
@@ -146,8 +144,7 @@ ss_batch::ss_batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_drive
   connect(low_speed_set_p, SIGNAL(valueChanged(int)), batch_mode_driver_p, SLOT(set_low_feed_speed(int)));
   connect(dump_speed_set_p, SIGNAL(valueChanged(int)), batch_mode_driver_p, SLOT(set_dump_feed_speed(int)));
   connect(save_program_button_p, SIGNAL(clicked()), this, SLOT(save_program_clicked()));
-//  connect(save_table_button_p, SIGNAL(clicked()), this, SLOT(save_table_clicked()));
-//  connect(clear_table_button_p, SIGNAL(clicked()), this, SLOT(clear_table_clicked()));
+  connect(reprint_button_p, SIGNAL(clicked()), this, SLOT(reprint_clicked()));
   connect(quit_button_p, SIGNAL(clicked()), this, SLOT(quit_clicked()));
   connect(barcode_line_p, SIGNAL(barcode_entered(QString)), batch_mode_driver_p, SLOT(barcode_entered(QString)));
 //  connect(batch_mode_driver_p, SIGNAL(seed_lot_barcode_entered(QString)), ss_table_p, SLOT(enter_seed_lot_barcode(QString)));
@@ -422,21 +419,12 @@ void ss_batch::save_program_clicked()
   centre_p->add_waiting_screen(29);//batch_save_ss_setup
   centre_p->screen_done = true;
 }
-/*
-void batch::save_table_clicked()
+
+void ss_batch::reprint_clicked()
 {
-  batch_mode_driver_p -> stop();
-  centre_p->set_speed(0);
-  centre_p->add_waiting_screen(20);//batch_save_table
-  centre_p->screen_done = true;
+  batch_mode_driver_p -> envelope_p -> print();
 }
 
-void batch::clear_table_clicked()
-{
-  table_p->clear();
-  barcode_line_p->setFocus();
-}
-*/
 void ss_batch::quit_clicked()
 {
   batch_mode_driver_p -> stop();

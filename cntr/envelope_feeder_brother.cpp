@@ -21,7 +21,7 @@ void envelope_feeder_brother::feed()
   fp = fopen("/sys/class/gpio/gpio173/value", "w");
   fprintf(fp, "1");
   fclose(fp);
-  feed_pulse_timer_p -> start(600);
+  feed_pulse_timer_p -> start(2000);
 }
 
 void envelope_feeder_brother::end_feed()

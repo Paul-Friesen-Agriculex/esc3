@@ -176,6 +176,7 @@ class batch_mode_driver : public QObject
   int spreadsheet_number_of_columns;
   int spreadsheet_line_number;//number of the line for the packet being filled
   int get_next_spreadsheet_line_number();//look for next line number not filled for current seed_lot_barcode.  Return -1 if no more.
+  int get_spreadsheet_line_number_after(int val);//look for line number not filled for current seed_lot_barcode, following val.  Return -1 if no more.
   int lines_left_to_fill;//number of packs for current seed_lot_bar_code still to be filled.  set by get_next_spreadsheet_line_number().
 //  QList<bool> pack_filled;//used to mark when a packet has been filled
   ss_setup* ss_setup_p;
@@ -197,6 +198,7 @@ class batch_mode_driver : public QObject
 //  spreadsheet_column* column_for_next_field_p;
   int sample_row;//row to be used for a sample during envelope setup
   bool print_envelope;
+  void print_seed_lot_envelopes(QString mat_id);
   
   
   void list_program();//in terminal - diagnostics

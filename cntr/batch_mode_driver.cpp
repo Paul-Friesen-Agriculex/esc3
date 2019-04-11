@@ -480,6 +480,17 @@ int batch_mode_driver::save_spreadsheet(QString filename)
   return 1;
 }
 
+void batch_mode_driver::print_seed_lot_envelopes(QString mat_id)
+{
+  for(int i=0; i<ss_material_id_p->data_list.size(); ++i)
+  {
+    if( (ss_material_id_p->data_list[i]==mat_id) && (ss_first_column_p->data_list[i]!="Y") )
+    {
+      envelope_p -> print(i);
+    }
+  }
+}
+
 void batch_mode_driver::list_program()
 {
   cout<<"\nbatch_mode_driver::list_program\n";
@@ -606,7 +617,16 @@ void batch_mode_driver::run()
             }
 //            cout<<"print_envelope = "<<print_envelope<<endl;
             
-            if(print_envelope) envelope_p -> print(spreadsheet_line_number);
+//            if(print_envelope) 
+//            {
+//              envelope_p -> print(spreadsheet_line_number);
+//              envelope_p -> print(get_spreadsheet_line_number_after(spreadsheet_line_number));//will not print if value is -1
+//            }
+            
+            if(print_envelope)
+            {
+              print_seed_lot_envelopes(seed_lot_barcode);
+            }
             
             mode = hi_closed;
             cout<<"mode hi_closed. count "<<centre_p->count<<"\n";
@@ -735,7 +755,11 @@ void batch_mode_driver::run()
               centre_p->add_waiting_screen(0);
               centre_p->screen_done = true;
             }
-            if(print_envelope) envelope_p -> print(spreadsheet_line_number);
+
+//            if(print_envelope) envelope_p -> print(spreadsheet_line_number);
+            
+//            if(print_envelope) envelope_p -> print(get_spreadsheet_line_number_after(spreadsheet_line_number));//will not print if value is -1
+
             mode = hi_closed;
             cout<<"mode hi_closed. count "<<centre_p->count<<"\n";
           }
@@ -788,6 +812,9 @@ void batch_mode_driver::run()
   
       {
 //        if(print_envelope) envelope_p -> print(spreadsheet_line_number);
+        
+        if(print_envelope) envelope_p -> feed();
+        
         mode = hi_open;
         cout<<"mode hi_open. count "<<centre_p->count<<"\n";
       }
@@ -882,6 +909,9 @@ void batch_mode_driver::run()
       centre_p->block_endgate_opening = !pack_barcode_ok;
       ++endgate_close_counter;
       if(endgate_close_counter>=50)      {
+
+        if(print_envelope) envelope_p -> feed();
+
         mode = dump_into_end;
         cout<<"mode dump_into_end\n";
         emit dumping();        
@@ -1523,6 +1553,19 @@ int batch_mode_driver::get_next_spreadsheet_line_number()//look for next line nu
     }
   }
   return(ret_val);
+}
+
+int batch_mode_driver::get_spreadsheet_line_number_after(int val)//look for line number not filled for current seed_lot_barcode, following val.  Return -1 if no more.
+{
+  if ( (val<0) || (val>=spreadsheet_number_of_lines) ) return(-1);//-1 used to signal no more lines
+  for(int i=val+1; i<spreadsheet_number_of_lines; ++i)
+  {
+    if(   (ss_material_id_p->data_list[i] == seed_lot_barcode)     &&     (ss_first_column_p->data_list[i]!="Y")     )
+    {
+      return(i);
+    }
+  }
+  return(-1);
 }
 
 count_rate_predictor::count_rate_predictor(centre* centre_p_s)

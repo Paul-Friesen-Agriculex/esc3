@@ -25,9 +25,9 @@ envelope::envelope()
   set_size(85, 150);
   
   e_f_brother_p = new envelope_feeder_brother;
-  timer_p = new QTimer;
-  timer_p -> setSingleShot(true);
-  connect(timer_p, SIGNAL(timeout()), e_f_brother_p, SLOT(feed()));
+//  timer_p = new QTimer;
+//  timer_p -> setSingleShot(true);
+//  connect(timer_p, SIGNAL(timeout()), e_f_brother_p, SLOT(feed()));
 }
 
 envelope::~envelope()
@@ -215,7 +215,7 @@ void envelope::print()
   painter.drawImage(image_p->rect(), *image_p);
 //  image_p -> invertPixels();
   
-  timer_p -> start(10000);
+//  timer_p -> start(10000);
 
   cout<<"end envelope::print\n";
 
@@ -223,8 +223,13 @@ void envelope::print()
 
 void envelope::print(int line_number)
 {
+  if(line_number<0) return;//-1 is used to signal no more rows
   sample_row = line_number;
   refresh_image();
   print();
 }
     
+void envelope::feed()
+{
+  e_f_brother_p->feed();
+}
