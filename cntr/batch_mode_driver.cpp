@@ -56,6 +56,7 @@ batch_mode_driver::batch_mode_driver(centre* centre_p_s, cutgate* cutgate_p_s)
 //  column_for_next_field_p = 0;
   sample_row = 0;
   print_envelope = false;
+  print_control_mode = start_on_pack_collect;
 //  spreadsheet_line = 0;
 }
   
@@ -568,37 +569,18 @@ void batch_mode_driver::run()
       cutgate_p -> open();
       centre_p->block_endgate_opening = !pack_barcode_ok;
 
-
-
-      if(use_spreadsheet == true)
+      if(seed_lot_barcode_ok == true)
       {
-        if(seed_lot_barcode_ok == true)
+        if(use_spreadsheet == true)
         {
-          
-          cout<<"before get_next_spreadsheet_line_number\n";
-          
           spreadsheet_line_number = get_next_spreadsheet_line_number();
-          
-          cout<<"about to emit refresh_screen\n";
-          
           emit refresh_screen();
-          
-          cout<<"after emit refresh_screen\n";
-          
-          
-          cout<<"spreadsheet_line_number = "<<spreadsheet_line_number<<endl;
-          
           if(spreadsheet_line_number==-1)//-1 value signals no more lines for this seed_lot_barcode
           {
             QMessageBox box;
             box.setText(QString("No unfilled rows for seed lot %1.  Dumping out.").arg(seed_lot_barcode));
             box.exec();
             restart_flag = true;
-//            mode = dump_into_cut_gate;
-//            cout<<"mode dump_into_cut_gate. count "<<centre_p->count<<"\n";
-//            dump_into_cut_gate_time.restart();
-//            old_count = centre_p -> count;
-//            dump_end_qtime.restart();
           }
           else //have valid line number to fill
           {
@@ -615,31 +597,25 @@ void batch_mode_driver::run()
               centre_p->add_waiting_screen(0);
               centre_p->screen_done = true;
             }
-//            cout<<"print_envelope = "<<print_envelope<<endl;
-            
-//            if(print_envelope) 
-//            {
-//              envelope_p -> print(spreadsheet_line_number);
-//              envelope_p -> print(get_spreadsheet_line_number_after(spreadsheet_line_number));//will not print if value is -1
-//            }
             
             if(print_envelope)
             {
-              print_seed_lot_envelopes(seed_lot_barcode);
+              if(print_control_mode==start_on_pack_collect)
+              {
+                envelope_p -> print(spreadsheet_line_number);
+              }
+              else if(print_control_mode==start_on_previous_pack_collect)
+              {
+                envelope_p -> print(spreadsheet_line_number);
+                envelope_p -> print(get_spreadsheet_line_number_after(spreadsheet_line_number));
+              }
+              else if(print_control_mode==preprint_batch)
+              {
+                print_seed_lot_envelopes(seed_lot_barcode);
+              }
             }
-            
-            mode = hi_closed;
-            cout<<"mode hi_closed. count "<<centre_p->count<<"\n";
           }
         }
-      }
-
-
-
-
-
-      if(seed_lot_barcode_ok == true)
-      {
         mode = hi_open;
         cout<<"mode hi_open\n";
       }
@@ -755,11 +731,7 @@ void batch_mode_driver::run()
               centre_p->add_waiting_screen(0);
               centre_p->screen_done = true;
             }
-
-//            if(print_envelope) envelope_p -> print(spreadsheet_line_number);
             
-//            if(print_envelope) envelope_p -> print(get_spreadsheet_line_number_after(spreadsheet_line_number));//will not print if value is -1
-
             mode = hi_closed;
             cout<<"mode hi_closed. count "<<centre_p->count<<"\n";
           }
@@ -782,10 +754,23 @@ void batch_mode_driver::run()
         mode = wait_for_endgate_to_close;
         cout<<"mode wait_for_endgate_to_close. count "<<centre_p->count<<"\n";
         endgate_close_counter = 0;
+        
+        
+        if(print_envelope)
+        {
+          if(print_control_mode==start_on_pack_collect)
+          {
+            envelope_p -> print(spreadsheet_line_number);
+          }
+          else if(print_control_mode==start_on_previous_pack_collect)
+          {
+            envelope_p -> print(get_spreadsheet_line_number_after(spreadsheet_line_number));
+          }
+        }
+        
+        
+            
       }
-      
-//      cout<<"mode hi_closed.  time_to_end="<<time_to_end<<endl;
-      
       if(time_to_end<2.0)
       {
         mode = wait_for_pack;
@@ -811,10 +796,6 @@ void batch_mode_driver::run()
       if(endgate_close_counter>=50)
   
       {
-//        if(print_envelope) envelope_p -> print(spreadsheet_line_number);
-        
-        if(print_envelope) envelope_p -> feed();
-        
         mode = hi_open;
         cout<<"mode hi_open. count "<<centre_p->count<<"\n";
       }
@@ -852,6 +833,23 @@ void batch_mode_driver::run()
           mode = wait_for_endgate_to_close;
           cout<<"mode wait_for_endgate_to_close. count "<<centre_p->count<<"\n";
           endgate_close_counter = 0;
+          
+          
+          if(print_envelope)
+          {
+            if(print_control_mode==start_on_pack_collect)
+            {
+              envelope_p -> print(spreadsheet_line_number);
+              cout<<"printed envelope prog889 "<<spreadsheet_line_number<<endl;
+            }
+            else if(print_control_mode==start_on_previous_pack_collect)
+            {
+              envelope_p -> print(get_spreadsheet_line_number_after(spreadsheet_line_number));
+            }
+          }
+          
+          
+            
         }
       }
       if(centre_p->count >= current_count_limit)//error.  over limit.
@@ -910,7 +908,7 @@ void batch_mode_driver::run()
       ++endgate_close_counter;
       if(endgate_close_counter>=50)      {
 
-        if(print_envelope) envelope_p -> feed();
+//        if(print_envelope) envelope_p -> feed();
 
         mode = dump_into_end;
         cout<<"mode dump_into_end\n";
@@ -1233,6 +1231,8 @@ void batch_mode_driver::save_ss_setup(QString filename)
 
   stream<<"print_envelope\n";
   stream<<print_envelope<<endl;
+  stream<<"print_control_mode\n";
+  stream<<print_control_mode<<endl;
   if(envelope_p)
   {
     stream<<"envelope_p->get_width\n";
@@ -1460,6 +1460,22 @@ void batch_mode_driver::load_ss_setup()//load the ss_setup indicated by ss_setup
         return;
       }
     }
+    else if(line == "print_control_mode")
+    {
+      stream.readLineInto(&subline);
+      int val = subline.toInt(&conversion_ok_flag);
+      if(conversion_ok_flag==false)
+      {
+        cout<<"failed to convert   "<<subline.toStdString()<<"   to int\n";
+        return;
+      }
+      
+      print_control_mode = static_cast<print_control_mode_e>(val);
+      
+//      if (val==0) print_control_mode=start_on_pack_collect;
+//      if (val==1) print_control_mode=start_on_previous_pack_collect;
+//      if (val==2) print_control_mode=preprint_batch;
+    }
     else if(line == "envelope_p->get_width")
     {
       stream.readLineInto(&subline);
@@ -1533,9 +1549,13 @@ void batch_mode_driver::load_ss_setup()//load the ss_setup indicated by ss_setup
       cout<<"batch_mode_driver::load_file.  data type identifier not found.  "<<line.toStdString()<<"\n";
     }
   }
+  
+  cout<<"print_control_mode = "<<print_control_mode<<endl;
+  
 }
 
 int batch_mode_driver::get_next_spreadsheet_line_number()//look for next line number not filled for current seed_lot_barcode.  Return -1 if no more.
+//NOTE: also resets value of lines_left_to_fill
 {
   int ret_val = -1;
   lines_left_to_fill = 0;

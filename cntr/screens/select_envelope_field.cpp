@@ -30,8 +30,9 @@ select_envelope_field::select_envelope_field(centre*set_centre_p, batch_mode_dri
   choice4_p=new button("");
   choice5_p=new button("");
   choice6_p=new button("");
-  next_headings_p=new button("More headings");
+  more_headings_p=new button("More headings");
   previous_headings_p=new button("Previous headings");
+  next_p=new button("Next");
   back_p=new button("Back");
   message_p=new QLabel("");
 
@@ -58,7 +59,8 @@ select_envelope_field::select_envelope_field(centre*set_centre_p, batch_mode_dri
   middle_box_p->setLayout(middle_layout_p);
   
   bottom_layout_p->addWidget(previous_headings_p,0,0);
-  bottom_layout_p->addWidget(next_headings_p,0,1);
+  bottom_layout_p->addWidget(more_headings_p,0,1);
+  bottom_layout_p->addWidget(next_p,0,2);
   bottom_box_p->setLayout(bottom_layout_p);
   
   main_layout_p->addWidget(top_box_p);
@@ -73,8 +75,9 @@ select_envelope_field::select_envelope_field(centre*set_centre_p, batch_mode_dri
   connect(choice4_p, SIGNAL(clicked()), this, SLOT(choice4_clicked()));
   connect(choice5_p, SIGNAL(clicked()), this, SLOT(choice5_clicked()));
   connect(choice6_p, SIGNAL(clicked()), this, SLOT(choice6_clicked()));
-  connect(next_headings_p, SIGNAL(clicked()), this, SLOT(next_headings_clicked()));
+  connect(more_headings_p, SIGNAL(clicked()), this, SLOT(more_headings_clicked()));
   connect(previous_headings_p, SIGNAL(clicked()), this, SLOT(previous_headings_clicked()));
+  connect(next_p, SIGNAL(clicked()), this, SLOT(next_clicked()));
   connect(back_p, SIGNAL(clicked()), this, SLOT(back_clicked()));
   
 //  QString crop_name = centre_p->crops[0].name;
@@ -132,7 +135,7 @@ void select_envelope_field::enter_choice(int column)
   centre_p->screen_done = true;
 }
 
-void select_envelope_field::next_headings_clicked()
+void select_envelope_field::more_headings_clicked()
 {
   first_heading_displayed += 6;
   display_headings();
@@ -143,6 +146,12 @@ void select_envelope_field::previous_headings_clicked()
   first_heading_displayed -= 6;
   if(first_heading_displayed<0) first_heading_displayed = 0;
   display_headings();
+}
+
+void select_envelope_field::next_clicked()
+{
+  centre_p->add_waiting_screen(35);//position envelope field
+  centre_p->screen_done=true;
 }
 
 void select_envelope_field::back_clicked()

@@ -62,7 +62,13 @@ struct ss_setup
   int fill_time_column;
 //  QString envelope_setup_file;
 };
-  
+
+enum print_control_mode_e
+{
+  start_on_pack_collect,
+  start_on_previous_pack_collect,
+  preprint_batch
+};
 
 class batch_mode_driver : public QObject
 {
@@ -199,6 +205,7 @@ class batch_mode_driver : public QObject
   int sample_row;//row to be used for a sample during envelope setup
   bool print_envelope;
   void print_seed_lot_envelopes(QString mat_id);
+  print_control_mode_e print_control_mode;
   
   
   void list_program();//in terminal - diagnostics

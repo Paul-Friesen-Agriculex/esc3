@@ -53,6 +53,7 @@ class envelope : public QObject
   void set_size(int width, int height);//dimensions mm - printed size
   int get_width();
   int get_height();
+  bool printing;//true indicates envelope is printing, so selected text should change to black.
   
   //position of selected field
   int get_selected_x();
@@ -66,7 +67,8 @@ class envelope : public QObject
   void change_selected_type(envelope_field_type val);
   
   void enter_field(spreadsheet_column* column_p_s);
-  int delete_field(QString heading);//return 1 on success, 0 on failure
+  void delete_field();//delete selected field
+  void clear_fields();//delete all fields
   void select_previous_field();
   void select_next_field();
   

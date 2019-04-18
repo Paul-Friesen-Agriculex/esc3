@@ -26,13 +26,22 @@ void envelope_picture::set_current_position(int x, int y)
   current_y = y;
 }
 
+void envelope_picture::set_start_displacement(int pixels_down)
+{
+  start_displacement = pixels_down;
+}
+
 void envelope_picture::paintEvent(QPaintEvent*)
 {
   QPainter painter(this);
-  painter.drawImage(rect(), *envelope_qimage_p, envelope_qimage_p->rect() );
-//  painter.setBrush(QBrush(Qt::red));
-//  painter.drawEllipse(current_x-5, current_y-5, 10, 10);
-//  painter.setBrush(QBrush(Qt::black));
+  painter.setBrush(QBrush(Qt::white));
+  painter.setPen(Qt::white);
+  painter.drawRect(rect());
+  //image printing actually starts 10mm down from top of envelope
+  //QImage height has been reduced 10mm to account for this.
+  //When we display the QImage here, we wish to start the display 10mm down, so that this image matches the image as it will print.
+  QRect draw_rect = QRect(0, start_displacement, width(), height()-start_displacement);
+  painter.drawImage(draw_rect, *envelope_qimage_p, envelope_qimage_p->rect() );
 }
   
 position_envelope_field::position_envelope_field(centre* set_centre_p, batch_mode_driver* batch_mode_driver_p_s)
@@ -46,6 +55,8 @@ position_envelope_field::position_envelope_field(centre* set_centre_p, batch_mod
   back_button_p = new button("Back");
   select_previous_button_p = new button("Select\nprevious field");
   select_next_button_p = new button("Select\nnext field");
+  delete_selected_button_p = new button("Delete selected");
+  clear_envelope_button_p = new button("Clear envelope");
   test_print_button_p = new button("Test print");
   type_box_p = new QGroupBox("Field Type");
   text_button_p = new QRadioButton("Text");
@@ -60,7 +71,7 @@ position_envelope_field::position_envelope_field(centre* set_centre_p, batch_mod
   x_slider_p -> setMaximum(batch_mode_driver_p->envelope_p->get_width());
   y_label_p = new QLabel("Y ");
   y_slider_p = new QSlider(Qt::Horizontal);
-  y_slider_p -> setMinimum(0);
+  y_slider_p -> setMinimum(15);
   cout<<"y_slider_p setMaximum "<<batch_mode_driver_p->envelope_p->get_height()<<endl;
   y_slider_p -> setMaximum(batch_mode_driver_p->envelope_p->get_height());
   h_label_p = new QLabel("Height ");
@@ -70,8 +81,12 @@ position_envelope_field::position_envelope_field(centre* set_centre_p, batch_mod
   h_slider_p -> setMaximum(batch_mode_driver_p->envelope_p->get_height()/5);
   envelope_p = batch_mode_driver_p -> envelope_p;
   envelope_picture_p = new envelope_picture(envelope_p->image_p);
+  
+  //get_width, get_height are in mm.  Following lines set screen display size in screen pixels
   envelope_picture_p -> setMinimumSize(envelope_p->get_width()*2, envelope_p->get_height()*2);
   envelope_picture_p -> setMaximumSize(envelope_p->get_width()*2, envelope_p->get_height()*2);
+  envelope_picture_p -> set_start_displacement(10*2);//start drawing image 10mm down
+  
   new_field_button_p = new button("New field");
   done_button_p = new button("Done");
   layout_p = new QGridLayout;
@@ -79,6 +94,8 @@ position_envelope_field::position_envelope_field(centre* set_centre_p, batch_mod
   layout_p->addWidget(back_button_p, 0, 3);
   layout_p->addWidget(select_previous_button_p, 1, 1);
   layout_p->addWidget(select_next_button_p, 1, 2);
+  layout_p->addWidget(delete_selected_button_p, 2, 1);
+  layout_p->addWidget(clear_envelope_button_p, 2, 2);
   layout_p->addWidget(test_print_button_p, 3, 1);
   layout_p->addWidget(type_box_p, 1, 0, 3, 1);
   type_box_p->setBackgroundRole(QPalette::AlternateBase);
@@ -99,6 +116,8 @@ position_envelope_field::position_envelope_field(centre* set_centre_p, batch_mod
   connect(back_button_p, SIGNAL(clicked()), this, SLOT(back_button_clicked()));
   connect(select_previous_button_p, SIGNAL(clicked()), this, SLOT(select_previous_button_clicked()));
   connect(select_next_button_p, SIGNAL(clicked()), this, SLOT(select_next_button_clicked()));
+  connect(delete_selected_button_p, SIGNAL(clicked()), this, SLOT(delete_selected_clicked()));
+  connect(clear_envelope_button_p, SIGNAL(clicked()), this, SLOT(clear_envelope_clicked()));
   connect(test_print_button_p, SIGNAL(clicked()), this, SLOT(test_print_button_clicked()));
   connect(new_field_button_p, SIGNAL(clicked()), this, SLOT(new_field_button_clicked()));
   connect(done_button_p, SIGNAL(clicked()), this, SLOT(done_button_clicked()));
@@ -144,11 +163,35 @@ void position_envelope_field::back_button_clicked()
 void position_envelope_field::select_previous_button_clicked()
 {
   envelope_p -> select_previous_field();
+
+  x_slider_p -> setValue(envelope_p->get_selected_x());
+  y_slider_p -> setValue(envelope_p->get_selected_y());
+  h_slider_p -> setValue(envelope_p->get_selected_h());
+  if(envelope_p->get_selected_type() == Ubuntu_mono) text_button_p->setChecked(true);
+  if(envelope_p->get_selected_type() == code_39) code39_button_p->setChecked(true);
+
+
 }
 
 void position_envelope_field::select_next_button_clicked()
 {
   envelope_p -> select_next_field();
+
+  x_slider_p -> setValue(envelope_p->get_selected_x());
+  y_slider_p -> setValue(envelope_p->get_selected_y());
+  h_slider_p -> setValue(envelope_p->get_selected_h());
+  if(envelope_p->get_selected_type() == Ubuntu_mono) text_button_p->setChecked(true);
+  if(envelope_p->get_selected_type() == code_39) code39_button_p->setChecked(true);
+}
+
+void position_envelope_field::delete_selected_clicked()
+{
+  envelope_p->delete_field();
+}
+
+void position_envelope_field::clear_envelope_clicked()
+{
+  envelope_p->clear_fields();
 }
 
 void position_envelope_field::test_print_button_clicked()

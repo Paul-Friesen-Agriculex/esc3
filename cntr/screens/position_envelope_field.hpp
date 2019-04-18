@@ -21,10 +21,13 @@ class envelope_picture : public QWidget
   public:
   envelope_picture(QImage* qimage_s);
   void set_current_position(int x, int y);
+  void set_start_displacement(int pixels_down);//envelope printing of image starts 10mm down from top.  
+    //This sets the number of pixels down to start the image display to make this image match envelope.
   
   private:
   QImage* envelope_qimage_p;
   int current_x, current_y;
+  int start_displacement;
   
   protected: 
   void paintEvent(QPaintEvent* event);
@@ -42,6 +45,8 @@ class position_envelope_field : public screen
 	  void back_button_clicked();
     void select_previous_button_clicked();
     void select_next_button_clicked();
+    void delete_selected_clicked();
+    void clear_envelope_clicked();
     void test_print_button_clicked();
     void new_field_button_clicked();
     void done_button_clicked();
@@ -58,6 +63,8 @@ class position_envelope_field : public screen
     button* back_button_p;
     button* select_previous_button_p;
     button* select_next_button_p;
+    button* delete_selected_button_p;
+    button* clear_envelope_button_p;
     button* test_print_button_p;
     QGroupBox* type_box_p;
     QVBoxLayout* type_box_layout_p;

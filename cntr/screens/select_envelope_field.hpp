@@ -29,8 +29,9 @@ class select_envelope_field : public screen
   void choice5_clicked();
   void choice6_clicked();
   
-  void next_headings_clicked();
+  void more_headings_clicked();
   void previous_headings_clicked();
+  void next_clicked();
   void back_clicked();
   
   private:
@@ -42,9 +43,10 @@ class select_envelope_field : public screen
   button* choice5_p;
   button* choice6_p;
   
-  button* next_headings_p;
-  button* previous_headings_p;
   button* back_p;
+  button* more_headings_p;
+  button* previous_headings_p;
+  button* next_p;
   
   void display_headings();
   

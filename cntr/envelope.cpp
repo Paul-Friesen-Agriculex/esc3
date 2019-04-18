@@ -16,6 +16,7 @@ envelope::envelope()
   
 //  cout<<"\n\n**************************envelope_constructor\n\n";
   
+  selected_field=0;
   x=10;
   y=10;
   h=5;
@@ -23,6 +24,7 @@ envelope::envelope()
   sample_row=0;
   image_p = 0;
   set_size(85, 150);
+  printing = false;
   
   e_f_brother_p = new envelope_feeder_brother;
 //  timer_p = new QTimer;
@@ -47,8 +49,8 @@ void envelope::set_size(int width_s, int height_s)//dimensions mm
   {
     delete image_p;
   }
-//  image_p = new QImage(width_s*pixels_per_mm, height_s*pixels_per_mm, QImage::Format_Mono);
-  image_p = new QImage(width_s*pixels_per_mm, height_s*pixels_per_mm, QImage::Format_RGB16);
+  //image printing actually starts 10mm down from top of envelope
+  image_p = new QImage(width_s*pixels_per_mm, (height_s-10)*pixels_per_mm, QImage::Format_RGB16);
   width = width_s;
   height = height_s;
   refresh_image();
@@ -66,26 +68,31 @@ int envelope::get_height()
 
 int envelope::get_selected_x()
 {
+  if(  (selected_field>=field_list.size())  ||  (selected_field<0)  ) return(0);//invalid
   return(field_list[selected_field].x);
 }
 
 int envelope::get_selected_y()
 {
+  if(  (selected_field>=field_list.size())  ||  (selected_field<0)  ) return(0);//invalid
   return(field_list[selected_field].y);
 }
 
 int envelope::get_selected_h()
 {
+  if(  (selected_field>=field_list.size())  ||  (selected_field<0)  ) return(0);//invalid
   return(field_list[selected_field].h);
 }
 
 envelope_field_type envelope::get_selected_type()
 {
+  if(  (selected_field>=field_list.size())  ||  (selected_field<0)  ) return(Ubuntu_mono);//invalid
   return(field_list[selected_field].type);
 }
 
 void envelope::move_selected_x(int val)
 {
+  if(  (selected_field>=field_list.size())  ||  (selected_field<0)  ) return;//invalid
   field_list[selected_field].x = val;
   x=val;
   cout<<"envelope::move_selected_x.  x="<<x<<endl;
@@ -94,6 +101,7 @@ void envelope::move_selected_x(int val)
 
 void envelope::move_selected_y(int val)
 {
+  if(  (selected_field>=field_list.size())  ||  (selected_field<0)  ) return;//invalid
   field_list[selected_field].y = val;
   y=val;
   refresh_image();
@@ -101,6 +109,7 @@ void envelope::move_selected_y(int val)
 
 void envelope::move_selected_h(int val)
 {
+  if(  (selected_field>=field_list.size())  ||  (selected_field<0)  ) return;//invalid
   field_list[selected_field].h = val;
   h=val;
   refresh_image();
@@ -108,6 +117,7 @@ void envelope::move_selected_h(int val)
 
 void envelope::change_selected_type(envelope_field_type val)
 {
+  if(  (selected_field>=field_list.size())  ||  (selected_field<0)  ) return;//invalid
   field_list[selected_field].type = val;
   type = val;
   refresh_image();
@@ -115,32 +125,36 @@ void envelope::change_selected_type(envelope_field_type val)
 
 void envelope::refresh_image()
 {
+  cout<<"envelope::refresh_image.  printing = "<<printing<<endl;
+  
+  
   image_p -> fill(QColor(255, 255, 255));
 
   QPainter painter(image_p);
   code_39_writer writer(&painter);
   for(int i=0; i<field_list.size(); ++i)
   {
-    QPen pen;
-    if(i == selected_field)
+    if( (i==selected_field) && (printing==false) )
     {
-      pen.setBrush(QBrush(Qt::red, Qt::SolidPattern));
+      painter.setPen(QPen(Qt::red));
+      painter.setBrush(QBrush(Qt::red));
     }
     else
     {
-      pen.setBrush(QBrush(Qt::black, Qt::SolidPattern));
+      painter.setPen(QPen(Qt::black));
+      painter.setBrush(QBrush(Qt::black));
     }
-    painter.setPen(pen);
     switch(field_list[i].type)
     {
       case Ubuntu_mono:
         painter.setFont(QFont("Ubuntu Mono", field_list[i].h*pixels_per_mm));
-        painter.drawText(field_list[i].x*pixels_per_mm, field_list[i].y*pixels_per_mm, field_list[i].column_p->data_list[sample_row]);
-//        cout<<"drew text "<<field_list[i].column_p->data_list[sample_row].toStdString()<<endl;
+        //image printing actually starts 10mm down from top of envelope
+        painter.drawText(field_list[i].x*pixels_per_mm, (field_list[i].y-10)*pixels_per_mm, field_list[i].column_p->data_list[sample_row]);
         break;
       case code_39:
         writer.set_size(field_list[i].h*pixels_per_mm, field_list[i].h*pixels_per_mm/20);
-        writer.write(field_list[i].x*pixels_per_mm, field_list[i].y*pixels_per_mm, &(field_list[i].column_p->data_list[sample_row]));
+        //image printing actually starts 10mm down from top of envelope
+        writer.write(field_list[i].x*pixels_per_mm, (field_list[i].y-10)*pixels_per_mm, &(field_list[i].column_p->data_list[sample_row]));
         break;
       default:
         cout<<"envelope::refresh_image - type not found\n";  
@@ -150,12 +164,13 @@ void envelope::refresh_image()
 
 void envelope::enter_field(spreadsheet_column* column_p_s)
 {
-  
-  cout<<"envelope::enter_field\n";
-  cout<<"  x = "<<x<<endl;
-  cout<<"  y = "<<y<<endl;
-  cout<<"  h = "<<h<<endl;
-  cout<<"  type = "<<type<<endl;
+  y += 10;
+  if(y>=height) y=height;
+//  cout<<"envelope::enter_field\n";
+//  cout<<"  x = "<<x<<endl;
+//  cout<<"  y = "<<y<<endl;
+//  cout<<"  h = "<<h<<endl;
+//  cout<<"  type = "<<type<<endl;
   
   envelope_field ef;
   ef.column_p = column_p_s;
@@ -174,6 +189,23 @@ void envelope::enter_field(spreadsheet_column* column_p_s)
   }
 }
 
+void envelope::delete_field()//delete selected field
+{
+  field_list.removeAt(selected_field);
+  if(selected_field>=field_list.size()) selected_field = field_list.size()-1;
+  if(selected_field<0) selected_field=0;
+//  cout<<"selected_field="<<selected_field<<endl;
+  refresh_image();
+}
+
+void envelope::clear_fields()//delete all fields
+{
+  field_list.clear();
+  selected_field = 0;
+  refresh_image();
+}
+
+/*
 int envelope::delete_field(QString heading)//return 1 on success, 0 on failure
 {
   for(int i=0; i<field_list.size(); ++i)
@@ -187,7 +219,7 @@ int envelope::delete_field(QString heading)//return 1 on success, 0 on failure
   }
   return 0;
 }
-
+*/
 void envelope::select_previous_field()
 {
   --selected_field;
@@ -205,17 +237,30 @@ void envelope::select_next_field()
 void envelope::print()
 {
   cout<<"start envelope::print\n";
+  printing = true;//black and white image for printing
+  refresh_image();
   
   QPrinter printer(QPrinter::HighResolution);
 //  QPrinter printer(QPrinter::ScreenResolution);
-  printer.setPaperSize(QPrinter::B7);
+//  printer.setPaperSize(QPrinter::B7);
   QPainter painter(&printer);
 //  image_p -> invertPixels();
 //  painter.drawImage(QRect(0,0,3000,6000), *image_p);
-  painter.drawImage(image_p->rect(), *image_p);
+
+
+
+//  painter.drawImage(image_p->rect(), *image_p);
+  QPoint startpoint( (92-width/2)*pixels_per_mm ,  -10 );
+  painter.drawImage(startpoint, *image_p);
+
+
+
 //  image_p -> invertPixels();
   
 //  timer_p -> start(10000);
+
+  printing = false;//return to colour for screen display
+  refresh_image();
 
   cout<<"end envelope::print\n";
 

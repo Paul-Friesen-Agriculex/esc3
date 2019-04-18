@@ -508,6 +508,8 @@ void totalize_save_file::enter_clicked()
 batch_save_program::batch_save_program(centre* centre_p, batch_mode_driver* batch_mode_driver_p_s)
 :keyboard(centre_p)
 {
+  message_p->setMaximumSize(500,100);  
+  
   batch_mode_driver_p = batch_mode_driver_p_s;
   QString message("Enter file name. Programs already saved for ");
   message.append(centre_p->crops[0].name);
@@ -518,10 +520,11 @@ batch_save_program::batch_save_program(centre* centre_p, batch_mode_driver* batc
   QStringList program_list = program_dir.entryList();
   for(int i=0; i<program_list.size(); ++i)
   {
+    if(i>0) message.append(", ");
     QString name = program_list[i];
     name.remove(".ESC3");
     message.append(name);
-    message.append("\n");
+//    message.append("\n");
   }
   message_p->setText(message);
   
@@ -619,6 +622,8 @@ void batch_save_table::enter_clicked()
 batch_save_ss_setup::batch_save_ss_setup(centre* centre_p, batch_mode_driver* batch_mode_driver_p_s)
 :keyboard(centre_p)
 {
+  message_p->setMaximumSize(500,100);  
+  
   batch_mode_driver_p = batch_mode_driver_p_s;
   QString message("Enter file name. Spreadsheet setups already saved for ");
   message.append(centre_p->crops[0].name);
@@ -629,10 +634,12 @@ batch_save_ss_setup::batch_save_ss_setup(centre* centre_p, batch_mode_driver* ba
   QStringList program_list = program_dir.entryList();
   for(int i=0; i<program_list.size(); ++i)
   {
+    if(i>0) message.append(", ");
+
     QString name = program_list[i];
     name.remove(".ESC3sss");
     message.append(name);
-    message.append("\n");
+//    message.append("\n");
   }
   message_p->setText(message);
   
