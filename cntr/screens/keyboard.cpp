@@ -686,3 +686,22 @@ void batch_save_ss_setup::enter_clicked()
   centre_p->screen_done=true;
   //returning to ss_batch with bm_save_ss_setup filename not blank will trigger save.  see ss_batch constructor.
 }
+
+enter_field_text::enter_field_text(centre* centre_p, batch_mode_driver* batch_mode_driver_p_s)
+:keyboard(centre_p)
+{
+//  message_p->setMaximumSize(500,100);  
+  
+  batch_mode_driver_p = batch_mode_driver_p_s;
+  QString message("Select data source for the field");
+  message_p->setText(message);
+
+  connect(enter_key_p, SIGNAL(clicked()), this, SLOT(enter_clicked()));
+}
+
+void enter_field_text::enter_clicked()
+{
+  batch_mode_driver_p->envelope_p->enter_text_field(*entry_line_p);
+  centre_p->add_waiting_screen(35);//position_envelope_field
+  centre_p->screen_done=true;
+}

@@ -20,6 +20,8 @@ struct envelope_field
   int x;
   int y;
   int h;
+  char data_source_flag;//'d' -> data.  'h' -> heading.  't' -> text entry
+  QString text;//only used in case of text entry.  otherwise blank
 };
 
 class envelope : public QObject
@@ -66,7 +68,9 @@ class envelope : public QObject
   void move_selected_h(int val);
   void change_selected_type(envelope_field_type val);
   
-  void enter_field(spreadsheet_column* column_p_s);
+  void enter_ss_data_field(spreadsheet_column* column_p_s);
+  void enter_ss_heading_field(spreadsheet_column* column_p_s);
+  void enter_text_field(QString text_s);
   void delete_field();//delete selected field
   void clear_fields();//delete all fields
   void select_previous_field();

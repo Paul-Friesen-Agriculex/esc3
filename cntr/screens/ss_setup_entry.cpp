@@ -154,7 +154,7 @@ void ss_setup_entry::enter_choice(int column)
   {
 //    cout<<"start mode f\n";
     batch_mode_driver_p -> ss_setup_p -> fill_time_column = column;
-    centre_p -> add_waiting_screen(24);
+    centre_p -> add_waiting_screen(25);//set_envelope_size
     centre_p -> screen_done = true;
 //    cout<<"end mode f\n";
   }

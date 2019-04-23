@@ -32,7 +32,6 @@ HEADERS += batch_mode_driver.hpp \
            screens/crop_edit.hpp \
            screens/crop_name_exists.hpp \
            screens/enter_program.hpp \
-           screens/envelope_layout_choice.hpp \
            screens/keyboard.hpp \
            screens/keypad.hpp \
            screens/macro_screen.hpp \
@@ -54,7 +53,8 @@ HEADERS += batch_mode_driver.hpp \
            screens/table.hpp \
            screens/tool_choice.hpp \
            screens/totalize.hpp \
-           screens/totalize_options.hpp
+           screens/totalize_options.hpp \
+           screens/select_field_data_source.hpp
 SOURCES += batch_mode_driver.cpp \
            button.cpp \
            centre.cpp \
@@ -79,7 +79,6 @@ SOURCES += batch_mode_driver.cpp \
            screens/crop_edit.cpp \
            screens/crop_name_exists.cpp \
            screens/enter_program.cpp \
-           screens/envelope_layout_choice.cpp \
            screens/keyboard.cpp \
            screens/keypad.cpp \
            screens/macro_screen.cpp \
@@ -101,7 +100,8 @@ SOURCES += batch_mode_driver.cpp \
            screens/table.cpp \
            screens/tool_choice.cpp \
            screens/totalize.cpp \
-           screens/totalize_options.cpp
+           screens/totalize_options.cpp \
+           screens/select_field_data_source.cpp
 
 QT += widgets
 QT += printsupport

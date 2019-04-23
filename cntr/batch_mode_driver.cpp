@@ -57,6 +57,7 @@ batch_mode_driver::batch_mode_driver(centre* centre_p_s, cutgate* cutgate_p_s)
   sample_row = 0;
   print_envelope = false;
   print_control_mode = start_on_pack_collect;
+  field_data_source_flag = 'd'; //use spreadsheet data in print field (not heading).
 //  spreadsheet_line = 0;
 }
   
@@ -1241,16 +1242,45 @@ void batch_mode_driver::save_ss_setup(QString filename)
     stream<<envelope_p->get_height()<<endl;
     for(int i=0; i<envelope_p->field_list.size(); ++i)
     {
-      stream<<"field heading\n";
-      stream<<envelope_p->field_list[i].column_p->heading<<endl;
-      stream<<"field type\n";
-      stream<<envelope_p->field_list[i].type<<endl;
-      stream<<"field x\n";
-      stream<<envelope_p->field_list[i].x<<endl;
-      stream<<"field y\n";
-      stream<<envelope_p->field_list[i].y<<endl;
-      stream<<"field h\n";
-      stream<<envelope_p->field_list[i].h<<endl;
+      if(envelope_p->field_list[i].data_source_flag == 'd')
+      {
+        stream<<"field heading for data\n";
+        stream<<envelope_p->field_list[i].column_p->heading<<endl;
+        stream<<"field type\n";
+        stream<<envelope_p->field_list[i].type<<endl;
+        stream<<"field x\n";
+        stream<<envelope_p->field_list[i].x<<endl;
+        stream<<"field y\n";
+        stream<<envelope_p->field_list[i].y<<endl;
+        stream<<"field h\n";
+        stream<<envelope_p->field_list[i].h<<endl;
+      }
+      if(envelope_p->field_list[i].data_source_flag == 'h')
+      {
+        stream<<"field heading for heading\n";
+        stream<<envelope_p->field_list[i].column_p->heading<<endl;
+        stream<<"field type\n";
+        stream<<envelope_p->field_list[i].type<<endl;
+        stream<<"field x\n";
+        stream<<envelope_p->field_list[i].x<<endl;
+        stream<<"field y\n";
+        stream<<envelope_p->field_list[i].y<<endl;
+        stream<<"field h\n";
+        stream<<envelope_p->field_list[i].h<<endl;
+      }
+      if(envelope_p->field_list[i].data_source_flag == 't')
+      {
+        stream<<"field for text\n";
+        stream<<envelope_p->field_list[i].text<<endl;
+        stream<<"field type\n";
+        stream<<envelope_p->field_list[i].type<<endl;
+        stream<<"field x\n";
+        stream<<envelope_p->field_list[i].x<<endl;
+        stream<<"field y\n";
+        stream<<envelope_p->field_list[i].y<<endl;
+        stream<<"field h\n";
+        stream<<envelope_p->field_list[i].h<<endl;
+      }
     }
   }
   
@@ -1496,11 +1526,28 @@ void batch_mode_driver::load_ss_setup()//load the ss_setup indicated by ss_setup
         return;
       }
     }
-    else if(line == "field heading")
+    else if(line == "field heading for data")
     {
       stream.readLineInto(&subline);
       envelope_field field;
       field.column_p = get_spreadsheet_column_pointer(subline);
+      field.data_source_flag = 'd';
+      envelope_p->field_list.append(field);
+    }
+    else if(line == "field heading for heading")
+    {
+      stream.readLineInto(&subline);
+      envelope_field field;
+      field.column_p = get_spreadsheet_column_pointer(subline);
+      field.data_source_flag = 'h';
+      envelope_p->field_list.append(field);
+    }
+    else if(line == "field for text")
+    {
+      stream.readLineInto(&subline);
+      envelope_field field;
+      field.text = subline;
+      field.data_source_flag = 't';
       envelope_p->field_list.append(field);
     }
     else if(line == "field type")

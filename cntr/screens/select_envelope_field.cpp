@@ -130,7 +130,8 @@ void select_envelope_field::choice6_clicked()
 
 void select_envelope_field::enter_choice(int column)
 {
-  batch_mode_driver_p->envelope_p->enter_field(batch_mode_driver_p->get_spreadsheet_column_pointer(column));
+  if(batch_mode_driver_p->field_data_source_flag == 'd') batch_mode_driver_p->envelope_p->enter_ss_data_field(batch_mode_driver_p->get_spreadsheet_column_pointer(column));
+  if(batch_mode_driver_p->field_data_source_flag == 'h') batch_mode_driver_p->envelope_p->enter_ss_heading_field(batch_mode_driver_p->get_spreadsheet_column_pointer(column));
   centre_p->add_waiting_screen(35);//position_envelope_field
   centre_p->screen_done = true;
 }

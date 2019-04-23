@@ -19,6 +19,7 @@ class set_envelope_size : public screen
   
   private slots:
 	  void back_button_clicked();
+    void no_envelope_button_clicked();
     void ok_button_clicked();
     void run();
   
@@ -26,6 +27,7 @@ class set_envelope_size : public screen
     batch_mode_driver* batch_mode_driver_p;
 	  QLabel* message_p;
     button* back_button_p;
+    button* no_envelope_button_p;
     QLabel* width_label_p;
     QSlider* width_slider_p;
     QLabel* height_label_p;

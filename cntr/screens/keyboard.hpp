@@ -214,5 +214,19 @@ class batch_save_ss_setup : public keyboard
   void enter_clicked();
 };
 
+class enter_field_text : public keyboard
+{
+  Q_OBJECT
+  
+  batch_mode_driver* batch_mode_driver_p;
+  
+  public:
+  enter_field_text(centre* set_centre_p, batch_mode_driver* batch_mode_driver_p_s);
+  
+  public slots:
+  void enter_clicked();
+};
+
+
 #endif
 
