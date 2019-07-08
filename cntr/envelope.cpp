@@ -149,12 +149,40 @@ void envelope::refresh_image()
       case Ubuntu_mono:
         painter.setFont(QFont("Ubuntu Mono", field_list[i].h*pixels_per_mm));
         //image printing actually starts 10mm down from top of envelope
-        painter.drawText(field_list[i].x*pixels_per_mm, (field_list[i].y-10)*pixels_per_mm, field_list[i].column_p->data_list[sample_row]);
+        if(field_list[i].data_source_flag == 'd')
+        {
+          painter.drawText(field_list[i].x*pixels_per_mm, (field_list[i].y-10)*pixels_per_mm, field_list[i].column_p->data_list[sample_row]);
+        }
+        else if(field_list[i].data_source_flag == 'h')
+        {
+          painter.drawText(field_list[i].x*pixels_per_mm, (field_list[i].y-10)*pixels_per_mm, field_list[i].column_p->heading);
+        }
+        else if(field_list[i].data_source_flag == 't')
+        {
+          painter.drawText(field_list[i].x*pixels_per_mm, (field_list[i].y-10)*pixels_per_mm, field_list[i].text);
+        }
         break;
       case code_39:
         writer.set_size(field_list[i].h*pixels_per_mm, field_list[i].h*pixels_per_mm/20);
         //image printing actually starts 10mm down from top of envelope
-        writer.write(field_list[i].x*pixels_per_mm, (field_list[i].y-10)*pixels_per_mm, &(field_list[i].column_p->data_list[sample_row]));
+//        writer.write(field_list[i].x*pixels_per_mm, (field_list[i].y-10)*pixels_per_mm, &(field_list[i].column_p->data_list[sample_row]));
+
+
+        if(field_list[i].data_source_flag == 'd')
+        {
+          writer.write(field_list[i].x*pixels_per_mm, (field_list[i].y-10)*pixels_per_mm, &field_list[i].column_p->data_list[sample_row]);
+        }
+        else if(field_list[i].data_source_flag == 'h')
+        {
+          writer.write(field_list[i].x*pixels_per_mm, (field_list[i].y-10)*pixels_per_mm, &field_list[i].column_p->heading);
+        }
+        else if(field_list[i].data_source_flag == 't')
+        {
+          writer.write(field_list[i].x*pixels_per_mm, (field_list[i].y-10)*pixels_per_mm, &field_list[i].text);
+        }
+
+
+
         break;
       default:
         cout<<"envelope::refresh_image - type not found\n";  
@@ -162,11 +190,11 @@ void envelope::refresh_image()
   }
 }
 
-void envelope::enter_field(spreadsheet_column* column_p_s)
+void envelope::enter_ss_data_field(spreadsheet_column* column_p_s)
 {
   y += 10;
   if(y>=height) y=height;
-//  cout<<"envelope::enter_field\n";
+//  cout<<"envelope::enter_ss_data_field\n";
 //  cout<<"  x = "<<x<<endl;
 //  cout<<"  y = "<<y<<endl;
 //  cout<<"  h = "<<h<<endl;
@@ -178,15 +206,54 @@ void envelope::enter_field(spreadsheet_column* column_p_s)
   ef.y = y;
   ef.h = h;
   ef.type = type;
+  ef.data_source_flag = 'd';
+  ef.text = "";
   
   field_list.append(ef);
   selected_field = field_list.size()-1;
   
-  cout<<"field_list headings\n";
-  for(int i=0; i<field_list.size(); ++i)
-  {
-    cout<<field_list[i].column_p->heading.toStdString()<<endl;
-  }
+//  cout<<"field_list headings\n";
+//  for(int i=0; i<field_list.size(); ++i)
+//  {
+//    cout<<field_list[i].column_p->heading.toStdString()<<endl;
+//  }
+}
+
+void envelope::enter_ss_heading_field(spreadsheet_column* column_p_s)
+{
+  y += 10;
+  if(y>=height) y=height;
+  
+  envelope_field ef;
+  ef.column_p = column_p_s;
+  ef.x = x;
+  ef.y = y;
+  ef.h = h;
+  ef.type = type;
+  ef.data_source_flag = 'h';
+  ef.text = "";
+  
+  field_list.append(ef);
+  selected_field = field_list.size()-1;
+}
+
+void envelope::enter_text_field(QString text_s)
+{
+  y += 10;
+  if(y>=height) y=height;
+  
+  envelope_field ef;
+  ef.column_p = 0;
+  ef.x = x;
+  ef.y = y;
+  ef.h = h;
+  ef.type = type;
+  ef.data_source_flag = 't';
+//  ef.text = batch_mode_driver_p -> text_for_envelope_field;
+  ef.text = text_s;
+  
+  field_list.append(ef);
+  selected_field = field_list.size()-1;
 }
 
 void envelope::delete_field()//delete selected field

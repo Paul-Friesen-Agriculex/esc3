@@ -201,7 +201,7 @@ void position_envelope_field::test_print_button_clicked()
 
 void position_envelope_field::new_field_button_clicked()
 {
-  centre_p->add_waiting_screen(34);//select_envelope_field
+  centre_p->add_waiting_screen(36);//select_field_data_source
   centre_p->screen_done = true;
 }
 

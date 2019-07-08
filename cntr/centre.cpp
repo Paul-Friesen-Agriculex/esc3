@@ -35,13 +35,14 @@
 #include "spreadsheet_choice.hpp"
 #include "ss_setup_choice.hpp"
 #include "ss_setup_entry.hpp"
-#include "envelope_layout_choice.hpp"
+//#include "envelope_layout_choice.hpp"
 #include "set_envelope_size.hpp"
 #include "ss_options.hpp"
 #include "ss_column_display_options.hpp"
 #include "ss_batch.hpp"
 #include "select_envelope_field.hpp"
 #include "position_envelope_field.hpp"
+#include "select_field_data_source.hpp"
 #include "macro_screen.hpp"	//TEST~~~
 //#include "table.hpp"        //TEST~~~ //access barcodes and count from table
 
@@ -438,7 +439,7 @@ void centre::run()
       case 21: screen_p=new spreadsheet_choice(this, batch_mode_driver_p); break;
       case 22: screen_p=new ss_setup_choice(this, batch_mode_driver_p); break;
       case 23: screen_p=new ss_setup_entry(this, batch_mode_driver_p); break;
-      case 24: screen_p=new envelope_layout_choice(this, batch_mode_driver_p); break;
+//      case 24: screen_p=new envelope_layout_choice(this, batch_mode_driver_p); break;
       case 25: screen_p=new set_envelope_size(this, batch_mode_driver_p); break;
 //      case : screen_p=new (this); break;
 //      case : screen_p=new (this); break;
@@ -454,8 +455,8 @@ void centre::run()
       case 33: screen_p=new ss_batch(this, batch_mode_driver_p); break;
       case 34: screen_p=new select_envelope_field(this, batch_mode_driver_p); break;
       case 35: screen_p=new position_envelope_field(this, batch_mode_driver_p); break;
-//      case : screen_p=new (this); break;
-//      case : screen_p=new (this); break;
+      case 36: screen_p=new select_field_data_source(this, batch_mode_driver_p); break;
+      case 37: screen_p=new enter_field_text(this, batch_mode_driver_p); break;
 //      case : screen_p=new (this); break;
 //      case : screen_p=new (this); break;
 //      case : screen_p=new (this); break;

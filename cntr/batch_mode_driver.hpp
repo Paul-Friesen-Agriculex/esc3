@@ -206,6 +206,8 @@ class batch_mode_driver : public QObject
   bool print_envelope;
   void print_seed_lot_envelopes(QString mat_id);
   print_control_mode_e print_control_mode;
+  char field_data_source_flag;//'d' -> data.  'h' -> heading.  't' -> text entry
+//  QString text_for_envelope_field;
   
   
   void list_program();//in terminal - diagnostics
