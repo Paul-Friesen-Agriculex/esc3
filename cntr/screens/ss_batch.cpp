@@ -342,7 +342,8 @@ void ss_batch::pack_collected(int count_to_record)
   */
 }  
 
-void ss_batch::dump_complete(int dump_count)
+//void ss_batch::dump_complete(int dump_count)
+void ss_batch::dump_complete()
 {
 //  dump_container_can_be_removed = true;
 //  dump_container_ready_count = dump_count;

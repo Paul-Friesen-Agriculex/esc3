@@ -45,6 +45,7 @@
 #include "select_field_data_source.hpp"
 #include "macro_screen.hpp"	//TEST~~~
 //#include "table.hpp"        //TEST~~~ //access barcodes and count from table
+#include "brother_envelope_feeder.hpp"
 
 
 Q_DECLARE_METATYPE(crop)
@@ -98,6 +99,7 @@ centre::centre():
   endgate_p = new endgate;
   envelope_sensor_p = new envelope_sensor;
   feeder_p = new feeder;
+  brother_envelope_feeder_p = new brother_envelope_feeder;
   run_timer_p = new QTimer;
   connect(run_timer_p, SIGNAL(timeout()), this, SLOT(run()));
   run_timer_p->start(10);
@@ -220,6 +222,11 @@ centre::~centre()
     delete screen_p;
     screen_p = 0;
   }
+  if(brother_envelope_feeder_p)
+  {
+	delete brother_envelope_feeder_p;
+	brother_envelope_feeder_p = 0;
+  }
   emit set_camera_processing(false);//cause camera thread's run() function to return
   clock_t sleep_until = clock() + 1000;//to let run function return
   while(clock()<sleep_until)
@@ -292,6 +299,7 @@ void centre::run()
 //  cutgate_state = cutgate_p->get_state();
   endgate_state = endgate_p->get_state();
   envelope_present = envelope_sensor_p->read();
+  brother_envelope_feeder_p -> run();
 
   if(current_screen==5)//totalize
   {

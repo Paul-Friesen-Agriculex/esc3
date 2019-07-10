@@ -20,6 +20,7 @@ class screen;
 class batch_mode_driver;
 class diagnostics_console;
 class macro_screen; //TEST~~~
+class brother_envelope_feeder;
 
 const int screen_wait_list_size=10;
 
@@ -57,6 +58,7 @@ class centre : public QObject
   endgate* endgate_p;
   envelope_sensor* envelope_sensor_p;
   feeder* feeder_p;
+  brother_envelope_feeder* brother_envelope_feeder_p;
   QTimer* run_timer_p;
   screen* screen_p;
   int previous_screen_list[10];

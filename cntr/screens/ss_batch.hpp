@@ -65,7 +65,8 @@ class ss_batch : public screen
   public slots:
 //  void pack_ready();
   void pack_collected(int count);
-  void dump_complete(int dump_count);
+//  void dump_complete(int dump_count);
+  void dump_complete();
   void dumping();
   void focus_on_barcode();
   void bad_lot_slot();
