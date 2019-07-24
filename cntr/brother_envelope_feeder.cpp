@@ -45,7 +45,7 @@ void brother_envelope_feeder::run()
   {
     motor_off();
     delay_envelope_taken->start(3000);	//delay to create gap between envelopes taken by printer
-    cout<<endl<<"envelope_taken"<<endl;			//OMIT~~~//
+//    cout<<endl<<"envelope_taken"<<endl;			//OMIT~~~//
 //    int system_int; 							//OMIT~~~//
 //    system_int = system("date \"+%M:%S:%N\"");	//OMIT~~~//
   }
@@ -53,7 +53,7 @@ void brother_envelope_feeder::run()
   {
     motor_on();
     delay_sensor_triggered->start(1400); //original 1400 ms//	//delay to allow envelope to be pushed further into printer
-    cout<<endl<<"push envelope further"<<endl;	//OMIT~~~//
+//    cout<<endl<<"push envelope further"<<endl;	//OMIT~~~//
 //    int system_int; 							//OMIT~~~//
 //    system_int = system("date \"+%M:%S:%N\"");	//OMIT~~~//
   }

@@ -210,7 +210,7 @@ void batch_mode_driver::load_program()//load the program indicated by program_pa
 
     else
     {
-      cout<<"batch_mode_driver::load_file.  data type identifier not found.\n";
+      cout<<"batch_mode_driver::load_program.  data type identifier not found.\n";
     }
   }
   current_set = 0;
@@ -980,6 +980,8 @@ void batch_mode_driver::run()
 //      dump_elapsed = dump_end_qtime.elapsed();
 //      cout<<"dump_end_qtime.elapsed = "<<dump_elapsed<<endl;
       
+      
+//      cout<<"dump_end_qtime.elapsed() = "<<dump_end_qtime.elapsed()<<endl;
       if(dump_end_qtime.elapsed() >= dump_end_qtime_limit)//if count has not changed, dump is complete
       {
         dump_end_qtime.restart();
@@ -1046,7 +1048,7 @@ void batch_mode_driver::set_dump_feed_speed(int speed_s)
 void batch_mode_driver::barcode_entered(QString value)
 {
 //  cout<<"start batch_mode_driver::barcode_entered\n";
-  cout<<"barcode_entered value "<<value.toStdString()<<endl;
+//  cout<<"barcode_entered value "<<value.toStdString()<<endl;
   QString value_trimmed = value.trimmed();//remove whitespace at start and end
   if(barcode_mode == seed_lot)
   {
@@ -1593,7 +1595,7 @@ void batch_mode_driver::load_ss_setup()//load the ss_setup indicated by ss_setup
 
     else
     {
-      cout<<"batch_mode_driver::load_file.  data type identifier not found.  "<<line.toStdString()<<"\n";
+      cout<<"batch_mode_driver::load_ss_setup.  data type identifier not found.  "<<line.toStdString()<<"\n";
     }
   }
   

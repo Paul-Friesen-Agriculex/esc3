@@ -29,7 +29,11 @@ spreadsheet_choice::spreadsheet_choice(centre*set_centre_p, batch_mode_driver* b
   choice6_p=new button("");
   more_spreadsheets_p=new button("More spreadsheets");
   back_p=new button("Back");
-  message_p=new QLabel("Select spreadsheet");
+  message_p=new QLabel(" \
+Select spreadsheet.\n \
+Spreadsheets must be in CSV format and\n \
+in the root directory of a USB stick\n \
+attached to the machine.");
 
   top_box_p=new QGroupBox;
   middle_box_p=new QGroupBox;

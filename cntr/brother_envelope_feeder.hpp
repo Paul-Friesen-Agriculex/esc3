@@ -20,7 +20,7 @@ class brother_envelope_feeder:public QObject
   QTimer* delay_envelope_taken;
   QTimer* delay_sensor_triggered;
   
-  public:
+  public slots:
   void run();
 
   private slots:  

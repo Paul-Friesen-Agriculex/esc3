@@ -119,8 +119,8 @@ void ss_batch_table::refresh()
     model_p -> setHeaderData(j, Qt::Horizontal, col_p->heading);
   }
 
-  cout<<"ss_batch_table::refresh() 1\n";
-  cout<<"batch_mode_driver_p->spreadsheet_number_of_lines = "<<batch_mode_driver_p->spreadsheet_number_of_lines<<endl;
+//  cout<<"ss_batch_table::refresh() 1\n";
+//  cout<<"batch_mode_driver_p->spreadsheet_number_of_lines = "<<batch_mode_driver_p->spreadsheet_number_of_lines<<endl;
   
   for(int i=0; i<batch_mode_driver_p->spreadsheet_number_of_lines; ++i)
   {
@@ -150,7 +150,7 @@ void ss_batch_table::refresh()
     }
   }
 
-  cout<<"ss_batch_table::refresh() 2\n";
+//  cout<<"ss_batch_table::refresh() 2\n";
 
   
   //to position current row near middle of screen, set current row first to row_back, then to row_forward, then to current_row, which is between them
@@ -165,7 +165,7 @@ void ss_batch_table::refresh()
   selectionModel()->setCurrentIndex(model_p->index(current_row, 0), QItemSelectionModel::NoUpdate);
   setCurrentIndex(model_p->index(current_row, 0));
 
-  cout<<"ss_batch_table::refresh() 3\n";
+//  cout<<"ss_batch_table::refresh() 3\n";
   
   /*
   for(int i=0; i<batch_mode_driver_p->spreadsheet_number_of_lines; ++i)

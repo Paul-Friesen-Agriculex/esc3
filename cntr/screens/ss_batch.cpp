@@ -342,12 +342,12 @@ void ss_batch::pack_collected(int count_to_record)
   */
 }  
 
-//void ss_batch::dump_complete(int dump_count)
-void ss_batch::dump_complete()
+void ss_batch::dump_complete(int dump_count)
+//void ss_batch::dump_complete()
 {
 //  dump_container_can_be_removed = true;
 //  dump_container_ready_count = dump_count;
-  
+  cout<<"ss_batch::dump_complete.  dump_count "<<dump_count<<"\n";
   end_valve_mode = ss_dump_open_empty;
   barcode_line_p->setFocus();
   /*
@@ -595,6 +595,7 @@ void ss_batch::run()
       if(centre_p->get_endgate_state() == ENDGATE_CLOSED)
       {
         end_valve_mode = ss_dump_container_removed_too_soon;
+        cout<<"entering ss_dump_container_removed_too_soon from ss_dump_opened_while_empty\n";
       }
       break;
     case ss_dump_closed_filling:
@@ -615,6 +616,7 @@ void ss_batch::run()
       if(centre_p->get_endgate_state() == ENDGATE_CLOSED)
       {
         end_valve_mode = ss_dump_container_removed_too_soon;
+        cout<<"entering ss_dump_container_removed_too_soon from ss_dump_pass_through\n";
       }
       break;
     case ss_dump_open_empty:

@@ -949,7 +949,7 @@ batch_mode_driver.o: batch_mode_driver.cpp batch_mode_driver.hpp \
 		envelope.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o batch_mode_driver.o batch_mode_driver.cpp
 
-brother_envelope_feeder.o: brother_envelope_feeder.cpp envelope_sensor.hpp
+brother_envelope_feeder.o: brother_envelope_feeder.cpp brother_envelope_feeder.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o brother_envelope_feeder.o brother_envelope_feeder.cpp
 
 button.o: button.cpp button.hpp
