@@ -1004,6 +1004,7 @@ centre.o: centre.cpp centre.hpp \
 		screens/ss_setup_choice.hpp \
 		screens/ss_setup_entry.hpp \
 		screens/set_envelope_size.hpp \
+		screens/ss_setup_delete.hpp \
 		screens/ss_options.hpp \
 		screens/ss_column_display_options.hpp \
 		screens/ss_batch.hpp \
