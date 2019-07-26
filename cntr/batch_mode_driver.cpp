@@ -666,6 +666,8 @@ void batch_mode_driver::run()
       if(cutoff_gate_close_time.elapsed() >= cutoff_gate_delay_time)
       {
         cutgate_p -> close();
+        
+        actual_count = current_count_limit;//This number will be recorded in actual_count column of spreadsheet, if required.  Actual count may be less if seed is short.
 
         //remember current numbers for display purposes
         pack_ready_pack = current_pack;
@@ -706,6 +708,11 @@ void batch_mode_driver::run()
         }
         else//use_spreadsheet true
         {
+          if(ss_setup_p->actual_count_column >= 0)// -1 value signals not to record count
+          {
+            ss_actual_count_p -> data_list[spreadsheet_line_number] = actual_count;
+          }
+          
           ss_first_column_p->data_list[spreadsheet_line_number] = "Y";
 //          pack_filled[spreadsheet_line_number] = true;
           spreadsheet_line_number = get_next_spreadsheet_line_number();

@@ -201,7 +201,7 @@ void ss_setup_choice::add_ss_setup_clicked()
 
 void ss_setup_choice::delete_ss_setup_clicked()
 {
-  centre_p->add_waiting_screen(30);//delete_ss_setup
+  centre_p->add_waiting_screen(30);//ss_setup_delete
   centre_p->screen_done=true;
 }
 

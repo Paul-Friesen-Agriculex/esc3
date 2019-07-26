@@ -187,6 +187,7 @@ class batch_mode_driver : public QObject
 //  QList<bool> pack_filled;//used to mark when a packet has been filled
   ss_setup* ss_setup_p;
   QString ss_setup_path;
+  int actual_count;//to record actual number of seeds in pack.  Might be less than required if seed is short
   void load_ss_setup();
   void clear_ss_setup();
   void fill_ss_column_pointers();

@@ -51,7 +51,7 @@ position_envelope_field::position_envelope_field(centre* set_centre_p, batch_mod
   cout<<"start position_envelope_field::position_envelope_field \n";
   
   batch_mode_driver_p = batch_mode_driver_p_s;
-  message_p = new QLabel("Position the field");
+  message_p = new QLabel("Position the field\n(or click \"new field\")");
   back_button_p = new button("Back");
   select_previous_button_p = new button("Select\nprevious field");
   select_next_button_p = new button("Select\nnext field");

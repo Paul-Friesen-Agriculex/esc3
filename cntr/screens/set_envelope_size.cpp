@@ -70,7 +70,8 @@ void set_envelope_size::no_envelope_button_clicked()
 void set_envelope_size::ok_button_clicked()
 {
   batch_mode_driver_p -> envelope_p -> set_size(width_slider_p->value(), height_slider_p->value());
-  centre_p -> add_waiting_screen(36);//select_field_data_source
+//  centre_p -> add_waiting_screen(36);//select_field_data_source
+  centre_p -> add_waiting_screen(35);//position_envelope_field
   centre_p -> screen_done = true;
 }
 

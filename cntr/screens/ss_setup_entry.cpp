@@ -43,9 +43,9 @@ ss_setup_entry::ss_setup_entry(centre*set_centre_p, batch_mode_driver* batch_mod
   
   main_layout_p=new QVBoxLayout;
   
-  top_layout_p->addWidget(message_p,0,0);
+  top_layout_p->addWidget(message_p,0,0,2,1);
   top_layout_p->addWidget(back_p, 0, 1);
-  top_layout_p->addWidget(none_p, 1, 0);
+  top_layout_p->addWidget(none_p, 1, 1);
   top_box_p->setLayout(top_layout_p);
   
   middle_layout_p->addWidget(choice1_p,0,0);
@@ -187,14 +187,47 @@ void ss_setup_entry::back_clicked()
 
 void ss_setup_entry::display_headings()
 {
-//  cout<<"ss_setup_entry::display_headings.  mode="<<mode<<endl;
+  none_p->show();
+  if(mode=='m') 
+  {
+    message_p->setText(" \
+Pick material id. column.\n\n \
+This column should contain the\n \
+bar code of the seed lot to be\n \
+used for each packet.");
+    
+    none_p -> hide();
+  }
+  if(mode=='r') 
+  {
+    message_p->setText(" \
+Pick required count column.\n\n \
+This column should contain the\n \
+number of seeds for each packet.");  
   
-  if(mode=='m') message_p->setText("Pick material id. column");
-  if(mode=='r') message_p->setText("Pick required count column");  
-  if(mode=='e') message_p->setText("Pick envelope id. column");  
-  if(mode=='a') message_p->setText("Pick actual count column");
-  if(mode=='p') message_p->setText("Pick print time column");
-  if(mode=='f') message_p->setText("Pick fill time column");
+    none_p -> hide();
+  }
+  if(mode=='e') message_p->setText(" \
+Pick envelope id. column (optional). \n\n \
+This can contain a unique identifier for \n \
+each packet.  If printed on the envelope in \n \
+barcode, the barcode can be checked against \n \
+this column.");  
+  if(mode=='a') message_p->setText(" \
+Pick actual count column (optional)\n\n \
+If selected, the number of seeds counted will \n \
+be recorded here.  This could differ from the \n \
+required count if seed is short.");
+  if(mode=='p') message_p->setText(" \
+Pick print time column (optional).\n\n \
+If selected, time of printing packet \n \
+will be recorded here. ");
+  if(mode=='f') message_p->setText(" \
+Pick fill time column (optional).\n\n \
+If selected, time of filling packet \n \
+will be recorded here. ");
+
+
   
   spreadsheet_column* column_p;
 

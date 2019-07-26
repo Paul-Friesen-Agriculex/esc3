@@ -693,7 +693,7 @@ enter_field_text::enter_field_text(centre* centre_p, batch_mode_driver* batch_mo
 //  message_p->setMaximumSize(500,100);  
   
   batch_mode_driver_p = batch_mode_driver_p_s;
-  QString message("Select data source for the field");
+  QString message("Enter text.");
   message_p->setText(message);
 
   connect(enter_key_p, SIGNAL(clicked()), this, SLOT(enter_clicked()));

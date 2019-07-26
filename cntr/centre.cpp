@@ -37,6 +37,8 @@
 #include "ss_setup_entry.hpp"
 //#include "envelope_layout_choice.hpp"
 #include "set_envelope_size.hpp"
+
+#include "ss_setup_delete.hpp"
 #include "ss_options.hpp"
 #include "ss_column_display_options.hpp"
 #include "ss_batch.hpp"
@@ -457,7 +459,7 @@ void centre::run()
       case 27: screen_p=new macro_name_entry(this);  break;    //TEST~~~ 11_13_2018//
       case 28: screen_p=new macro_screen(this); break;	    //TEST~~~ macro_menu
       case 29: screen_p=new batch_save_ss_setup(this, batch_mode_driver_p); break;
-//      case : screen_p=new (this); break;
+      case 30: screen_p=new ss_setup_delete(this, batch_mode_driver_p); break;
       case 31: screen_p=new ss_options(this, batch_mode_driver_p); break;
       case 32: screen_p=new ss_column_display_options(this, batch_mode_driver_p); break;
       case 33: screen_p=new ss_batch(this, batch_mode_driver_p); break;
