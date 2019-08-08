@@ -33,18 +33,18 @@ void brother_envelope_feeder::run()
   {
 	if((delay_envelope_taken->isActive()) && (envelope_feeder_sensor_triggered))	//updates delays until sensor triggers//
 	{
-	  delay_envelope_taken->start(3000);
+	  delay_envelope_taken->start(2000);
 	}
 	else if((delay_sensor_triggered->isActive()) && !envelope_feeder_sensor_triggered)
 	{
-	  delay_sensor_triggered->start(1400);	//original 1400ms//
+	  delay_sensor_triggered->start(1200);	//original 1400ms//
 	}
   }
   
   else if(envelope_feeder_sensor_triggered)
   {
     motor_off();
-    delay_envelope_taken->start(3000);	//delay to create gap between envelopes taken by printer
+    delay_envelope_taken->start(2000);	//delay to create gap between envelopes taken by printer
 //    cout<<endl<<"envelope_taken"<<endl;			//OMIT~~~//
 //    int system_int; 							//OMIT~~~//
 //    system_int = system("date \"+%M:%S:%N\"");	//OMIT~~~//
@@ -52,7 +52,7 @@ void brother_envelope_feeder::run()
   else
   {
     motor_on();
-    delay_sensor_triggered->start(1400); //original 1400 ms//	//delay to allow envelope to be pushed further into printer
+    delay_sensor_triggered->start(1200); //original 1400 ms//	//delay to allow envelope to be pushed further into printer
 //    cout<<endl<<"push envelope further"<<endl;	//OMIT~~~//
 //    int system_int; 							//OMIT~~~//
 //    system_int = system("date \"+%M:%S:%N\"");	//OMIT~~~//
@@ -83,7 +83,7 @@ void brother_envelope_feeder::envelope_feeder_sensor_state()
   fp = fopen("/sys/class/gpio/gpio192/value", "r");
   if(!fscanf(fp,"%d",&i)) cout<<"fscanf failure\n";
   fclose(fp);
-  if (i==1)
+  if (i==0)
   {
     envelope_feeder_sensor_triggered = true;
   }

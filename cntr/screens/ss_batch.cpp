@@ -246,6 +246,8 @@ ss_batch::ss_batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_drive
   
   main_layout_p->setRowMinimumHeight(5, 0);
   main_layout_p->setRowStretch(5, 0);
+  
+  batch_mode_driver_p -> use_spreadsheet = true;
 
   count_message_p->setStyleSheet("QLabel {" 
         "background-color: white;"          
@@ -313,16 +315,23 @@ void ss_batch::pack_collected(int count_to_record)
 //  pack_can_be_removed = false;
 //  ss_pack_removed_too_soon = false;
 //  pack_was_placed = false;
-  
+
+//  cout<<"ss_batch::pack_collected\n";
+
   if( (end_valve_mode==ss_closed_bad_lot) || (end_valve_mode==ss_open_emptying_bad_lot) ) return;
   
+//  cout<<"1\n";
+    
 //  table_p->enter_seeds(count_to_record);
-
+/*
   if(batch_mode_driver_p->ss_actual_count_p!=0)
   {
+    cout<<"actual_count_p != 0\n";
+    cout<<"batch_mode_driver_p->spreadsheet_line_number = "<<batch_mode_driver_p->spreadsheet_line_number<<endl;
+    cout<<"batch_mode_driver_p->ss_actual_count_p->data_list.size() = "<<batch_mode_driver_p->ss_actual_count_p->data_list.size()<<endl;
     batch_mode_driver_p->ss_actual_count_p->data_list[batch_mode_driver_p->spreadsheet_line_number] = QString::number(count_to_record);
   }
-  
+*/  
   refresh_screen();
   
   barcode_line_p->setFocus();
@@ -347,7 +356,7 @@ void ss_batch::dump_complete(int dump_count)
 {
 //  dump_container_can_be_removed = true;
 //  dump_container_ready_count = dump_count;
-  cout<<"ss_batch::dump_complete.  dump_count "<<dump_count<<"\n";
+//  cout<<"ss_batch::dump_complete.  dump_count "<<dump_count<<"\n";
   end_valve_mode = ss_dump_open_empty;
   barcode_line_p->setFocus();
   /*
@@ -537,7 +546,7 @@ void ss_batch::run()
         end_valve_mode = ss_closed_empty;
         
         
-        cout<<"        ss_batch::run.  batch_mode_driver_p->pack_complete = "<<batch_mode_driver_p->pack_complete<<".  setting true.\n";
+//        cout<<"        ss_batch::run.  batch_mode_driver_p->pack_complete = "<<batch_mode_driver_p->pack_complete<<".  setting true.\n";
         batch_mode_driver_p->pack_complete = true;
         
         

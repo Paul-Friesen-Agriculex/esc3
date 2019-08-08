@@ -227,6 +227,8 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
   
   main_layout_p->setRowMinimumHeight(5, 0);
   main_layout_p->setRowStretch(5, 0);
+  
+  batch_mode_driver_p -> use_spreadsheet = false;
 
   count_message_p->setStyleSheet("QLabel {" 
         "background-color: white;"          

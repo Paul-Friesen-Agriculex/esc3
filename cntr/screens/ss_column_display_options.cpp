@@ -17,9 +17,7 @@ ss_column_display_options::ss_column_display_options(centre*set_centre_p, batch_
   centre_p=set_centre_p;
   batch_mode_driver_p = batch_mode_driver_p_s;
 
-
-//  cout<<"ss_column_display_options::ss_column_display_options\n";
-//  batch_mode_driver_p->list_ss_setup();
+  mode = 'a';//add more display columns
 
   choice1_p=new button("");
   choice2_p=new button("");
@@ -31,6 +29,7 @@ ss_column_display_options::ss_column_display_options(centre*set_centre_p, batch_
   previous_headings_p=new button("Previous headings");
   done_p=new button("Done");
   back_p=new button("Back");
+  add_remove_p=new button("Remove columns");
   message_p=new QLabel("");
 
   top_box_p=new QGroupBox;
@@ -43,8 +42,9 @@ ss_column_display_options::ss_column_display_options(centre*set_centre_p, batch_
   
   main_layout_p=new QVBoxLayout;
   
-  top_layout_p->addWidget(message_p,0,0);
+  top_layout_p->addWidget(message_p,0,0,2,1);
   top_layout_p->addWidget(back_p, 0, 1);
+  top_layout_p->addWidget(add_remove_p, 1, 1);
   top_box_p->setLayout(top_layout_p);
   
   middle_layout_p->addWidget(choice1_p,0,0);
@@ -76,6 +76,7 @@ ss_column_display_options::ss_column_display_options(centre*set_centre_p, batch_
   connect(previous_headings_p, SIGNAL(clicked()), this, SLOT(previous_headings_clicked()));
   connect(done_p, SIGNAL(clicked()), this, SLOT(done_clicked()));
   connect(back_p, SIGNAL(clicked()), this, SLOT(back_clicked()));
+  connect(add_remove_p, SIGNAL(clicked()), this, SLOT(add_remove_clicked()));
   
   QString crop_name = centre_p->crops[0].name;
   ss_setup_path = "ss_setups/";
@@ -124,7 +125,14 @@ void ss_column_display_options::choice6_clicked()
 
 void ss_column_display_options::enter_choice(int column)
 {
-  batch_mode_driver_p->display_column_numbers.append(column);
+  if(mode == 'a')//add choice
+  {
+    batch_mode_driver_p->display_column_numbers.append(column);
+  }
+  else //remove choice
+  {
+    batch_mode_driver_p->display_column_numbers.removeAll(column);
+  }
   display_headings();
 }
 
@@ -152,14 +160,31 @@ void ss_column_display_options::back_clicked()
   centre_p->screen_done=true;
 }
 
+void ss_column_display_options::add_remove_clicked()
+{
+  if(mode == 'a')
+  {
+    mode = 'r';
+    add_remove_p -> setText("Add columns");
+  }
+  else//mode was 'r'
+  {
+    mode = 'a';
+    add_remove_p -> setText("Remove columns");
+  }
+  display_headings();
+}
+
 void ss_column_display_options::display_headings()
 {
 //  cout<<"ss_column_display_options::display_headings."<<endl;
   
   spreadsheet_column* column_p;
 
-  QString message_text("Pick display column ");
-  message_text.append(QString::number(batch_mode_driver_p->display_column_numbers.size()));
+  QString message_text;
+  if(mode == 'a') message_text = "Pick column to display.  Current display columns:";
+  else message_text = "Pick a column to remove.  Current display columns:";
+//  message_text.append(QString::number(batch_mode_driver_p->display_column_numbers.size()));
   for(int i=0; i<batch_mode_driver_p->display_column_numbers.size(); ++i)
   {
     message_text.append("\n   ");

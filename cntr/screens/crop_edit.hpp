@@ -28,6 +28,7 @@ class crop_edit : public screen
 	  void cropEditButn_clicked();
 	  void cropRecalibrate_clicked();
 	  void backButn_clicked();
+    void done_button_clicked();
   
   private:
 	  QLabel* message_p;
@@ -36,6 +37,7 @@ class crop_edit : public screen
 	  button* cropEditButn_p;
 	  button* cropRecalibrateButn_p;
 	  button* backButn_p;
+    button* done_button_p;
   
   
 	  QGroupBox* top_box_p;

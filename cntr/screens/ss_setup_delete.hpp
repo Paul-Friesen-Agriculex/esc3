@@ -1,9 +1,8 @@
-#ifndef ss_column_display_options_hpp
-#define ss_column_display_options_hpp
+#ifndef ss_setup_delete_hpp
+#define ss_setup_delete_hpp
 
 #include <QString>
 #include "centre.hpp"
-#include "batch_mode_driver.hpp"
 
 class button;
 class QGridLayout;
@@ -13,13 +12,13 @@ class QLabel;
 class QDir;
 class QStringList;
 
-class ss_column_display_options : public screen
+class ss_setup_delete : public screen
 {
   Q_OBJECT
   
   public:
-  ss_column_display_options(centre*set_centre_p, batch_mode_driver* batch_mode_driver_p_s);
-  ~ss_column_display_options();
+  ss_setup_delete(centre*set_centre_p, batch_mode_driver* batch_mode_driver_p_s);
+  ~ss_setup_delete();
   
   private slots:
   void choice1_clicked();
@@ -29,11 +28,10 @@ class ss_column_display_options : public screen
   void choice5_clicked();
   void choice6_clicked();
   
-  void next_headings_clicked();
-  void previous_headings_clicked();
-  void done_clicked();
+  void more_ss_setups_clicked();
+//  void add_ss_setup_clicked();
+//  void delete_ss_setup_clicked();
   void back_clicked();
-  void add_remove_clicked();
   
   private:
   QLabel* message_p;
@@ -44,13 +42,13 @@ class ss_column_display_options : public screen
   button* choice5_p;
   button* choice6_p;
   
-  button* next_headings_p;
-  button* previous_headings_p;
-  button* done_p;
+  button* more_ss_setups_p;
+//  button* add_ss_setup_p;
+//  button* delete_ss_setup_p;
   button* back_p;
-  button* add_remove_p;
   
-  void display_headings();
+  void generate_ss_setup_list();
+  void display_ss_setups();
   
   QGroupBox* top_box_p;
   QGroupBox* middle_box_p;
@@ -62,19 +60,13 @@ class ss_column_display_options : public screen
   
   QVBoxLayout* main_layout_p;
   
-  int first_heading_displayed;
+  int first_ss_setup_displayed;
   
 //  centre* centre_p;
   batch_mode_driver* batch_mode_driver_p;
   
   QDir* dir_p;
-  
-  void enter_choice(int column);
-  
-  
+  QStringList* ss_setup_list_p;
   QString ss_setup_path;
-  char mode; //'a'->add display columns.  'r'->remove display columns
-};  
-
-
+};
 #endif

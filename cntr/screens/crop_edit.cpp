@@ -25,6 +25,7 @@ crop_edit::crop_edit(centre*set_centre_p)
 	  cropRecalibrateButn_p = new button("Recalibrate/Change Settings\nExisting Crop");
 	  
 	  backButn_p = new button("Back");
+       done_button_p = new button("Done editing");
 	  message_p=new QLabel("Edit Crop...");
 
 	  top_box_p =new QGroupBox;
@@ -35,8 +36,9 @@ crop_edit::crop_edit(centre*set_centre_p)
 	 
 	  main_layout_p=new QVBoxLayout;
 	  
-	  top_layout_p->addWidget(message_p,0,0);
+	  top_layout_p->addWidget(message_p,0,0,2,1);
 	  top_layout_p->addWidget(backButn_p, 0, 1);
+       top_layout_p->addWidget(done_button_p, 1, 1);
 	  top_box_p->setLayout(top_layout_p);
 	  
 	  buttonlist_layout_p->addWidget(cropAddButn_p,0,0);
@@ -57,6 +59,7 @@ crop_edit::crop_edit(centre*set_centre_p)
 	  connect(cropEditButn_p, SIGNAL(clicked()), this, SLOT(cropEditButn_clicked()));
 	  connect(cropRecalibrateButn_p, SIGNAL(clicked()), this, SLOT(cropRecalibrate_clicked()));
 	  connect(backButn_p, SIGNAL(clicked()), this, SLOT(backButn_clicked()));
+       connect(done_button_p, SIGNAL(clicked()), this, SLOT(done_button_clicked()));
 }
 
 void crop_edit::cropAddButn_clicked()
@@ -96,5 +99,8 @@ void crop_edit::backButn_clicked()
   
 }
 
-
+void crop_edit::done_button_clicked()
+{
+     centre_p->screen_done = true;
+}
 

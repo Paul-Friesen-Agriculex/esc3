@@ -4,6 +4,7 @@
 #include <QTextStream>
 #include <iomanip>
 #include <QMessageBox>
+#include <QDateTime>
 
 using namespace std;
 
@@ -607,7 +608,17 @@ void batch_mode_driver::run()
               }
               else if(print_control_mode==start_on_previous_pack_collect)
               {
+                
+                
+                cout<<"mode wait_for_seed_lot_barcode.  A.  printing line "<<spreadsheet_line_number<<"\n";
+                
+                
                 envelope_p -> print(spreadsheet_line_number);
+                
+                
+                cout<<"mode wait_for_seed_lot_barcode.  B.  printing line "<<get_spreadsheet_line_number_after(spreadsheet_line_number)<<"\n";
+                
+                
                 envelope_p -> print(get_spreadsheet_line_number_after(spreadsheet_line_number));
               }
               else if(print_control_mode==preprint_batch)
@@ -630,9 +641,14 @@ void batch_mode_driver::run()
         if(centre_p->feed_speed != high_feed_speed)
         {
           centre_p->set_speed(high_feed_speed);
+          
+          cout << "mode hi_open setting centre speed to high_feed_speed value "<< high_feed_speed<<endl;
+          
         }
         centre_p->block_endgate_opening = !pack_barcode_ok;
-        if(time_to_end<0.4)
+        
+        
+        if(  (time_to_end<0.4)  &&  ((centre_p->count)>current_count_limit/2)  )
         {
           mode = low_open;
           cout<<"mode low_open. count "<<centre_p->count<<"\n";
@@ -708,13 +724,34 @@ void batch_mode_driver::run()
         }
         else//use_spreadsheet true
         {
+          if(ss_setup_p->fill_time_column >= 0)// -1 value signals not to record
+          {
+            QDateTime fill_time = QDateTime::currentDateTime();
+            ss_fill_time_p -> data_list[spreadsheet_line_number] = fill_time.toString(Qt::ISODate);
+          }
+          
           if(ss_setup_p->actual_count_column >= 0)// -1 value signals not to record count
           {
-            ss_actual_count_p -> data_list[spreadsheet_line_number] = actual_count;
+            ss_actual_count_p -> data_list[spreadsheet_line_number] = QString::number(actual_count);
           }
           
           ss_first_column_p->data_list[spreadsheet_line_number] = "Y";
 //          pack_filled[spreadsheet_line_number] = true;
+
+
+
+
+
+//          if(ss_actual_count_p!=0)
+//          {
+//            ss_actual_count_p->data_list[batch_mode_driver_p->spreadsheet_line_number] = QString::number(count_to_record);
+//          }
+
+
+
+
+
+
           spreadsheet_line_number = get_next_spreadsheet_line_number();
 //          emit refresh_screen();
           if(spreadsheet_line_number==-1)//-1 value signals no more lines for this seed_lot_barcode
@@ -779,7 +816,8 @@ void batch_mode_driver::run()
         
             
       }
-      if(time_to_end<2.0)
+//      if(time_to_end<1.5)//2.0)
+      if(  (time_to_end<1.5)  &&  ((centre_p->count)>current_count_limit/2)  )
       {
         mode = wait_for_pack;
         

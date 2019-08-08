@@ -125,7 +125,7 @@ void envelope::change_selected_type(envelope_field_type val)
 
 void envelope::refresh_image()
 {
-  cout<<"envelope::refresh_image.  printing = "<<printing<<endl;
+  cout<<"envelope::refresh_image.  sample_row = "<<sample_row<<endl;
   
   
   image_p -> fill(QColor(255, 255, 255));
@@ -329,7 +329,7 @@ void envelope::print()
   printing = false;//return to colour for screen display
   refresh_image();
 
-  cout<<"end envelope::print\n";
+//  cout<<"end envelope::print\n";
 
 }
 
