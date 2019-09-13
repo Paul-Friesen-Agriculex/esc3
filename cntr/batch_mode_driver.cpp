@@ -53,7 +53,7 @@ batch_mode_driver::batch_mode_driver(centre* centre_p_s, cutgate* cutgate_p_s)
   clear_envelope_layout();
   ss_setup_path = "";
   envelope_layout_path = "";
-  envelope_p = new envelope;
+  envelope_p = new envelope(this);
 //  column_for_next_field_p = 0;
   sample_row = 0;
   print_envelope = false;
@@ -1680,6 +1680,24 @@ int batch_mode_driver::get_spreadsheet_line_number_after(int val)//look for line
     }
   }
   return(-1);
+}
+
+bool batch_mode_driver::rnmark_ethernet_setting()
+{
+  if(centre_p->print_rnmark_ethernet) return true;
+  else return false;
+}
+
+bool batch_mode_driver::rnmark_usbserial_setting()
+{
+  if(centre_p->print_rnmark_usbserial) return true;
+  else return false;
+}
+
+bool batch_mode_driver::brother_usb_setting()
+{
+  if(centre_p->print_brother_usb) return true;
+  else return false;
 }
 
 count_rate_predictor::count_rate_predictor(centre* centre_p_s)

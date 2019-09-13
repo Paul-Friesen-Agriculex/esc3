@@ -25,7 +25,7 @@ crop_edit::crop_edit(centre*set_centre_p)
 	  cropRecalibrateButn_p = new button("Recalibrate/Change Settings\nExisting Crop");
 	  
 	  backButn_p = new button("Back");
-       done_button_p = new button("Done editing");
+    done_button_p = new button("Done editing");
 	  message_p=new QLabel("Edit Crop...");
 
 	  top_box_p =new QGroupBox;

@@ -8,13 +8,15 @@
 #include "code_39_writer.hpp"
 #include "batch_mode_driver.hpp"
 #include "envelope_feeder_brother.hpp"
+#include "rnmark_printer.hpp" //
 
 using namespace std;
 
-envelope::envelope()
+envelope::envelope(batch_mode_driver* batch_mode_driver_p_s)
 {
   
 //  cout<<"\n\n**************************envelope_constructor\n\n";
+  batch_mode_driver_p = batch_mode_driver_p_s;
   
   selected_field=0;
   x=10;
@@ -27,9 +29,16 @@ envelope::envelope()
   printing = false;
   
   e_f_brother_p = new envelope_feeder_brother;
+  rnmark_printer_p = new rnmark_printer;
+
+  
 //  timer_p = new QTimer;
 //  timer_p -> setSingleShot(true);
 //  connect(timer_p, SIGNAL(timeout()), e_f_brother_p, SLOT(feed()));
+
+  feedback_timer_p = new QTimer; 
+  connect(feedback_timer_p, SIGNAL(timeout()), this, SLOT(rnmark_printer_p->read_packets_from_printer()));
+  feedback_timer_p->start(1000);
 }
 
 envelope::~envelope()
@@ -39,8 +48,9 @@ envelope::~envelope()
   
   if(image_p) delete image_p;
   if(e_f_brother_p) delete e_f_brother_p;
-  timer_p -> stop();
-  delete timer_p;
+  if(rnmark_printer_p) delete rnmark_printer_p;
+  feedback_timer_p -> stop();
+  delete feedback_timer_p;
 }
 
 void envelope::set_size(int width_s, int height_s)//dimensions mm
@@ -127,8 +137,10 @@ void envelope::refresh_image()
 {
   cout<<"envelope::refresh_image.  sample_row = "<<sample_row<<endl;
   
+  //serial_transmission_str->clear();
   
-  image_p -> fill(QColor(255, 255, 255));
+  //image_p -> fill(QColor(255, 255, 255));
+  image_p -> fill(Qt::white);
 
   QPainter painter(image_p);
   code_39_writer writer(&painter);
@@ -307,20 +319,71 @@ void envelope::print()
   printing = true;//black and white image for printing
   refresh_image();
   
-  QPrinter printer(QPrinter::HighResolution);
+  //Brother USB Printer//
+  if(batch_mode_driver_p->brother_usb_setting())  
+  {
+    cout<<endl<<"BM_DRIVER::BROTHER_USB: "<<batch_mode_driver_p->brother_usb_setting()<<endl;
+    
+    QPrinter printer(QPrinter::HighResolution);
 //  QPrinter printer(QPrinter::ScreenResolution);
 //  printer.setPaperSize(QPrinter::B7);
-  QPainter painter(&printer);
+    QPainter painter(&printer);
 //  image_p -> invertPixels();
 //  painter.drawImage(QRect(0,0,3000,6000), *image_p);
 
-
-
 //  painter.drawImage(image_p->rect(), *image_p);
-  QPoint startpoint( (92-width/2)*pixels_per_mm ,  -10 );
-  painter.drawImage(startpoint, *image_p);
+    QPoint startpoint( (92-width/2)*pixels_per_mm ,  -10 );
+    painter.drawImage(startpoint, *image_p);
+  }
+  
+  //USB Serial Data Transmission - 32 character limit per envelope field, padded with "&"//  
+  if((rnmark_printer_p->check_usb_connection()) && (batch_mode_driver_p->rnmark_usbserial_setting()))
+  {
+    QString serial_transmission_str;
+    serial_transmission_str.clear();
+  
+    cout<<endl<<"field_list.size(): "<<field_list.size()<<endl;
+    for(int q=0; q<field_list.size(); ++q)
+    {
+      if(field_list[q].data_source_flag == 'd')
+      {
+        qDebug()<<field_list[q].column_p->data_list[sample_row];
+        serial_transmission_str.append(field_list[q].column_p->data_list[sample_row]);
+        while(serial_transmission_str.size() < (q+1)*32) serial_transmission_str.append("&");
+      }
+      else if(field_list[q].data_source_flag == 'h')
+      {
+        qDebug()<<field_list[q].column_p->heading;
+        serial_transmission_str.append(field_list[q].column_p->heading);
+        while(serial_transmission_str.size() < (q+1)*32) serial_transmission_str.append("&");
+      }
+      else if(field_list[q].data_source_flag == 't')
+      {
+        qDebug()<<field_list[q].text;
+        serial_transmission_str.append(field_list[q].text);
+        while(serial_transmission_str.size() < (q+1)*32) serial_transmission_str.append("&");
+      }
+    }
+    rnmark_printer_p->send_barcode_serial_transmission(serial_transmission_str);
+    serial_transmission_str.clear();
+  }
 
+  //Socket Ethernet Transmission//
+  if((rnmark_printer_p->check_socket_connection()) && (batch_mode_driver_p->rnmark_ethernet_setting()))
+  {
+    QImage convert_alphamask_p;
+    convert_alphamask_p = image_p->scaled(512, 896, Qt::KeepAspectRatio);
+    convert_alphamask_p = convert_alphamask_p.convertToFormat(QImage::Format_MonoLSB, Qt::MonoOnly);
+    convert_alphamask_p.save("rnmark_image", "BMP");
 
+    rnmark_printer_p->clear_ram();
+    rnmark_printer_p->retrieve_bmp_dimensions();
+    rnmark_printer_p->set_printing_area_width();
+    rnmark_printer_p->generate_bmp_bytearray();
+    
+    rnmark_printer_p->print_once_mode();
+    rnmark_printer_p->resume_print();
+  }
 
 //  image_p -> invertPixels();
   

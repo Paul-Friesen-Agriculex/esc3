@@ -222,6 +222,9 @@ class batch_mode_driver : public QObject
   public slots:
   void barcode_entered(QString value);
   void cutgate_timing_error();
+  bool rnmark_ethernet_setting();
+  bool rnmark_usbserial_setting();
+  bool brother_usb_setting();
   
   signals:
   void dumping();

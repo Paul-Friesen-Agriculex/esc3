@@ -18,6 +18,7 @@ class camera;
 class processor;
 class screen;
 class batch_mode_driver;
+class rnmark_printer;
 class diagnostics_console;
 class macro_screen; //TEST~~~
 class brother_envelope_feeder;
@@ -143,11 +144,11 @@ class centre : public QObject
   int tm_autosave_count;//counts how many counts were recorded;
   QString tm_save_filename;
   
-  bool macro_status_bool;			  //temporary variable to transfer ifstream to tablewidget
-  int macro_numb_int;				    //
-  char macro_name_char[30];			//
-  char macro_mask_char[30];			//
-  char macro_function_char[30];		//
+  bool macro_status_bool;			      //temporary variable to transfer ifstream to tablewidget
+  int macro_numb_int;				        //
+  char macro_name_char[30];			    //
+  char macro_mask_char[30];			    //
+  char macro_function_char[30];		  //
   QString combined_macro_functions;	//new char to combine all macros
   
   //batch mode
@@ -160,6 +161,10 @@ class centre : public QObject
   
   batch_mode_driver* batch_mode_driver_p;
   macro_screen* macro_screen_p; //TEST~~~ 11_13_2018//
+  
+  bool print_rnmark_usbserial;
+  bool print_rnmark_ethernet;
+  bool print_brother_usb;
 };
 
 class screen : public QWidget

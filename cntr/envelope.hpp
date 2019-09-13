@@ -8,7 +8,9 @@
 
 class QImage;
 struct spreadsheet_column;
+class batch_mode_driver;  //TEST~~~//
 class envelope_feeder_brother;
+class rnmark_printer;
 class QTimer;
 
 enum envelope_field_type{Ubuntu_mono, code_39, none};
@@ -33,7 +35,10 @@ class envelope : public QObject
   static const float pixels_per_mm = 47;
   void refresh_image();
   envelope_feeder_brother* e_f_brother_p;
-  QTimer* timer_p;
+  rnmark_printer* rnmark_printer_p;
+  batch_mode_driver* batch_mode_driver_p; //TEST~~~//
+  //QTimer* timer_p;
+  QTimer* feedback_timer_p;
 
   //envelope dimensions mm
   int width;
@@ -47,9 +52,12 @@ class envelope : public QObject
 
   int sample_row;//row number of spreadsheet line to use as sample
   
+  //serial communication with RNSoft
+  //QString serial_transmission_str;
+  
   public:
   QList<envelope_field> field_list;
-  envelope();
+  envelope(batch_mode_driver* batch_mode_driver_p_s);    //TEST~~~//
   ~envelope();
   QImage* image_p;
   void set_size(int width, int height);//dimensions mm - printed size

@@ -21,6 +21,7 @@
 #include "totalize_options.hpp"
 #include "playback.hpp"
 #include "tool_choice.hpp"
+#include "print_settings.hpp"
 #include "calibrate.hpp"
 #include "program_choice.hpp"
 #include "enter_program.hpp"
@@ -188,6 +189,9 @@ centre::centre():
   end_of_playback_flag = false;
   measured_line_frequency = 4700;
   
+  print_rnmark_usbserial = true;
+  print_rnmark_ethernet = true;
+  print_brother_usb = true;
   batch_mode_driver_p = new batch_mode_driver(this, cutgate_p);
   
   //totalize mode
@@ -451,7 +455,7 @@ void centre::run()
       case 23: screen_p=new ss_setup_entry(this, batch_mode_driver_p); break;
 //      case 24: screen_p=new envelope_layout_choice(this, batch_mode_driver_p); break;
       case 25: screen_p=new set_envelope_size(this, batch_mode_driver_p); break;
-//      case : screen_p=new (this); break;
+      case 26: screen_p=new print_settings(this); break;
 //      case : screen_p=new (this); break;
 //      case : screen_p=new (this); break;
 //      case : screen_p=new (this); break;
