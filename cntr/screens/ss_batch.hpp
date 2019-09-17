@@ -53,6 +53,8 @@ enum ss_end_valve_mode_enum
   ss_dump_container_removed_too_soon
 };
 
+class manual_operation_window;
+
 class ss_batch : public screen
 {
   Q_OBJECT
@@ -78,7 +80,9 @@ class ss_batch : public screen
   void rescan_clicked();
   void restart_clicked();
   void save_program_clicked();
-  void reprint_clicked();
+  void reprint_button_1_clicked();
+  void reprint_button_2_clicked();
+  void manual_print_button_clicked();
   void quit_clicked();
   void run();
   
@@ -99,7 +103,9 @@ class ss_batch : public screen
   ss_batch_table* ss_table_p;
   message_box* status_box_p;
   button* save_program_button_p;
-  button* reprint_button_p;
+  button* reprint_button_1_p;
+  button* reprint_button_2_p;
+  button* manual_print_button_p;
   button* quit_button_p;
   message_box* barcode_status_p;
   
@@ -148,9 +154,61 @@ class ss_batch : public screen
   
   barcode_entry_mode old_barcode_mode;
   
+  int reprint_line_1;//line number that will be reprinted on envelope if reprint button 1 is clicked
+  int reprint_line_2;//line number that will be reprinted on envelope if reprint button 2 is clicked
+  int reprint_line_manual;//line number that will be reprinted on envelope if manual reprint button is clicked
+  void update_reprint_buttons();
+  
   macro_screen* macro_screen_p;
   QString count_string;				//seed count access from gpio_keyboard
   QTimer* run_timer_p;
+  
+  manual_operation_window* manual_operation_window_p;
+};
+
+class manual_operation_window : public QWidget
+{
+  Q_OBJECT
+  
+  public:
+  manual_operation_window(QWidget* parent, batch_mode_driver* batch_mode_driver_p_s);
+  
+  private:
+  batch_mode_driver* batch_mode_driver_p;
+  
+  button* previous_p;
+  button* print_line_1_p;
+  button* print_line_2_p;
+  button* print_line_3_p;
+  button* print_line_4_p;
+  button* print_line_5_p;
+  button* repeat_line_1_p;
+  button* repeat_line_2_p;
+  button* repeat_line_3_p;
+  button* repeat_line_4_p;
+  button* repeat_line_5_p;
+  button* next_p;
+  button* close_p;
+  
+  QGridLayout* layout_p;
+  
+  int first_line;
+  
+  void update_buttons();
+  
+  private slots:
+  void previous_clicked();
+  void print_line_1_clicked();
+  void print_line_2_clicked();
+  void print_line_3_clicked();
+  void print_line_4_clicked();
+  void print_line_5_clicked();
+  void repeat_line_1_clicked();
+  void repeat_line_2_clicked();
+  void repeat_line_3_clicked();
+  void repeat_line_4_clicked();
+  void repeat_line_5_clicked();
+  void next_clicked();
 };
 
 #endif

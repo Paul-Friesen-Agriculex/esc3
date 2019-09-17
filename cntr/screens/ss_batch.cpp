@@ -83,7 +83,13 @@ ss_batch::ss_batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_drive
   status_box_p = new message_box;
   status_box_p -> setMinimumSize(250,100);
   save_program_button_p = new button("Save Spreadsheet\nSetup");
-  reprint_button_p = new button("Reprint\nenvelope");
+  
+  reprint_button_1_p = new button("");
+  reprint_button_2_p = new button("");
+  manual_print_button_p = new button("Manual\noperation");
+//  update_reprint_buttons();
+  
+  
   quit_button_p = new button("Quit");
   barcode_status_p = new message_box;
   
@@ -119,9 +125,11 @@ ss_batch::ss_batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_drive
   speed_layout_p -> addWidget(dump_speed_set_p, 2, 1);
   bottom_layout_p -> addWidget(status_box_p, 0, 0, 2, 1);
   bottom_layout_p -> addWidget(save_program_button_p, 0, 2);
-  bottom_layout_p -> addWidget(reprint_button_p, 0, 3);
-  bottom_layout_p -> addWidget(quit_button_p, 0, 5);
-  bottom_layout_p -> addWidget(barcode_status_p, 1, 2, 1, 3);
+  bottom_layout_p -> addWidget(reprint_button_1_p, 0, 3);
+  bottom_layout_p -> addWidget(reprint_button_2_p, 0, 4);
+  bottom_layout_p -> addWidget(manual_print_button_p, 0, 5);
+  bottom_layout_p -> addWidget(quit_button_p, 0, 6);
+  bottom_layout_p -> addWidget(barcode_status_p, 1, 2, 1, 4);
   main_layout_p -> addWidget(top_box_p, 0, 0, 1, 2);
   main_layout_p -> addWidget(control_box_p, 1, 0);
   main_layout_p -> addWidget(ss_table_p, 1, 1);
@@ -144,7 +152,9 @@ ss_batch::ss_batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_drive
   connect(low_speed_set_p, SIGNAL(valueChanged(int)), batch_mode_driver_p, SLOT(set_low_feed_speed(int)));
   connect(dump_speed_set_p, SIGNAL(valueChanged(int)), batch_mode_driver_p, SLOT(set_dump_feed_speed(int)));
   connect(save_program_button_p, SIGNAL(clicked()), this, SLOT(save_program_clicked()));
-  connect(reprint_button_p, SIGNAL(clicked()), this, SLOT(reprint_clicked()));
+  connect(reprint_button_1_p, SIGNAL(clicked()), this, SLOT(reprint_button_1_clicked()));
+  connect(reprint_button_2_p, SIGNAL(clicked()), this, SLOT(reprint_button_2_clicked()));
+  connect(manual_print_button_p, SIGNAL(clicked()), this, SLOT(manual_print_button_clicked()));
   connect(quit_button_p, SIGNAL(clicked()), this, SLOT(quit_clicked()));
   connect(barcode_line_p, SIGNAL(barcode_entered(QString)), batch_mode_driver_p, SLOT(barcode_entered(QString)));
 //  connect(batch_mode_driver_p, SIGNAL(seed_lot_barcode_entered(QString)), ss_table_p, SLOT(enter_seed_lot_barcode(QString)));
@@ -229,7 +239,8 @@ ss_batch::ss_batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_drive
   
   batch_mode_driver_p ->fill_ss_column_pointers();
   ss_table_p -> refresh();
-  
+  reprint_line_1 = reprint_line_2 = 0;
+  update_reprint_buttons();
   
   
    
@@ -246,6 +257,8 @@ ss_batch::ss_batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_drive
   
   main_layout_p->setRowMinimumHeight(5, 0);
   main_layout_p->setRowStretch(5, 0);
+  
+  manual_operation_window_p = 0;
   
   batch_mode_driver_p -> use_spreadsheet = true;
 
@@ -429,12 +442,12 @@ void ss_batch::save_program_clicked()
   centre_p->add_waiting_screen(29);//batch_save_ss_setup
   centre_p->screen_done = true;
 }
-
+/*
 void ss_batch::reprint_clicked()
 {
   batch_mode_driver_p -> envelope_p -> print();
 }
-
+*/
 void ss_batch::quit_clicked()
 {
   batch_mode_driver_p -> stop();
@@ -807,10 +820,261 @@ void ss_batch::run()
     
   old_barcode_mode = batch_mode_driver_p->barcode_mode;
   
-
+  update_reprint_buttons();
       
-      
+//  barcode_line_p->setFocus();    
 }
+
+void ss_batch::update_reprint_buttons()
+{
+
+//  cout<<"ssbu1\n";
+
+  QString reprint_message = "reprint pack\n";
+  if(batch_mode_driver_p->spreadsheet_line_number >= 0)//-1 value used to signal no more seeds for seed lot.  Do not update in this case.
+  {
+    reprint_line_1 = batch_mode_driver_p->spreadsheet_line_number;
+  }
+
+//  cout<<"ssbu2.  reprint_line_1 = "<<reprint_line_1<<".  batch_mode_driver_p->ss_envelope_id_p->data_list.size() = "<<batch_mode_driver_p->ss_envelope_id_p->data_list.size()<<endl;
+
+  if( (reprint_line_1<0)  ||  (reprint_line_1>=batch_mode_driver_p->ss_envelope_id_p->data_list.size())  )//not expected 
+  {
+    cout<<"ss_batch:update_reprint_buttons.  reprint_line_1 = "<<reprint_line_1<<"\n";
+    exit(1);
+  }
+
+//  cout<<"ssbu3\n";
+
+  reprint_message.append(batch_mode_driver_p->ss_envelope_id_p->data_list[reprint_line_1]);
+  reprint_button_1_p -> setText(reprint_message);
+  
+
+//  cout<<"ssbu4\n";
+
+  reprint_message = "reprint pack\n";
+  reprint_line_2 = reprint_line_1 - 1;
+
+//  cout<<"ssbu5\n";
+
+  if(reprint_line_2>=0)
+  {
+    reprint_message.append(batch_mode_driver_p->ss_envelope_id_p->data_list[reprint_line_2]);
+    reprint_button_2_p->setText(reprint_message);
+    reprint_button_2_p->show();
+  }
+  else
+  {
+    reprint_button_2_p->hide();
+  }
+
+//  cout<<"ssbu6\n";
+
+}
+
+void ss_batch::reprint_button_1_clicked()
+{
+  batch_mode_driver_p -> envelope_p -> print(reprint_line_1);
+  
+  
+  
+/*  int original_spreadsheet_line_number = batch_mode_driver_p->spreadsheet_line_number;//remember, restore later
+  batch_mode_driver_p->spreadsheet_line_number = reprint_line_1;
+  batch_mode_driver_p -> envelope_p -> print();
+  batch_mode_driver_p->spreadsheet_line_number = original_spreadsheet_line_number;*/
+}
+  
+void ss_batch::reprint_button_2_clicked()
+{
+  batch_mode_driver_p -> envelope_p -> print(reprint_line_2);
+
+
+/*  int original_spreadsheet_line_number = batch_mode_driver_p->spreadsheet_line_number;//remember, restore later
+  
+  cout<<"reprint_button_2_clicked.  reprint_line_1 = "<<reprint_line_1<<".  reprint_line_2 = "<<reprint_line_2<<endl;
+  
+  batch_mode_driver_p->spreadsheet_line_number = reprint_line_2;
+  batch_mode_driver_p -> envelope_p -> print();
+  batch_mode_driver_p->spreadsheet_line_number = original_spreadsheet_line_number;*/
+}
+  
+void ss_batch::manual_print_button_clicked()
+{
+  manual_operation_window_p = new manual_operation_window(0, batch_mode_driver_p);
+  manual_operation_window_p -> show();
+  barcode_line_p -> setFocus();
+  
+//  manual_operation_window box(batch_mode_driver_p);
+//  box.show();
+}
+  
+  
+  
+manual_operation_window::manual_operation_window(QWidget* parent, batch_mode_driver* batch_mode_driver_p_s)
+:QWidget(parent)
+{
+  batch_mode_driver_p = batch_mode_driver_p_s;
+//  setMaximumSize(800, 480);		//Original~~~
+  setGeometry(0,0,100,480);		//Original~~~
+  
+  layout_p = new QGridLayout;
+  previous_p = new button("Previous line");
+  print_line_1_p = new button("");
+  print_line_2_p = new button("");
+  print_line_3_p = new button("");
+  print_line_4_p = new button("");
+  print_line_5_p = new button("");
+  repeat_line_1_p = new button("");
+  repeat_line_2_p = new button("");
+  repeat_line_3_p = new button("");
+  repeat_line_4_p = new button("");
+  repeat_line_5_p = new button("");
+  next_p = new button("Next line");
+  close_p = new button("Close");
+  
+  layout_p -> addWidget(previous_p,0,0,1,2);
+  layout_p -> addWidget(print_line_1_p,1,0);
+  layout_p -> addWidget(print_line_2_p,2,0);
+  layout_p -> addWidget(print_line_3_p,3,0);
+  layout_p -> addWidget(print_line_4_p,4,0);
+  layout_p -> addWidget(print_line_5_p,5,0);
+  layout_p -> addWidget(repeat_line_1_p,1,1);
+  layout_p -> addWidget(repeat_line_2_p,2,1);
+  layout_p -> addWidget(repeat_line_3_p,3,1);
+  layout_p -> addWidget(repeat_line_4_p,4,1);
+  layout_p -> addWidget(repeat_line_5_p,5,1);
+  layout_p -> addWidget(next_p,6,0,1,2);
+  layout_p -> addWidget(close_p,7,0,1,2);
+  setLayout(layout_p);
+  
+  connect(previous_p, SIGNAL(clicked()), this, SLOT(previous_clicked()));
+  connect(print_line_1_p, SIGNAL(clicked()), this, SLOT(print_line1_clicked()));
+  connect(print_line_2_p, SIGNAL(clicked()), this, SLOT(print_line2_clicked()));
+  connect(print_line_3_p, SIGNAL(clicked()), this, SLOT(print_line3_clicked()));
+  connect(print_line_4_p, SIGNAL(clicked()), this, SLOT(print_line4_clicked()));
+  connect(print_line_5_p, SIGNAL(clicked()), this, SLOT(print_line5_clicked()));
+  connect(repeat_line_1_p, SIGNAL(clicked()), this, SLOT(repeat_line1_clicked()));
+  connect(repeat_line_2_p, SIGNAL(clicked()), this, SLOT(repeat_line2_clicked()));
+  connect(repeat_line_3_p, SIGNAL(clicked()), this, SLOT(repeat_line3_clicked()));
+  connect(repeat_line_4_p, SIGNAL(clicked()), this, SLOT(repeat_line4_clicked()));
+  connect(repeat_line_5_p, SIGNAL(clicked()), this, SLOT(repeat_line5_clicked()));
+  connect(next_p, SIGNAL(clicked()), this, SLOT(next_clicked()));
+  connect(close_p, SIGNAL(clicked()), this, SLOT(deleteLater()));
+  
+  first_line = batch_mode_driver_p->spreadsheet_line_number-5;
+  update_buttons();//will check first_line and may change it
+  
+//  show();
+  
+//  cout<<"end of manual_operation_window constructor\n";
+  
+}
+
+void manual_operation_window::update_buttons()
+{
+  int max_first_line = batch_mode_driver_p->ss_envelope_id_p->data_list.size()-5;
+  if(first_line<0) first_line = 0;
+  if(first_line>max_first_line) first_line = max_first_line;
+  
+  if(first_line>=0)
+  {
+    print_line_1_p -> setText(QString("Reprint ") + batch_mode_driver_p->ss_envelope_id_p->data_list[first_line]); 
+    repeat_line_1_p -> setText(QString("Repeat ") + batch_mode_driver_p->ss_envelope_id_p->data_list[first_line]); 
+  }
+  else
+  {
+    print_line_1_p -> hide();
+    repeat_line_1_p -> hide();
+  }
+  
+  if(first_line+1>=0)
+  {
+    print_line_2_p -> setText(QString("Reprint ") + batch_mode_driver_p->ss_envelope_id_p->data_list[first_line+1]); 
+    repeat_line_2_p -> setText(QString("Repeat ") + batch_mode_driver_p->ss_envelope_id_p->data_list[first_line+1]); 
+  }
+  else
+  {
+    print_line_2_p -> hide();
+  }
+  
+  if(first_line+2>=0)
+  {
+    print_line_3_p -> setText(QString("Reprint ") + batch_mode_driver_p->ss_envelope_id_p->data_list[first_line+2]); 
+    repeat_line_3_p -> setText(QString("Repeat ") + batch_mode_driver_p->ss_envelope_id_p->data_list[first_line+2]); 
+  }
+  else
+  {
+    print_line_3_p -> hide();
+  }
+  
+  if(first_line+3>=0)
+  {
+    print_line_4_p -> setText(QString("Reprint ") + batch_mode_driver_p->ss_envelope_id_p->data_list[first_line+3]); 
+    repeat_line_4_p -> setText(QString("Repeat ") + batch_mode_driver_p->ss_envelope_id_p->data_list[first_line+3]); 
+  }
+  else
+  {
+    print_line_4_p -> hide();
+  }
+  
+  if(first_line+4>=0)
+  {
+    print_line_5_p -> setText(QString("Reprint ") + batch_mode_driver_p->ss_envelope_id_p->data_list[first_line+4]); 
+    repeat_line_5_p -> setText(QString("Repeat ") + batch_mode_driver_p->ss_envelope_id_p->data_list[first_line+4]); 
+  }
+  else
+  {
+    print_line_5_p -> hide();
+  }
+}
+
+void manual_operation_window::previous_clicked()
+{
+  --first_line;
+  update_buttons();//will check first_line and may change it
+}
+
+void manual_operation_window::print_line_1_clicked()
+{
+  if(first_line<0) return;
+  batch_mode_driver_p -> envelope_p -> print(first_line);
+}
+  
+void manual_operation_window::print_line_2_clicked()
+{
+  if(first_line+1<0) return;
+  batch_mode_driver_p -> envelope_p -> print(first_line+1);
+}
+  
+void manual_operation_window::print_line_3_clicked()
+{
+  if(first_line+2<0) return;
+  batch_mode_driver_p -> envelope_p -> print(first_line+2);
+}
+  
+void manual_operation_window::print_line_4_clicked()
+{
+  if(first_line+3<0) return;
+  batch_mode_driver_p -> envelope_p -> print(first_line+3);
+}
+  
+void manual_operation_window::print_line_5_clicked()
+{
+  if(first_line+4<0) return;
+  batch_mode_driver_p -> envelope_p -> print(first_line+4);
+}
+  
+void manual_operation_window::next_clicked()
+{
+  ++first_line;
+  update_buttons();//will check first_line and may change it
+}
+
+void manual_operation_window::repeat_line_1_clicked()
+{
+  if(first_line<0) return;
+  batch_mode_driver_p->ss_first_column_p->data_list[first_line] = "N";
+  
 
 
 /*  

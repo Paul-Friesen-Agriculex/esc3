@@ -37,7 +37,7 @@ void brother_envelope_feeder::run()
 	}
 	else if((delay_sensor_triggered->isActive()) && !envelope_feeder_sensor_triggered)
 	{
-	  delay_sensor_triggered->start(1200);	//original 1400ms//
+	  delay_sensor_triggered->start(2000);	//original 1400ms//
 	}
   }
   
@@ -52,7 +52,7 @@ void brother_envelope_feeder::run()
   else
   {
     motor_on();
-    delay_sensor_triggered->start(1200); //original 1400 ms//	//delay to allow envelope to be pushed further into printer
+    delay_sensor_triggered->start(2000); //original 1400 ms//	//delay to allow envelope to be pushed further into printer
 //    cout<<endl<<"push envelope further"<<endl;	//OMIT~~~//
 //    int system_int; 							//OMIT~~~//
 //    system_int = system("date \"+%M:%S:%N\"");	//OMIT~~~//

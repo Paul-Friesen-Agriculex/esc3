@@ -207,12 +207,17 @@ number of seeds for each packet.");
   
     none_p -> hide();
   }
-  if(mode=='e') message_p->setText(" \
-Pick envelope id. column (optional). \n\n \
-This can contain a unique identifier for \n \
+  if(mode=='e') 
+  {
+    message_p->setText(" \
+Pick envelope id. column. \n\n \
+Should contain a unique identifier for \n \
 each packet.  If printed on the envelope in \n \
 barcode, the barcode can be checked against \n \
 this column.");  
+
+    none_p -> hide();
+  }
   if(mode=='a') message_p->setText(" \
 Pick actual count column (optional)\n\n \
 If selected, the number of seeds counted will \n \
