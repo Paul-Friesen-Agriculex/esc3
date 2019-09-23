@@ -46,7 +46,7 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
   back_button_p = new button("Back");
   barcode_line_p = new barcode_line;
   barcode_line_p->setMaximumSize(120,40);  //ORIGINAL~~~
-  rescan_button_p = new button("Rescan seed lot barcode");
+//  rescan_button_p = new button("Rescan seed lot barcode");
   restart_button_p = new button("Dump out and\nrestart seed lot");
   high_speed_label_p = new QLabel("High");
   high_speed_set_p = new QSlider;
@@ -98,7 +98,7 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
   bottom_layout_p -> addWidget(barcode_line_p, 1, 4); 
   barcode_line_p -> setText("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");  
   barcode_line_p -> clear();  
-  control_layout_p -> addWidget(rescan_button_p, 0, 0);
+//  control_layout_p -> addWidget(rescan_button_p, 0, 0);
   control_layout_p -> addWidget(restart_button_p, 0, 1);
   control_layout_p -> addWidget(speed_box_p, 1, 0, 1, 2);     
   speed_layout_p -> addWidget(high_speed_label_p, 0, 0);
@@ -126,7 +126,7 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
   
   connect(options_button_p, SIGNAL(clicked()), this, SLOT(options_clicked()));
   connect(back_button_p, SIGNAL(clicked()), this, SLOT(back_clicked()));
-  connect(rescan_button_p, SIGNAL(clicked()), this, SLOT(rescan_clicked()));
+//  connect(rescan_button_p, SIGNAL(clicked()), this, SLOT(rescan_clicked()));
   connect(restart_button_p, SIGNAL(clicked()), this, SLOT(restart_clicked()));
   connect(high_speed_set_p, SIGNAL(valueChanged(int)), batch_mode_driver_p, SLOT(set_high_feed_speed(int)));
   connect(low_speed_set_p, SIGNAL(valueChanged(int)), batch_mode_driver_p, SLOT(set_low_feed_speed(int)));
@@ -238,6 +238,7 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
 
 batch::~batch()
 {
+  cout<<"~batch start\n";
   run_timer_p -> stop();
   table_p->save_file(QString("settings/batch_backup"));
   batch_mode_driver_p -> stop();
@@ -261,6 +262,7 @@ batch::~batch()
   delete bottom_box_p;
   delete control_layout_p;
   delete main_layout_p;
+  cout<<"~batch end\n";
   
 }
 /*
@@ -340,13 +342,14 @@ void batch::back_clicked()
   centre_p->add_waiting_screen(centre_p->get_previous_screen());
   centre_p->screen_done=true;
 }
-
+/*
 void batch::rescan_clicked()
 {
-  batch_mode_driver_p->mode = wait_for_seed_lot_barcode;
-  batch_mode_driver_p->seed_lot_barcode_ok = false;
+//  batch_mode_driver_p->mode = wait_for_seed_lot_barcode;
+//  batch_mode_driver_p->seed_lot_barcode_ok = false;
+  
 }
-
+*/
 void batch::restart_clicked()
 {
   batch_mode_driver_p -> restart();

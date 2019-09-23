@@ -17,6 +17,7 @@ batch_table::batch_table(centre* c_p, batch_mode_driver* batch_mode_driver_p_s)
   model_row = 0;
   model_column = 0;
   filled_rows = 0;
+//  latest_seed_lot_barcode_row = 0;
   model_p = new QStandardItemModel(1,4);
   for(int j=0; j<4; ++j)
   {
@@ -143,6 +144,7 @@ void batch_table::enter_seed_lot_barcode(QString barcode)
 //  QModelIndex next_index = model_p->index(model_row, model_column);
 //  setCurrentIndex(next_index);
   model_p -> item(model_row, model_column) -> setData(QVariant(barcode), Qt::DisplayRole);
+//  latest_seed_lot_barcode_row = model_row;
   resizeColumnsToContents();
   
   ++model_row;  
@@ -347,3 +349,13 @@ void batch_table::clear()
   resizeColumnsToContents();
 //  setFocus();
 }
+/*
+void batch_table::re_enter_seed_lot_barcode(QString barcode)//will enter new barcode in line latest_seed_lot_barcode_row
+{
+  barcode = barcode.trimmed();//remove whitespace at ends
+  model_p -> item(latest_seed_lot_barcode_row, 0) -> setData(QVariant(barcode), Qt::DisplayRole);
+  resizeColumnsToContents();
+  emit focus_on_barcode();
+}
+*/  
+

@@ -30,6 +30,7 @@ ss_options::ss_options(centre*set_centre_p, batch_mode_driver* set_batch_mode_dr
   
   record_only_p = new QRadioButton("Record barcodes only - no matching");
 
+  back_button_p = new button("Back");
   envelope_layout_p = new button("Envelope layout");
   column_display_p = new button("Display columns");
   macro_menu_button_p = new button("Macro Menu");
@@ -56,6 +57,7 @@ ss_options::ss_options(centre*set_centre_p, batch_mode_driver* set_batch_mode_dr
   main_layout_p = new QGridLayout;
 //  main_layout_p -> addWidget(require_seed_lot_barcode_p);
   main_layout_p -> addWidget(require_pack_barcode_p, 0, 0);
+  main_layout_p -> addWidget(back_button_p, 0, 2);
   main_layout_p -> addWidget(barcode_matching_group_p, 1, 0, 1, 3);
   main_layout_p -> addWidget(print_control_group_p, 2, 0, 3, 1);
   main_layout_p -> addWidget(envelope_layout_p, 2, 1);
@@ -67,6 +69,7 @@ ss_options::ss_options(centre*set_centre_p, batch_mode_driver* set_batch_mode_dr
 //  require_seed_lot_barcode_p -> setAutoExclusive(false);
   require_pack_barcode_p -> setAutoExclusive(false);
   
+  connect(back_button_p, SIGNAL(clicked()), this, SLOT(back_button_clicked()));
   connect(start_on_pack_collect_p, SIGNAL(toggled(bool)), this, SLOT(start_on_pack_collect_clicked(bool)));
   connect(start_on_previous_pack_collect_p, SIGNAL(toggled(bool)), this, SLOT(start_on_previous_pack_collect_clicked(bool)));
   connect(preprint_batch_p, SIGNAL(toggled(bool)), this, SLOT(preprint_batch_clicked(bool)));
@@ -95,6 +98,21 @@ ss_options::ss_options(centre*set_centre_p, batch_mode_driver* set_batch_mode_dr
   {
     preprint_batch_p->setChecked(true);
   }
+  
+  if(batch_mode_driver_p->print_envelope == false)
+  {
+    start_on_pack_collect_p->hide();
+    start_on_previous_pack_collect_p->hide();
+    preprint_batch_p->hide();
+    envelope_layout_p->hide();
+  }
+}
+
+
+void ss_options::back_button_clicked()
+{
+  centre_p->add_waiting_screen(centre_p->get_previous_screen());
+  centre_p->screen_done=true;
 }
 
 void ss_options::done_button_clicked()

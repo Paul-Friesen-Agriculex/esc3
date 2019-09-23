@@ -165,6 +165,9 @@ void ss_batch_table::refresh()
   selectionModel()->setCurrentIndex(model_p->index(current_row, 0), QItemSelectionModel::NoUpdate);
   setCurrentIndex(model_p->index(current_row, 0));
 
+  resizeColumnsToContents();
+
+
 //  cout<<"ss_batch_table::refresh() 3\n";
   
   /*

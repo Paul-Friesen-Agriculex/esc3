@@ -15,6 +15,7 @@ class batch_table:public QTableView
   
   private:
   int model_row, model_column;
+//  int latest_seed_lot_barcode_row;
   int filled_rows;
   QStandardItemModel* model_p;
   centre* centre_p;
@@ -35,6 +36,7 @@ class batch_table:public QTableView
   void save_file(QString file_name);
   void load_file(QString file_name);
   void clear();
+//  void re_enter_seed_lot_barcode(QString barcode);//will enter new barcode in line latest_seed_lot_barcode_row
   
   signals:
   void focus_on_barcode();//signal to batch to return keyboard focus to barcode

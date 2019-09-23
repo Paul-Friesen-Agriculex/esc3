@@ -732,6 +732,7 @@ screen::screen(centre* set_centre_p)
   setGeometry(0,0,800,480);		//Original~~~
   //setMaximumSize(1000,600);		  //TEST~~~
   //setGeometry(0,0,1000,600);		//TEST~~~
+
   
   setStyleSheet(
     "button {"
@@ -743,12 +744,8 @@ screen::screen(centre* set_centre_p)
         "stop: 0 #f6f7fa, stop: 1 #dadbde);"
         "min-width: 40px;}"
         
-    /*"QPushButton {"
-        "font-size: 13pt;}"*/
-        
     "QPushButton {"
         "border: 2px solid #8f8f91;"
-        //"height: 25px;"
         "font: 16px;"
         "border-radius: 8px;"
         "background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
@@ -783,9 +780,6 @@ screen::screen(centre* set_centre_p)
         "border: 0px;"
         "max-height: 480px;}"
     
-    /*"QTableWidget {"                    //macro-screen//
-        "font-size: 13pt;}"*/
-
     "QTabWidget {"                    //macro-screen//
         "font-size: 13pt;}"
         
@@ -796,13 +790,19 @@ screen::screen(centre* set_centre_p)
         "font-size: 13pt;"
         "border: 2px solid #8f8f91;}"
         
-    "QScrollBar {"
+    "QScrollBar::vertical {"
         "width: 60px;"
         "border: 1px solid #404040;"
-        //"border: 3px solid white;"
-        //"border: 3px solid #595959;"
         "background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
-        "stop: 0 #f6f7fa, stop: 1 #dadbde);}"
+        "stop: 0 #f6f7fa, stop: 1 #dadbde);"
+        "}"
+
+    "QScrollBar::horizontal {"
+        "height: 40px;"
+        "border: 1px solid #404040;"
+        "background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
+        "stop: 0 #f6f7fa, stop: 1 #dadbde);"
+        "}"
         
     "QScrollBar::handle {"
         //"border: 3px solid black;"
@@ -810,8 +810,7 @@ screen::screen(centre* set_centre_p)
         "min-height: 40px;"
         "border-radius: 12px;"
         "background: white;"
-        /*"margin-top: 64px;"
-        "margin-bottom: 64px;*/"}"
+        "}"
       
     "QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {"
         "width: 0;"
@@ -832,21 +831,24 @@ screen::screen(centre* set_centre_p)
         "border: none;"
         "background: none;}"
         
-    /*"QScrollBar::up-arrow:vertical {"
-        //"background: black;"
-        "height: 20px;"
-        "width: 60px;"
-        "border: 3px solid #595959;}"
+    "QScrollBar::up-arrow:horizontal, QScrollBar::down-arrow:horizontal {"
+        "width: 0;"
+        "height: 0;"
+        "border: none;"
+        "background: none;"
+        "color: none;}"
         
-    "QScrollBar::down-arrow:vertical: {"
-        //"background: black;"
-        "height: 20px;"
-        "width: 60px;"
-        "border: 3px solid #595959;}"*/
-        
-    /*"QCheckBox {"
-        "width: 100px;"
-        "height: 100px;}"*/
+    "QScrollBar::add-line:horizontal {"
+        "width: 0;"
+        "height: 0;"      
+        "border: none;"
+        "background: none;}"
+
+    "QScrollBar::sub-line:horizontal {"
+        "width: 0;"
+        "height: 0;"
+        "border: none;"
+        "background: none;}"
         
     "QRadioButton::indicator {"
         "font-size: 15pt;"

@@ -180,7 +180,8 @@ class batch_mode_driver : public QObject
   spreadsheet_column* get_spreadsheet_column_pointer(QString column_heading);
   int spreadsheet_number_of_lines;//does not include heading line
   int spreadsheet_number_of_columns;
-  int spreadsheet_line_number;//number of the line for the packet being filled
+  int spreadsheet_line_number;//number of the line for the packet being filled.  When cutgate is closed, this is the line for the sample in it.
+  int end_valve_spreadsheet_line_number;//number of the line for the sample in the end gate.
   int get_next_spreadsheet_line_number();//look for next line number not filled for current seed_lot_barcode.  Return -1 if no more.
   int get_spreadsheet_line_number_after(int val);//look for line number not filled for current seed_lot_barcode, following val.  Return -1 if no more.
   int lines_left_to_fill;//number of packs for current seed_lot_bar_code still to be filled.  set by get_next_spreadsheet_line_number().

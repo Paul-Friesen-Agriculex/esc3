@@ -209,6 +209,7 @@ void position_envelope_field::done_button_clicked()
 {
   batch_mode_driver_p -> print_envelope = true;
   centre_p -> add_waiting_screen(33);//ss_batch
+  centre_p -> add_waiting_screen(31);//ss_options
   centre_p -> screen_done = true;
 }
 

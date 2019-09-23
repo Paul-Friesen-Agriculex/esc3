@@ -63,6 +63,7 @@ class ss_batch : public screen
   ss_batch(centre*set_centre_p, batch_mode_driver* set_batch_mode_driver_p);
   ~ss_batch();
   batch_mode_driver* batch_mode_driver_p;
+  bool manual_operation_window_created;
   
   public slots:
 //  void pack_ready();
@@ -171,10 +172,11 @@ class manual_operation_window : public QWidget
   Q_OBJECT
   
   public:
-  manual_operation_window(QWidget* parent, batch_mode_driver* batch_mode_driver_p_s);
+  manual_operation_window(QWidget* parent, batch_mode_driver* batch_mode_driver_p_s, ss_batch* ss_batch_p_s);
   
   private:
   batch_mode_driver* batch_mode_driver_p;
+  ss_batch* ss_batch_p;
   
   button* previous_p;
   button* print_line_1_p;
@@ -209,6 +211,7 @@ class manual_operation_window : public QWidget
   void repeat_line_4_clicked();
   void repeat_line_5_clicked();
   void next_clicked();
+  void close_clicked();
 };
 
 #endif

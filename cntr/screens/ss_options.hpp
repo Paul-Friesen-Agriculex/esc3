@@ -25,6 +25,7 @@ class ss_options : public screen
 //  ~batch();
   
   private slots:
+  void back_button_clicked();
   void envelope_layout_button_clicked();
   void column_display_button_clicked();
   void macro_menu_button_clicked();
@@ -50,6 +51,7 @@ class ss_options : public screen
   QRadioButton* start_on_previous_pack_collect_p;
   QRadioButton* preprint_batch_p;
   
+  button* back_button_p;
   button* envelope_layout_p;
   button* column_display_p;
   button* macro_menu_button_p;

@@ -63,7 +63,9 @@ void set_envelope_size::back_button_clicked()
 
 void set_envelope_size::no_envelope_button_clicked()
 {
+  batch_mode_driver_p->print_envelope = false;
   centre_p->add_waiting_screen(33);//ss_batch
+  centre_p->add_waiting_screen(31);//ss_options
   centre_p->screen_done = true;
 }
 

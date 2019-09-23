@@ -21,9 +21,7 @@ void ss_barcode_line::keyPressEvent(QKeyEvent* event)
   QLineEdit::keyPressEvent(event); //TEST~~~
   if(event->key() == Qt::Key_Return)
   {
-//    cout<<"about to emit barcode_entered("<<displayText().toStdString()<<")\n";
     emit barcode_entered(displayText());  //TEST~~~
-//    cout<<"emitted barcode_entered("<<displayText().toStdString()<<")\n";
     clear();
   }
 }
@@ -87,7 +85,6 @@ ss_batch::ss_batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_drive
   reprint_button_1_p = new button("");
   reprint_button_2_p = new button("");
   manual_print_button_p = new button("Manual\noperation");
-//  update_reprint_buttons();
   
   
   quit_button_p = new button("Quit");
@@ -157,8 +154,6 @@ ss_batch::ss_batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_drive
   connect(manual_print_button_p, SIGNAL(clicked()), this, SLOT(manual_print_button_clicked()));
   connect(quit_button_p, SIGNAL(clicked()), this, SLOT(quit_clicked()));
   connect(barcode_line_p, SIGNAL(barcode_entered(QString)), batch_mode_driver_p, SLOT(barcode_entered(QString)));
-//  connect(batch_mode_driver_p, SIGNAL(seed_lot_barcode_entered(QString)), ss_table_p, SLOT(enter_seed_lot_barcode(QString)));
-//  connect(batch_mode_driver_p, SIGNAL(pack_barcode_entered(QString)), ss_table_p, SLOT(enter_pack_barcode(QString)));
   connect(low_speed_set_p, SIGNAL(sliderReleased()), this, SLOT(focus_on_barcode()));
 
   centre_p->set_endgate_state(ENDGATE_CLOSED);
@@ -183,22 +178,12 @@ ss_batch::ss_batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_drive
   mode = old_mode = wait_for_seed_lot_barcode;
   end_valve_mode = old_end_valve_mode = ss_closed_empty;
   
-  
-//  pack_was_placed = false;
-//  pack_was_removed = false;
-//  seed_for_pack_ready = false;
-//  pack_can_be_removed = false;
-//  ss_pack_removed_too_soon = false;
   pack_ready_message = "Pack Ready";
   pack_removed_too_soon_message = "Pack Not Ready\nPut Back";
-//  dump_container_was_placed = false;
-//  dump_container_can_be_removed = false;
-//  ss_dump_container_removed_too_soon = false;
   dump_container_needed_message = "Place Dump\nContainer";
   dump_container_ready_message = "Finished Dumping";
   dump_container_removed_too_soon_message = "Dumping Not\nFinished";
   bad_seed_lot_message = "Count went over limit.\nDiscard seed lot.\nReduce feed speed.";
-//  dump_flag = false;
   old_barcode_mode = pack;
   
   cout<<"p5\n";
@@ -209,40 +194,20 @@ ss_batch::ss_batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_drive
   connect(batch_mode_driver_p, SIGNAL(dump_complete(int)), this, SLOT(dump_complete(int)));
   connect(batch_mode_driver_p, SIGNAL(dumping()), this, SLOT(dumping()));
   connect(ss_table_p, SIGNAL(focus_on_barcode()), this, SLOT(focus_on_barcode()));
-//  connect(batch_mode_driver_p, SIGNAL(pack_ready()), this, SLOT(pack_ready()));
   
   connect(batch_mode_driver_p, SIGNAL(bad_lot_signal()), this, SLOT(bad_lot_slot()));
   connect(batch_mode_driver_p, SIGNAL(refresh_screen()), this, SLOT(refresh_screen()));
     
-//  table_p->load_file("settings/batch_backup");
-  
-//  if(batch_mode_driver_p->bm_save_program_filename != "")//returning from batch_save_program screen with name of file to save
-//  {
-//    batch_mode_driver_p->save_program(batch_mode_driver_p->bm_save_program_filename);
-//    batch_mode_driver_p->bm_save_program_filename = "";
-//  }
-
   if(batch_mode_driver_p->bm_save_ss_setup_filename != "")//returning from batch_save_ss_setup screen with name of file to save
   {
     batch_mode_driver_p->save_ss_setup(batch_mode_driver_p->bm_save_ss_setup_filename);
     batch_mode_driver_p->bm_save_ss_setup_filename = "";
   }
   
-//  if(batch_mode_driver_p->bm_save_table_filename != "")//returning from batch_save_table_file screen with name of file to save
-//  {
-    
-//    cout<<"batch::batch.  save file name = "<<batch_mode_driver_p->bm_save_table_filename.toStdString()<<endl;
-    
-//    table_p->save_file(batch_mode_driver_p->bm_save_table_filename);
-//    batch_mode_driver_p->bm_save_table_filename = "";
-//  }
-  
   batch_mode_driver_p ->fill_ss_column_pointers();
   ss_table_p -> refresh();
   reprint_line_1 = reprint_line_2 = 0;
   update_reprint_buttons();
-  
-  
    
   cout<<"p0\n";
   cout<<"heading "<<batch_mode_driver_p->ss_material_id_p->heading.toStdString()<<endl;
@@ -259,6 +224,7 @@ ss_batch::ss_batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_drive
   main_layout_p->setRowStretch(5, 0);
   
   manual_operation_window_p = 0;
+  manual_operation_window_created = false;
   
   batch_mode_driver_p -> use_spreadsheet = true;
 
@@ -273,10 +239,8 @@ ss_batch::ss_batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_drive
 
 ss_batch::~ss_batch()
 {
+  cout<<"~ss_batch start\n";
   run_timer_p -> stop();
-//  table_p->save_file(QString("settings/batch_backup"));
-//  bool spreadsheet_saved = false;
-//  bool exit_loop = false;
   while(1)
   {
     cout<<"spreadsheet_filename = "<<batch_mode_driver_p->spreadsheet_filename.toStdString()<<endl;
@@ -307,7 +271,6 @@ ss_batch::~ss_batch()
   delete dump_speed_set_p;
   delete ss_table_p;
   delete status_box_p;
-//  delete clear_table_button_p;
   delete quit_button_p;
   delete top_layout_p;
   delete top_box_p;
@@ -316,39 +279,18 @@ ss_batch::~ss_batch()
   delete control_layout_p;
   delete main_layout_p;
   
+  if(manual_operation_window_created) delete manual_operation_window_p;
+  manual_operation_window_created = false;
+  manual_operation_window_p = 0;
+  cout<<"~ss_batch end\n";
 }
-/*
-void batch::pack_ready()
-{
-  seed_for_pack_ready = true;//will stay true until pack is removed
-}  
-*/
+
 void ss_batch::pack_collected(int count_to_record)
 {
-//  pack_can_be_removed = false;
-//  ss_pack_removed_too_soon = false;
-//  pack_was_placed = false;
-
-//  cout<<"ss_batch::pack_collected\n";
-
   if( (end_valve_mode==ss_closed_bad_lot) || (end_valve_mode==ss_open_emptying_bad_lot) ) return;
-  
-//  cout<<"1\n";
-    
-//  table_p->enter_seeds(count_to_record);
-/*
-  if(batch_mode_driver_p->ss_actual_count_p!=0)
-  {
-    cout<<"actual_count_p != 0\n";
-    cout<<"batch_mode_driver_p->spreadsheet_line_number = "<<batch_mode_driver_p->spreadsheet_line_number<<endl;
-    cout<<"batch_mode_driver_p->ss_actual_count_p->data_list.size() = "<<batch_mode_driver_p->ss_actual_count_p->data_list.size()<<endl;
-    batch_mode_driver_p->ss_actual_count_p->data_list[batch_mode_driver_p->spreadsheet_line_number] = QString::number(count_to_record);
-  }
-*/  
   refresh_screen();
   
   barcode_line_p->setFocus();
-//  pack_was_removed = true;
   /*
   //QString Alternative  to Integers//  //11_02_2018~~~//
   int row;
@@ -365,11 +307,7 @@ void ss_batch::pack_collected(int count_to_record)
 }  
 
 void ss_batch::dump_complete(int dump_count)
-//void ss_batch::dump_complete()
 {
-//  dump_container_can_be_removed = true;
-//  dump_container_ready_count = dump_count;
-//  cout<<"ss_batch::dump_complete.  dump_count "<<dump_count<<"\n";
   end_valve_mode = ss_dump_open_empty;
   barcode_line_p->setFocus();
   /*
@@ -428,11 +366,6 @@ void ss_batch::rescan_clicked()
 void ss_batch::restart_clicked()
 {
   batch_mode_driver_p -> restart();
-//  pack_can_be_removed = false;
-//  ss_pack_removed_too_soon = false;
-//  dump_container_can_be_removed = false;
-//  dump_flag = true;
-//  ss_dump_container_removed_too_soon = false;
 }
 
 void ss_batch::save_program_clicked()
@@ -442,12 +375,7 @@ void ss_batch::save_program_clicked()
   centre_p->add_waiting_screen(29);//batch_save_ss_setup
   centre_p->screen_done = true;
 }
-/*
-void ss_batch::reprint_clicked()
-{
-  batch_mode_driver_p -> envelope_p -> print();
-}
-*/
+
 void ss_batch::quit_clicked()
 {
   batch_mode_driver_p -> stop();
@@ -557,12 +485,7 @@ void ss_batch::run()
       if(centre_p->get_endgate_state() == ENDGATE_CLOSED)
       {
         end_valve_mode = ss_closed_empty;
-        
-        
-//        cout<<"        ss_batch::run.  batch_mode_driver_p->pack_complete = "<<batch_mode_driver_p->pack_complete<<".  setting true.\n";
         batch_mode_driver_p->pack_complete = true;
-        
-        
       }
       break;
     case ss_pack_removed_too_soon:
@@ -665,21 +588,6 @@ void ss_batch::run()
       cout<<"end_valve_mode not found\n";
   }
       
-
-
-
-
-
-
-
-
-
-
-
-
-
-//  if( (pack_can_be_removed==true) && (ss_pack_removed_too_soon==false) && (dump_flag==false) )
-  
   if( (end_valve_mode==ss_closed_full) || (end_valve_mode==ss_open_emptying) || (end_valve_mode==ss_open_empty) )
   {
     QString number;
@@ -691,7 +599,6 @@ void ss_batch::run()
     status_box_p->set_background(0, 255, 0);
     status_box_p->update();
   }
-//  else if(ss_pack_removed_too_soon)
   
   else if(end_valve_mode==ss_pack_removed_too_soon)
   {
@@ -700,7 +607,6 @@ void ss_batch::run()
     status_box_p->set_background(255, 0, 0);
     status_box_p->update();
   }
-//  else if(dump_container_can_be_removed)
   else if(end_valve_mode==ss_dump_open_empty)
   {
     status_box_p->set_text(dump_container_ready_message);
@@ -708,7 +614,6 @@ void ss_batch::run()
     status_box_p->set_background(0, 255, 0);
     status_box_p->update();
   }
-//  else if(ss_dump_container_removed_too_soon)
   else if(end_valve_mode==ss_dump_container_removed_too_soon)
   {
     status_box_p->set_text(dump_container_removed_too_soon_message);
@@ -716,7 +621,6 @@ void ss_batch::run()
     status_box_p->set_background(255, 0, 0);
     status_box_p->update();
   }
-//  else if(batch_mode_driver_p->mode == wait_for_bad_lot_cleanout)
   else if( (end_valve_mode==ss_closed_bad_lot) || (end_valve_mode==ss_open_emptying_bad_lot) )
   {
     status_box_p->set_text(bad_seed_lot_message);
@@ -726,7 +630,6 @@ void ss_batch::run()
   }    
   else
   {
-//    if(dump_flag == true)
     if( (end_valve_mode==ss_dump_closed_filling) || (end_valve_mode==ss_dump_pass_through) || (end_valve_mode==ss_dump_open_empty) )
     {
       status_box_p->set_text(dump_container_needed_message);
@@ -776,15 +679,26 @@ void ss_batch::run()
     {
       if(batch_mode_driver_p->pack_barcode_old==true)
       {
-        barcode_status_p->set_text("Scan Pack Barcode");
-        barcode_status_p->set_text_size(30); 
+        QString msg = "Scan Pack Barcode.";
+        if(batch_mode_driver_p->use_spreadsheet == true)
+        {
+          QString spreadsheet_pack_id = batch_mode_driver_p->ss_envelope_id_p->data_list[batch_mode_driver_p->end_valve_spreadsheet_line_number];
+          msg.append("  Pack ");
+          msg.append(spreadsheet_pack_id);
+          msg.append(".\nSeed Lot:"); 
+          msg.append(batch_mode_driver_p->seed_lot_barcode);
+        }
+        barcode_status_p->set_text(msg);
+        barcode_status_p->set_text_size(15); 
         barcode_status_p->set_background(255, 255, 0);
         barcode_status_p->update();
       }
       if( (batch_mode_driver_p->pack_barcode_old==false) && (batch_mode_driver_p->pack_barcode_ok==true) )
       {
-        QString msg = "Barcore OK\nSeed Lot: ";
+        QString msg = "Barcode OK.  Seed Lot: ";
         msg.append(batch_mode_driver_p->seed_lot_barcode);
+        msg.append("\nPack Barcode Scanned: ");
+        msg.append(batch_mode_driver_p->ss_envelope_id_p->data_list[batch_mode_driver_p->end_valve_spreadsheet_line_number]);
         barcode_status_p->set_text(msg);
         barcode_status_p->set_text_size(15); 
         barcode_status_p->set_background(0, 255, 0);
@@ -792,12 +706,19 @@ void ss_batch::run()
       }
       if( (batch_mode_driver_p->pack_barcode_old==false) && (batch_mode_driver_p->pack_barcode_ok==false) )
       {
-        QString msg = "Incorrect Barcore\nSeed Lot: ";
+        QString msg = "Incorrect Barcode";
+        if(batch_mode_driver_p->use_spreadsheet == true)
+        {
+          QString spreadsheet_pack_id = batch_mode_driver_p->ss_envelope_id_p->data_list[batch_mode_driver_p->end_valve_spreadsheet_line_number];
+          msg.append("  Pack required:");
+          msg.append(spreadsheet_pack_id);
+          msg.append(".  Pack scanned:");
+          msg.append(batch_mode_driver_p->pack_barcode);
+        }
+        msg.append("\nSeed Lot: ");
         msg.append(batch_mode_driver_p->seed_lot_barcode);
         barcode_status_p->set_text(msg);
         barcode_status_p->set_text_size(15); 
-//        barcode_status_p->set_text("Incorrect Barcode");
-//        barcode_status_p->set_text_size(30); 
         barcode_status_p->set_background(255, 0, 0);
         barcode_status_p->update();
       }
@@ -822,41 +743,25 @@ void ss_batch::run()
   
   update_reprint_buttons();
       
-//  barcode_line_p->setFocus();    
 }
 
 void ss_batch::update_reprint_buttons()
 {
-
-//  cout<<"ssbu1\n";
 
   QString reprint_message = "reprint pack\n";
   if(batch_mode_driver_p->spreadsheet_line_number >= 0)//-1 value used to signal no more seeds for seed lot.  Do not update in this case.
   {
     reprint_line_1 = batch_mode_driver_p->spreadsheet_line_number;
   }
-
-//  cout<<"ssbu2.  reprint_line_1 = "<<reprint_line_1<<".  batch_mode_driver_p->ss_envelope_id_p->data_list.size() = "<<batch_mode_driver_p->ss_envelope_id_p->data_list.size()<<endl;
-
   if( (reprint_line_1<0)  ||  (reprint_line_1>=batch_mode_driver_p->ss_envelope_id_p->data_list.size())  )//not expected 
   {
     cout<<"ss_batch:update_reprint_buttons.  reprint_line_1 = "<<reprint_line_1<<"\n";
     exit(1);
   }
-
-//  cout<<"ssbu3\n";
-
   reprint_message.append(batch_mode_driver_p->ss_envelope_id_p->data_list[reprint_line_1]);
   reprint_button_1_p -> setText(reprint_message);
-  
-
-//  cout<<"ssbu4\n";
-
   reprint_message = "reprint pack\n";
   reprint_line_2 = reprint_line_1 - 1;
-
-//  cout<<"ssbu5\n";
-
   if(reprint_line_2>=0)
   {
     reprint_message.append(batch_mode_driver_p->ss_envelope_id_p->data_list[reprint_line_2]);
@@ -867,54 +772,31 @@ void ss_batch::update_reprint_buttons()
   {
     reprint_button_2_p->hide();
   }
-
-//  cout<<"ssbu6\n";
-
 }
 
 void ss_batch::reprint_button_1_clicked()
 {
   batch_mode_driver_p -> envelope_p -> print(reprint_line_1);
-  
-  
-  
-/*  int original_spreadsheet_line_number = batch_mode_driver_p->spreadsheet_line_number;//remember, restore later
-  batch_mode_driver_p->spreadsheet_line_number = reprint_line_1;
-  batch_mode_driver_p -> envelope_p -> print();
-  batch_mode_driver_p->spreadsheet_line_number = original_spreadsheet_line_number;*/
 }
   
 void ss_batch::reprint_button_2_clicked()
 {
   batch_mode_driver_p -> envelope_p -> print(reprint_line_2);
-
-
-/*  int original_spreadsheet_line_number = batch_mode_driver_p->spreadsheet_line_number;//remember, restore later
-  
-  cout<<"reprint_button_2_clicked.  reprint_line_1 = "<<reprint_line_1<<".  reprint_line_2 = "<<reprint_line_2<<endl;
-  
-  batch_mode_driver_p->spreadsheet_line_number = reprint_line_2;
-  batch_mode_driver_p -> envelope_p -> print();
-  batch_mode_driver_p->spreadsheet_line_number = original_spreadsheet_line_number;*/
 }
   
 void ss_batch::manual_print_button_clicked()
 {
-  manual_operation_window_p = new manual_operation_window(0, batch_mode_driver_p);
+  manual_operation_window_p = new manual_operation_window(0, batch_mode_driver_p, this);
   manual_operation_window_p -> show();
+  manual_operation_window_created = true;
   barcode_line_p -> setFocus();
-  
-//  manual_operation_window box(batch_mode_driver_p);
-//  box.show();
 }
   
-  
-  
-manual_operation_window::manual_operation_window(QWidget* parent, batch_mode_driver* batch_mode_driver_p_s)
+manual_operation_window::manual_operation_window(QWidget* parent, batch_mode_driver* batch_mode_driver_p_s, ss_batch* ss_batch_p_s)
 :QWidget(parent)
 {
   batch_mode_driver_p = batch_mode_driver_p_s;
-//  setMaximumSize(800, 480);		//Original~~~
+  ss_batch_p = ss_batch_p_s;
   setGeometry(0,0,100,480);		//Original~~~
   
   layout_p = new QGridLayout;
@@ -948,25 +830,24 @@ manual_operation_window::manual_operation_window(QWidget* parent, batch_mode_dri
   setLayout(layout_p);
   
   connect(previous_p, SIGNAL(clicked()), this, SLOT(previous_clicked()));
-  connect(print_line_1_p, SIGNAL(clicked()), this, SLOT(print_line1_clicked()));
-  connect(print_line_2_p, SIGNAL(clicked()), this, SLOT(print_line2_clicked()));
-  connect(print_line_3_p, SIGNAL(clicked()), this, SLOT(print_line3_clicked()));
-  connect(print_line_4_p, SIGNAL(clicked()), this, SLOT(print_line4_clicked()));
-  connect(print_line_5_p, SIGNAL(clicked()), this, SLOT(print_line5_clicked()));
-  connect(repeat_line_1_p, SIGNAL(clicked()), this, SLOT(repeat_line1_clicked()));
-  connect(repeat_line_2_p, SIGNAL(clicked()), this, SLOT(repeat_line2_clicked()));
-  connect(repeat_line_3_p, SIGNAL(clicked()), this, SLOT(repeat_line3_clicked()));
-  connect(repeat_line_4_p, SIGNAL(clicked()), this, SLOT(repeat_line4_clicked()));
-  connect(repeat_line_5_p, SIGNAL(clicked()), this, SLOT(repeat_line5_clicked()));
+  connect(print_line_1_p, SIGNAL(clicked()), this, SLOT(print_line_1_clicked()));
+  connect(print_line_2_p, SIGNAL(clicked()), this, SLOT(print_line_2_clicked()));
+  connect(print_line_3_p, SIGNAL(clicked()), this, SLOT(print_line_3_clicked()));
+  connect(print_line_4_p, SIGNAL(clicked()), this, SLOT(print_line_4_clicked()));
+  connect(print_line_5_p, SIGNAL(clicked()), this, SLOT(print_line_5_clicked()));
+  connect(repeat_line_1_p, SIGNAL(clicked()), this, SLOT(repeat_line_1_clicked()));
+  connect(repeat_line_2_p, SIGNAL(clicked()), this, SLOT(repeat_line_2_clicked()));
+  connect(repeat_line_3_p, SIGNAL(clicked()), this, SLOT(repeat_line_3_clicked()));
+  connect(repeat_line_4_p, SIGNAL(clicked()), this, SLOT(repeat_line_4_clicked()));
+  connect(repeat_line_5_p, SIGNAL(clicked()), this, SLOT(repeat_line_5_clicked()));
   connect(next_p, SIGNAL(clicked()), this, SLOT(next_clicked()));
   connect(close_p, SIGNAL(clicked()), this, SLOT(deleteLater()));
+  connect(close_p, SIGNAL(clicked()), this, SLOT(close_clicked()));
   
   first_line = batch_mode_driver_p->spreadsheet_line_number-5;
   update_buttons();//will check first_line and may change it
   
-//  show();
-  
-//  cout<<"end of manual_operation_window constructor\n";
+  ss_batch_p -> manual_operation_window_created = true;
   
 }
 
@@ -1064,233 +945,49 @@ void manual_operation_window::print_line_5_clicked()
   batch_mode_driver_p -> envelope_p -> print(first_line+4);
 }
   
+void manual_operation_window::repeat_line_1_clicked()
+{
+  if(first_line<0) return;
+  batch_mode_driver_p->ss_first_column_p->data_list[first_line] = "N";
+  ss_batch_p->refresh_screen();
+}
+
+void manual_operation_window::repeat_line_2_clicked()
+{
+  if(first_line+1<0) return;
+  batch_mode_driver_p->ss_first_column_p->data_list[first_line+1] = "N";
+  ss_batch_p->refresh_screen();
+}
+
+void manual_operation_window::repeat_line_3_clicked()
+{
+  if(first_line+2<0) return;
+  batch_mode_driver_p->ss_first_column_p->data_list[first_line+2] = "N";
+  ss_batch_p->refresh_screen();
+}
+
+void manual_operation_window::repeat_line_4_clicked()
+{
+  if(first_line+3<0) return;
+  batch_mode_driver_p->ss_first_column_p->data_list[first_line+3] = "N";
+  ss_batch_p->refresh_screen();
+}
+
+void manual_operation_window::repeat_line_5_clicked()
+{
+  if(first_line+4<0) return;
+  batch_mode_driver_p->ss_first_column_p->data_list[first_line+4] = "N";
+  ss_batch_p->refresh_screen();
+}
+
 void manual_operation_window::next_clicked()
 {
   ++first_line;
   update_buttons();//will check first_line and may change it
 }
 
-void manual_operation_window::repeat_line_1_clicked()
+void manual_operation_window::close_clicked()
 {
-  if(first_line<0) return;
-  batch_mode_driver_p->ss_first_column_p->data_list[first_line] = "N";
-  
-
-
-/*  
-  if( (centre_p->envelope_present==true) && (pack_was_placed==false) && (centre_p->count>0) )
-  {
-    cout<<"setting pack_was_placed true\n";
-    pack_was_placed = true;
-  }
-  if( (centre_p->envelope_present==false) && (pack_was_placed==true) && (centre_p->count>0) )
-  {
-    cout<<"setting pack_was_removed true\n";
-    pack_was_removed = true;
-    pack_was_placed = false;
-    if( (dump_flag==false) && (count>0) && (centre_p->cutgate_p->get_state()==CUTGATE_OPEN) && (ss_pack_removed_too_soon==false) )
-    {
-      
-      cout<<"setting ss_pack_removed_too_soon true\n";
-      
-      ss_pack_removed_too_soon = true;
-    }
-    if( (dump_flag==true) && (count>0) && (centre_p->cutgate_p->get_state()==CUTGATE_OPEN) && (ss_dump_container_removed_too_soon==false) )
-    {
-      ss_dump_container_removed_too_soon = true;
-    }
-  }
-  if(ss_pack_removed_too_soon==true)
-  {
-    if(centre_p->envelope_present==true)
-    {
-      ss_pack_removed_too_soon = false;
-      pack_was_removed = false;
-    }
-  }
-  if( (seed_for_pack_ready==true) && (batch_mode_driver_p->pack_barcode_ok==true) )
-  {
-    pack_can_be_removed = true;
-    seed_for_pack_ready = false;
-  }
-  
-  if(centre_p->envelope_present==true)
-  {
-    ss_pack_removed_too_soon = false;
-    pack_was_removed = false;
-    ss_dump_container_removed_too_soon = false;
-  }
-  if( (dump_container_can_be_removed==true) && (centre_p->envelope_present==false) )
-  {
-    //new seed lot.  reset dump variables.
-    dump_container_can_be_removed = false;
-    ss_dump_container_removed_too_soon = false;
-    dump_container_was_placed = false;
-    cout<<"setting dump_flag false 1 \n";
-    dump_flag = false;
-    pack_was_removed = false;
-    pack_can_be_removed = false;
-    ss_pack_removed_too_soon = false;
-    pack_was_placed = false;
-  }
-
-
-
-  if( (pack_can_be_removed==true) && (ss_pack_removed_too_soon==false) && (dump_flag==false) )
-  {
-    QString number;
-    if(batch_mode_driver_p->use_spreadsheet==false)
-    {
-      pack_ready_message = "PACK READY.\nPackage ";
-      pack_ready_message.append(number.setNum(batch_mode_driver_p->pack_ready_pack+1));
-      pack_ready_message.append(" of ");
-      pack_ready_message.append(number.setNum(batch_mode_driver_p->pack_ready_pack_limit));
-      pack_ready_message.append("\n");
-      pack_ready_message.append(number.setNum(batch_mode_driver_p->pack_ready_count_limit));
-      pack_ready_message.append(" seeds");
-    }
-    else
-    {
-      pack_ready_message = "PACK READY.\n";
-      pack_ready_message.append(number.setNum(batch_mode_driver_p->lines_left_to_fill));
-      pack_ready_message.append(" packs left for \nthis seed lot.");
-    }
-    status_box_p->set_text(pack_ready_message);
-    status_box_p->set_text_size(20);
-    status_box_p->set_background(0, 255, 0);
-    status_box_p->update();
-  }
-  else if(ss_pack_removed_too_soon)
-  {
-    status_box_p->set_text(pack_removed_too_soon_message);
-    status_box_p->set_text_size(30);
-    status_box_p->set_background(255, 0, 0);
-    status_box_p->update();
-  }
-  else if(dump_container_can_be_removed)
-  {
-    status_box_p->set_text(dump_container_ready_message);
-    status_box_p->set_text_size(30);
-    status_box_p->set_background(0, 255, 0);
-    status_box_p->update();
-  }
-  else if(ss_dump_container_removed_too_soon)
-  {
-    status_box_p->set_text(dump_container_removed_too_soon_message);
-    status_box_p->set_text_size(30);
-    status_box_p->set_background(255, 0, 0);
-    status_box_p->update();
-  }
-  else if(batch_mode_driver_p->mode == wait_for_bad_lot_cleanout)
-  {
-    status_box_p->set_text(bad_seed_lot_message);
-    status_box_p->set_text_size(15);
-    status_box_p->set_background(255, 0, 0);
-    status_box_p->update();
-  }    
-  else
-  {
-    if(dump_flag == true)
-    {
-      status_box_p->set_text(dump_container_needed_message);
-      status_box_p->set_text_size(30);
-      status_box_p->set_background(255, 255, 0);
-      status_box_p->update();
-    }  
-    else
-    {
-      if(batch_mode_driver_p->use_spreadsheet==false)
-      {
-        message=QString("Crop: %1.  Sensitivity: %2.\nGate should be set at %3.\nPack %4 of %5.\n%6 seeds/pack.\nfile %7") 
-          .arg(centre_p->crops[0].name) 
-          .arg(centre_p->crops[0].sensitivity) 
-          .arg(centre_p->crops[0].gate_setting)
-          .arg(batch_mode_driver_p->current_pack+1)
-          .arg(batch_mode_driver_p->current_pack_limit)
-          .arg(batch_mode_driver_p->current_count_limit)
-          .arg(batch_mode_driver_p->program_path);
-      }  
-      else
-      {
-        message=QString("Crop: %1.  Sensitivity: %2.\nGate should be set at %3.\n%4 packs left\nfor this seed lot.\n%5 seeds in this pack.") 
-          .arg(centre_p->crops[0].name) 
-          .arg(centre_p->crops[0].sensitivity) 
-          .arg(centre_p->crops[0].gate_setting)
-          .arg(batch_mode_driver_p->lines_left_to_fill)
-          .arg(batch_mode_driver_p->current_count_limit);
-      }  
-      status_box_p->set_text(message);
-      status_box_p->set_text_size(16);
-      status_box_p->set_background(30, 200, 255);
-      status_box_p->update();
-    }
-  } 
-  
-  //barcode status
-  if(batch_mode_driver_p->barcode_mode == seed_lot)
-  {
-    if(batch_mode_driver_p->mode==wait_for_seed_lot_barcode)
-    {
-      if(batch_mode_driver_p->seed_lot_barcode_ok==false)
-      {
-        barcode_status_p->set_text("Scan Seed Lot Barcode");
-        barcode_status_p->set_text_size(30); 
-        barcode_status_p->set_background(255, 255, 0);
-        barcode_status_p->update();
-      } 
-    }
-    else//mode is not wait_for_seed_lot_barcode
-    {
-      barcode_status_p->set_text("");
-      barcode_status_p->set_text_size(20); 
-      barcode_status_p->set_background(30, 200, 255);
-      barcode_status_p->update();
-    }       
-  }
-  if(batch_mode_driver_p->barcode_mode == pack)
-  {
-    if(batch_mode_driver_p->require_pack_barcode == true)
-    {
-      if(batch_mode_driver_p->pack_barcode_old==true)
-      {
-        barcode_status_p->set_text("Scan Pack Barcode");
-        barcode_status_p->set_text_size(30); 
-        barcode_status_p->set_background(255, 255, 0);
-        barcode_status_p->update();
-      }
-      if( (batch_mode_driver_p->pack_barcode_old==false) && (batch_mode_driver_p->pack_barcode_ok==true) )
-      {
-        barcode_status_p->set_text("Barcode OK");
-        barcode_status_p->set_text_size(30); 
-        barcode_status_p->set_background(0, 255, 0);
-        barcode_status_p->update();
-      }
-      if( (batch_mode_driver_p->pack_barcode_old==false) && (batch_mode_driver_p->pack_barcode_ok==false) )
-      {
-        barcode_status_p->set_text("Incorrect Barcode");
-        barcode_status_p->set_text_size(30); 
-        barcode_status_p->set_background(255, 0, 0);
-        barcode_status_p->update();
-      }
-    }
-    else//barcode not required
-    {
-      barcode_status_p->set_text("Barcode not required");
-      barcode_status_p->set_text_size(30); 
-      barcode_status_p->set_background(0, 255, 0);
-      barcode_status_p->update();
-    }
-  }
-  if(batch_mode_driver_p->mode == wait_for_bad_lot_cleanout)
-  {
-    barcode_status_p->set_text("Remove over-counted seed lot.");
-    barcode_status_p->set_text_size(20); 
-    barcode_status_p->set_background(255, 0, 0);
-    barcode_status_p->update();
-  }
-    
-  old_barcode_mode = batch_mode_driver_p->barcode_mode;
-  
-
+  ss_batch_p -> manual_operation_window_created = false;
 }
-*/
+

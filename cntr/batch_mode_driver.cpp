@@ -576,6 +576,7 @@ void batch_mode_driver::run()
         if(use_spreadsheet == true)
         {
           spreadsheet_line_number = get_next_spreadsheet_line_number();
+          end_valve_spreadsheet_line_number = spreadsheet_line_number;
           emit refresh_screen();
           if(spreadsheet_line_number==-1)//-1 value signals no more lines for this seed_lot_barcode
           {
@@ -652,8 +653,23 @@ void batch_mode_driver::run()
         {
           mode = low_open;
           cout<<"mode low_open. count "<<centre_p->count<<"\n";
+          
+          
+          cout<<"end of mode hi_open.  spreadsheet_line_number = "<<spreadsheet_line_number<<".  end_valve_spreadsheet_line_number = "<<end_valve_spreadsheet_line_number<<endl;
+          
+          
         }
       }
+      
+      
+      
+      
+      end_valve_spreadsheet_line_number = spreadsheet_line_number;//in spreadsheet mode, spreadsheet_line_number will change
+        //when cutgate closes.  end_valve_spreadsheet_line_number will then be line number of sample in end gate
+      
+      
+      
+      
       break;
     case low_open:
       barcode_mode = pack;
@@ -751,8 +767,15 @@ void batch_mode_driver::run()
 
 
 
+//          end_valve_spreadsheet_line_number = spreadsheet_line_number;//cutgate about to close.  spreadsheet_line_number will be line in cutgate.  
+            //end_valve_spreadsheet_line_number will be in endgate
 
-          spreadsheet_line_number = get_next_spreadsheet_line_number();
+          cout<<"gate delay mode.  end_valve_spreadsheet_line_number = "<<end_valve_spreadsheet_line_number<<endl;
+
+          spreadsheet_line_number = get_next_spreadsheet_line_number();//cutgate about to close.  spreadsheet_line_number will be line in cutgate.  end_valve_spreadsheet_line_number will be in endgate
+
+          cout<<"gate delay mode after get_next_spreadsheet_line_number.  spreadsheet_line_number = "<<spreadsheet_line_number<<".  end_valve_spreadsheet_line_number = "<<end_valve_spreadsheet_line_number<<endl;
+
 //          emit refresh_screen();
           if(spreadsheet_line_number==-1)//-1 value signals no more lines for this seed_lot_barcode
           {
@@ -1135,7 +1158,8 @@ void batch_mode_driver::barcode_entered(QString value)
       }
       if(pack_match_spreadsheet == true)
       {
-        QString spreadsheet_pack_barcode  = ss_envelope_id_p->data_list[spreadsheet_line_number];
+        QString spreadsheet_pack_barcode  = ss_envelope_id_p->data_list[end_valve_spreadsheet_line_number];
+        cout<<"spreadsheet_pack_barcode = "<<spreadsheet_pack_barcode.toStdString()<<".  pack_barcode = "<<pack_barcode.toStdString()<<endl;
         if(pack_barcode == spreadsheet_pack_barcode)
         {
           pack_barcode_ok = true;

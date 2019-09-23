@@ -644,9 +644,12 @@ batch_save_ss_setup::batch_save_ss_setup(centre* centre_p, batch_mode_driver* ba
   message_p->setText(message);
   
   QString path(batch_mode_driver_p->ss_setup_path);
+//  cout<<"path = "<<path.toStdString()<<endl;
   int slash_index = path.lastIndexOf("/");
   int chars_to_take = path.length() - slash_index - 1;
+//  cout<<"chars_to_take = "<<chars_to_take<<endl;
   QString file_name = path.right(chars_to_take);
+//  cout<<"file_name = "<<file_name.toStdString();
   file_name.remove(".ESC3sss");
   *entry_line_p = file_name;
   entry_line_display_p->setText(*entry_line_p);

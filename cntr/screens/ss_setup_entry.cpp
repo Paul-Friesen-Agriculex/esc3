@@ -128,16 +128,19 @@ void ss_setup_entry::enter_choice(int column)
   if(mode=='m')
   {
     batch_mode_driver_p -> ss_setup_p -> material_id_column = column;
+    batch_mode_driver_p -> display_column_numbers.append(column);
     mode = 'r';
   }
   else if(mode=='r')
   {
     batch_mode_driver_p -> ss_setup_p -> required_count_column = column;
+    batch_mode_driver_p -> display_column_numbers.append(column);
     mode = 'e';
   }
   else if(mode=='e')
   {
     batch_mode_driver_p -> ss_setup_p -> envelope_id_column = column;
+    batch_mode_driver_p -> display_column_numbers.append(column);
     mode = 'a';
   }
   else if(mode=='a')
@@ -152,11 +155,10 @@ void ss_setup_entry::enter_choice(int column)
   }
   else if(mode=='f')
   {
-//    cout<<"start mode f\n";
     batch_mode_driver_p -> ss_setup_p -> fill_time_column = column;
     centre_p -> add_waiting_screen(25);//set_envelope_size
     centre_p -> screen_done = true;
-//    cout<<"end mode f\n";
+    
   }
   display_headings();
 }
@@ -181,8 +183,32 @@ void ss_setup_entry::none_clicked()
 
 void ss_setup_entry::back_clicked()
 {
-  centre_p->add_waiting_screen(centre_p->get_previous_screen());
-  centre_p->screen_done=true;
+  if(mode=='m')
+  {
+    centre_p->add_waiting_screen(centre_p->get_previous_screen());
+    centre_p->screen_done=true;
+  }
+  if(mode=='r')
+  {
+    mode='m';
+  }
+  if(mode=='e')
+  {
+    mode='r';
+  }
+  if(mode=='a')
+  {
+    mode='e';
+  }
+  if(mode=='p')
+  {
+    mode='a';
+  }
+  if(mode=='f')
+  {
+    mode='p';
+  }
+  display_headings();
 }
 
 void ss_setup_entry::display_headings()
