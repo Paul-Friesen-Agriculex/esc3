@@ -92,6 +92,12 @@ keypad::~keypad()
   delete layout_p;
 }
 
+void keypad::set_number(int num)
+{
+  entry_line_p->setNum(num);
+  display_p->setText(*entry_line_p);
+}
+
 void keypad::clear()
 {
   entry_line_p->clear();

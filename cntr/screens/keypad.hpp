@@ -17,6 +17,9 @@ class keypad:public QWidget
   ~keypad();
   void clear();
   
+  public slots:
+  void set_number(int num);
+  
   private slots:
   void n0_clicked();
   void n1_clicked();

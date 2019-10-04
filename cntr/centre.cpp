@@ -355,8 +355,9 @@ void centre::run()
   {
     if(endgate_state == ENDGATE_CLOSED)
     {
-      if(envelope_present==true && block_endgate_opening==false)
+      if(envelope_present==true &&   (block_endgate_opening==false || batch_mode_driver_p->release_pack==true)    )
       {
+        batch_mode_driver_p->release_pack = false;
         set_endgate_state(ENDGATE_OPEN);
       }
     }

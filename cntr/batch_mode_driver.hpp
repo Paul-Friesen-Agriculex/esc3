@@ -157,6 +157,7 @@ class batch_mode_driver : public QObject
   bool pack_barcode_old;//pack that was scanned is finished
   bool seed_lot_barcode_ok;
   bool pack_barcode_ok;
+  bool release_pack;//true signals to release counted seed, even if barcode matching not satisfied.  For use in case of lost packet.
   
   //saving files
   QString bm_save_program_filename;//new filename just entered.  Set back to blank when file is saved.
@@ -211,6 +212,13 @@ class batch_mode_driver : public QObject
   char field_data_source_flag;//'d' -> data.  'h' -> heading.  't' -> text entry
 //  QString text_for_envelope_field;
   
+  //extra pack handling
+//  bool extra_pack_window_active;//setting true causes pause in batch program execution after cutgate closes
+  bool fill_extra_pack;//setting true causes extra pack production
+  bool extra_pack_filling;//signals that extra pack is filling
+  int extra_pack_count_limit;
+  int extra_pack_stored_count_limit;//store current_count_limit so it can be restored after extra pack
+  bool extra_pack_finished;
   
   void list_program();//in terminal - diagnostics
   
@@ -233,6 +241,8 @@ class batch_mode_driver : public QObject
   void pack_barcode_entered(QString barcode);
   void bad_lot_signal();//issued if count went over limit on this batch
   void refresh_screen();
+  void send_extra_pack_message(QString message);
+  void extra_pack_finished_signal();
   
   //testing
   void send_message2(QString);

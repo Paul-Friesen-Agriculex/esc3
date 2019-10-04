@@ -78,7 +78,7 @@ class ss_batch : public screen
   private slots:
   void options_clicked();
   void back_clicked();
-  void rescan_clicked();
+  void release_pack_clicked();
   void restart_clicked();
   void save_program_clicked();
   void reprint_button_1_clicked();
@@ -92,7 +92,7 @@ class ss_batch : public screen
   button* options_button_p;
   button* back_button_p;
   ss_barcode_line* barcode_line_p;
-  button* rescan_button_p;
+  button* release_pack_button_p;
   button* restart_button_p;
   QLabel* high_speed_label_p;
   QLabel* low_speed_label_p;

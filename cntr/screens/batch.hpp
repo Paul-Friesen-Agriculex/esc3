@@ -5,6 +5,7 @@
 #include "centre.hpp"
 #include "batch_mode_driver.hpp"
 #include "macro_screen.hpp"
+#include "keypad.hpp"
 
 #include <QLabel>
 #include <QTextEdit>  //ORIGINAL~~~
@@ -19,6 +20,7 @@ class QSlider;
 class QTimer;
 class QFileDialog;
 class message_box;
+class repeat_pack_window;
 
 class barcode_line : public QLineEdit  
 {
@@ -71,7 +73,7 @@ class batch : public screen
   private slots:
   void options_clicked();
   void back_clicked();
-//  void rescan_clicked();
+  void repeat_pack_clicked();
   void restart_clicked();
   void save_program_clicked();
   void save_table_clicked();
@@ -84,7 +86,7 @@ class batch : public screen
   button* options_button_p;
   button* back_button_p;
   barcode_line* barcode_line_p;
-//  button* rescan_button_p;
+  button* repeat_pack_button_p;
   button* restart_button_p;
   QLabel* high_speed_label_p;
   QLabel* low_speed_label_p;
@@ -148,6 +150,36 @@ class batch : public screen
   macro_screen* macro_screen_p;
   QString count_string;				//seed count access from gpio_keyboard
   QTimer* run_timer_p;
+  
+  repeat_pack_window* repeat_pack_window_p;
+  public:
+  bool repeat_pack_window_exists;
+};
+
+class repeat_pack_window:public QWidget
+{
+  Q_OBJECT
+  
+  private:
+  button* entry_button_p;
+  button* cancel_button_p;
+  QLabel* message_p;
+  keypad* keypad_p;
+  QVBoxLayout* layout_p;
+  batch_mode_driver* batch_mode_driver_p;
+  batch* batch_p;
+  int seeds_to_count;
+  
+  public:
+  repeat_pack_window(batch_mode_driver* batch_mode_driver_p_s, batch* batch_p_s);
+  
+  public slots:
+  void set_message(QString message);
+  void cancel_button_clicked();
+  
+  private slots:
+  void entry_button_clicked();
+  void number_entered(int val);
 };
 
 #endif

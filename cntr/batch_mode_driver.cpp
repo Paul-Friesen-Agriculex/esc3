@@ -39,6 +39,7 @@ batch_mode_driver::batch_mode_driver(centre* centre_p_s, cutgate* cutgate_p_s)
   pack_barcode_old = true;//need a new scan
   seed_lot_barcode_ok = false;
   pack_barcode_ok = false;
+  release_pack = false;//true signals to release counted seed, even if barcode matching not satisfied.  For use in case of lost packet.
   
   dump_into_cut_gate_time.start();
   dump_into_end_time.start();
@@ -59,7 +60,10 @@ batch_mode_driver::batch_mode_driver(centre* centre_p_s, cutgate* cutgate_p_s)
   print_envelope = false;
   print_control_mode = start_on_pack_collect;
   field_data_source_flag = 'd'; //use spreadsheet data in print field (not heading).
-//  spreadsheet_line = 0;
+  
+  fill_extra_pack = false;
+  extra_pack_count_limit = 0;
+  extra_pack_finished = false;
 }
   
 batch_mode_driver::~batch_mode_driver()
@@ -569,10 +573,18 @@ void batch_mode_driver::run()
         centre_p->set_speed(0);
       }
       cutgate_p -> open();
-      centre_p->block_endgate_opening = !pack_barcode_ok;
+      centre_p->block_endgate_opening =  !pack_barcode_ok;
 
-      if(seed_lot_barcode_ok == true)
+
+
+
+
+
+
+
+      if(   (seed_lot_barcode_ok == true)   ||   (release_pack == true)    )
       {
+//        release_pack = false;//true signals to release counted seed, even if barcode matching not satisfied.  For use in case of lost packet.
         if(use_spreadsheet == true)
         {
           spreadsheet_line_number = get_next_spreadsheet_line_number();
@@ -711,11 +723,26 @@ void batch_mode_driver::run()
         
         if(use_spreadsheet==false)//control by ESC-3 program
         {
-          ++current_pack;
+          if(extra_pack_filling==false) //normal operation
+          {
+            ++current_pack;
+          }
+          
+          
+          
+          
+          else//extra_pack_filling is true
+          {
+            current_count_limit = extra_pack_stored_count_limit;//restore previous value          
+          }
+          
+          
+          
+          
           if(current_pack >= current_pack_limit)
           {
             current_pack = 0;
-            ++current_set;
+            ++current_set;          
             if(current_set >= program_size)
             {
               mode = dump_into_cut_gate;
@@ -737,21 +764,67 @@ void batch_mode_driver::run()
             mode = hi_closed;
             cout<<"mode hi_closed. count "<<centre_p->count<<"\n";
           }
+//          }
+//          else//extra_pack_window_active is true.  Pause and watch for fill_extra pack to be set true
+//          {
+//            if(fill_extra_pack == true)//Operator has requested an extra pack.  fill it without advancing program.
+//            {
+//              current_count_limit = extra_pack_count_limit;
+//              fill_extra_pack = false;
+//              mode = hi_closed;
+//              cout<<"mode hi_closed. count "<<centre_p->count<<"\n";
+//            }
+//          }
         }
         else//use_spreadsheet true
         {
           if(ss_setup_p->fill_time_column >= 0)// -1 value signals not to record
           {
-            QDateTime fill_time = QDateTime::currentDateTime();
-            ss_fill_time_p -> data_list[spreadsheet_line_number] = fill_time.toString(Qt::ISODate);
+            
+//            cout<<"about to record time.  ss_first_column_p->data_list[spreadsheet_line_number] = "<<ss_first_column_p->data_list[spreadsheet_line_number].toStdString()<<endl;
+            
+            
+//            if(ss_first_column_p->data_list[spreadsheet_line_number] != "R")  //R signals to release seed depite barcode match failure.  Do not record as filled in this case
+//            {
+              QDateTime fill_time = QDateTime::currentDateTime();
+              ss_fill_time_p -> data_list[spreadsheet_line_number] = fill_time.toString(Qt::ISODate);
+//            }
+
+
+
           }
           
           if(ss_setup_p->actual_count_column >= 0)// -1 value signals not to record count
           {
-            ss_actual_count_p -> data_list[spreadsheet_line_number] = QString::number(actual_count);
+//            if(ss_first_column_p->data_list[spreadsheet_line_number] != "R")  //R signals to release seed depite barcode match failure.  Do not record as filled in this case
+//            {
+              ss_actual_count_p -> data_list[spreadsheet_line_number] = QString::number(actual_count);
+//            }
           }
           
+          
+          
+          
+
+
           ss_first_column_p->data_list[spreadsheet_line_number] = "Y";
+          
+          /*
+          if(ss_first_column_p->data_list[spreadsheet_line_number] == "N")//if skipping pack, this will be "S".  Do not change.
+          {
+            ss_first_column_p->data_list[spreadsheet_line_number] = "Y";
+          }
+          */
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
 //          pack_filled[spreadsheet_line_number] = true;
 
 
@@ -843,6 +916,13 @@ void batch_mode_driver::run()
       if(  (time_to_end<1.5)  &&  ((centre_p->count)>current_count_limit/2)  )
       {
         mode = wait_for_pack;
+        if(extra_pack_filling == true)//extra pack has been filled.  cancel
+        {
+          extra_pack_filling = false;
+          extra_pack_finished = true;
+//          current_count_limit = extra_pack_stored_count_limit;//restore previous value
+          emit send_extra_pack_message("Extra pack ready");
+        }
         
         
         
@@ -881,16 +961,17 @@ void batch_mode_driver::run()
       if(pack_complete==true) 
       {
         emit pack_collected(pack_ready_count_limit);
-
-
-
         pack_barcode_ok = false;
-        
-
-
-
-
         pack_barcode_old = true;
+        if(extra_pack_filling==true)
+        {
+          emit send_extra_pack_message("Filling extra pack.  Please wait");
+        }
+        if(extra_pack_finished == true)
+        {
+          extra_pack_finished = false;
+          emit extra_pack_finished_signal();
+        }
         if(next_seed_lot_bad==true)//count went over limit in next batch
         {
           mode = wait_for_bad_lot_cleanout;
@@ -924,6 +1005,17 @@ void batch_mode_driver::run()
       if(centre_p->count >= current_count_limit)//error.  over limit.
       {
         next_seed_lot_bad = true;
+      }
+      if(fill_extra_pack == true)//Operator has requested an extra pack.  fill it without advancing program.
+      {
+        cout<<"fill_extra_pack true\n";
+        extra_pack_stored_count_limit = current_count_limit;//store value to restore later
+        current_count_limit = extra_pack_count_limit;
+        emit send_extra_pack_message("Collect seed lot in end gate");
+        extra_pack_filling = true;
+        fill_extra_pack = false;
+//          mode = hi_closed;
+//          cout<<"mode hi_closed. count "<<centre_p->count<<"\n";
       }
       break;
     case wait_for_bad_lot_cleanout:
@@ -1684,7 +1776,8 @@ int batch_mode_driver::get_next_spreadsheet_line_number()//look for next line nu
 //    cout<<"ss_material_id_p->data_list[i] "<<ss_material_id_p->data_list[i].toStdString()<<endl;
 //    cout<<"   ss_first_column_p->data_list[i]  "<<ss_first_column_p->data_list[i].toStdString()<<endl;
     
-    if(   (ss_material_id_p->data_list[i] == seed_lot_barcode)     &&     (ss_first_column_p->data_list[i]!="Y")     )
+//    if(   (ss_material_id_p->data_list[i] == seed_lot_barcode)     &&     (ss_first_column_p->data_list[i]!="Y")     )
+    if(   (ss_material_id_p->data_list[i] == seed_lot_barcode)     &&     (ss_first_column_p->data_list[i]=="N")     )
     {
       if(ret_val == -1) ret_val = i;
       ++lines_left_to_fill;
@@ -1698,7 +1791,8 @@ int batch_mode_driver::get_spreadsheet_line_number_after(int val)//look for line
   if ( (val<0) || (val>=spreadsheet_number_of_lines) ) return(-1);//-1 used to signal no more lines
   for(int i=val+1; i<spreadsheet_number_of_lines; ++i)
   {
-    if(   (ss_material_id_p->data_list[i] == seed_lot_barcode)     &&     (ss_first_column_p->data_list[i]!="Y")     )
+//    if(   (ss_material_id_p->data_list[i] == seed_lot_barcode)     &&     (ss_first_column_p->data_list[i]!="Y")     )
+    if(   (ss_material_id_p->data_list[i] == seed_lot_barcode)     &&     (ss_first_column_p->data_list[i]=="N")     )
     {
       return(i);
     }

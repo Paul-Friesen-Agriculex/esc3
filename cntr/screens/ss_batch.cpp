@@ -46,7 +46,7 @@ ss_batch::ss_batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_drive
   back_button_p = new button("Back");
   barcode_line_p = new ss_barcode_line;
   barcode_line_p->setMaximumSize(120,40);  //ORIGINAL~~~
-  rescan_button_p = new button("Rescan seed lot barcode");
+  release_pack_button_p = new button("Release pack");
   restart_button_p = new button("Dump out and\nrestart seed lot");
   high_speed_label_p = new QLabel("High");
   high_speed_set_p = new QSlider;
@@ -111,7 +111,7 @@ ss_batch::ss_batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_drive
   bottom_layout_p -> addWidget(barcode_line_p, 1, 4);   
   barcode_line_p -> setText("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");  
   barcode_line_p -> clear();  
-  control_layout_p -> addWidget(rescan_button_p, 0, 0);
+  control_layout_p -> addWidget(release_pack_button_p, 0, 0);
   control_layout_p -> addWidget(restart_button_p, 0, 1);
   control_layout_p -> addWidget(speed_box_p, 1, 0, 1, 2);     
   speed_layout_p -> addWidget(high_speed_label_p, 0, 0);
@@ -143,7 +143,7 @@ ss_batch::ss_batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_drive
   
   connect(options_button_p, SIGNAL(clicked()), this, SLOT(options_clicked()));
   connect(back_button_p, SIGNAL(clicked()), this, SLOT(back_clicked()));
-  connect(rescan_button_p, SIGNAL(clicked()), this, SLOT(rescan_clicked()));
+  connect(release_pack_button_p, SIGNAL(clicked()), this, SLOT(release_pack_clicked()));
   connect(restart_button_p, SIGNAL(clicked()), this, SLOT(restart_clicked()));
   connect(high_speed_set_p, SIGNAL(valueChanged(int)), batch_mode_driver_p, SLOT(set_high_feed_speed(int)));
   connect(low_speed_set_p, SIGNAL(valueChanged(int)), batch_mode_driver_p, SLOT(set_low_feed_speed(int)));
@@ -357,10 +357,30 @@ void ss_batch::back_clicked()
   centre_p->screen_done=true;
 }
 
-void ss_batch::rescan_clicked()
+void ss_batch::release_pack_clicked()
 {
-  batch_mode_driver_p->mode = wait_for_seed_lot_barcode;
-  batch_mode_driver_p->seed_lot_barcode_ok = false;
+  batch_mode_driver_p->ss_first_column_p->data_list[batch_mode_driver_p->end_valve_spreadsheet_line_number] = "R";
+  
+  
+  if(batch_mode_driver_p->ss_setup_p->fill_time_column >= 0)// -1 value signals not to record
+  {
+    batch_mode_driver_p->ss_fill_time_p->data_list[batch_mode_driver_p->end_valve_spreadsheet_line_number] = "";
+  }
+  if(batch_mode_driver_p->ss_setup_p->actual_count_column >= 0)// -1 value signals not to record
+  {
+    batch_mode_driver_p->ss_actual_count_p->data_list[batch_mode_driver_p->end_valve_spreadsheet_line_number] = "";
+  }
+  
+  
+  
+  
+  batch_mode_driver_p->release_pack = true;//true signals to release counted seed, even if barcode matching not satisfied.  For use in case of lost packet.
+  
+//  batch_mode_driver_p->spreadsheet_line_number = batch_mode_driver_p->get_next_spreadsheet_line_number();
+//  refresh_screen();
+  focus_on_barcode();
+  
+  cout<<"end of batch::release_pack_clicked()\n";
 }
 
 void ss_batch::restart_clicked()
@@ -714,9 +734,20 @@ void ss_batch::run()
           msg.append(spreadsheet_pack_id);
           msg.append(".  Pack scanned:");
           msg.append(batch_mode_driver_p->pack_barcode);
+          if(batch_mode_driver_p->release_pack == false)
+          {
+            msg.append("\nIf correct pack unavailabe, press RELEASE PACK");
+          }
+          else
+          {
+            msg.append("\nRELEASE PACK was pressed.  lift envelope sensor.");
+          }
         }
-        msg.append("\nSeed Lot: ");
-        msg.append(batch_mode_driver_p->seed_lot_barcode);
+        else
+        {
+          msg.append("\nSeed Lot: ");
+          msg.append(batch_mode_driver_p->seed_lot_barcode);
+        }
         barcode_status_p->set_text(msg);
         barcode_status_p->set_text_size(15); 
         barcode_status_p->set_background(255, 0, 0);

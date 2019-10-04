@@ -46,7 +46,7 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
   back_button_p = new button("Back");
   barcode_line_p = new barcode_line;
   barcode_line_p->setMaximumSize(120,40);  //ORIGINAL~~~
-//  rescan_button_p = new button("Rescan seed lot barcode");
+  repeat_pack_button_p = new button("Repeat a pack");
   restart_button_p = new button("Dump out and\nrestart seed lot");
   high_speed_label_p = new QLabel("High");
   high_speed_set_p = new QSlider;
@@ -98,7 +98,7 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
   bottom_layout_p -> addWidget(barcode_line_p, 1, 4); 
   barcode_line_p -> setText("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");  
   barcode_line_p -> clear();  
-//  control_layout_p -> addWidget(rescan_button_p, 0, 0);
+  control_layout_p -> addWidget(repeat_pack_button_p, 0, 0);
   control_layout_p -> addWidget(restart_button_p, 0, 1);
   control_layout_p -> addWidget(speed_box_p, 1, 0, 1, 2);     
   speed_layout_p -> addWidget(high_speed_label_p, 0, 0);
@@ -126,7 +126,7 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
   
   connect(options_button_p, SIGNAL(clicked()), this, SLOT(options_clicked()));
   connect(back_button_p, SIGNAL(clicked()), this, SLOT(back_clicked()));
-//  connect(rescan_button_p, SIGNAL(clicked()), this, SLOT(rescan_clicked()));
+  connect(repeat_pack_button_p, SIGNAL(clicked()), this, SLOT(repeat_pack_clicked()));
   connect(restart_button_p, SIGNAL(clicked()), this, SLOT(restart_clicked()));
   connect(high_speed_set_p, SIGNAL(valueChanged(int)), batch_mode_driver_p, SLOT(set_high_feed_speed(int)));
   connect(low_speed_set_p, SIGNAL(valueChanged(int)), batch_mode_driver_p, SLOT(set_low_feed_speed(int)));
@@ -233,7 +233,10 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
   count_message_p->setStyleSheet("QLabel {" 
         "background-color: white;"          
         "border: 3px solid black;"          
-        "font-size: 20pt;}");               
+        "font-size: 20pt;}"); 
+        
+  repeat_pack_window_p = 0;
+  repeat_pack_window_exists = false;
 }
 
 batch::~batch()
@@ -264,6 +267,7 @@ batch::~batch()
   delete main_layout_p;
   cout<<"~batch end\n";
   
+  if(repeat_pack_window_exists) delete repeat_pack_window_p;
 }
 /*
 void batch::pack_ready()
@@ -342,14 +346,15 @@ void batch::back_clicked()
   centre_p->add_waiting_screen(centre_p->get_previous_screen());
   centre_p->screen_done=true;
 }
-/*
-void batch::rescan_clicked()
+
+void batch::repeat_pack_clicked()
 {
-//  batch_mode_driver_p->mode = wait_for_seed_lot_barcode;
-//  batch_mode_driver_p->seed_lot_barcode_ok = false;
-  
+  repeat_pack_window_p = new repeat_pack_window(batch_mode_driver_p, this);
+  connect(repeat_pack_window_p, SIGNAL(destroyed(QObject*)), this, SLOT(focus_on_barcode()));
+  connect(batch_mode_driver_p, SIGNAL(send_extra_pack_message(QString)), repeat_pack_window_p, SLOT(set_message(QString)));
+  connect(batch_mode_driver_p, SIGNAL(extra_pack_finished_signal()), repeat_pack_window_p, SLOT(cancel_button_clicked()));
 }
-*/
+
 void batch::restart_clicked()
 {
   batch_mode_driver_p -> restart();
@@ -761,10 +766,60 @@ void batch::run()
   }
     
   old_barcode_mode = batch_mode_driver_p->barcode_mode;
-  
-
-      
-      
 }
 
+repeat_pack_window::repeat_pack_window(batch_mode_driver* batch_mode_driver_p_s, batch* batch_p_s)
+:QWidget()
+{
+  batch_mode_driver_p = batch_mode_driver_p_s;
+  batch_p = batch_p_s;
+  
+  seeds_to_count = batch_mode_driver_p->current_count_limit;
+  cancel_button_p = new button("Cancel");
+  entry_button_p = new button("");
+  QString entry_button_text("Press to count Extra Pack of %1 Seeds");
+  entry_button_text = entry_button_text.arg(seeds_to_count);
+  entry_button_p -> setText(entry_button_text);
+  message_p = new QLabel("Or enter another value");
+  keypad_p = new keypad;
+  
+  connect(cancel_button_p, SIGNAL(clicked()), this, SLOT(cancel_button_clicked()));
+  connect(entry_button_p, SIGNAL(clicked()), this, SLOT(entry_button_clicked()));
+  connect(keypad_p, SIGNAL(number_entered(int)), this, SLOT(number_entered(int)));
+  
+  layout_p = new QVBoxLayout;
+  layout_p -> addWidget(cancel_button_p);
+  layout_p -> addWidget(entry_button_p);
+  layout_p -> addWidget(message_p);
+  layout_p -> addWidget(keypad_p);
+  setLayout(layout_p);
+  
+  setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
+  show();
+  
+//  batch_mode_driver_p->extra_pack_window_active = true;
+}
+  
+void repeat_pack_window::set_message(QString message)
+{
+  message_p->setText(message);  
+}
+  
+void repeat_pack_window::entry_button_clicked()
+{
+  number_entered(seeds_to_count);
+}
 
+void repeat_pack_window::cancel_button_clicked()
+{
+  batch_p->repeat_pack_window_exists = false;
+//  batch_mode_driver_p->extra_pack_window_active = false;
+  deleteLater();
+}
+
+void repeat_pack_window::number_entered(int val)
+{
+  batch_mode_driver_p -> extra_pack_count_limit = val;
+  batch_mode_driver_p -> fill_extra_pack = true;
+//  message_p -> setText("Collect pack in end gate");
+}
