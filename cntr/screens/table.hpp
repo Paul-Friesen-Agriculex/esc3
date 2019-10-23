@@ -16,11 +16,13 @@ class table:public QTableView
   int model_row, model_column;
   QStandardItemModel* model_p;
   centre* centre_p;
+
   friend class totalize;  //TEST~~~
 
   public:
   table(centre* centre_p_s);
   void set_visible_columns(int num);
+  bool saved;//false will cause prompt to save table on exit or clear
   
   public slots:
   void enter_seeds(int num);

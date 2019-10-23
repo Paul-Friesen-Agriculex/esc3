@@ -7,6 +7,7 @@
 #include <QTimer>
 #include <QKeyEvent>
 #include <QFileDialog>
+#include <QMessageBox>
 #include "centre.hpp"
 #include "totalize.hpp"
 #include "button.hpp"
@@ -139,6 +140,8 @@ totalize::totalize(centre* set_centre_p)
   speed_layout_p->setContentsMargins(0,0,0,0);
   bottom_layout_p->setContentsMargins(0,0,0,0);
   main_layout_p->setContentsMargins(0,0,10,10);
+  
+//  table_p->saved = false;
 }
 
 totalize::~totalize()
@@ -231,6 +234,29 @@ void totalize::save_clicked()
 
 void totalize::clear_table_clicked()
 {
+  if(table_p->saved == false)
+  {
+    QMessageBox msgBox;
+    msgBox.setText("The document has been modified.");
+    msgBox.setInformativeText("Do you want to save your changes?");
+    msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+    msgBox.setDefaultButton(QMessageBox::Save);
+    int ret = msgBox.exec();
+    switch (ret) 
+    {
+      case QMessageBox::Save:
+        save_clicked();
+        return;
+      case QMessageBox::Discard:
+        table_p->clear();
+        return;
+      case QMessageBox::Cancel:
+        return;
+      default:
+        // should never be reached
+        return;
+    }
+  }
   table_p->clear();
 }
 
@@ -321,6 +347,8 @@ void totalize::run()
     totalize_str_weight = (table_p -> model_p -> item(current_totalize_table_row,5) -> text());
 
     macro_screen_p -> usb_serial_out(bar_str_1, bar_str_2, bar_str_3, bar_str_4, totalize_str_count, totalize_str_weight);	  //TEST~~~ Strings instead of ints 11_02_2018~~~//
+
+    table_p->save_file(QString("settings/totalize_backup"));
   }
 
   if(centre_p->tm_zero_when_seed_discharged == true)

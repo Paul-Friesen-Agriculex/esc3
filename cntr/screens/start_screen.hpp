@@ -22,7 +22,7 @@ class start_screen : public screen
   void batch_from_spreadsheet_clicked();
   void tools_clicked();
   void shutdown();
-  void exit_program();
+//  void exit_program();
   
   private:
   button* totalize_button_p;
@@ -30,7 +30,7 @@ class start_screen : public screen
   button* batch_from_spreadsheet_button_p;
   button* tools_button_p;
   button* shutdown_button_p;
-  button* exit_button_p;
+//  button* exit_button_p;
   QGridLayout* modebox_layout_p;
   QGridLayout* shutdownbox_layout_p;
   QGroupBox* modebox_p;

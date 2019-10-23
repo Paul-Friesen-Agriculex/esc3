@@ -10,7 +10,6 @@
 #include "centre.hpp"
 #include "ss_batch.hpp"
 #include "button.hpp"
-//#include "batch_mode_driver.hpp"
 #include "message_box.hpp"
 
 
@@ -29,9 +28,6 @@ void ss_barcode_line::keyPressEvent(QKeyEvent* event)
 ss_batch::ss_batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
  :screen(set_centre_p)
 {
-  
-  cout<<"p1\n";
-  
   batch_mode_driver_p = set_batch_mode_driver_p;
 
   if (centre_p->crops[0].calibrated == false) 
@@ -71,13 +67,7 @@ ss_batch::ss_batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_drive
   low_speed_set_p->setValue(batch_mode_driver_p->low_feed_speed);
   dump_speed_set_p->setValue(batch_mode_driver_p->dump_speed);
   
-  cout<<"p2\n";
-  
-  
   ss_table_p = new ss_batch_table(centre_p, batch_mode_driver_p);
-  
-  cout<<"p2b\n";
-  
   status_box_p = new message_box;
   status_box_p -> setMinimumSize(250,100);
   save_program_button_p = new button("Save Spreadsheet\nSetup");
@@ -85,7 +75,6 @@ ss_batch::ss_batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_drive
   reprint_button_1_p = new button("");
   reprint_button_2_p = new button("");
   manual_print_button_p = new button("Manual\noperation");
-  
   
   quit_button_p = new button("Quit");
   barcode_status_p = new message_box;
@@ -96,9 +85,6 @@ ss_batch::ss_batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_drive
   speed_box_p -> setTitle("Speeds");
   bottom_box_p = new QGroupBox;
     
-  
-  cout<<"p3\n";
-  
   top_layout_p = new QGridLayout;
   control_layout_p = new QGridLayout;
   speed_layout_p = new QGridLayout;
@@ -137,9 +123,6 @@ ss_batch::ss_batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_drive
   speed_box_p -> setLayout(speed_layout_p);
   bottom_box_p -> setLayout(bottom_layout_p);
   setLayout(main_layout_p);
-  
-  cout<<"p4\n";
-  
   
   connect(options_button_p, SIGNAL(clicked()), this, SLOT(options_clicked()));
   connect(back_button_p, SIGNAL(clicked()), this, SLOT(back_clicked()));
@@ -186,9 +169,6 @@ ss_batch::ss_batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_drive
   bad_seed_lot_message = "Count went over limit.\nDiscard seed lot.\nReduce feed speed.";
   old_barcode_mode = pack;
   
-  cout<<"p5\n";
-  
-  
   end_valve_empty_counter = 0;
   connect(batch_mode_driver_p, SIGNAL(pack_collected(int)), this, SLOT(pack_collected(int)));
   connect(batch_mode_driver_p, SIGNAL(dump_complete(int)), this, SLOT(dump_complete(int)));
@@ -209,9 +189,6 @@ ss_batch::ss_batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_drive
   reprint_line_1 = reprint_line_2 = 0;
   update_reprint_buttons();
    
-  cout<<"p0\n";
-  cout<<"heading "<<batch_mode_driver_p->ss_material_id_p->heading.toStdString()<<endl;
-
   barcode_line_p->setFocus();
 
   top_layout_p->setContentsMargins(0,0,0,0);        //set layout margins to shrink to designated container dimensions//
@@ -231,15 +208,13 @@ ss_batch::ss_batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_drive
   count_message_p->setStyleSheet("QLabel {" 
         "background-color: white;"          
         "border: 3px solid black;"          
-        "font-size: 20pt;}");               
+        "font-size: 20pt;}");   
   
-  cout<<"p6\n";
-  
+  cout<<"end of ss_batch::ss_batch.  spreadsheet_line_number = "<<batch_mode_driver_p->spreadsheet_line_number<<endl;
 }
 
 ss_batch::~ss_batch()
 {
-  cout<<"~ss_batch start\n";
   run_timer_p -> stop();
   while(1)
   {
@@ -257,7 +232,6 @@ ss_batch::~ss_batch()
     if( (val!=0) || (ret==QMessageBox::Ok) ) break;
   }
     
-  
   batch_mode_driver_p -> stop();
   delete count_message_p;
   delete options_button_p;
@@ -282,7 +256,6 @@ ss_batch::~ss_batch()
   if(manual_operation_window_created) delete manual_operation_window_p;
   manual_operation_window_created = false;
   manual_operation_window_p = 0;
-  cout<<"~ss_batch end\n";
 }
 
 void ss_batch::pack_collected(int count_to_record)
@@ -376,11 +349,7 @@ void ss_batch::release_pack_clicked()
   
   batch_mode_driver_p->release_pack = true;//true signals to release counted seed, even if barcode matching not satisfied.  For use in case of lost packet.
   
-//  batch_mode_driver_p->spreadsheet_line_number = batch_mode_driver_p->get_next_spreadsheet_line_number();
-//  refresh_screen();
   focus_on_barcode();
-  
-  cout<<"end of batch::release_pack_clicked()\n";
 }
 
 void ss_batch::restart_clicked()
@@ -828,7 +797,7 @@ manual_operation_window::manual_operation_window(QWidget* parent, batch_mode_dri
 {
   batch_mode_driver_p = batch_mode_driver_p_s;
   ss_batch_p = ss_batch_p_s;
-  setGeometry(0,0,100,480);		//Original~~~
+  setGeometry(0,0,100,400);	
   
   layout_p = new QGridLayout;
   previous_p = new button("Previous line");
@@ -884,9 +853,13 @@ manual_operation_window::manual_operation_window(QWidget* parent, batch_mode_dri
 
 void manual_operation_window::update_buttons()
 {
+//  first_line = batch_mode_driver_p->spreadsheet_line_number-5;
+  
   int max_first_line = batch_mode_driver_p->ss_envelope_id_p->data_list.size()-5;
-  if(first_line<0) first_line = 0;
   if(first_line>max_first_line) first_line = max_first_line;
+//  if(first_line<0) first_line = 0;
+  
+  cout<<"manual_operation_window::update_buttons.  first_line = "<<first_line<<endl;
   
   if(first_line>=0)
   {
@@ -1017,7 +990,7 @@ void manual_operation_window::next_clicked()
   update_buttons();//will check first_line and may change it
 }
 
-void manual_operation_window::close_clicked()
+void manual_operation_window::close_clicked()//note - close button is connected to both this and delete later slot.  this function is to prevent ss_batch from deleting this window if already deleted
 {
   ss_batch_p -> manual_operation_window_created = false;
 }

@@ -421,7 +421,8 @@ void centre::run()
     
 //    cout<<"deleting screen_p\n";
     
-    delete screen_p;
+//    delete screen_p;
+    screen* old_screen_p = screen_p;
     
     cout<<"current_screen="<<current_screen<<endl;
     
@@ -483,6 +484,8 @@ void centre::run()
                cout<<"default screen_p case\n";
     }
     screen_p->show();
+    delete old_screen_p;
+    old_screen_p = 0;
   }
 }
 
@@ -501,6 +504,7 @@ bool centre::save_settings(QString file_name)
   fset<<tm_barcode_columns<<endl;
   fset<<tm_zero_when_seed_discharged<<endl;
   fset<<tm_autosave_count_limit<<endl;
+  fset<<tm_last_filename.toStdString()<<endl;
 
   fset.close();
   return true;
@@ -541,6 +545,9 @@ bool centre::load_settings(QString file_name)
 
   fset.getline(input, 100);
   tm_autosave_count_limit = atoi(input);
+
+  fset.getline(input, 100);
+  tm_last_filename = QString(input);
 
   fset.close();
   return true;

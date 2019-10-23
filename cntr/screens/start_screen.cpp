@@ -15,7 +15,7 @@ start_screen::start_screen(centre* set_centre_p)
   batch_from_spreadsheet_button_p = new button("Batch From Spreadsheet Mode");
   tools_button_p = new button("Tools");
   shutdown_button_p = new button("Shut Down");
-  exit_button_p = new button("Exit Program");
+//  exit_button_p = new button("Exit Program");
   
   modebox_layout_p = new QGridLayout;
   shutdownbox_layout_p = new QGridLayout;
@@ -28,7 +28,7 @@ start_screen::start_screen(centre* set_centre_p)
   modebox_layout_p->addWidget(batch_from_spreadsheet_button_p, 0, 2);
   modebox_layout_p->addWidget(tools_button_p, 1, 0);
   shutdownbox_layout_p->addWidget(shutdown_button_p, 0, 0);
-  shutdownbox_layout_p->addWidget(exit_button_p, 0, 1);
+//  shutdownbox_layout_p->addWidget(exit_button_p, 0, 1);
   main_layout_p -> addWidget(modebox_p,0,0);
   main_layout_p -> addWidget(shutdownbox_p,1,0);
   
@@ -41,7 +41,7 @@ start_screen::start_screen(centre* set_centre_p)
   connect(batch_from_spreadsheet_button_p, SIGNAL(clicked()), this, SLOT(batch_from_spreadsheet_clicked()));
   connect(tools_button_p, SIGNAL(clicked()), this, SLOT(tools_clicked()));
   connect(shutdown_button_p, SIGNAL(clicked()), this, SLOT(shutdown()));
-  connect(exit_button_p, SIGNAL(clicked()), this, SLOT(exit_program()));
+//  connect(exit_button_p, SIGNAL(clicked()), this, SLOT(exit_program()));
 }
 
 void start_screen::totalize_clicked()
@@ -76,9 +76,10 @@ void start_screen::shutdown()
   centre_p->~centre();
   exit(1);
 }
-
+/*
 void start_screen::exit_program()
 {
   centre_p->~centre();
   exit(0);
 }
+*/

@@ -20,7 +20,8 @@ ss_batch_table::ss_batch_table(centre* c_p, batch_mode_driver* batch_mode_driver
   batch_mode_driver_p = batch_mode_driver_p_s;
   model_row = 0;
   model_column = 0;
-  current_row = 0;
+//  current_row = 0;
+  current_row = batch_mode_driver_p->spreadsheet_line_number;
   int number_of_columns = batch_mode_driver_p->display_column_numbers.size();
   model_p = new QStandardItemModel(1,number_of_columns);
   setModel(model_p);
@@ -76,7 +77,7 @@ ss_batch_table::ss_batch_table(centre* c_p, batch_mode_driver* batch_mode_driver
     
   );
   
-//  refresh();
+  refresh();
   
 //  cout<<"bt5\n";
   
@@ -129,14 +130,15 @@ void ss_batch_table::refresh()
 //    cout<<"p2\n";
 //    cout<<"display_column_pointers[0]->data_list[i] "<<display_column_pointers[0]->data_list[i].toStdString()<<endl;
 //    if(display_column_pointers[0]->data_list[i] == "Y")//packet for this row is filled.  colour red
-    if(batch_mode_driver_p->ss_first_column_p->data_list[i] == "Y")//packet for this row is filled.  colour red
+    if(batch_mode_driver_p->ss_first_column_p->data_list[i] == "Y")//packet for this row is filled.  colour dark green
     {
-      row_colour = QColor(255,100,100);
+      row_colour = QColor(100,230,100);
     }
 //    cout<<"p3\n";
-    if(i==current_row)//colour yellow
+    if(i==current_row)//colour light green
     {
-      row_colour = QColor(255,255,100);
+//      row_colour = QColor(255,255,100);yellow
+      row_colour = QColor(100,255,100);//light green
     }
 //    cout<<"p4\n";
 //    cout<<"number_of_columns "<<number_of_columns<<endl;

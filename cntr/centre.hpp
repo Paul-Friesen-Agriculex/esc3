@@ -141,7 +141,8 @@ class centre : public QObject
   bool tm_macro_updated;	//TEST~~~
   int tm_autosave_count_limit;//after this many counts are recorded, autosaves the file
   int tm_autosave_count;//counts how many counts were recorded;
-  QString tm_save_filename;
+  QString tm_save_filename;//if this is not blank, a file save is triggered with this name.  Includes directory info.
+  QString tm_last_filename;//holds the name last used to save a file.  No directory info or extension.
   
   bool macro_status_bool;			  //temporary variable to transfer ifstream to tablewidget
   int macro_numb_int;				    //

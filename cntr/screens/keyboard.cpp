@@ -471,6 +471,19 @@ totalize_save_file::totalize_save_file(centre* centre_p)
   QString message("Enter file name.");
   message_p->setText(message);
   connect(enter_key_p, SIGNAL(clicked()), this, SLOT(enter_clicked()));
+  QString default_file_name = centre_p->tm_last_filename;
+  /*
+  QString default_file_name = centre_p->tm_save_filename;
+  cout<<"default_file_name 1 = "<<default_file_name.toStdString()<<endl;
+  default_file_name.remove(0, default_file_name.indexOf("/"));//remove "user/"
+  cout<<"default_file_name 2 = "<<default_file_name.toStdString()<<endl;
+  default_file_name.remove(0, default_file_name.indexOf("/"));//remove crop name, "/"
+  cout<<"default_file_name 3 = "<<default_file_name.toStdString()<<endl;
+  default_file_name.remove(default_file_name.lastIndexOf("."), default_file_name.size());//remove ".csv"
+  cout<<"default_file_name 4 = "<<default_file_name.toStdString()<<endl;
+  */
+  *entry_line_p = default_file_name;
+  entry_line_display_p -> setText(*entry_line_p);
 }
 
 void totalize_save_file::enter_clicked()
@@ -500,6 +513,7 @@ void totalize_save_file::enter_clicked()
   cout<<"outfile_name "<<outfile_name.toLatin1().data()<<endl;
   
   centre_p->tm_save_filename = outfile_name;
+  centre_p->tm_last_filename = *entry_line_p;
   centre_p->add_waiting_screen(5);//totalize
   centre_p->screen_done=true;
   //returning to totalize with tm_save_filename not blank will trigger save.  see totalize constructor.

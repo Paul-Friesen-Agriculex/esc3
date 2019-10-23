@@ -60,7 +60,6 @@ struct ss_setup
   int actual_count_column;
   int print_time_column;
   int fill_time_column;
-//  QString envelope_setup_file;
 };
 
 enum print_control_mode_e
@@ -98,10 +97,6 @@ class batch_mode_driver : public QObject
   int program_size;
   bool force_dump_out;
   envelope_feeder_brother* e_f_brother_p;
-  
-  //testing
-//  int print_message_count;
-  
   
   public:
   batch_mode_driver(centre* centre_p_s, cutgate* cutgate_p_s);
@@ -166,7 +161,6 @@ class batch_mode_driver : public QObject
   
   //spreadsheet handling
   bool use_spreadsheet;
-//  int spreadsheet_line;//line corresponding to pack currently being filled
   QString spreadsheet_filename;
   void load_spreadsheet(QString filename);
   int save_spreadsheet(QString filename);
@@ -186,7 +180,6 @@ class batch_mode_driver : public QObject
   int get_next_spreadsheet_line_number();//look for next line number not filled for current seed_lot_barcode.  Return -1 if no more.
   int get_spreadsheet_line_number_after(int val);//look for line number not filled for current seed_lot_barcode, following val.  Return -1 if no more.
   int lines_left_to_fill;//number of packs for current seed_lot_bar_code still to be filled.  set by get_next_spreadsheet_line_number().
-//  QList<bool> pack_filled;//used to mark when a packet has been filled
   ss_setup* ss_setup_p;
   QString ss_setup_path;
   int actual_count;//to record actual number of seeds in pack.  Might be less than required if seed is short
@@ -195,8 +188,8 @@ class batch_mode_driver : public QObject
   void fill_ss_column_pointers();
   QList<int> display_column_numbers;
   QString envelope_layout_path;
-  void load_envelope_layout();
-  void clear_envelope_layout();
+//  void load_envelope_layout();
+//  void clear_envelope_layout();
 
   //saving spreadsheet setup files
   QString bm_save_ss_setup_filename;//new filename just entered.  Set back to blank when file is saved.
@@ -204,23 +197,23 @@ class batch_mode_driver : public QObject
   
   //envelope
   envelope* envelope_p;
-//  spreadsheet_column* column_for_next_field_p;
   int sample_row;//row to be used for a sample during envelope setup
   bool print_envelope;
   void print_seed_lot_envelopes(QString mat_id);
   print_control_mode_e print_control_mode;
   char field_data_source_flag;//'d' -> data.  'h' -> heading.  't' -> text entry
-//  QString text_for_envelope_field;
   
   //extra pack handling
-//  bool extra_pack_window_active;//setting true causes pause in batch program execution after cutgate closes
   bool fill_extra_pack;//setting true causes extra pack production
   bool extra_pack_filling;//signals that extra pack is filling
   int extra_pack_count_limit;
   int extra_pack_stored_count_limit;//store current_count_limit so it can be restored after extra pack
   bool extra_pack_finished;
   
+  //diagnostics
   void list_program();//in terminal - diagnostics
+  int cout_counter;//use to count cycles to print diagnostic messages occasionally
+  int cout_counter_limit;//cout_counter cycles back to zero after this number of runs
   
   private slots:
   void run();
@@ -234,7 +227,6 @@ class batch_mode_driver : public QObject
   
   signals:
   void dumping();
-//  void pack_ready();
   void pack_collected(int count);
   void dump_complete(int dump_count);
   void seed_lot_barcode_entered(QString barcode);
@@ -265,7 +257,6 @@ class count_rate_predictor : public QObject
   public:
   count_rate_predictor(centre* centre_p_s);
   ~count_rate_predictor();
-//  void add_counts(int to_add, int feed_speed_s);
   void set_initial_count_rate_multiplier(float multiplier_s) {count_rate_multiplier = multiplier_s;};
   float get_rate();
   

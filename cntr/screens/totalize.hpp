@@ -73,6 +73,7 @@ class totalize : public screen
   QTimer* run_timer_p;
   macro_screen* macro_screen_p;
   QString count_string;
+  
 };
 
 #endif

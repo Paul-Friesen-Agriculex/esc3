@@ -1,12 +1,10 @@
 #ifndef ss_batch_hpp
 #define ss_batch_hpp
 
-//#include "batch_table.hpp"
 #include "ss_batch_table.hpp"
 #include "centre.hpp"
 #include "batch_mode_driver.hpp"
 #include "macro_screen.hpp"
-//#include "batch.hpp"
 
 #include <QLabel>
 #include <QTextEdit>  //ORIGINAL~~~
@@ -66,10 +64,8 @@ class ss_batch : public screen
   bool manual_operation_window_created;
   
   public slots:
-//  void pack_ready();
   void pack_collected(int count);
   void dump_complete(int dump_count);
-//  void dump_complete();
   void dumping();
   void focus_on_barcode();
   void bad_lot_slot();
@@ -100,7 +96,6 @@ class ss_batch : public screen
   QSlider* high_speed_set_p;
   QSlider* low_speed_set_p;
   QSlider* dump_speed_set_p;
-//  batch_table* table_p;
   ss_batch_table* ss_table_p;
   message_box* status_box_p;
   button* save_program_button_p;
@@ -136,22 +131,12 @@ class ss_batch : public screen
   
   
   
-//  bool pack_was_placed;
-//  bool pack_was_removed;
-//  bool seed_for_pack_ready;
-//  bool pack_can_be_removed;
   QString pack_ready_message;
-//  bool ss_pack_removed_too_soon;
   QString pack_removed_too_soon_message;
-//  bool dump_container_was_placed;
-//  bool dump_container_can_be_removed;
   QString dump_container_needed_message;
   QString dump_container_ready_message;
-//  int dump_container_ready_count;
-//  bool ss_dump_container_removed_too_soon;
   QString dump_container_removed_too_soon_message;
   QString bad_seed_lot_message;
-//  bool dump_flag;//true -> dumping
   
   barcode_entry_mode old_barcode_mode;
   

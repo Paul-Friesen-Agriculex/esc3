@@ -56,6 +56,8 @@ void table::set_visible_columns(int num)
   }
   
   centre_p->tm_barcode_columns = num;
+  
+  saved = false;
 }
 
 void table::enter_seeds(int num)
@@ -75,6 +77,8 @@ void table::enter_seeds(int num)
   setCurrentIndex(next_index);
   setFocus();
   resizeColumnsToContents();
+  
+  saved = false;
 }
 
 void table::enter_weight(int num)
@@ -87,6 +91,8 @@ void table::enter_weight(int num)
   setCurrentIndex(current_index);
   setFocus();
   resizeColumnsToContents();
+  
+  saved = false;
 }
 
 void table::keyPressEvent(QKeyEvent* event)
@@ -103,6 +109,8 @@ void table::keyPressEvent(QKeyEvent* event)
     setCurrentIndex(next_index);
     resizeColumnsToContents();
   }
+  
+  saved = false;
 }
 
 void table::mouseReleaseEvent(QMouseEvent*)
@@ -131,6 +139,11 @@ void table::save_file(QString file_name)
       }
     }
     file.close();
+    
+    if(file_name != "settings/totalize_backup")
+    {
+      saved = true;
+    }
   }
   else cout<<"could not open save file\n";
   
@@ -198,6 +211,8 @@ void table::load_file(QString file_name)
     setCurrentIndex(next_index);
     resizeColumnsToContents();
     setFocus();
+  
+    saved = true;
     
   }
   else cout<<"file failed to open for reading\n";
@@ -221,4 +236,6 @@ void table::clear()
   
   resizeColumnsToContents();
   setFocus();
+  
+  saved = true;
 }
