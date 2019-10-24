@@ -601,7 +601,8 @@ void batch_mode_driver::run()
         centre_p->block_endgate_opening = !pack_barcode_ok;
         
         
-        if(  (time_to_end<0.4)  &&  ((centre_p->count)>current_count_limit/2)  )
+//        if(  (time_to_end<0.4)  &&  ((centre_p->count)>current_count_limit/2)  )
+        if(time_to_end<2)// &&  ((centre_p->count)>current_count_limit/2)  )
         {
           mode = low_open;
           cout<<"mode low_open. count "<<centre_p->count<<"\n";
@@ -622,6 +623,11 @@ void batch_mode_driver::run()
       }
       cutgate_p -> open();
       centre_p->block_endgate_opening = !pack_barcode_ok;
+      if(time_to_end>5)
+      {
+          mode = hi_open;
+          cout<<"mode hi_open. count "<<centre_p->count<<"\n";
+      }
       if(centre_p->count >= current_count_limit)
       {
         centre_p->count = 0;
@@ -1006,7 +1012,7 @@ void batch_mode_driver::run()
   if(cout_counter >= cout_counter_limit)
   {
     cout_counter = 0;
-    cout<<"time_to_end = "<<time_to_end<<endl;
+//    cout<<"time_to_end = "<<time_to_end<<endl;
   }
 }
 
