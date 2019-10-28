@@ -141,7 +141,7 @@ totalize::totalize(centre* set_centre_p)
   bottom_layout_p->setContentsMargins(0,0,0,0);
   main_layout_p->setContentsMargins(0,0,10,10);
   
-//  table_p->saved = false;
+  table_p->resizeColumnsToContents();
 }
 
 totalize::~totalize()
@@ -366,5 +366,6 @@ void totalize::run()
       }
     }
   }
+  table_p -> resizeColumnsToContents();
 }
 

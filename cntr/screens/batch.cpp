@@ -67,9 +67,38 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
   dump_speed_set_p->setOrientation(Qt::Horizontal);
   dump_speed_set_p->setFocusPolicy(Qt::NoFocus);
   
-  high_speed_set_p->setValue(batch_mode_driver_p->high_feed_speed);
-  low_speed_set_p->setValue(batch_mode_driver_p->low_feed_speed);
-  dump_speed_set_p->setValue(batch_mode_driver_p->dump_speed);
+  
+  
+  
+  
+  //calculate speed slider positions from speed values.  This is needed because the speed values are piecewise linear functions of the slider positions.
+  
+  int high_speed_value = batch_mode_driver_p->high_feed_speed;
+  int high_speed_position;
+  if(high_speed_value<=250) high_speed_position = 2*high_speed_value;
+  else high_speed_position = (high_speed_value+500) / 1.5;
+  
+  int low_speed_value = batch_mode_driver_p->low_feed_speed;
+  int low_speed_position;
+  if(low_speed_value<=250) low_speed_position = 2*low_speed_value;
+  else low_speed_position = (low_speed_value+500) / 1.5;
+  
+  int dump_speed_value = batch_mode_driver_p->dump_speed;
+  int dump_speed_position;
+  if(dump_speed_value<=250) dump_speed_position = 2*dump_speed_value;
+  else dump_speed_position = (dump_speed_value+500) / 1.5;
+  
+  high_speed_set_p->setValue(high_speed_position);
+  low_speed_set_p->setValue(low_speed_position);
+  dump_speed_set_p->setValue(dump_speed_position);
+  
+  
+  
+  
+  
+//  high_speed_set_p->setValue(batch_mode_driver_p->high_feed_speed);
+//  low_speed_set_p->setValue(batch_mode_driver_p->low_feed_speed);
+//  dump_speed_set_p->setValue(batch_mode_driver_p->dump_speed);
   
   table_p = new batch_table(centre_p, batch_mode_driver_p);
   status_box_p = new message_box;
@@ -84,6 +113,7 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
   control_box_p = new QGroupBox;
   speed_box_p = new QGroupBox;
   speed_box_p -> setTitle("Speeds");
+  speed_box_p -> setMinimumWidth(300);
   bottom_box_p = new QGroupBox;
     
   top_layout_p = new QGridLayout;
@@ -498,7 +528,7 @@ void batch::run()
         end_valve_mode = closed_empty;
         
         
-        cout<<"        batch::run.  batch_mode_driver_p->pack_complete = "<<batch_mode_driver_p->pack_complete<<".  setting true.\n";
+//        cout<<"        batch::run.  batch_mode_driver_p->pack_complete = "<<batch_mode_driver_p->pack_complete<<".  setting true.\n";
         batch_mode_driver_p->pack_complete = true;
         
         

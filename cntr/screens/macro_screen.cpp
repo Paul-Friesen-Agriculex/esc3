@@ -369,6 +369,8 @@ void macro_screen::usb_serial_out(QString bar_str_1, QString bar_str_2, QString 
 
 void macro_screen::usb_serial_out(QString lotcode_str, QString packcode_str, QString batch_count_str, QString substitution_str, QString dump_count_str)
 {
+  
+  /*
   cout<<endl<<"QString Variant BATCHMODE"<<endl;                         //OMIT~~~//
   cout<<"lotcode: "<<lotcode_str.toUtf8().constData();                   //OMIT~~~
   cout<<endl<<"packcode: "<<packcode_str.toUtf8().constData();           //
@@ -376,6 +378,7 @@ void macro_screen::usb_serial_out(QString lotcode_str, QString packcode_str, QSt
   cout<<endl<<"substitution: "<<substitution_str.toUtf8().constData();   //
   cout<<endl<<"dump count: "<<dump_count_str.toUtf8().constData();       //
   cout<<endl<<endl;                                                      //
+  */
 //----------------------------------------------------------------------------------------//
     
   bool macro_status_bool;			      //temporary variable to transfer ifstream to tablewidget
@@ -440,7 +443,7 @@ void macro_screen::usb_serial_out(QString lotcode_str, QString packcode_str, QSt
 	    }
 	    if(macros.eof()) break;
     }
-    cout<<endl<<combined_macro_functions.toUtf8().constData()<<endl;  //OMIT~~~
+//    cout<<endl<<combined_macro_functions.toUtf8().constData()<<endl;  //OMIT~~~
     macros.close();
   }  
 //--------------------------------------------------------------OUTPUT TO SERIAL--------------------------------------------------------------//
@@ -450,7 +453,7 @@ void macro_screen::usb_serial_out(QString lotcode_str, QString packcode_str, QSt
   //int filedesc = open("/dev/ttyUSB0", O_WRONLY);  //if udev rules are not applied//
   //write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros) != size_string_macros;
   //write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros);
-  cout<<endl<<"serial string buffer length: "<<write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros)<<endl; //ORIGINAL~~~
+//  cout<<endl<<"serial string buffer length: "<<write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros)<<endl; //ORIGINAL~~~
 //--------------------------------------------------------------------------------------------------------------------------------------------//
   //serial terminal write function with slight delay between commands//
   /*int write_output = 0; //TEST~~~

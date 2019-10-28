@@ -20,7 +20,8 @@ void ss_barcode_line::keyPressEvent(QKeyEvent* event)
   QLineEdit::keyPressEvent(event); //TEST~~~
   if(event->key() == Qt::Key_Return)
   {
-    emit barcode_entered(displayText());  //TEST~~~
+//    emit barcode_entered(displayText());  //TEST~~~
+    emit barcode_entered(text());  //TEST~~~
     clear();
   }
 }
@@ -63,9 +64,39 @@ ss_batch::ss_batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_drive
   dump_speed_set_p->setOrientation(Qt::Horizontal);
   dump_speed_set_p->setFocusPolicy(Qt::NoFocus);
   
-  high_speed_set_p->setValue(batch_mode_driver_p->high_feed_speed);
-  low_speed_set_p->setValue(batch_mode_driver_p->low_feed_speed);
-  dump_speed_set_p->setValue(batch_mode_driver_p->dump_speed);
+  
+  
+  
+  
+  //calculate speed slider positions from speed values.  This is needed because the speed values are piecewise linear functions of the slider positions.
+  
+  int high_speed_value = batch_mode_driver_p->high_feed_speed;
+  int high_speed_position;
+  if(high_speed_value<=250) high_speed_position = 2*high_speed_value;
+  else high_speed_position = (high_speed_value+500) / 1.5;
+  
+  int low_speed_value = batch_mode_driver_p->low_feed_speed;
+  int low_speed_position;
+  if(low_speed_value<=250) low_speed_position = 2*low_speed_value;
+  else low_speed_position = (low_speed_value+500) / 1.5;
+  
+  int dump_speed_value = batch_mode_driver_p->dump_speed;
+  int dump_speed_position;
+  if(dump_speed_value<=250) dump_speed_position = 2*dump_speed_value;
+  else dump_speed_position = (dump_speed_value+500) / 1.5;
+  
+  high_speed_set_p->setValue(high_speed_position);
+  low_speed_set_p->setValue(low_speed_position);
+  dump_speed_set_p->setValue(dump_speed_position);
+  
+  
+  
+  
+  
+  
+//  high_speed_set_p->setValue(batch_mode_driver_p->high_feed_speed);
+//  low_speed_set_p->setValue(batch_mode_driver_p->low_feed_speed);
+//  dump_speed_set_p->setValue(batch_mode_driver_p->dump_speed);
   
   ss_table_p = new ss_batch_table(centre_p, batch_mode_driver_p);
   status_box_p = new message_box;
@@ -83,6 +114,7 @@ ss_batch::ss_batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_drive
   control_box_p = new QGroupBox;
   speed_box_p = new QGroupBox;
   speed_box_p -> setTitle("Speeds");
+  speed_box_p -> setMinimumWidth(300);
   bottom_box_p = new QGroupBox;
     
   top_layout_p = new QGridLayout;

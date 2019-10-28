@@ -661,6 +661,7 @@ moc_batch.cpp: screens/batch_table.hpp \
 		envelope.hpp \
 		screens/macro_screen.hpp \
 		screens/table.hpp \
+		screens/keypad.hpp \
 		screens/batch.hpp
 	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/batch.hpp -o moc_batch.cpp
 
@@ -996,6 +997,7 @@ centre.o: centre.cpp centre.hpp \
 		screens/enter_program.hpp \
 		screens/batch.hpp \
 		screens/batch_table.hpp \
+		screens/keypad.hpp \
 		screens/batch_options.hpp \
 		screens/program_delete.hpp \
 		screens/crop_name_exists.hpp \
@@ -1091,6 +1093,7 @@ batch.o: screens/batch.cpp centre.hpp \
 		envelope.hpp \
 		screens/macro_screen.hpp \
 		screens/table.hpp \
+		screens/keypad.hpp \
 		button.hpp \
 		screens/message_box.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o batch.o screens/batch.cpp

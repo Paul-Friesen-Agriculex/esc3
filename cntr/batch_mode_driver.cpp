@@ -5,6 +5,7 @@
 #include <iomanip>
 #include <QMessageBox>
 #include <QDateTime>
+#include <QPushButton>
 
 using namespace std;
 
@@ -12,7 +13,11 @@ batch_mode_driver::batch_mode_driver(centre* centre_p_s, cutgate* cutgate_p_s)
 {
   centre_p = centre_p_s;
   cutgate_p = cutgate_p_s;
-  count_rate_predictor_p = new count_rate_predictor(centre_p);
+//  count_rate_predictor_p = new count_rate_predictor(centre_p);
+  slowdown_count_diff = 0;
+  slowdown_count_diff_set = false;//will be set to true if a value is loaded from file or is estimated by run function.
+    //a true value prevents the run function from estimating a new value from scratch.  It will, however, adjust the value as appropriate.
+  low_speed_mode_time.start();
   pack_present = old_pack_present = false;
   pack_changed = true;
   timer_p = new QTimer;
@@ -24,6 +29,7 @@ batch_mode_driver::batch_mode_driver(centre* centre_p_s, cutgate* cutgate_p_s)
   high_feed_speed = 100;
   low_feed_speed = 10;
   dump_speed = 1000;
+  current_count_limit = -1;//negative value indicates that it has not been set.
   
   //batch options
   require_seed_lot_barcode = true;
@@ -72,8 +78,8 @@ batch_mode_driver::batch_mode_driver(centre* centre_p_s, cutgate* cutgate_p_s)
   
 batch_mode_driver::~batch_mode_driver()
 {
-  delete count_rate_predictor_p;
-  count_rate_predictor_p = 0;
+//  delete count_rate_predictor_p;
+//  count_rate_predictor_p = 0;
   for(int i=0; i<program_size; ++i) delete program[i];
   program.clear();
   timer_p -> stop();
@@ -319,6 +325,7 @@ void batch_mode_driver::restart()
   dump_into_end_time.restart();
   mode = dump_into_end;
   cout<<"mode dump_into_end\n";
+  emit dumping();
   pack_barcode_ok = false;
   pack_barcode_old = true;
 }
@@ -484,6 +491,7 @@ void batch_mode_driver::list_program()
 
 void batch_mode_driver::run()
 {
+  /*
   float predicted_count_rate = (count_rate_predictor_p->get_rate());
   float time_to_end;
   if(predicted_count_rate > .001)
@@ -494,6 +502,17 @@ void batch_mode_driver::run()
   {
     time_to_end = 1000;
   }
+  */
+  
+  if(   (slowdown_count_diff_set==false)   &&   (current_count_limit>=0)   )//estimate a starting value for slowdown_count_diff.
+    //a negative value for current_count_limit indicates it has not been set and should not be used
+  {
+    slowdown_count_diff = current_count_limit/10;
+    stop_count_diff = 3*slowdown_count_diff;
+    slowdown_count_diff_set = true;
+    cout<<"initial setting of slowdown_count_diff "<<slowdown_count_diff<<endl;
+  }
+  
   old_pack_present = pack_present;
   pack_present = centre_p->envelope_present;
 
@@ -541,11 +560,21 @@ void batch_mode_driver::run()
           if(spreadsheet_line_number==-1)//-1 value signals no more lines for this seed_lot_barcode
           {
             QMessageBox box;
-            box.setText(QString("No unfilled rows for seed lot %1.  Dumping out.").arg(seed_lot_barcode));
+            box.setText(QString("No unfilled rows for seed lot %1. ").arg(seed_lot_barcode));
+            QPushButton* rescan_button_p = box.addButton(QString("Rescan"), QMessageBox::ActionRole);
+            QPushButton* dump_button_p = box.addButton(QString("Dump out seed"), QMessageBox::ActionRole);
             box.exec();
-            restart_flag = true;
             
-//            cout<<"after QMessageBox.  pack_barcode_ok = "<<pack_barcode_ok<<endl;
+            
+            
+            if(box.clickedButton() == rescan_button_p)
+            {
+              seed_lot_barcode_ok = false;
+            }
+            else if (box.clickedButton() == dump_button_p)
+            {
+              restart_flag = true;
+            }
           }
           else //have valid line number to fill
           {
@@ -581,13 +610,19 @@ void batch_mode_driver::run()
             }
           }
         }
-        mode = hi_open;
-        cout<<"mode hi_open\n";
+        if(seed_lot_barcode_ok == true)
+        {
+          mode = hi_open;
+          cout<<"mode hi_open\n";
+        }
 
 //        cout<<"after mode hi_open.  pack_barcode_ok = "<<pack_barcode_ok<<endl;
 
       }
-      if(restart_flag==true) restart();
+      if(restart_flag==true) 
+      {
+        restart();
+      }
       break;
     case hi_open:
       barcode_mode = pack;
@@ -602,10 +637,19 @@ void batch_mode_driver::run()
         
         
 //        if(  (time_to_end<0.4)  &&  ((centre_p->count)>current_count_limit/2)  )
-        if(time_to_end<2)// &&  ((centre_p->count)>current_count_limit/2)  )
+//        if(time_to_end<2)// &&  ((centre_p->count)>current_count_limit/2)  )
+        
+        if(   (current_count_limit-centre_p->count) < slowdown_count_diff   )
+        
+        
+        
+        
+        
+        
         {
           mode = low_open;
           cout<<"mode low_open. count "<<centre_p->count<<"\n";
+          low_speed_mode_time.restart();
 
 //          cout<<"after mode low_open.  pack_barcode_ok = "<<pack_barcode_ok<<endl;
 
@@ -623,20 +667,30 @@ void batch_mode_driver::run()
       }
       cutgate_p -> open();
       centre_p->block_endgate_opening = !pack_barcode_ok;
+      /*
       if(time_to_end>5)
       {
           mode = hi_open;
           cout<<"mode hi_open. count "<<centre_p->count<<"\n";
       }
+      */
       if(centre_p->count >= current_count_limit)
       {
         centre_p->count = 0;
         mode = gate_delay;
         cout<<"mode gate_delay. count "<<centre_p->count<<"\n";
-
-//        cout<<"after mode gate_delay.  pack_barcode_ok = "<<pack_barcode_ok<<endl;
-
         cutoff_gate_close_time.restart();
+        
+        int low_open_ms = low_speed_mode_time.elapsed();
+        float desired_low_open_ms = 2000;
+        float k = 0.5;//controls convergence speed
+        float min_slowdown_count_diff = 0.8*float(slowdown_count_diff);//do not reduce more than 20% at a time
+        float max_slowdown_count_diff = current_count_limit/2;
+        slowdown_count_diff = slowdown_count_diff + k*current_count_limit*(float(desired_low_open_ms-low_open_ms)/desired_low_open_ms);
+        if(slowdown_count_diff<min_slowdown_count_diff) slowdown_count_diff = min_slowdown_count_diff;
+        if(slowdown_count_diff>max_slowdown_count_diff) slowdown_count_diff = max_slowdown_count_diff;
+        stop_count_diff = 3*slowdown_count_diff;
+        cout<<"low_open_ms = "<<low_open_ms<<"   slowdown_count_diff = "<<slowdown_count_diff<<endl;
       }
       break;
     case gate_delay:
@@ -766,7 +820,21 @@ void batch_mode_driver::run()
           }
         }
       }
-      if(  (time_to_end<1.5)  &&  ((centre_p->count)>current_count_limit/2)  )
+      
+      
+      
+//      if(  (time_to_end<1.5)  &&  ((centre_p->count)>current_count_limit/2)  )
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      if(   (current_count_limit-centre_p->count) < stop_count_diff   )
       {
         mode = wait_for_pack;
         if(extra_pack_filling == true)//extra pack has been filled.  cancel
@@ -1617,7 +1685,7 @@ int batch_mode_driver::get_spreadsheet_line_number_after(int val)//look for line
   }
   return(-1);
 }
-
+/*
 count_rate_predictor::count_rate_predictor(centre* centre_p_s)
 {
   centre_p = centre_p_s;
@@ -1649,5 +1717,5 @@ float count_rate_predictor::get_rate()
 {
   return (count_rate_multiplier * float(centre_p->feed_speed));
 }
-
+*/
     

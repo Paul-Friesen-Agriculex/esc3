@@ -11,7 +11,7 @@
 #include "envelope.hpp"
 
 class QTimer;
-class count_rate_predictor;
+//class count_rate_predictor;
 class envelope;
 
 struct bm_set //batch mode set of packs
@@ -129,8 +129,14 @@ class batch_mode_driver : public QObject
   int pack_ready_pack;//number of the pack that has been completed in its set
   int pack_ready_count_limit;
   int pack_ready_pack_limit;
+  
   bool discharge_next_packet;
-  count_rate_predictor* count_rate_predictor_p;
+//  count_rate_predictor* count_rate_predictor_p;
+  int slowdown_count_diff;//seed feeder slows down when count is this many seeds from limit
+  bool slowdown_count_diff_set;//if this is false, run function will estimate a default starting value.  Otherwise, the set value will be used.  The set value will be adjusted continuously.
+  QTime low_speed_mode_time;
+  int stop_count_diff;//will stop feeder if reaches this in mode hi_closed
+  
   bool force_endgate_open;
   
   //batch option flags
@@ -240,7 +246,7 @@ class batch_mode_driver : public QObject
   void send_message2(QString);
   void send_message_time_to_end(QString);
 };
-	
+/*	
 class count_rate_predictor : public QObject
 {
   Q_OBJECT
@@ -263,4 +269,5 @@ class count_rate_predictor : public QObject
   signals:
   void send_message(QString message);
 };
+*/
 #endif
