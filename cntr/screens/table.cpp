@@ -34,6 +34,8 @@ table::table(centre* c_p)
   set_visible_columns(centre_p->tm_barcode_columns);
   verticalHeader()->hide();
   
+  hideColumn(5);
+  
   resizeColumnsToContents();
   
 }
@@ -54,6 +56,8 @@ void table::set_visible_columns(int num)
   {
     showColumn(i);
   }
+  
+  hideColumn(5);
   
   centre_p->tm_barcode_columns = num;
   

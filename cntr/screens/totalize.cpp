@@ -344,7 +344,7 @@ void totalize::run()
     bar_str_3 = (table_p -> model_p -> item(current_totalize_table_row,2) -> text()); 
     bar_str_4 = (table_p -> model_p -> item(current_totalize_table_row,3) -> text());
     totalize_str_count = (table_p -> model_p -> item(current_totalize_table_row,4) -> text());
-    totalize_str_weight = (table_p -> model_p -> item(current_totalize_table_row,5) -> text());
+//    totalize_str_weight = (table_p -> model_p -> item(current_totalize_table_row,5) -> text());
 
     macro_screen_p -> usb_serial_out(bar_str_1, bar_str_2, bar_str_3, bar_str_4, totalize_str_count, totalize_str_weight);	  //TEST~~~ Strings instead of ints 11_02_2018~~~//
 
