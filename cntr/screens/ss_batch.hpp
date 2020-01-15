@@ -73,6 +73,7 @@ class ss_batch : public screen
   
   private slots:
   void options_clicked();
+  void remove_drive_clicked();
   void back_clicked();
   void release_pack_clicked();
   void restart_clicked();
@@ -86,6 +87,7 @@ class ss_batch : public screen
   private:
   QLabel* count_message_p;
   button* options_button_p;
+  button* remove_drive_button_p;
   button* back_button_p;
   ss_barcode_line* barcode_line_p;
   button* release_pack_button_p;
@@ -150,6 +152,8 @@ class ss_batch : public screen
   QTimer* run_timer_p;
   
   manual_operation_window* manual_operation_window_p;
+  
+  bool eject_memory_sticks;//signal to destructor to eject after saving.
 };
 
 class manual_operation_window : public QWidget

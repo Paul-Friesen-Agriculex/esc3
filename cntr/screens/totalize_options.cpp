@@ -49,11 +49,11 @@ totalize_options::totalize_options(centre*set_centre_p)
   autosave_limit_group_p->setLayout(autosave_limit_layout_p);
   
   main_layout_p->addWidget(back_button_p,0,1);
-  main_layout_p->addWidget(macro_menu_button_p,4,0);	//TEST~~~
-  main_layout_p->addWidget(zero_when_seed_discharged_p, 1, 0);
-  main_layout_p->addWidget(number_of_barcode_columns_group_p, 2, 0);
-  main_layout_p->addWidget(autosave_limit_group_p, 3, 0);
-  main_layout_p->addWidget(ok_button_p, 4, 1);
+  main_layout_p->addWidget(macro_menu_button_p,3,0);
+  main_layout_p->addWidget(zero_when_seed_discharged_p, 0, 0);
+  main_layout_p->addWidget(number_of_barcode_columns_group_p, 1, 0);
+  main_layout_p->addWidget(autosave_limit_group_p, 2, 0);
+  main_layout_p->addWidget(ok_button_p, 3, 1);
   
   setLayout(main_layout_p);
   
@@ -77,6 +77,7 @@ void totalize_options::back_button_clicked()
 void totalize_options::zero_when_seed_discharged_changed(bool value)
 {
   centre_p->tm_zero_when_seed_discharged = value;
+  cout<<"centre_p->tm_zero_when_seed_discharged = "<<centre_p->tm_zero_when_seed_discharged<<endl;
 }
 
 void totalize_options::number_of_barcode_columns_changed(int value)

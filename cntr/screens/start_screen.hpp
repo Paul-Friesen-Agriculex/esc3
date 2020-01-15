@@ -7,6 +7,7 @@
 class button;
 class QGridLayout;
 class QGroupBox;
+class help_screen;
 
 
 class start_screen : public screen
@@ -21,6 +22,8 @@ class start_screen : public screen
   void batch_clicked();
   void batch_from_spreadsheet_clicked();
   void tools_clicked();
+  void eject_memory_sticks_clicked();
+  void help_button_clicked();
   void shutdown();
 //  void exit_program();
   
@@ -29,12 +32,16 @@ class start_screen : public screen
   button* batch_button_p;
   button* batch_from_spreadsheet_button_p;
   button* tools_button_p;
+  button* eject_memory_sticks_button_p;
   button* shutdown_button_p;
+  button* help_button_p;
 //  button* exit_button_p;
   QGridLayout* modebox_layout_p;
   QGridLayout* shutdownbox_layout_p;
   QGroupBox* modebox_p;
   QGroupBox* shutdownbox_p;
   QGridLayout* main_layout_p;
+  
+  help_screen* help_screen_p;
 };
 #endif

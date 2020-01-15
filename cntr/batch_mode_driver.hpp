@@ -162,7 +162,8 @@ class batch_mode_driver : public QObject
   
   //saving files
   QString bm_save_program_filename;//new filename just entered.  Set back to blank when file is saved.
-  QString bm_save_table_filename;//new filename just entered.  Set back to blank when file is saved.
+  QString bm_save_table_filename;//new filename just entered.  Includes directory info and .csv extension.  Set back to blank when file is saved.
+  QString bm_last_table_filename;//stores name last used to save table.  No directory or extension.
   void save_program(QString filename);
   
   //spreadsheet handling

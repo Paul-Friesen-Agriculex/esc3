@@ -53,6 +53,7 @@ ss_options::ss_options(centre*set_centre_p, batch_mode_driver* set_batch_mode_dr
   print_control_group_layout_p -> addWidget(start_on_previous_pack_collect_p, 1, 0);
   print_control_group_layout_p -> addWidget(preprint_batch_p, 2, 0);
   print_control_group_p -> setLayout(print_control_group_layout_p);
+  print_control_group_p -> setTitle("Print control");
   
   main_layout_p = new QGridLayout;
 //  main_layout_p -> addWidget(require_seed_lot_barcode_p);
@@ -62,7 +63,7 @@ ss_options::ss_options(centre*set_centre_p, batch_mode_driver* set_batch_mode_dr
   main_layout_p -> addWidget(print_control_group_p, 2, 0, 3, 1);
   main_layout_p -> addWidget(envelope_layout_p, 2, 1);
   main_layout_p -> addWidget(column_display_p, 3, 1);
-  main_layout_p -> addWidget(macro_menu_button_p, 2, 2);
+//  main_layout_p -> addWidget(macro_menu_button_p, 2, 2);
   main_layout_p -> addWidget(done_button_p, 3, 2);
   setLayout(main_layout_p);
   

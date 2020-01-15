@@ -149,8 +149,10 @@ void table::save_file(QString file_name)
       saved = true;
     }
   }
-  else cout<<"could not open save file\n";
-  
+  else 
+  {
+    cout<<"could not open save file "<<file_name.toStdString()<<endl;
+  }
 }
 
 void table::load_file(QString file_name)

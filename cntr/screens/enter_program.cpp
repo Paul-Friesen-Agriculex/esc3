@@ -48,6 +48,8 @@ enter_program::enter_program(centre*set_centre_p, batch_mode_driver* batch_mode_
   
   enter_flag = 'p';
   prompt_p -> setText("Enter number of packages");
+  prompt_p -> setFixedWidth(200);
+  prompt_p -> setWordWrap(true);
   
   
   cout<<"enter_program::enter_program.  before update\n";
@@ -118,7 +120,7 @@ void enter_program::number_entered(int value)
     
     current_packs = value; 
     enter_flag = 's';
-    prompt_p -> setText("Enter number of \nseeds per package");
+    prompt_p -> setText("Enter number of seeds per package");
     cout<<"enter_program::number_entered packs\n";
 //    batch_mode_driver_p->list_program();
     update_program_string();
@@ -183,6 +185,12 @@ void enter_program::update_program_string()
     program_string_p -> append(" seeds each.\n");
   }
   cout<<"update_program_string 4\n";
+  
+  if(enter_flag=='s')
+  {
+    program_string_p->append(QString::number(current_packs));
+    program_string_p->append(" packs  ");
+  }
   edit_p -> setText(*program_string_p);
 }
   

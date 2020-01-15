@@ -87,6 +87,12 @@ attached to the machine.");
   if(directory_list.size()==0)
   {
     cout<<"no USB drives found\n";
+    message_p->setText(" \
+NO SPREADSHEET FOUND.\n\n \
+Spreadsheets must be in CSV format and\n \
+in the root directory of a USB stick\n \
+attached to the machine.");
+    spreadsheet_list_p = 0;
   }
   else
   {
@@ -94,30 +100,31 @@ attached to the machine.");
     spreadsheet_path.append("/");
     cout<<"spreadsheet_path = "<<spreadsheet_path.toStdString()<<endl;
     dir_p -> setPath(spreadsheet_path);
+  
+  
+  
+    
+    cout<<"2\n";
+    
+    spreadsheet_list_p = new QStringList;
+    QStringList filter;
+    filter<<"*.csv";
+    *spreadsheet_list_p = dir_p->entryList(filter);
+    
+    cout<<"3\n";
+    
+    for(int i=0; i<spreadsheet_list_p->size(); ++i)
+    {
+      QString temp = spreadsheet_list_p->at(i);
+      temp.remove(".csv");
+      spreadsheet_list_p->replace(i, temp);
+    }
+    first_spreadsheet_displayed = 0;
+    display_spreadsheets();
+    centre_p->batch_mode_driver_p->use_spreadsheet = true;  
+    
+    cout<<"4\n";
   }
-  
-  
-  
-  cout<<"2\n";
-  
-  spreadsheet_list_p = new QStringList;
-  QStringList filter;
-  filter<<"*.csv";
-  *spreadsheet_list_p = dir_p->entryList(filter);
-  
-  cout<<"3\n";
-  
-  for(int i=0; i<spreadsheet_list_p->size(); ++i)
-  {
-    QString temp = spreadsheet_list_p->at(i);
-    temp.remove(".csv");
-    spreadsheet_list_p->replace(i, temp);
-  }
-  first_spreadsheet_displayed = 0;
-  display_spreadsheets();
-  centre_p->batch_mode_driver_p->use_spreadsheet = true;  
-  
-  cout<<"4\n";
   
 }
 

@@ -165,6 +165,7 @@ class repeat_pack_window:public QWidget
   button* cancel_button_p;
   QLabel* message_p;
   keypad* keypad_p;
+  barcode_line* barcode_line_p;
   QVBoxLayout* layout_p;
   batch_mode_driver* batch_mode_driver_p;
   batch* batch_p;

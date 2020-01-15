@@ -96,7 +96,8 @@ SOURCES       = batch_mode_driver.cpp \
 		screens/table.cpp \
 		screens/tool_choice.cpp \
 		screens/totalize.cpp \
-		screens/totalize_options.cpp moc_batch_mode_driver.cpp \
+		screens/totalize_options.cpp \
+		screens/help_screen.cpp moc_batch_mode_driver.cpp \
 		moc_brother_envelope_feeder.cpp \
 		moc_button.cpp \
 		moc_centre.cpp \
@@ -141,7 +142,8 @@ SOURCES       = batch_mode_driver.cpp \
 		moc_table.cpp \
 		moc_tool_choice.cpp \
 		moc_totalize.cpp \
-		moc_totalize_options.cpp
+		moc_totalize_options.cpp \
+		moc_help_screen.cpp
 OBJECTS       = batch_mode_driver.o \
 		brother_envelope_feeder.o \
 		button.o \
@@ -191,6 +193,7 @@ OBJECTS       = batch_mode_driver.o \
 		tool_choice.o \
 		totalize.o \
 		totalize_options.o \
+		help_screen.o \
 		moc_batch_mode_driver.o \
 		moc_brother_envelope_feeder.o \
 		moc_button.o \
@@ -236,7 +239,8 @@ OBJECTS       = batch_mode_driver.o \
 		moc_table.o \
 		moc_tool_choice.o \
 		moc_totalize.o \
-		moc_totalize_options.o
+		moc_totalize_options.o \
+		moc_help_screen.o
 DIST          = /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/common/unix.conf \
 		/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/common/linux.conf \
@@ -346,7 +350,8 @@ DIST          = /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/spec_pre.prf \
 		screens/table.hpp \
 		screens/tool_choice.hpp \
 		screens/totalize.hpp \
-		screens/totalize_options.hpp batch_mode_driver.cpp \
+		screens/totalize_options.hpp \
+		screens/help_screen.hpp batch_mode_driver.cpp \
 		brother_envelope_feeder.cpp \
 		button.cpp \
 		centre.cpp \
@@ -394,7 +399,8 @@ DIST          = /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/spec_pre.prf \
 		screens/table.cpp \
 		screens/tool_choice.cpp \
 		screens/totalize.cpp \
-		screens/totalize_options.cpp
+		screens/totalize_options.cpp \
+		screens/help_screen.cpp
 QMAKE_TARGET  = cntr
 DESTDIR       = #avoid trailing-slash linebreak
 TARGET        = cntr
@@ -570,8 +576,8 @@ dist: distdir FORCE
 distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
-	$(COPY_FILE) --parents batch_mode_driver.hpp brother_envelope_feeder.hpp button.hpp centre.hpp code_39_writer.hpp crop.hpp cutgate.hpp diagnostics_console.hpp display.hpp dust_streak.hpp endgate.hpp envelope.hpp envelope_feeder_brother.hpp envelope_sensor.hpp feeder.hpp processor.hpp processor_calcs.hpp screens/batch.hpp screens/batch_options.hpp screens/batch_table.hpp screens/calibrate.hpp screens/crop_choice.hpp screens/crop_delete.hpp screens/crop_edit.hpp screens/crop_name_exists.hpp screens/enter_program.hpp screens/keyboard.hpp screens/keypad.hpp screens/macro_screen.hpp screens/message_box.hpp screens/playback.hpp screens/position_envelope_field.hpp screens/program_choice.hpp screens/program_delete.hpp screens/select_envelope_field.hpp screens/select_field_data_source.hpp screens/set_envelope_size.hpp screens/spreadsheet_choice.hpp screens/ss_batch.hpp screens/ss_batch_table.hpp screens/ss_column_display_options.hpp screens/ss_options.hpp screens/ss_setup_choice.hpp screens/ss_setup_delete.hpp screens/ss_setup_entry.hpp screens/start_screen.hpp screens/table.hpp screens/tool_choice.hpp screens/totalize.hpp screens/totalize_options.hpp $(DISTDIR)/
-	$(COPY_FILE) --parents batch_mode_driver.cpp brother_envelope_feeder.cpp button.cpp centre.cpp code_39_writer.cpp cutgate.cpp diagnostics_console.cpp display.cpp dust_streak.cpp endgate.cpp envelope.cpp envelope_feeder_brother.cpp envelope_sensor.cpp feeder.cpp main.cpp processor.cpp screens/batch.cpp screens/batch_options.cpp screens/batch_table.cpp screens/calibrate.cpp screens/crop_choice.cpp screens/crop_delete.cpp screens/crop_edit.cpp screens/crop_name_exists.cpp screens/enter_program.cpp screens/keyboard.cpp screens/keypad.cpp screens/macro_screen.cpp screens/message_box.cpp screens/playback.cpp screens/position_envelope_field.cpp screens/program_choice.cpp screens/program_delete.cpp screens/select_envelope_field.cpp screens/select_field_data_source.cpp screens/set_envelope_size.cpp screens/spreadsheet_choice.cpp screens/ss_batch.cpp screens/ss_batch_table.cpp screens/ss_column_display_options.cpp screens/ss_options.cpp screens/ss_setup_choice.cpp screens/ss_setup_delete.cpp screens/ss_setup_entry.cpp screens/start_screen.cpp screens/table.cpp screens/tool_choice.cpp screens/totalize.cpp screens/totalize_options.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents batch_mode_driver.hpp brother_envelope_feeder.hpp button.hpp centre.hpp code_39_writer.hpp crop.hpp cutgate.hpp diagnostics_console.hpp display.hpp dust_streak.hpp endgate.hpp envelope.hpp envelope_feeder_brother.hpp envelope_sensor.hpp feeder.hpp processor.hpp processor_calcs.hpp screens/batch.hpp screens/batch_options.hpp screens/batch_table.hpp screens/calibrate.hpp screens/crop_choice.hpp screens/crop_delete.hpp screens/crop_edit.hpp screens/crop_name_exists.hpp screens/enter_program.hpp screens/keyboard.hpp screens/keypad.hpp screens/macro_screen.hpp screens/message_box.hpp screens/playback.hpp screens/position_envelope_field.hpp screens/program_choice.hpp screens/program_delete.hpp screens/select_envelope_field.hpp screens/select_field_data_source.hpp screens/set_envelope_size.hpp screens/spreadsheet_choice.hpp screens/ss_batch.hpp screens/ss_batch_table.hpp screens/ss_column_display_options.hpp screens/ss_options.hpp screens/ss_setup_choice.hpp screens/ss_setup_delete.hpp screens/ss_setup_entry.hpp screens/start_screen.hpp screens/table.hpp screens/tool_choice.hpp screens/totalize.hpp screens/totalize_options.hpp screens/help_screen.hpp $(DISTDIR)/
+	$(COPY_FILE) --parents batch_mode_driver.cpp brother_envelope_feeder.cpp button.cpp centre.cpp code_39_writer.cpp cutgate.cpp diagnostics_console.cpp display.cpp dust_streak.cpp endgate.cpp envelope.cpp envelope_feeder_brother.cpp envelope_sensor.cpp feeder.cpp main.cpp processor.cpp screens/batch.cpp screens/batch_options.cpp screens/batch_table.cpp screens/calibrate.cpp screens/crop_choice.cpp screens/crop_delete.cpp screens/crop_edit.cpp screens/crop_name_exists.cpp screens/enter_program.cpp screens/keyboard.cpp screens/keypad.cpp screens/macro_screen.cpp screens/message_box.cpp screens/playback.cpp screens/position_envelope_field.cpp screens/program_choice.cpp screens/program_delete.cpp screens/select_envelope_field.cpp screens/select_field_data_source.cpp screens/set_envelope_size.cpp screens/spreadsheet_choice.cpp screens/ss_batch.cpp screens/ss_batch_table.cpp screens/ss_column_display_options.cpp screens/ss_options.cpp screens/ss_setup_choice.cpp screens/ss_setup_delete.cpp screens/ss_setup_entry.cpp screens/start_screen.cpp screens/table.cpp screens/tool_choice.cpp screens/totalize.cpp screens/totalize_options.cpp screens/help_screen.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -594,9 +600,9 @@ check: first
 
 compiler_rcc_make_all:
 compiler_rcc_clean:
-compiler_moc_header_make_all: moc_batch_mode_driver.cpp moc_brother_envelope_feeder.cpp moc_button.cpp moc_centre.cpp moc_cutgate.cpp moc_diagnostics_console.cpp moc_display.cpp moc_endgate.cpp moc_envelope.cpp moc_envelope_feeder_brother.cpp moc_envelope_sensor.cpp moc_feeder.cpp moc_processor.cpp moc_batch.cpp moc_batch_options.cpp moc_batch_table.cpp moc_calibrate.cpp moc_crop_choice.cpp moc_crop_delete.cpp moc_crop_edit.cpp moc_crop_name_exists.cpp moc_enter_program.cpp moc_keyboard.cpp moc_keypad.cpp moc_macro_screen.cpp moc_message_box.cpp moc_playback.cpp moc_position_envelope_field.cpp moc_program_choice.cpp moc_program_delete.cpp moc_select_envelope_field.cpp moc_select_field_data_source.cpp moc_set_envelope_size.cpp moc_spreadsheet_choice.cpp moc_ss_batch.cpp moc_ss_batch_table.cpp moc_ss_column_display_options.cpp moc_ss_options.cpp moc_ss_setup_choice.cpp moc_ss_setup_delete.cpp moc_ss_setup_entry.cpp moc_start_screen.cpp moc_table.cpp moc_tool_choice.cpp moc_totalize.cpp moc_totalize_options.cpp
+compiler_moc_header_make_all: moc_batch_mode_driver.cpp moc_brother_envelope_feeder.cpp moc_button.cpp moc_centre.cpp moc_cutgate.cpp moc_diagnostics_console.cpp moc_display.cpp moc_endgate.cpp moc_envelope.cpp moc_envelope_feeder_brother.cpp moc_envelope_sensor.cpp moc_feeder.cpp moc_processor.cpp moc_batch.cpp moc_batch_options.cpp moc_batch_table.cpp moc_calibrate.cpp moc_crop_choice.cpp moc_crop_delete.cpp moc_crop_edit.cpp moc_crop_name_exists.cpp moc_enter_program.cpp moc_keyboard.cpp moc_keypad.cpp moc_macro_screen.cpp moc_message_box.cpp moc_playback.cpp moc_position_envelope_field.cpp moc_program_choice.cpp moc_program_delete.cpp moc_select_envelope_field.cpp moc_select_field_data_source.cpp moc_set_envelope_size.cpp moc_spreadsheet_choice.cpp moc_ss_batch.cpp moc_ss_batch_table.cpp moc_ss_column_display_options.cpp moc_ss_options.cpp moc_ss_setup_choice.cpp moc_ss_setup_delete.cpp moc_ss_setup_entry.cpp moc_start_screen.cpp moc_table.cpp moc_tool_choice.cpp moc_totalize.cpp moc_totalize_options.cpp moc_help_screen.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) moc_batch_mode_driver.cpp moc_brother_envelope_feeder.cpp moc_button.cpp moc_centre.cpp moc_cutgate.cpp moc_diagnostics_console.cpp moc_display.cpp moc_endgate.cpp moc_envelope.cpp moc_envelope_feeder_brother.cpp moc_envelope_sensor.cpp moc_feeder.cpp moc_processor.cpp moc_batch.cpp moc_batch_options.cpp moc_batch_table.cpp moc_calibrate.cpp moc_crop_choice.cpp moc_crop_delete.cpp moc_crop_edit.cpp moc_crop_name_exists.cpp moc_enter_program.cpp moc_keyboard.cpp moc_keypad.cpp moc_macro_screen.cpp moc_message_box.cpp moc_playback.cpp moc_position_envelope_field.cpp moc_program_choice.cpp moc_program_delete.cpp moc_select_envelope_field.cpp moc_select_field_data_source.cpp moc_set_envelope_size.cpp moc_spreadsheet_choice.cpp moc_ss_batch.cpp moc_ss_batch_table.cpp moc_ss_column_display_options.cpp moc_ss_options.cpp moc_ss_setup_choice.cpp moc_ss_setup_delete.cpp moc_ss_setup_entry.cpp moc_start_screen.cpp moc_table.cpp moc_tool_choice.cpp moc_totalize.cpp moc_totalize_options.cpp
+	-$(DEL_FILE) moc_batch_mode_driver.cpp moc_brother_envelope_feeder.cpp moc_button.cpp moc_centre.cpp moc_cutgate.cpp moc_diagnostics_console.cpp moc_display.cpp moc_endgate.cpp moc_envelope.cpp moc_envelope_feeder_brother.cpp moc_envelope_sensor.cpp moc_feeder.cpp moc_processor.cpp moc_batch.cpp moc_batch_options.cpp moc_batch_table.cpp moc_calibrate.cpp moc_crop_choice.cpp moc_crop_delete.cpp moc_crop_edit.cpp moc_crop_name_exists.cpp moc_enter_program.cpp moc_keyboard.cpp moc_keypad.cpp moc_macro_screen.cpp moc_message_box.cpp moc_playback.cpp moc_position_envelope_field.cpp moc_program_choice.cpp moc_program_delete.cpp moc_select_envelope_field.cpp moc_select_field_data_source.cpp moc_set_envelope_size.cpp moc_spreadsheet_choice.cpp moc_ss_batch.cpp moc_ss_batch_table.cpp moc_ss_column_display_options.cpp moc_ss_options.cpp moc_ss_setup_choice.cpp moc_ss_setup_delete.cpp moc_ss_setup_entry.cpp moc_start_screen.cpp moc_table.cpp moc_tool_choice.cpp moc_totalize.cpp moc_totalize_options.cpp moc_help_screen.cpp
 moc_batch_mode_driver.cpp: centre.hpp \
 		cutgate.hpp \
 		endgate.hpp \
@@ -941,6 +947,9 @@ moc_totalize_options.cpp: centre.hpp \
 		screens/totalize_options.hpp
 	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/totalize_options.hpp -o moc_totalize_options.cpp
 
+moc_help_screen.cpp: screens/help_screen.hpp
+	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/help_screen.hpp -o moc_help_screen.cpp
+
 compiler_moc_source_make_all:
 compiler_moc_source_clean:
 compiler_uic_make_all:
@@ -1206,7 +1215,8 @@ macro_screen.o: screens/macro_screen.cpp centre.hpp \
 		crop.hpp \
 		screens/macro_screen.hpp \
 		screens/table.hpp \
-		button.hpp
+		button.hpp \
+		screens/help_screen.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o macro_screen.o screens/macro_screen.cpp
 
 message_box.o: screens/message_box.cpp screens/message_box.hpp
@@ -1447,6 +1457,10 @@ totalize_options.o: screens/totalize_options.cpp centre.hpp \
 		button.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o totalize_options.o screens/totalize_options.cpp
 
+help_screen.o: screens/help_screen.cpp screens/help_screen.hpp \
+		button.hpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o help_screen.o screens/help_screen.cpp
+
 moc_batch_mode_driver.o: moc_batch_mode_driver.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_batch_mode_driver.o moc_batch_mode_driver.cpp
 
@@ -1584,6 +1598,9 @@ moc_totalize.o: moc_totalize.cpp
 
 moc_totalize_options.o: moc_totalize_options.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_totalize_options.o moc_totalize_options.cpp
+
+moc_help_screen.o: moc_help_screen.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_help_screen.o moc_help_screen.cpp
 
 ####### Install
 

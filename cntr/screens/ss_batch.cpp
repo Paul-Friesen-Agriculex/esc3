@@ -40,6 +40,7 @@ ss_batch::ss_batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_drive
   }
   count_message_p = new QLabel;
   options_button_p = new button("Options");
+  remove_drive_button_p = new button("Safely remove\nUSB stick(s)");
   back_button_p = new button("Back");
   barcode_line_p = new ss_barcode_line;
   barcode_line_p->setMaximumSize(120,40);  //ORIGINAL~~~
@@ -125,10 +126,14 @@ ss_batch::ss_batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_drive
 
   top_layout_p -> addWidget(count_message_p, 0, 0);
   top_layout_p -> addWidget(options_button_p, 0, 1);
-  top_layout_p -> addWidget(back_button_p, 0, 2);
-  bottom_layout_p -> addWidget(barcode_line_p, 1, 4);   
+  top_layout_p -> addWidget(remove_drive_button_p, 0, 2);
+  top_layout_p -> addWidget(back_button_p, 0, 3);
+  bottom_layout_p -> addWidget(barcode_line_p, 1, 4);  
+  barcode_line_p->setFocus();
   barcode_line_p -> setText("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");  
-  barcode_line_p -> clear();  
+//  barcode_line_p -> setText("10XXxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");  
+  barcode_line_p -> setText("                                                             ");  
+//  barcode_line_p -> clear();  
   control_layout_p -> addWidget(release_pack_button_p, 0, 0);
   control_layout_p -> addWidget(restart_button_p, 0, 1);
   control_layout_p -> addWidget(speed_box_p, 1, 0, 1, 2);     
@@ -157,6 +162,7 @@ ss_batch::ss_batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_drive
   setLayout(main_layout_p);
   
   connect(options_button_p, SIGNAL(clicked()), this, SLOT(options_clicked()));
+  connect(remove_drive_button_p, SIGNAL(clicked()), this, SLOT(remove_drive_clicked()));
   connect(back_button_p, SIGNAL(clicked()), this, SLOT(back_clicked()));
   connect(release_pack_button_p, SIGNAL(clicked()), this, SLOT(release_pack_clicked()));
   connect(restart_button_p, SIGNAL(clicked()), this, SLOT(restart_clicked()));
@@ -236,11 +242,15 @@ ss_batch::ss_batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_drive
   manual_operation_window_created = false;
   
   batch_mode_driver_p -> use_spreadsheet = true;
+  batch_mode_driver_p -> seed_lot_barcode = "";
+  batch_mode_driver_p -> pack_barcode = "";
 
   count_message_p->setStyleSheet("QLabel {" 
         "background-color: white;"          
         "border: 3px solid black;"          
         "font-size: 20pt;}");   
+
+  eject_memory_sticks = false;
   
   cout<<"end of ss_batch::ss_batch.  spreadsheet_line_number = "<<batch_mode_driver_p->spreadsheet_line_number<<endl;
 }
@@ -263,7 +273,38 @@ ss_batch::~ss_batch()
     }
     if( (val!=0) || (ret==QMessageBox::Ok) ) break;
   }
-    
+  
+  if(eject_memory_sticks == true)
+  {
+    QDir dir("/media/odroid/");
+    QStringList directory_list = dir.entryList(QDir::Dirs  | QDir::NoDotAndDotDot);
+    int num_drives = directory_list.size();//number of USB memory sticks detected
+    for (int i=0; i<num_drives; ++i)
+    {
+      QString command = "umount /media/odroid/";
+      command.append(directory_list[i]);
+      char* command_a = command.toLatin1().data();
+      if(system (command_a) != 0)
+      {
+        cout<<"unmount command failed\n";
+      }
+    }
+    QDir check_dir("/media/odroid/");
+    QStringList check_list = check_dir.entryList(QDir::Dirs  | QDir::NoDotAndDotDot);
+    if(check_list.size() == 0) 
+    {
+      QMessageBox box;
+      box.setText(QString("%1 USB stick(s) can be safely removed").arg(num_drives));
+      box.exec();
+    }
+    else
+    {
+      QMessageBox box;
+      box.setText(QString("WARNING - %1 USB stick(s) were NOT unmounted.  Shut down machine to remove them safely.").arg(check_list.size()));
+      box.exec();
+    }
+  }
+  
   batch_mode_driver_p -> stop();
   delete count_message_p;
   delete options_button_p;
@@ -352,6 +393,16 @@ void ss_batch::options_clicked()
   centre_p->add_waiting_screen(33);//come back to ss_batch
   centre_p->add_waiting_screen(31);//ss_options
   centre_p->screen_done=true;
+}
+
+void ss_batch::remove_drive_clicked()
+{
+  eject_memory_sticks = true;//signal to destructor
+  
+  batch_mode_driver_p -> stop();
+  centre_p->set_speed(0);
+  centre_p->add_waiting_screen(0);
+  centre_p->screen_done = true;
 }
 
 void ss_batch::back_clicked()

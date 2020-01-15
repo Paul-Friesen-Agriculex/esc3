@@ -20,6 +20,7 @@ class QHBoxLayout;
 class QLabel;
 class QRadioButton;
 class QSpinBox;
+class help_screen;
 
 class macro_screen : public screen
 {
@@ -52,7 +53,9 @@ class macro_screen : public screen
   button* help_button_p;
   button* disable_all_button_p;
   button* enable_all_button_p;
+  help_screen* help_screen_p;
   
+  QLabel* instruction_label_p;
   QLineEdit *lineEdit;
   bool serialusb_connected;
 
@@ -66,11 +69,12 @@ class macro_screen : public screen
   QTableWidgetItem* tableWidgetItem_p;
   QLabel* tableWidget_label_p;
   QLabel* screen_title_label_p;
+  QLabel* description_p;
   QMessageBox msgBox;
   QString macro_function_string;
 
   static const int macro_button_width = 135;
-  static const int macro_button_height = 45;
+  static const int macro_button_height = 35;
   static const int macro_cols = 5;
   static const int macro_rows = 10;
   centre* centre_p;

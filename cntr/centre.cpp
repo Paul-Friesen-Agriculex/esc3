@@ -192,7 +192,7 @@ centre::centre():
   
   //totalize mode
   tm_barcode_columns = 0;
-  tm_zero_when_seed_discharged = false;
+//  tm_zero_when_seed_discharged = false;
   tm_autosave_count_limit = 0;//after this many counts are recorded, autosaves the file
   tm_autosave_count = 0;//counts how many counts were recorded;
   tm_save_filename = "";
@@ -505,6 +505,7 @@ bool centre::save_settings(QString file_name)
   fset<<tm_zero_when_seed_discharged<<endl;
   fset<<tm_autosave_count_limit<<endl;
   fset<<tm_last_filename.toStdString()<<endl;
+  fset<<batch_mode_driver_p->bm_last_table_filename.toStdString()<<endl;
 
   fset.close();
   return true;
@@ -548,6 +549,9 @@ bool centre::load_settings(QString file_name)
 
   fset.getline(input, 100);
   tm_last_filename = QString(input);
+
+  fset.getline(input, 100);
+  batch_mode_driver_p->bm_last_table_filename = QString(input);
 
   fset.close();
   return true;

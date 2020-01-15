@@ -12,6 +12,8 @@
 #include "totalize.hpp"
 #include "button.hpp"
 #include <QString>
+#include <QDir>
+#include <QStringList>
 
 //#include <QtMath> //exponential qslider// TEST~~~//
 
@@ -130,11 +132,72 @@ totalize::totalize(centre* set_centre_p)
   
   if(centre_p->tm_save_filename != "")//returning from totalize_save_file screen with name of file to save
   {
+    //save in user folder under crop name
     table_p->save_file(centre_p->tm_save_filename);
+    
+    //save to any USB memory sticks detected
+    QDir* dir_p = new QDir("/media/odroid/");
+    QStringList directory_list = dir_p->entryList(QDir::Dirs  | QDir::NoDotAndDotDot);
+    int num_drives = directory_list.size();//number of USB memory sticks detected
+    for(int i=0; i<num_drives; ++i)
+    {
+      table_p -> save_file(QString("/media/odroid/").append(directory_list[i]).append("/").append(centre_p->tm_last_filename).append(".csv"));
+    }
+
+    bool drives_removed = false;
+    if(num_drives>0)
+    {
+      QMessageBox box;
+      box.setText(QString("saved to %1 memory sticks").arg(num_drives));
+      QPushButton* eject_button = box.addButton("Safely remove memory sticks", QMessageBox::ActionRole);
+      QPushButton* keep_button = box.addButton("Do not remove", QMessageBox::ActionRole);
+      box.exec();
+      
+      if(box.clickedButton() == eject_button)
+      {
+        for (int i=0; i<num_drives; ++i)
+        {
+          QString command = "umount /media/odroid/";
+          command.append(directory_list[i]);
+          char* command_a = command.toLatin1().data();
+          if(system (command_a) != 0)
+          {
+            cout<<"unmount command failed\n";
+          }
+        }
+        QDir check_dir("/media/odroid/");
+        QStringList check_list = check_dir.entryList(QDir::Dirs  | QDir::NoDotAndDotDot);
+        if(check_list.size() == 0) drives_removed = true;
+      }
+      else if(box.clickedButton() == keep_button)
+      {
+        //do nothing
+      }
+    }
+    else//no memory sticks detected
+    {
+      QMessageBox box;
+      box.setText("No memory sticks detected.  Saved internally only.");
+      box.setInformativeText("If you plug in a memory stick and save again, "
+                             "the file will be written to it.  It will be in .csv format, "
+                             "and can be opened by a spreadsheet or database.");
+      box.exec();
+    }
+    if(drives_removed == true)
+    {
+      QMessageBox box;
+      box.setText("You can now safely remove the memory stick(s)");
+      box.exec();
+    }
+      
+    delete dir_p;  
+
+    
     centre_p->tm_save_filename = "";
   }
   
   speed_label_p->setAlignment(Qt::AlignCenter);
+//  speed_set_p->setFixedHeight(100);
   top_layout_p->setContentsMargins(0,0,0,0);        //set layout margins to shrink to designated container dimensions//
   control_layout_p->setContentsMargins(0,0,0,0);
   speed_layout_p->setContentsMargins(0,0,0,0);
@@ -300,13 +363,13 @@ void totalize::run()
   {
     centre_p -> totalize_force_endgate_open = true;
     endgate_button_p->setText("Close Endgate\nHold Seed");
-    centre_p->tm_zero_when_seed_discharged = false;
+//    centre_p->tm_zero_when_seed_discharged = false;
   }
   else //endgate is closed
   {      
     centre_p -> totalize_force_endgate_open = false;
     endgate_button_p->setText("Open Endgate\nDischarge Seed");
-    centre_p->tm_zero_when_seed_discharged = true;
+//    centre_p->tm_zero_when_seed_discharged = true;
   }
   
   old_count = count;

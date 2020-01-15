@@ -382,6 +382,9 @@ void batch_mode_driver::load_spreadsheet(QString filename)
   spreadsheet_number_of_columns = 0;
   for(int i=list.size()-1; i>=0; --i)
   {
+    
+    cout<<"0\n";
+    
     ss_column_p = ss_first_column_p;
     ss_first_column_p = new spreadsheet_column;
     ss_first_column_p->heading = list[i];
@@ -391,6 +394,9 @@ void batch_mode_driver::load_spreadsheet(QString filename)
   spreadsheet_number_of_lines=0;
   while(stream.readLineInto(&line))
   {
+    
+    cout<<"1\n";
+    
     spreadsheet_number_of_lines++;
     list = line.split(",");
     ss_column_p = ss_first_column_p;
@@ -401,11 +407,17 @@ void batch_mode_driver::load_spreadsheet(QString filename)
     }
     for(int i=list.size(); i<spreadsheet_number_of_columns; ++i)//in case of empty columns, append null strings.  Not expected to execute normally
     {
+      
+      cout<<"2\n";
+      
       ss_column_p->data_list.append("");
       ss_column_p = ss_column_p->next;
     }
   }
   infile.close();
+  
+  cout<<"3\n";
+  
   
   if(ss_first_column_p->heading != "Filled")//if spreadsheet does not have this column, create it
   {
@@ -420,6 +432,7 @@ void batch_mode_driver::load_spreadsheet(QString filename)
   }
   mode = wait_for_seed_lot_barcode;
   ss_column_p = ss_first_column_p;
+  /*
   for(int i=0; i<13; ++i) 
   {
     ss_column_p = ss_column_p->next;
@@ -428,7 +441,7 @@ void batch_mode_driver::load_spreadsheet(QString filename)
   {
     cout<<"  i"<<i<<"   "<<(ss_column_p->data_list[i]).toStdString()<<endl;
   }
-  
+  */
   //look for first unfilled row, initialize spreadsheet_line_number
   for(int i=0; i<spreadsheet_number_of_lines; ++i)
   {

@@ -4,9 +4,9 @@
 #include "centre.hpp"
 
 class button;
-//class QGridLayout;
+class QGridLayout;
 class QGroupBox;
-class QVBoxLayout;
+//class QVBoxLayout;
 class QLabel;
 class QRadioButton;
 //class QSlider;
@@ -24,6 +24,7 @@ class batch_options : public screen
 //  ~batch();
   
   private slots:
+  void barcode_switch_toggled(bool checked);
   void macro_menu_button_clicked();	//TEST~~~
 
   
@@ -41,8 +42,8 @@ class batch_options : public screen
   button* macro_menu_button_p;
   
   QGroupBox* barcode_matching_group_p;
-  QVBoxLayout* barcode_matching_group_layout_p;
-  QVBoxLayout* main_layout_p;
+  QGridLayout* barcode_matching_group_layout_p;
+  QGridLayout* main_layout_p;
   
   public slots:
   void done_button_clicked();

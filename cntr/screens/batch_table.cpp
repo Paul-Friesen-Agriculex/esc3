@@ -19,7 +19,7 @@ batch_table::batch_table(centre* c_p, batch_mode_driver* batch_mode_driver_p_s)
   filled_rows = 0;
 //  latest_seed_lot_barcode_row = 0;
   model_p = new QStandardItemModel(1,4);
-  for(int j=0; j<4; ++j)
+  for(int j=0; j<3; ++j)
   {
     QStandardItem* item_p = new QStandardItem("");
     model_p -> setItem(0, j, item_p);
@@ -28,7 +28,7 @@ batch_table::batch_table(centre* c_p, batch_mode_driver* batch_mode_driver_p_s)
   model_p -> setHeaderData(0, Qt::Horizontal, "Lot code");
   model_p -> setHeaderData(1, Qt::Horizontal, "Pack code");
   model_p -> setHeaderData(2, Qt::Horizontal, "Count");
-  model_p -> setHeaderData(3, Qt::Horizontal, "Substitution");
+//  model_p -> setHeaderData(3, Qt::Horizontal, "Substitution");
 
   setCurrentIndex(model_p->index(0,1));
   verticalHeader()->hide();
@@ -54,6 +54,7 @@ batch_table::batch_table(centre* c_p, batch_mode_driver* batch_mode_driver_p_s)
   );
   //QStandardItem::setFont
   //model_p.item_p->setFont(20);
+  hideColumn(3);
 }
 
 batch_table::~batch_table()
@@ -325,6 +326,8 @@ void batch_table::load_file(QString file_name)
     
   }
   else cout<<"file failed to open for reading\n";
+  
+  hideColumn(3);
   
   cout<<"end batch_table::load_file("<<file_name.toStdString()<<")\n";
   

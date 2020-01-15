@@ -23,7 +23,7 @@ void barcode_line::keyPressEvent(QKeyEvent* event)
   {
 //    cout<<"about to emit barcode_entered("<<displayText().toStdString()<<")\n";
     emit barcode_entered(displayText());  //TEST~~~
-//    cout<<"emitted barcode_entered("<<displayText().toStdString()<<")\n";
+    cout<<"emitted barcode_entered("<<displayText().toStdString()<<")\n";
     clear();
   }
 }
@@ -223,7 +223,7 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
   
   if(batch_mode_driver_p->bm_save_program_filename != "")//returning from batch_save_program screen with name of file to save
   {
-    batch_mode_driver_p->save_program(batch_mode_driver_p->bm_save_program_filename);
+    batch_mode_driver_p->save_program(batch_mode_driver_p->bm_save_program_filename);   
     batch_mode_driver_p->bm_save_program_filename = "";
   }
 /*
@@ -238,7 +238,66 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
     
     cout<<"batch::batch.  save file name = "<<batch_mode_driver_p->bm_save_table_filename.toStdString()<<endl;
     
+    //save in user folder under crop name
     table_p->save_file(batch_mode_driver_p->bm_save_table_filename);
+    
+    //save to any USB memory sticks detected
+    QDir* dir_p = new QDir("/media/odroid/");
+    QStringList directory_list = dir_p->entryList(QDir::Dirs  | QDir::NoDotAndDotDot);
+    int num_drives = directory_list.size();//number of USB memory sticks detected
+    for(int i=0; i<num_drives; ++i)
+    {
+      table_p -> save_file(QString("/media/odroid/").append(directory_list[i]).append("/").append(batch_mode_driver_p->bm_last_table_filename).append(".csv"));
+    }
+
+    bool drives_removed = false;
+    if(num_drives>0)
+    {
+      QMessageBox box;
+      box.setText(QString("saved to %1 memory sticks").arg(num_drives));
+      QPushButton* eject_button = box.addButton("Safely remove memory sticks", QMessageBox::ActionRole);
+      QPushButton* keep_button = box.addButton("Do not remove", QMessageBox::ActionRole);
+      box.exec();
+      
+      if(box.clickedButton() == eject_button)
+      {
+        for (int i=0; i<num_drives; ++i)
+        {
+          QString command = "umount /media/odroid/";
+          command.append(directory_list[i]);
+          char* command_a = command.toLatin1().data();
+          if(system (command_a) != 0)
+          {
+            cout<<"unmount command failed\n";
+          }
+        }
+        QDir check_dir("/media/odroid/");
+        QStringList check_list = check_dir.entryList(QDir::Dirs  | QDir::NoDotAndDotDot);
+        if(check_list.size() == 0) drives_removed = true;
+      }
+      else if(box.clickedButton() == keep_button)
+      {
+        //do nothing
+      }
+    }
+    else//no memory sticks detected
+    {
+      QMessageBox box;
+      box.setText("No memory sticks detected.  Saved internally only.");
+      box.setInformativeText("If you plug in a memory stick and save again, "
+                             "the file will be written to it.  It will be in .csv format, "
+                             "and can be opened by a spreadsheet or database.");
+      box.exec();
+    }
+    if(drives_removed == true)
+    {
+      QMessageBox box;
+      box.setText("You can now safely remove the memory stick(s)");
+      box.exec();
+    }
+      
+    delete dir_p;  
+
     batch_mode_driver_p->bm_save_table_filename = "";
   }
   /*
@@ -259,6 +318,8 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
   main_layout_p->setRowStretch(5, 0);
   
   batch_mode_driver_p -> use_spreadsheet = false;
+  batch_mode_driver_p -> seed_lot_barcode = "";
+  batch_mode_driver_p -> pack_barcode = "";
 
   count_message_p->setStyleSheet("QLabel {" 
         "background-color: white;"          
@@ -352,6 +413,7 @@ void batch::dumping()
 
 void batch::focus_on_barcode()
 {
+  cout<<"start batch::focus_on_barcode \n";
   barcode_line_p -> setFocus();
 }
 
@@ -383,6 +445,7 @@ void batch::repeat_pack_clicked()
   connect(repeat_pack_window_p, SIGNAL(destroyed(QObject*)), this, SLOT(focus_on_barcode()));
   connect(batch_mode_driver_p, SIGNAL(send_extra_pack_message(QString)), repeat_pack_window_p, SLOT(set_message(QString)));
   connect(batch_mode_driver_p, SIGNAL(extra_pack_finished_signal()), repeat_pack_window_p, SLOT(cancel_button_clicked()));
+  focus_on_barcode();
 }
 
 void batch::restart_clicked()
@@ -812,17 +875,23 @@ repeat_pack_window::repeat_pack_window(batch_mode_driver* batch_mode_driver_p_s,
   entry_button_p -> setText(entry_button_text);
   message_p = new QLabel("Or enter another value");
   keypad_p = new keypad;
+  barcode_line_p = new barcode_line;
   
   connect(cancel_button_p, SIGNAL(clicked()), this, SLOT(cancel_button_clicked()));
   connect(entry_button_p, SIGNAL(clicked()), this, SLOT(entry_button_clicked()));
   connect(keypad_p, SIGNAL(number_entered(int)), this, SLOT(number_entered(int)));
+  connect(barcode_line_p, SIGNAL(barcode_entered(QString)), batch_mode_driver_p, SLOT(barcode_entered(QString)));
+
   
   layout_p = new QVBoxLayout;
   layout_p -> addWidget(cancel_button_p);
   layout_p -> addWidget(entry_button_p);
   layout_p -> addWidget(message_p);
   layout_p -> addWidget(keypad_p);
+  layout_p -> addWidget(barcode_line_p);
   setLayout(layout_p);
+  
+  barcode_line_p -> setFocus();
   
   setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
   show();
@@ -838,6 +907,7 @@ void repeat_pack_window::set_message(QString message)
 void repeat_pack_window::entry_button_clicked()
 {
   number_entered(seeds_to_count);
+  barcode_line_p -> setFocus();  
 }
 
 void repeat_pack_window::cancel_button_clicked()
@@ -851,5 +921,6 @@ void repeat_pack_window::number_entered(int val)
 {
   batch_mode_driver_p -> extra_pack_count_limit = val;
   batch_mode_driver_p -> fill_extra_pack = true;
+  barcode_line_p -> setFocus();
 //  message_p -> setText("Collect pack in end gate");
 }
