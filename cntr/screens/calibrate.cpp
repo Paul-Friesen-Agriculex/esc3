@@ -8,6 +8,7 @@
 #include "centre.hpp"
 #include "calibrate.hpp"
 #include "button.hpp"
+#include "help_screen.hpp"
 
 using namespace std;
 
@@ -26,6 +27,7 @@ calibrate::calibrate(centre* set_centre_p)
   speed_set_p->setMaximum(50);
   speed_set_p->setOrientation(Qt::Horizontal);
   message_box_p = new QTextEdit;
+  help_button_p = new button("Help");
   skip_button_p = new button("Skip Calibration");
   done_button_p = new button("Done");
   
@@ -50,6 +52,7 @@ calibrate::calibrate(centre* set_centre_p)
   speed_layout_p -> addWidget(speed_label_p, 0, 0);
   speed_layout_p -> addWidget(startstop_button_p, 0, 1);
   speed_layout_p -> addWidget(speed_set_p, 1, 0, 1, 2);
+  bottom_layout_p -> addWidget(help_button_p, 0, 1);
   bottom_layout_p -> addWidget(skip_button_p, 0, 2);
   bottom_layout_p -> addWidget(done_button_p, 0, 3);
   main_layout_p -> addWidget(top_box_p, 0, 0, 1, 2);
@@ -69,6 +72,7 @@ calibrate::calibrate(centre* set_centre_p)
   connect(endgate_button_p, SIGNAL(clicked()), this, SLOT(endgate_clicked()));
   connect(startstop_button_p, SIGNAL(clicked()), this, SLOT(startstop_clicked()));
   connect(speed_set_p, SIGNAL(valueChanged(int)), this, SLOT(change_speed(int)));
+  connect(help_button_p, SIGNAL(clicked()), this, SLOT(help_button_clicked()));
   connect(skip_button_p, SIGNAL(clicked()), this, SLOT(skip_clicked()));
   connect(done_button_p, SIGNAL(clicked()), this, SLOT(done_clicked()));
   
@@ -195,6 +199,22 @@ void calibrate::change_speed(int value)
     centre_p->set_speed(value);
   }
 }
+
+void calibrate::help_button_clicked()
+{
+  help_screen_p = new help_screen;
+  
+  help_screen_p -> set_text("The purpose of callibration is to teach the machine what a single seed should look like.  "
+                            "It is important to drop the seeds slowly to minimize the chance that two seeds overlap during the process.  "
+                            "The machine uses the seed images from the callibration to detect if two or more seed images "
+                            "overlap during counting, improving the speed and accuracy of the count.\n\n"
+                            
+                            "Be sure to use a repesentative sample.  "
+                            "If there is a wide range of seed types and seed sizes for a crop, use a mix of the different types and sizes.");
+                            
+  help_screen_p -> show();
+}
+
 void calibrate::skip_clicked()
 {
   centre_p->restart_calibration_f();//resets calibration parameters in processor

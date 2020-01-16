@@ -11,6 +11,7 @@ class QLabel;
 class QSlider;
 class QTextEdit;
 class QTimer;
+class help_screen;
 
 class calibrate : public screen
 {
@@ -27,6 +28,7 @@ class calibrate : public screen
   void endgate_clicked();
   void startstop_clicked();
   void change_speed(int value);
+  void help_button_clicked();
   void skip_clicked();
   void done_clicked();
   void run();
@@ -41,6 +43,7 @@ class calibrate : public screen
   button* startstop_button_p;
   QSlider* speed_set_p;
   QTextEdit* message_box_p;
+  button* help_button_p;
   button* skip_button_p;
   button* done_button_p;
   
@@ -55,6 +58,8 @@ class calibrate : public screen
   QGridLayout* bottom_layout_p;
   
   QGridLayout* main_layout_p;
+  
+  help_screen* help_screen_p;
   
   bool feeder_is_running;
   ENDGATE_STATE screen_endgate;//state of endgate according to screen control.
