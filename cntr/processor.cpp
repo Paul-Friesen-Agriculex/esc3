@@ -1526,9 +1526,15 @@ int blob::seeds_in_blob()
     score_ic[i] = 120.0/((ic_estimate-float(i))*(ic_estimate-float(i))+1)/(1+ic_uncertainty);
     score_likelihood[i] = -15*i;
   }
-  score_mi1[1] = 2 * (mi1_n - max_inflection_1);//negative if single seed is unlikely
-  score_mi3[1] = 8 * (mi3_n - max_inflection_3);//negative if single seed is unlikely
-  score_mi9[1] = 32 * (mi9_n - max_inflection_9);//negative if single seed is unlikely
+
+//  score_mi1[1] = 2 * (mi1_n - max_inflection_1);//negative if single seed is unlikely
+//  score_mi3[1] = 8 * (mi3_n - max_inflection_3);//negative if single seed is unlikely
+//  score_mi9[1] = 32 * (mi9_n - max_inflection_9);//negative if single seed is unlikely
+
+  score_mi1[1] = 2 * (mi1_n*1.2 - max_inflection_1);//negative if single seed is unlikely
+  score_mi3[1] = 8 * (mi3_n*1.2 - max_inflection_3);//negative if single seed is unlikely
+  score_mi9[1] = 32 * (mi9_n*1.2 - max_inflection_9);//negative if single seed is unlikely
+
   int most_likely_number = 0;
   int max_score = -1000;
   for(int i=1;i<max_seeds;++i)//start at i=1 seed.  0 position in matrix is not used.

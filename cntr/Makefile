@@ -947,7 +947,13 @@ moc_totalize_options.cpp: centre.hpp \
 		screens/totalize_options.hpp
 	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/totalize_options.hpp -o moc_totalize_options.cpp
 
-moc_help_screen.cpp: screens/help_screen.hpp
+moc_help_screen.cpp: centre.hpp \
+		cutgate.hpp \
+		endgate.hpp \
+		envelope_sensor.hpp \
+		feeder.hpp \
+		crop.hpp \
+		screens/help_screen.hpp
 	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr -I/home/odroid/Documents/github_repo/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/help_screen.hpp -o moc_help_screen.cpp
 
 compiler_moc_source_make_all:
@@ -1413,7 +1419,8 @@ start_screen.o: screens/start_screen.cpp centre.hpp \
 		feeder.hpp \
 		crop.hpp \
 		screens/start_screen.hpp \
-		button.hpp
+		button.hpp \
+		screens/help_screen.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o start_screen.o screens/start_screen.cpp
 
 table.o: screens/table.cpp screens/table.hpp \
@@ -1458,6 +1465,12 @@ totalize_options.o: screens/totalize_options.cpp centre.hpp \
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o totalize_options.o screens/totalize_options.cpp
 
 help_screen.o: screens/help_screen.cpp screens/help_screen.hpp \
+		centre.hpp \
+		cutgate.hpp \
+		endgate.hpp \
+		envelope_sensor.hpp \
+		feeder.hpp \
+		crop.hpp \
 		button.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o help_screen.o screens/help_screen.cpp
 
