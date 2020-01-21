@@ -22,6 +22,7 @@
 #include "playback.hpp"
 #include "tool_choice.hpp"
 #include "calibrate.hpp"
+#include "gateset.hpp"
 #include "program_choice.hpp"
 #include "enter_program.hpp"
 #include "batch.hpp"
@@ -439,6 +440,7 @@ void centre::run()
       case  8: screen_p=new playback(this); break;
       case  9: screen_p=new tool_choice(this); break;
       case 10: screen_p=new calibrate(this); break;
+      case 11: screen_p=new gateset(this); break;
       case 12: screen_p=new totalize_save_file(this); break;
       case 13: screen_p=new program_choice(this, batch_mode_driver_p); break;
       case 14: screen_p=new enter_program(this, batch_mode_driver_p); break;

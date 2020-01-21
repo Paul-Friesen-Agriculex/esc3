@@ -57,7 +57,8 @@ HEADERS += batch_mode_driver.hpp \
            screens/tool_choice.hpp \
            screens/totalize.hpp \
            screens/totalize_options.hpp \
-           screens/help_screen.hpp
+           screens/help_screen.hpp \
+           screens/gateset.hpp
 SOURCES += batch_mode_driver.cpp \
            brother_envelope_feeder.cpp \
            button.cpp \
@@ -107,7 +108,8 @@ SOURCES += batch_mode_driver.cpp \
            screens/tool_choice.cpp \
            screens/totalize.cpp \
            screens/totalize_options.cpp \
-           screens/help_screen.cpp
+           screens/help_screen.cpp \
+           screens/gateset.cpp
 
 QT += widgets
 QT += printsupport

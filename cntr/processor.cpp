@@ -1547,8 +1547,8 @@ int blob::seeds_in_blob()
     }
   }
   
-//  if(processor_p -> show_blob_bool)
-  if(processor_p->show_blob_bool && most_likely_number>1)
+  if(processor_p -> show_blob_bool)
+//  if(processor_p->show_blob_bool && most_likely_number>1)
 
   {
     cout<<"\n\n\nseeds_in_blob\n";

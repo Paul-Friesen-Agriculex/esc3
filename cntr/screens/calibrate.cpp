@@ -28,7 +28,7 @@ calibrate::calibrate(centre* set_centre_p)
   speed_set_p->setOrientation(Qt::Horizontal);
   message_box_p = new QTextEdit;
   help_button_p = new button("Help");
-  skip_button_p = new button("Skip Calibration");
+//  skip_button_p = new button("Skip Calibration");
   done_button_p = new button("Done");
   
   top_box_p = new QGroupBox;
@@ -53,7 +53,7 @@ calibrate::calibrate(centre* set_centre_p)
   speed_layout_p -> addWidget(startstop_button_p, 0, 1);
   speed_layout_p -> addWidget(speed_set_p, 1, 0, 1, 2);
   bottom_layout_p -> addWidget(help_button_p, 0, 1);
-  bottom_layout_p -> addWidget(skip_button_p, 0, 2);
+//  bottom_layout_p -> addWidget(skip_button_p, 0, 2);
   bottom_layout_p -> addWidget(done_button_p, 0, 3);
   main_layout_p -> addWidget(top_box_p, 0, 0, 1, 2);
   main_layout_p -> addWidget(control_box_p, 1, 0);
@@ -73,7 +73,7 @@ calibrate::calibrate(centre* set_centre_p)
   connect(startstop_button_p, SIGNAL(clicked()), this, SLOT(startstop_clicked()));
   connect(speed_set_p, SIGNAL(valueChanged(int)), this, SLOT(change_speed(int)));
   connect(help_button_p, SIGNAL(clicked()), this, SLOT(help_button_clicked()));
-  connect(skip_button_p, SIGNAL(clicked()), this, SLOT(skip_clicked()));
+//  connect(skip_button_p, SIGNAL(clicked()), this, SLOT(skip_clicked()));
   connect(done_button_p, SIGNAL(clicked()), this, SLOT(done_clicked()));
   
   centre_p->set_endgate_state(ENDGATE_CLOSED);
@@ -99,6 +99,9 @@ calibrate::calibrate(centre* set_centre_p)
   run_timer_p->start(10);
   
   centre_p->processor_display_blobs_f(true);
+
+  original_calibrated = centre_p->crops[0].calibrated;
+//  newly_calibrated = false;
   
   QString message;
   if(centre_p->recalibrating == true)
@@ -119,10 +122,10 @@ calibrate::calibrate(centre* set_centre_p)
     message_box_p->append(message);
     message=QString("Maximum Inflection 9 %1.") .arg(centre_p->crops[0].max_inflection_9);
     message_box_p->append(message);
-    message=QString("Recalibrating.  Drop 50 seeds slowly.");
+    message=QString("\nRecalibrating.  Drop 50 seeds slowly.");
     message_box_p->append(message);
 
-    centre_p->crops[0].calibrated = false;
+    centre_p->crops[0].calibrated = false;//this causes processor to calibrate
     centre_p->restart_calibration_f();
     centre_p->recalibrating = false;
   }
@@ -138,14 +141,28 @@ calibrate::calibrate(centre* set_centre_p)
 
 calibrate::~calibrate()
 {
+  
+  if(original_calibrated)
+  {
+    centre_p->crops[0].calibrated = true;
+  }
+  
   run_timer_p -> stop();
   delete run_timer_p;
 }
 
 void calibrate::gateset_clicked()
 {
-  centre_p->add_waiting_screen(10);//come back here when done
+//  centre_p->add_waiting_screen(10);//come back here when done
   centre_p->add_waiting_screen(11);//gateset
+  
+  centre_p->set_speed(0);
+  centre_p->count = 0;
+  if(original_calibrated)
+  {
+    centre_p->crops[0].calibrated = true;
+  }
+  
   centre_p->screen_done=true;
   centre_p->set_speed(0);
 }
@@ -153,6 +170,14 @@ void calibrate::gateset_clicked()
 void calibrate::back_clicked()
 {
   centre_p->add_waiting_screen(centre_p->get_previous_screen());
+  
+  centre_p->set_speed(0);
+  centre_p->count = 0;
+  if(original_calibrated)
+  {
+    centre_p->crops[0].calibrated = true;
+  }
+  
   centre_p->screen_done=true;
   centre_p->set_speed(0);
 }
@@ -214,21 +239,34 @@ void calibrate::help_button_clicked()
                             
   help_screen_p -> show();
 }
-
+/*
 void calibrate::skip_clicked()
 {
   centre_p->restart_calibration_f();//resets calibration parameters in processor
   centre_p->set_speed(0);
   centre_p->count = 0;
+  
+  if(original_calibrated)
+  {
+    centre_p->crops[0].calibrated = true;
+  }
   centre_p->add_waiting_screen(0);
   centre_p->screen_done = true;
 }
-
+*/
 void calibrate::done_clicked()
 {
 //  centre_p->restart_calibration_f();
 //  centre_p->set_speed(0);
   centre_p->count = 0;
+  
+  centre_p->set_speed(0);
+  centre_p->count = 0;
+  if(original_calibrated)
+  {
+    centre_p->crops[0].calibrated = true;
+  }
+  
   centre_p->screen_done = true;
   centre_p->recalibrating = false;
 } 
@@ -240,6 +278,7 @@ void calibrate::run()
   
   if (centre_p->crops[0].calibrated)
   {
+//    newly_calibrated = true;
     if(calibration_message_posted==false)
     {
       calibration_message_posted = true;

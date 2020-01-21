@@ -81,6 +81,7 @@ attached to the machine.");
 //  dir_p = new QDir(spreadsheet_path);
   
   
+  first_spreadsheet_displayed = 0;
   spreadsheet_path = "/media/odroid/";
   dir_p = new QDir(spreadsheet_path);
   QStringList directory_list = dir_p->entryList(QDir::Dirs  | QDir::NoDotAndDotDot);
@@ -119,7 +120,6 @@ attached to the machine.");
       temp.remove(".csv");
       spreadsheet_list_p->replace(i, temp);
     }
-    first_spreadsheet_displayed = 0;
     display_spreadsheets();
     centre_p->batch_mode_driver_p->use_spreadsheet = true;  
     
@@ -132,12 +132,19 @@ spreadsheet_choice::~spreadsheet_choice()
 {
   delete dir_p;
   dir_p = 0;
-  delete spreadsheet_list_p;
+  
+  cout<<"~spreadsheet 1\n";
+  
+  if (spreadsheet_list_p!=0) delete spreadsheet_list_p;
+  
+  cout<<"~spreadsheet 2\n";
+  
   spreadsheet_list_p = 0;
 }
 
 void spreadsheet_choice::choice1_clicked()
 {
+  if(spreadsheet_list_p==0) return;//no USB drives found
   if(first_spreadsheet_displayed<spreadsheet_list_p->size())
   {
     spreadsheet_path.append(spreadsheet_list_p->at(first_spreadsheet_displayed));
@@ -151,6 +158,7 @@ void spreadsheet_choice::choice1_clicked()
 
 void spreadsheet_choice::choice2_clicked()
 {
+  if(spreadsheet_list_p==0) return;//no USB drives found
   if(first_spreadsheet_displayed+1<spreadsheet_list_p->size())
   {
     spreadsheet_path.append(spreadsheet_list_p->at(first_spreadsheet_displayed+1));
@@ -164,6 +172,7 @@ void spreadsheet_choice::choice2_clicked()
 
 void spreadsheet_choice::choice3_clicked()
 {
+  if(spreadsheet_list_p==0) return;//no USB drives found
   if(first_spreadsheet_displayed+2<spreadsheet_list_p->size())
   {
     spreadsheet_path.append(spreadsheet_list_p->at(first_spreadsheet_displayed+2));
@@ -177,6 +186,7 @@ void spreadsheet_choice::choice3_clicked()
 
 void spreadsheet_choice::choice4_clicked()
 {
+  if(spreadsheet_list_p==0) return;//no USB drives found
   if(first_spreadsheet_displayed+3<spreadsheet_list_p->size())
   {
     spreadsheet_path.append(spreadsheet_list_p->at(first_spreadsheet_displayed+3));
@@ -190,6 +200,7 @@ void spreadsheet_choice::choice4_clicked()
 
 void spreadsheet_choice::choice5_clicked()
 {
+  if(spreadsheet_list_p==0) return;//no USB drives found
   if(first_spreadsheet_displayed+4<spreadsheet_list_p->size())
   {
     spreadsheet_path.append(spreadsheet_list_p->at(first_spreadsheet_displayed+4));
@@ -203,6 +214,7 @@ void spreadsheet_choice::choice5_clicked()
 
 void spreadsheet_choice::choice6_clicked()
 {
+  if(spreadsheet_list_p==0) return;//no USB drives found
   if(first_spreadsheet_displayed+5<spreadsheet_list_p->size())
   {
     spreadsheet_path.append(spreadsheet_list_p->at(first_spreadsheet_displayed+5));
@@ -216,12 +228,16 @@ void spreadsheet_choice::choice6_clicked()
 
 void spreadsheet_choice::more_spreadsheets_clicked()
 {
+  if(spreadsheet_list_p==0) return;//no USB drives found
   if(first_spreadsheet_displayed<(spreadsheet_list_p->size()-6)) first_spreadsheet_displayed += 6;
   display_spreadsheets();
 }
 
 void spreadsheet_choice::back_clicked()
 {
+  
+  cout<<"spreadsheet_choice::back_clicked.  first_spreadsheet_displayed = "<<first_spreadsheet_displayed<<endl;
+  
   if(first_spreadsheet_displayed>5) 
   {
     first_spreadsheet_displayed -= 6;
@@ -229,8 +245,14 @@ void spreadsheet_choice::back_clicked()
   }
   else
   {
+  
+    cout<<"spreadsheet_choice::back_clicked.  p1\n";
+  
     centre_p->add_waiting_screen(centre_p->get_previous_screen());
     centre_p->screen_done=true;
+  
+    cout<<"spreadsheet_choice::back_clicked.  p2\n";
+  
   }
 }
 

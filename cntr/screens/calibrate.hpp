@@ -29,7 +29,7 @@ class calibrate : public screen
   void startstop_clicked();
   void change_speed(int value);
   void help_button_clicked();
-  void skip_clicked();
+//  void skip_clicked();
   void done_clicked();
   void run();
   
@@ -44,7 +44,7 @@ class calibrate : public screen
   QSlider* speed_set_p;
   QTextEdit* message_box_p;
   button* help_button_p;
-  button* skip_button_p;
+//  button* skip_button_p;
   button* done_button_p;
   
   QGroupBox* top_box_p;
@@ -66,6 +66,8 @@ class calibrate : public screen
     //If this is open, endgate will be open regardless of envelope sensor.
     //If this is closed, it will be over-ridden by presence of an envelope
   bool calibration_message_posted;
+  bool original_calibrated;//to store original state
+//  bool newly_calibrated;//set true if callibration occurs
   
   QTimer* run_timer_p;
 };
