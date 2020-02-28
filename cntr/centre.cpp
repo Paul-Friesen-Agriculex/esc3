@@ -961,7 +961,12 @@ void centre::load_macros()	//TEST~~~ connecting macros screen
 
   {
     //table_p = new table;
-	  ifstream barcodes("settings/totalize_backup");
+	ifstream barcodes("settings/totalize_backup");
+	if(!barcodes.is_open())
+	{
+	  cout<<"settings/totalize_backup file not open\n";
+	  exit(1);
+	}
 	
     while(!barcodes.eof())	//TEST~~~
     {
@@ -1002,7 +1007,13 @@ void centre::load_macros()	//TEST~~~ connecting macros screen
   }
 //----------------------------------------------------------------------------------------------------------------//
   {  
-	  ifstream batchcodes("settings/batch_backup");
+	ifstream batchcodes("settings/batch_backup");
+	if(!batchcodes.is_open())
+	{
+	  cout<<"settings/batch_backup file not open\n";
+	  exit(1);
+	}
+	
 	
     while(!batchcodes.eof())	//TEST~~~
     {
@@ -1038,6 +1049,12 @@ void centre::load_macros()	//TEST~~~ connecting macros screen
 //----------------------------------------------------------------------------------------------------------------//
   {
     ifstream macros("macro_table");
+	if(!macros.is_open())
+	{
+	  cout<<"macro_table file not open\n";
+	  exit(1);
+	}
+	
     
     for(int i=0; i<10; ++i)		//searches all 10 macros available
     {

@@ -23,7 +23,7 @@ totalize::totalize(centre* set_centre_p)
  :screen(set_centre_p)
 {
 //  cout<<"start totalize::totalize\n";
-  
+  centre_p -> cutgate_p -> open();
   if (centre_p->crops[0].calibrated == false) 
   {
     centre_p->add_waiting_screen(5);//back here to totalize

@@ -24,7 +24,7 @@ totalize_options::totalize_options(centre*set_centre_p)
   number_of_barcode_columns_label_p = new QLabel("Number of Barcode Columns");
   number_of_barcode_columns_group_p = new QGroupBox;
   number_of_barcode_columns_layout_p = new QHBoxLayout;
-  number_of_barcode_columns_p->setMinimum(0);
+  number_of_barcode_columns_p->setMinimum(1);
   number_of_barcode_columns_p->setMaximum(4);
   number_of_barcode_columns_p->setValue(centre_p->tm_barcode_columns);
 

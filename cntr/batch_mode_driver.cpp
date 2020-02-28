@@ -68,7 +68,9 @@ batch_mode_driver::batch_mode_driver(centre* centre_p_s, cutgate* cutgate_p_s)
   field_data_source_flag = 'd'; //use spreadsheet data in print field (not heading).
   
   fill_extra_pack = false;
+  extra_pack_filling = false;
   extra_pack_count_limit = 0;
+  extra_pack_stored_count_limit = 0;
   extra_pack_finished = false;
   
   //diagnostics
@@ -369,9 +371,20 @@ void batch_mode_driver::save_program(QString filename)
 
 void batch_mode_driver::load_spreadsheet(QString filename)
 {
+  
+  cout<<"batch_mode_driver::load_spreadsheet.  filename = "<<filename.toStdString()<<endl;
+  
   spreadsheet_filename = filename;
   QFile infile(filename);
-  infile.open(QIODevice::ReadOnly);
+  if(!infile.open(QIODevice::ReadOnly))
+  {
+	cout<<"batch_mode_driver::load_spreadsheet.  file not open\n";
+	exit(1);
+  }
+	
+  
+  
+  
   QTextStream stream(&infile);
   QString line;
   QStringList list;
@@ -383,11 +396,12 @@ void batch_mode_driver::load_spreadsheet(QString filename)
   for(int i=list.size()-1; i>=0; --i)
   {
     
-    cout<<"0\n";
+//    cout<<"0\n";
     
     ss_column_p = ss_first_column_p;
     ss_first_column_p = new spreadsheet_column;
     ss_first_column_p->heading = list[i];
+    cout<<"load spreadsheet.  heading = "<<list[i].toStdString()<<endl;
     ss_first_column_p->next = ss_column_p;
     ++spreadsheet_number_of_columns;
   }
@@ -395,13 +409,16 @@ void batch_mode_driver::load_spreadsheet(QString filename)
   while(stream.readLineInto(&line))
   {
     
-    cout<<"1\n";
+    cout<<"\nnew line\n";
     
     spreadsheet_number_of_lines++;
     list = line.split(",");
     ss_column_p = ss_first_column_p;
-    for(int i=0; i<list.size(); ++i)
+    for(int i=0; i<list.size() && i<spreadsheet_number_of_columns; ++i)
     {
+      
+      cout<<list[i].toStdString()<<endl;
+      
       ss_column_p->data_list.append(list[i]);
       ss_column_p = ss_column_p->next;
     }
@@ -516,7 +533,6 @@ void batch_mode_driver::run()
     time_to_end = 1000;
   }
   */
-  
   if(   (slowdown_count_diff_set==false)   &&   (current_count_limit>=0)   )//estimate a starting value for slowdown_count_diff.
     //a negative value for current_count_limit indicates it has not been set and should not be used
   {
@@ -627,6 +643,9 @@ void batch_mode_driver::run()
         {
           mode = hi_open;
           cout<<"mode hi_open\n";
+  
+          cout<<"current_count_limit = "<<current_count_limit<<endl;
+  
         }
 
 //        cout<<"after mode hi_open.  pack_barcode_ok = "<<pack_barcode_ok<<endl;
@@ -662,6 +681,9 @@ void batch_mode_driver::run()
         {
           mode = low_open;
           cout<<"mode low_open. count "<<centre_p->count<<"\n";
+  
+//          cout<<"current_count_limit = "<<current_count_limit<<endl;
+  
           low_speed_mode_time.restart();
 
 //          cout<<"after mode low_open.  pack_barcode_ok = "<<pack_barcode_ok<<endl;
@@ -692,18 +714,22 @@ void batch_mode_driver::run()
         centre_p->count = 0;
         mode = gate_delay;
         cout<<"mode gate_delay. count "<<centre_p->count<<"\n";
+  
+        cout<<"current_count_limit = "<<current_count_limit<<endl;
+  
         cutoff_gate_close_time.restart();
         
         int low_open_ms = low_speed_mode_time.elapsed();
-        float desired_low_open_ms = 2000;
-        float k = 0.5;//controls convergence speed
+        float desired_low_open_ms = 1500;
+        float k = 0.05;//controls convergence speed
         float min_slowdown_count_diff = 0.8*float(slowdown_count_diff);//do not reduce more than 20% at a time
         float max_slowdown_count_diff = current_count_limit/2;
         slowdown_count_diff = slowdown_count_diff + k*current_count_limit*(float(desired_low_open_ms-low_open_ms)/desired_low_open_ms);
         if(slowdown_count_diff<min_slowdown_count_diff) slowdown_count_diff = min_slowdown_count_diff;
         if(slowdown_count_diff>max_slowdown_count_diff) slowdown_count_diff = max_slowdown_count_diff;
-        stop_count_diff = 3*slowdown_count_diff;
-        cout<<"low_open_ms = "<<low_open_ms<<"   slowdown_count_diff = "<<slowdown_count_diff<<endl;
+        stop_count_diff = 4*slowdown_count_diff;
+        if(stop_count_diff>current_count_limit/2) stop_count_diff = current_count_limit/2;
+        cout<<"low_open_ms = "<<low_open_ms<<"   slowdown_count_diff = "<<slowdown_count_diff<<"   stop_count_diff = "<<stop_count_diff<<endl;
       }
       break;
     case gate_delay:
@@ -733,16 +759,23 @@ void batch_mode_driver::run()
           }
           else//extra_pack_filling is true
           {
-            current_count_limit = extra_pack_stored_count_limit;//restore previous value          
+            current_count_limit = extra_pack_stored_count_limit;//restore previous value 
+            cout<<"extra_pack_filling was true.  current_count_limit = "<<current_count_limit<<endl;         
           }
           if(current_pack >= current_pack_limit)
           {
+            
+            cout<<"current_pack_limit = "<<current_pack_limit<<endl;
+            
             current_pack = 0;
             ++current_set;          
             if(current_set >= program_size)
             {
               mode = dump_into_cut_gate;
               cout<<"mode dump_into_cut_gate. count "<<centre_p->count<<"\n";
+  
+              cout<<"current_count_limit = "<<current_count_limit<<endl;
+  
               dump_into_cut_gate_time.restart();
               old_count = centre_p -> count;
               dump_end_qtime.restart();
@@ -752,13 +785,19 @@ void batch_mode_driver::run()
               current_count_limit = program[current_set]->seeds;
               current_pack_limit = program[current_set]->packs;
               mode = hi_closed;
-              cout<<"mode hi_closed. count "<<centre_p->count<<"\n";
+              cout<<"1  from mode gate_delay to mode hi_closed. count "<<centre_p->count<<"\n";
+  
+              cout<<"current_count_limit = "<<current_count_limit<<endl;
+  
             }
           }
           else
           {
             mode = hi_closed;
-            cout<<"mode hi_closed. count "<<centre_p->count<<"\n";
+            cout<<"2  from mode gate_delay to mode hi_closed. count "<<centre_p->count<<"\n";
+  
+            cout<<"current_count_limit = "<<current_count_limit<<endl;
+  
           }
         }
         else//use_spreadsheet true
@@ -805,6 +844,8 @@ void batch_mode_driver::run()
       }
       break;
     case hi_closed:
+      
+//      cout<<"mode hi_closed.  count "<<centre_p->count<<endl;
       barcode_mode = pack;
       if(centre_p->feed_speed != high_feed_speed)
       {
@@ -846,7 +887,7 @@ void batch_mode_driver::run()
       
       
       
-      
+//      cout<<"stop_count_diff = "<<stop_count_diff<<"   current_count_limit = "<<current_count_limit<<endl;
       if(   (current_count_limit-centre_p->count) < stop_count_diff   )
       {
         mode = wait_for_pack;
