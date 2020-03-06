@@ -82,7 +82,11 @@ processor::processor()
   
   image_size = line_length * image_lines;
   image_p = 0;
-
+  
+  SK_SHADCORR(0, false);
+//  SK_SETSCM(0, NULL, 8, line_length, image_lines, 10, 80);
+  SK_SETSCM(0, NULL, 8, line_length, 8, 10, 80);
+  
   line_count = 0;
   took_slice_index = -1;//indicates no blob has taken slice
   show_blob_bool = false;
