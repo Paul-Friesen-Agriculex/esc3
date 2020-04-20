@@ -1,9 +1,14 @@
 #include <QTimer>
 #include "endgate.hpp"
 #include <stdio.h>
+#include "centre.hpp"
+#include "signal_port.hpp"
 
-endgate::endgate()
+
+endgate::endgate(centre* centre_p_s)
 {
+  centre_p = centre_p_s;
+  signal_port_p = new signal_port;
   open_pulse_timer_p = new QTimer;
   close_pulse_timer_p = new QTimer;
   open_pulse_timer_p -> setSingleShot(true);
@@ -58,5 +63,9 @@ void endgate::end_close()
   fp = fopen("/sys/class/gpio/gpio210/value", "w");
   fprintf(fp, "0");
   fclose(fp);
+  if(centre_p->signal_port_pulse_when_endgate_closes)
+  {
+    signal_port_p->pulse();
+  }
 }
 

@@ -16,7 +16,7 @@ start_screen::start_screen(centre* set_centre_p)
   totalize_button_p = new button("Totalize Mode");
   batch_button_p = new button("Batch Mode");
   batch_from_spreadsheet_button_p = new button("Batch From Spreadsheet Mode");
-  tools_button_p = new button("Tools");
+  tools_button_p = new button("Tools/Options");
   eject_memory_sticks_button_p = new button("Safely remove memory sticks");
   shutdown_button_p = new button("Shut Down");
   help_button_p = new button("Help");

@@ -24,6 +24,7 @@ HEADERS += batch_mode_driver.hpp \
            feeder.hpp \
            processor.hpp \
            processor_calcs.hpp \
+           signal_port.hpp \
            screens/batch.hpp \
            screens/batch_options.hpp \
            screens/batch_table.hpp \
@@ -75,6 +76,7 @@ SOURCES += batch_mode_driver.cpp \
            feeder.cpp \
            main.cpp \
            processor.cpp \
+           signal_port.cpp \
            screens/batch.cpp \
            screens/batch_options.cpp \
            screens/batch_table.cpp \

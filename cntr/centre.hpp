@@ -157,6 +157,8 @@ class centre : public QObject
   //playback
   QImage qimage;
   
+  bool signal_port_pulse_when_endgate_closes;
+  
   QString macro_name; //TEST~~~11_13_2018//
   
   batch_mode_driver* batch_mode_driver_p;

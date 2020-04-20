@@ -8,6 +8,7 @@ class QGridLayout;
 class QGroupBox;
 class QVBoxLayout;
 class QLabel;
+class QRadioButton;
 
 class tool_choice : public screen
 {
@@ -21,12 +22,14 @@ class tool_choice : public screen
   void diagnostics_clicked();
   void stop_program_clicked();
   void back_button_clicked();
+  void signal_port_pulse_when_endgate_closes(bool state);
 
   private:
   button* crop_edit_button_p;
   button* diagnostics_button_p;
   button* stop_program_button_p;
   button* back_button_p;
+  QRadioButton* signal_port_pulse_when_endgate_closes_button_p;
 
   QGridLayout* main_layout_p;
 

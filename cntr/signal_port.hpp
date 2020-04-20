@@ -1,38 +1,26 @@
-#ifndef ENDGATE_HPP
-#define ENDGATE_HPP
+#ifndef signal_port_HPP
+#define signal_port_HPP
 
 #include <QObject>
-//#include <stdio.h>
 
 class QTimer;
-class centre;
-class signal_port;
 
-enum ENDGATE_STATE{ENDGATE_OPEN, ENDGATE_CLOSED};
-
-class endgate:public QObject
+class signal_port:public QObject
 {
   Q_OBJECT
   
   public:
-  endgate(centre* centre_p_s);
-  ~endgate();
+  signal_port();
+  ~signal_port();
   
   public slots:
-  void open(void);
-  void close(void);
-  ENDGATE_STATE get_state(void) {return state;};
+  void pulse(void);
 
   private slots:
-  void end_open(void);
-  void end_close(void);
+  void end_pulse(void);
   
   private:
-  QTimer* open_pulse_timer_p;
-  QTimer* close_pulse_timer_p;
-  ENDGATE_STATE state;
-  centre* centre_p;
-  signal_port* signal_port_p;
+  QTimer* pulse_timer_p;
 };
 
 #endif

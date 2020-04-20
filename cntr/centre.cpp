@@ -49,6 +49,7 @@
 #include "macro_screen.hpp"	//TEST~~~
 //#include "table.hpp"        //TEST~~~ //access barcodes and count from table
 #include "brother_envelope_feeder.hpp"
+#include "signal_port.hpp"
 
 
 Q_DECLARE_METATYPE(crop)
@@ -99,7 +100,8 @@ centre::centre():
   emit set_camera_processing(true);
 
   cutgate_p = new cutgate;
-  endgate_p = new endgate;
+  endgate_p = new endgate(this);
+  signal_port_pulse_when_endgate_closes = true;
   envelope_sensor_p = new envelope_sensor;
   feeder_p = new feeder;
   brother_envelope_feeder_p = new brother_envelope_feeder;
