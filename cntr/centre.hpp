@@ -14,6 +14,8 @@
 #include "crop.hpp"
 
 class QTimer;
+//class QLabel;
+//class message_box;
 class camera;
 class processor;
 class screen;
@@ -53,7 +55,12 @@ class centre : public QObject
   void save_image_signal(QString filename);	
   void load_image_signal(QString filename);	
 
-  private:  
+  private: 
+  bool init_ran;
+  void init();
+  
+//  QLabel* startup_progress_label_p; 
+//  message_box* startup_progress_label_p; 
   QThread* processor_thread_p;
   endgate* endgate_p;
   envelope_sensor* envelope_sensor_p;

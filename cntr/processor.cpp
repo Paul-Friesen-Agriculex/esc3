@@ -83,9 +83,11 @@ processor::processor()
   image_size = line_length * image_lines;
   image_p = 0;
   
+  cout<<"before shadecorr\n";
   SK_SHADCORR(0, false);
-//  SK_SETSCM(0, NULL, 8, line_length, image_lines, 10, 80);
-  SK_SETSCM(0, NULL, 8, line_length, 8, 10, 80);
+  SK_SETSCM(0, NULL, 8, line_length, image_lines, 10, 80);
+//  SK_SETSCM(0, NULL, 8, line_length, 8, 10, 80);
+  cout<<"after shadecorr\n";
   
   line_count = 0;
   took_slice_index = -1;//indicates no blob has taken slice
@@ -422,7 +424,7 @@ void processor::calibrate()//does the calibration after data has been collected
 {
   calibration_crop.name = current_crop.name;
   
-  cout<<"processor::calibrate.  current_crop.name "<<(current_crop.name).toStdString()<<endl;
+//  cout<<"processor::calibrate.  current_crop.name "<<(current_crop.name).toStdString()<<endl;
   
   int area_sum = 0;
   for(int i=0; i<50; ++i)
@@ -454,7 +456,7 @@ void processor::calibrate()//does the calibration after data has been collected
   
   area_average = area_sum/blob_count;//more accurate measure
   
-  cout<<"calibration blob_count="<<blob_count<<endl;
+//  cout<<"calibration blob_count="<<blob_count<<endl;
   
   int area_squared_deviations_sum = 0;
   float max_inflection_1 = -1000;
@@ -477,7 +479,7 @@ void processor::calibrate()//does the calibration after data has been collected
   calibration_crop.max_inflection_3 = max_inflection_3;
   calibration_crop.max_inflection_9 = max_inflection_9;
   
-  cout<<"end of processor::calibrate.  calibration_crop.name = "<<calibration_crop.name.toStdString()<<".  calibration_crop.calibrated = "<<calibration_crop.calibrated<<endl;
+//  cout<<"end of processor::calibrate.  calibration_crop.name = "<<calibration_crop.name.toStdString()<<".  calibration_crop.calibrated = "<<calibration_crop.calibrated<<endl;
 }
 
 void processor::new_image(unsigned char* pixel_p)
@@ -636,7 +638,7 @@ void processor::add_line(unsigned char* start_p)
           calibration_area_list_index = 0;
           calibration_crop.calibrated = true;
           
-          cout<<"in processor::add_line.  calibration_crop.name = "<<calibration_crop.name.toStdString()<<".  calibration_crop.calibrated = "<<calibration_crop.calibrated<<endl;
+//          cout<<"in processor::add_line.  calibration_crop.name = "<<calibration_crop.name.toStdString()<<".  calibration_crop.calibrated = "<<calibration_crop.calibrated<<endl;
           
           emit send_calibrated_crop(calibration_crop);
 //          current_crop = calibration_crop;

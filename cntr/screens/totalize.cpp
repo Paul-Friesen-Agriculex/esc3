@@ -123,6 +123,7 @@ totalize::totalize(centre* set_centre_p)
   table_p->load_file(QString("settings/totalize_backup"));
   table_p->set_visible_columns(centre_p->tm_barcode_columns);
   
+  centre_p->count = 0;
   count = old_count = 0;
   table_p->setFocus();
   

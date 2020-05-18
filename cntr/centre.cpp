@@ -7,6 +7,8 @@
 #include <QThread>
 #include <QTextStream>
 #include <QList>  //add for modifying specific position in file// 11_14_2018
+//#include <QLabel>
+#include "message_box.hpp"
 #include <time.h>
 
 #include "centre.hpp"
@@ -76,9 +78,30 @@ centre::centre():
 {
   qRegisterMetaType<crop>();
   
-  processor_thread_p = new QThread(this);
+//  startup_progress_label_p = new QLabel("Starting ESC-3 Program");
+//  startup_progress_label_p = new message_box;
+//  startup_progress_label_p -> set_text("Starting ESC-3 Program");
+//  startup_progress_label_p -> show();
+//  startup_progress_label_p -> update();
+  
+  init_ran = false;
+
+  run_timer_p = new QTimer;
+  connect(run_timer_p, SIGNAL(timeout()), this, SLOT(run()));
+  run_timer_p->start(10);
+}
+
+void centre::init()
+{
+  cout<<"before processor_thread_p\n";
+  
   processor_p = new processor();
+  processor_thread_p = new QThread(this);
   processor_p -> moveToThread(processor_thread_p);
+  
+//  startup_progress_label_p ->setText("Done Camera and Processor Setup");
+  
+  cout<<"after processor creation\n";
   
   connect(this, SIGNAL(set_camera_processing(bool)), processor_p, SLOT(set_camera_processing(bool)), Qt::BlockingQueuedConnection);
   connect(this, SIGNAL(playback_line()), processor_p, SLOT(playback_line()), Qt::QueuedConnection);
@@ -105,9 +128,6 @@ centre::centre():
   envelope_sensor_p = new envelope_sensor;
   feeder_p = new feeder;
   brother_envelope_feeder_p = new brother_envelope_feeder;
-  run_timer_p = new QTimer;
-  connect(run_timer_p, SIGNAL(timeout()), this, SLOT(run()));
-  run_timer_p->start(10);
   for(int i=0; i<screen_wait_list_size-1; ++i)
   {
     screen_wait_list[i]=0;
@@ -120,7 +140,6 @@ centre::centre():
   }
   default_permission_level=5;
   screen_done=true;
-  count=0;
   
   for(int i=0;i<100;++i)
   {
@@ -215,7 +234,10 @@ centre::centre():
 //  connect(batch_mode_driver_p->count_rate_predictor_p, SIGNAL(send_message(QString)), diagnostics_console_p, SLOT(receive_message3(QString)));
   
   tm_macro_updated = 0; 
+  count=0;
   
+//  delete startup_progress_label_p;
+//  startup_progress_label_p = 0;
 }
 
 centre::~centre()
@@ -279,13 +301,13 @@ void centre::receive_qimage(QImage qimage_set)
 
 void centre::receive_calibrated_crop(crop calibrated_crop)
 {
-  cout<<"\ncentre::receive_calibrated_crop.\n";
-  cout<<"  calibrated_crop.name="<<calibrated_crop.name.toStdString()<<endl;
+//  cout<<"\ncentre::receive_calibrated_crop.\n";
+//  cout<<"  calibrated_crop.name="<<calibrated_crop.name.toStdString()<<endl;
   
   crops[0] = calibrated_crop;
   
-  cout<<"crops[0].calibrated="<<crops[0].calibrated<<endl;
-  cout<<"end centre::receive_calibrated_crop\n\n";
+//  cout<<"crops[0].calibrated="<<crops[0].calibrated<<endl;
+//  cout<<"end centre::receive_calibrated_crop\n\n";
 }
 
 void centre::end_of_playback()
@@ -300,6 +322,15 @@ void centre::get_cycle_time(int value)//value is msec.
 
 void centre::run()
 {
+  
+//  cout<<"centre::run\n";
+  
+  if(init_ran == false)
+  {
+    init();
+    init_ran = true;
+  }
+    
   emit set_crop(crops[0]);
 //  cutgate_state = cutgate_p->get_state();
   endgate_state = endgate_p->get_state();

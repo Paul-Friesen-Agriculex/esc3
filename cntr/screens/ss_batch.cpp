@@ -193,7 +193,7 @@ ss_batch::ss_batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_drive
   connect(run_timer_p, SIGNAL(timeout()), this, SLOT(run()));
   run_timer_p->start(100);
   
-  count = 0;
+  centre_p->count = 0;
   batch_mode_driver_p->start();
   
   mode = old_mode = wait_for_seed_lot_barcode;
