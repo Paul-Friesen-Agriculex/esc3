@@ -15,6 +15,7 @@ class processor;
 class centre;
 //class secondary_processor;  //11_21_2018//
 
+
 struct slice
 {
   long long line;
@@ -295,6 +296,7 @@ class processor : public QObject
   
   private:
   
+  float corr_factors[2048];
   void calibrate();
   void new_image(unsigned char* pixel_p);
   void add_line(unsigned char* start_p);

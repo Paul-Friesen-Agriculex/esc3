@@ -82,13 +82,13 @@ processor::processor()
   
   image_size = line_length * image_lines;
   image_p = 0;
-  
+  /*
   cout<<"before shadecorr\n";
   SK_SHADCORR(0, false);
   SK_SETSCM(0, NULL, 8, line_length, image_lines, 10, 80);
 //  SK_SETSCM(0, NULL, 8, line_length, 8, 10, 80);
   cout<<"after shadecorr\n";
-  
+  */
   line_count = 0;
   took_slice_index = -1;//indicates no blob has taken slice
   show_blob_bool = false;
@@ -136,6 +136,7 @@ processor::processor()
   //We need to determine the part of the camera's field that is useable, and store values in valid_start and valid_end.
   //We take one image from the camera and determine average readings for all pixels.
   //This is used to set valid_start and valid_end such that dark ends of the field are ignored.
+  //Also used to set shading correction factors for each pixel.
   while(1)
   {
     result = SK_GETIMAGE(0, &image_p, 1000);
@@ -165,7 +166,16 @@ processor::processor()
   }
   for (int i=0; i<line_length; ++i)
   {
-	average_pixel_values[i] /= image_lines;
+  	average_pixel_values[i] /= image_lines;
+    if(average_pixel_values[i] > 25)
+    {
+      corr_factors[i] = 200.0/float(average_pixel_values[i]);
+    }
+    else
+    {
+      corr_factors[i] = 1.0;
+    }
+    average_pixel_values[i] *= corr_factors[i];
 	
 //	cout<<"average_pixel_values["<<i<<"] = "<<average_pixel_values[i]<<endl;
 	
@@ -173,12 +183,12 @@ processor::processor()
   int dark_start_end = 0;//this will become the end of the dark area at the start of the line
   for(int i=0; i<500; ++i)
   {
-	if(average_pixel_values[i] < 150) dark_start_end = i;
+	  if(average_pixel_values[i] < 150) dark_start_end = i;
   }
   int dark_end_start = line_length;//this will become the start of the dark area at the end of the line
   for(int i=line_length; i>(line_length-500); --i)
   {
-	if(average_pixel_values[i] < 150) dark_end_start = i;
+	  if(average_pixel_values[i] < 150) dark_end_start = i;
   }
   valid_start = dark_start_end + 10;
   valid_end = dark_end_start - 10;
@@ -485,7 +495,18 @@ void processor::calibrate()//does the calibration after data has been collected
 void processor::new_image(unsigned char* pixel_p)
 {
   slack_time = t.restart();
+  
   unsigned char* small_image_position_p = pixel_p;
+  for(int i=0; i<image_lines; ++i)
+  {
+    for(int j=0; j<line_length; ++j)
+    {
+      (*small_image_position_p) *= corr_factors[j];
+      ++small_image_position_p;
+    }
+  }
+  
+  small_image_position_p = pixel_p;
   for (int line = 0; line < image_lines; ++line)
   {
     add_line(small_image_position_p);
