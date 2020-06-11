@@ -7,6 +7,8 @@
 #include <QThread>
 #include <QTextStream>
 #include <QList>  //add for modifying specific position in file// 11_14_2018
+#include <QTcpServer>
+#include <QTcpSocket>
 //#include <QLabel>
 #include "message_box.hpp"
 #include <time.h>
@@ -219,7 +221,14 @@ void centre::init()
   tm_autosave_count = 0;//counts how many counts were recorded;
   tm_save_filename = "";
   block_endgate_opening = false;//true prevents endgate from opening.  Used if barcode test fails in batch.
- 
+  communicate_by_keyboard_cable = true;
+  communicate_by_tcp = false;
+  tcp_server = true;
+  network = 0;//0-> not set.  1->use 192.168.100.1.  2->use 192.168.200.1.
+  QString tcp_client_server_addr = "";
+  tcp_server_p = new QTcpServer;
+  tcp_socket_p = new QTcpSocket;
+
   load_settings("default");
   
   diagnostics_console_p = new diagnostics_console(this);
@@ -506,9 +515,9 @@ void centre::run()
       case 37: screen_p=new enter_field_text(this, batch_mode_driver_p); break;
 //      case : screen_p=new (this); break;
 //      case : screen_p=new (this); break;
-//      case : screen_p=new (this); break;
-//      case : screen_p=new (this); break;
-//      case : screen_p=new (this); break;
+      case 40: screen_p=new tcp_mode_choice(this); break;
+      case 41: screen_p=new tcp_server_addr_choice(this); break;
+      case 42: screen_p=new tcp_client_server_addr_entry(this); break;
 //      case : screen_p=new (this); break;
 //      case : screen_p=new (this); break;
 //      case : screen_p=new (this); break;
@@ -541,6 +550,8 @@ bool centre::save_settings(QString file_name)
   fset<<tm_autosave_count_limit<<endl;
   fset<<tm_last_filename.toStdString()<<endl;
   fset<<batch_mode_driver_p->bm_last_table_filename.toStdString()<<endl;
+  fset<<communicate_by_keyboard_cable<<endl;
+  fset<<communicate_by_tcp<<endl;
 
   fset.close();
   return true;
@@ -588,6 +599,12 @@ bool centre::load_settings(QString file_name)
   fset.getline(input, 100);
   batch_mode_driver_p->bm_last_table_filename = QString(input);
 
+  fset.getline(input, 100);
+  communicate_by_keyboard_cable = atoi(input);
+  
+  fset.getline(input, 100);
+  communicate_by_tcp = atoi(input);
+  
   fset.close();
   return true;
 }

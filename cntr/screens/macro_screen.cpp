@@ -44,6 +44,16 @@ macro_screen::macro_screen(centre*set_centre_p)
   disable_all_button_p = new button("Disable All");
   enable_all_button_p = new button("Enable All");
   
+  communications_choice_box_p = new QGroupBox;
+  communicate_by_keyboard_cable_button_p = new QRadioButton("Communicate By Keyboard Cable");
+  communicate_by_keyboard_cable_button_p -> setChecked(centre_p->communicate_by_keyboard_cable);
+  communicate_by_tcp_button_p = new QRadioButton("Communicate By TCP");
+  communicate_by_tcp_button_p -> setChecked(centre_p->communicate_by_tcp);
+  communications_choice_box_layout_p = new QVBoxLayout;
+  communications_choice_box_layout_p -> addWidget(communicate_by_keyboard_cable_button_p);
+  communications_choice_box_layout_p -> addWidget(communicate_by_tcp_button_p);
+  communications_choice_box_p -> setLayout(communications_choice_box_layout_p);
+  
   tableWidget_p = new QTableWidget(this);
   tableWidget_p->setRowCount(macro_rows);
   tableWidget_p->setColumnCount(macro_cols);
@@ -60,13 +70,14 @@ macro_screen::macro_screen(centre*set_centre_p)
   
   main_layout_p = new QGridLayout;
   main_layout_p->addWidget(screen_title_label_p, 0, 0);
-  main_layout_p->addWidget(description_p, 1, 0, 1, 4);
+  main_layout_p->addWidget(communications_choice_box_p, 1, 0, 1, 4);
+  main_layout_p->addWidget(description_p, 2, 0, 1, 4);
   main_layout_p->addWidget(back_button_p, 0, 3);
-  main_layout_p->addWidget(help_button_p, 4, 2);
-  main_layout_p->addWidget(ok_button_p, 4, 3);
-  main_layout_p->addWidget(disable_all_button_p, 4, 0);
+  main_layout_p->addWidget(help_button_p, 5, 2);
+  main_layout_p->addWidget(ok_button_p, 5, 3);
+  main_layout_p->addWidget(disable_all_button_p, 5, 0);
 //  main_layout_p->addWidget(enable_all_button_p, 4, 1);
-  main_layout_p->addWidget(tableWidget_p,2,0,2,4);
+  main_layout_p->addWidget(tableWidget_p,3,0,2,4);
   setLayout(main_layout_p);
   
   connect(back_button_p, SIGNAL(clicked()), this, SLOT(back_button_clicked()));
@@ -75,8 +86,11 @@ macro_screen::macro_screen(centre*set_centre_p)
   connect(disable_all_button_p, SIGNAL(clicked()), this, SLOT(disable_all_clicked()));
   connect(enable_all_button_p, SIGNAL(clicked()), this, SLOT(enable_all_clicked()));
   connect(tableWidget_p, SIGNAL(cellClicked(int, int)), this, SLOT(cellSelected(int, int)));
+  
+  connect(communicate_by_keyboard_cable_button_p, SIGNAL(toggled(bool)), this, SLOT(communications_choice_toggled(bool)));
+//  connect(communicate_by_tcp_button_p, SIGNAL(toggled()), this, SLOT(communications_choice_toggled()));
 
-  screen_title_label_p->setText("USB Communications Menu");
+  screen_title_label_p->setText("Communications Menu");
   screen_title_label_p->setStyleSheet("QLabel { font: bold }");
   description_p->setText("If the special USB Communications cable is connected to a computer, \
 items listed in the selected macro will be sent to the computer, which will see \
@@ -123,6 +137,17 @@ void macro_screen::check_serial_connection()
 	  cout<<"initialization sent"<<endl;
     }
   }
+}
+
+void macro_screen::communications_choice_toggled(bool)
+{
+  centre_p->communicate_by_keyboard_cable = communicate_by_keyboard_cable_button_p->isChecked();
+  centre_p->communicate_by_tcp = communicate_by_tcp_button_p->isChecked();
+  
+  cout<<"centre_p->communicate_by_keyboard_cable = "<<centre_p->communicate_by_keyboard_cable<<endl;
+  cout<<"centre_p->communicate_by_tcp = "<<centre_p->communicate_by_tcp<<endl;
+  
+  
 }
 
 void macro_screen::back_button_clicked()

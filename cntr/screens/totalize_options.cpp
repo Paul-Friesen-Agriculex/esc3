@@ -17,7 +17,7 @@ totalize_options::totalize_options(centre*set_centre_p)
   centre_p=set_centre_p;
   
   back_button_p = new button("Back");
-  macro_menu_button_p = new button("USB communications menu");
+  macro_menu_button_p = new button("Communications Menu");
   zero_when_seed_discharged_p = new QRadioButton("Zero Count when Seed Discharged");
 
   number_of_barcode_columns_p = new QSpinBox;

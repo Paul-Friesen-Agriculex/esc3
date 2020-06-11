@@ -23,6 +23,8 @@ class batch_mode_driver;
 class diagnostics_console;
 class macro_screen; //TEST~~~
 class brother_envelope_feeder;
+class QTcpServer;
+class QTcpSocket;
 
 const int screen_wait_list_size=10;
 
@@ -157,6 +159,13 @@ class centre : public QObject
   char macro_mask_char[30];			//
   char macro_function_char[30];		//
   QString combined_macro_functions;	//new char to combine all macros
+  bool communicate_by_keyboard_cable;
+  bool communicate_by_tcp;
+  bool tcp_server;
+  int network;
+  QString tcp_client_server_addr;
+  QTcpServer* tcp_server_p;
+  QTcpSocket* tcp_socket_p;
   
   //batch mode
   bool block_endgate_opening;//true prevents endgate from opening.  Used if barcode test fails in batch.

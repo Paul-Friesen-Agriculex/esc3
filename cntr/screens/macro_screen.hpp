@@ -17,6 +17,7 @@ class button;
 class QGridLayout;
 class QGroupBox;
 class QHBoxLayout;
+class QVBoxLayout;
 class QLabel;
 class QRadioButton;
 class QSpinBox;
@@ -46,6 +47,7 @@ class macro_screen : public screen
   void store_macro_table();
   void dialogbox_buttons(int n);
   void check_serial_connection();		  //TEST~~~
+  void communications_choice_toggled(bool);
 
   private:
   button* back_button_p;
@@ -54,6 +56,11 @@ class macro_screen : public screen
   button* disable_all_button_p;
   button* enable_all_button_p;
   help_screen* help_screen_p;
+  
+  QGroupBox* communications_choice_box_p;
+  QVBoxLayout* communications_choice_box_layout_p;
+  QRadioButton* communicate_by_keyboard_cable_button_p;
+  QRadioButton* communicate_by_tcp_button_p;
   
   QLabel* instruction_label_p;
   QLineEdit *lineEdit;

@@ -24,11 +24,11 @@ class totalize_options : public screen
   void number_of_barcode_columns_changed(int value);
   void autosave_limit_changed(int value);
   void ok_button_clicked();
-  void macro_menu_button_clicked();	//TEST~~~
+  void macro_menu_button_clicked();
 
   private:
   button* back_button_p;
-  button* macro_menu_button_p;	//TEST~~~
+  button* macro_menu_button_p;
   QRadioButton* zero_when_seed_discharged_p;
   
   QSpinBox* number_of_barcode_columns_p;
