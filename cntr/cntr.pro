@@ -59,7 +59,10 @@ HEADERS += batch_mode_driver.hpp \
            screens/totalize.hpp \
            screens/totalize_options.hpp \
            screens/help_screen.hpp \
-           screens/gateset.hpp
+           screens/gateset.hpp \
+           screens/tcp_client_server_addr_entry.hpp \
+           screens/tcp_mode_choice.hpp \
+           screens/tcp_server_addr_choice.hpp
 SOURCES += batch_mode_driver.cpp \
            brother_envelope_feeder.cpp \
            button.cpp \
@@ -111,8 +114,12 @@ SOURCES += batch_mode_driver.cpp \
            screens/totalize.cpp \
            screens/totalize_options.cpp \
            screens/help_screen.cpp \
-           screens/gateset.cpp
+           screens/gateset.cpp \
+           screens/tcp_client_server_addr_entry.cpp \
+           screens/tcp_mode_choice.cpp \
+           screens/tcp_server_addr_choice.cpp
 
 QT += widgets
 QT += printsupport
+QT += network
 LIBS += -L"/usr/lib" -lSK91USB3-LX

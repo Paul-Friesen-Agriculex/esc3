@@ -5,6 +5,8 @@
 #include <QLabel>
 #include <QRadioButton>
 #include <QSpinBox>
+#include <QTcpServer>
+#include <QTcpSocket>
 #include "centre.hpp"
 #include "tcp_server_addr_choice.hpp"
 #include "button.hpp"
@@ -14,11 +16,15 @@ using namespace std;
 tcp_server_addr_choice::tcp_server_addr_choice(centre*set_centre_p)
 :screen(set_centre_p)
 {
+  
+  cout<<"tcp_server_address_choice::tcp_server_address_choice 1\n";
+  
   centre_p=set_centre_p;
   
   back_button_p = new button("Back");
   net_100_button_p = new button("Use 192.168.100.1");
   net_200_button_p = new button("Use 192.168.200.1");
+  message_p = new QLabel("Select the TCP server address.\nConnecting device should connect to this address.");
   help_button_p = new button("Help");
   ok_button_p = new button("OK");
 
@@ -38,7 +44,7 @@ tcp_server_addr_choice::tcp_server_addr_choice(centre*set_centre_p)
   connect(net_200_button_p, SIGNAL(clicked()), this, SLOT(net_200_clicked()));
   connect(help_button_p, SIGNAL(clicked()), this, SLOT(help_button_clicked()));
   connect(ok_button_p, SIGNAL(clicked()), this, SLOT(ok_button_clicked()));
-  connect(centre_p->tcp_server_p, SIGNAL(newConnection()), this, SLOT(connection_detected()));
+//  connect(centre_p->tcp_server_p, SIGNAL(newConnection()), this, SLOT(connection_detected()));
 }
 
 void tcp_server_addr_choice::back_button_clicked()
@@ -49,29 +55,30 @@ void tcp_server_addr_choice::back_button_clicked()
 
 void tcp_server_addr_choice::net_100_clicked()
 {
-  centre_p->network = 1;
-  if(centre_p->tcp_server_p->listen(QHostAddress("192.168.100.1"), 50000) == false)
+  QString message_string = centre_p->choose_tcp_network(1);
+  if(message_string=="")//success
   {
-    message_p->setText(QString("listen failure.   ") . append(tcp_server_p->errorString());
+    message_p->setText("Listening for connection to address 192.168.100.1");
     return;
   }
-  message_p->setText("Listening for connection to address 192.168.100.1");
+  message_p->setText(QString("listen failure.   ") . append(message_string));
 }    
 
 void tcp_server_addr_choice::net_200_clicked()
 {
-  centre_p->network = 1;
-  if(centre_p->tcp_server_p->listen(QHostAddress("192.168.200.1"), 50000) == false)
+  QString message_string = centre_p->choose_tcp_network(2);
+  if(message_string=="")//success
   {
-    message_p->setText(QString("listen failure.   ") . append(tcp_server_p->errorString());
+    message_p->setText("Listening for connection to address 192.168.200.1");
     return;
   }
-  message_p->setText("Listening for connection to address 192.168.200.1");
+  message_p->setText(QString("listen failure.   ") . append(message_string));
 }    
 
 void tcp_server_addr_choice::connection_detected()
 {
-  centre_p->tcp_socket_p = centre_p->tcp_server_p->nextPendingConnection();
+  cout<<"connection_detected\n";
+
   if(centre_p->network == 1)
   {
     message_p->setText("Connected using address 192.168.100.1");
@@ -80,9 +87,13 @@ void tcp_server_addr_choice::connection_detected()
   {
     message_p->setText("Connected using address 192.168.200.1");
   }
+  
+//  centre_p->tcp_write("test\n");
+  
 }
   
-void tcp_server_addr_choice::ok_button_clicked()  
+void tcp_server_addr_choice::ok_button_clicked() 
+{ 
   centre_p->add_waiting_screen(5);//totalize
   centre_p->screen_done = true;
 }

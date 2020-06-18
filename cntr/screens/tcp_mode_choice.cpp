@@ -14,10 +14,12 @@ using namespace std;
 tcp_mode_choice::tcp_mode_choice(centre*set_centre_p)
 :screen(set_centre_p)
 {
+//  cout<<"tcp_mode_choice::tcp_mode_choice 1\n";
+  
   centre_p=set_centre_p;
   
   back_button_p = new button("Back");
-  function_as_server_button_p = new button("ESC-3 to function as sever");
+  function_as_server_button_p = new button("ESC-3 to function as server");
   function_as_client_button_p = new button("ESC-3 to function as client");
   help_button_p = new button("Help");
 
@@ -54,3 +56,6 @@ void tcp_mode_choice::function_as_client()
   centre_p->screen_done = true;
 }
 
+void tcp_mode_choice::help_button_clicked()
+{
+}

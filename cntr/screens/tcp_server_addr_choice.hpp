@@ -31,7 +31,7 @@ class tcp_server_addr_choice : public screen
   button* net_100_button_p;
   button* net_200_button_p;
   QLabel* message_p;
-  button* ok_button_p
+  button* ok_button_p;
   button* help_button_p;
 
   QGridLayout* main_layout_p;

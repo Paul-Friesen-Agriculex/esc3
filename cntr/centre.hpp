@@ -45,6 +45,7 @@ class centre : public QObject
   bool load_settings(QString file_name);
   void end_of_playback();
   void get_cycle_time(int value);
+  void tcp_connection_detected();
   
   signals:
   void set_camera_processing(bool state);
@@ -166,6 +167,8 @@ class centre : public QObject
   QString tcp_client_server_addr;
   QTcpServer* tcp_server_p;
   QTcpSocket* tcp_socket_p;
+  QString choose_tcp_network(int choice);//choice 1 -> 192.168.100.1.  choice 2 -> 192.168.200.1.  Empty return -> success.  Error string returned for failure
+  void tcp_write(QString string);
   
   //batch mode
   bool block_endgate_opening;//true prevents endgate from opening.  Used if barcode test fails in batch.

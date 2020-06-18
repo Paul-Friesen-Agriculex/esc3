@@ -23,6 +23,7 @@
 
 #include <QtGui>  //included to implement delay in serial output//
 #include <QTime>  //
+#include <QTcpSocket>
   //explore some databases that may be used and spreadsheet programs, may need to include more features 
   //such as moving to or creating another sheet/file
 
@@ -35,6 +36,9 @@ macro_screen::macro_screen(centre*set_centre_p)
 	:screen(set_centre_p)
 {
   centre_p=set_centre_p;
+  
+  cout<<"1 centre_p = "<<centre_p<<endl;
+  
   screen_title_label_p = new QLabel;
   description_p = new QLabel;
 
@@ -49,9 +53,11 @@ macro_screen::macro_screen(centre*set_centre_p)
   communicate_by_keyboard_cable_button_p -> setChecked(centre_p->communicate_by_keyboard_cable);
   communicate_by_tcp_button_p = new QRadioButton("Communicate By TCP");
   communicate_by_tcp_button_p -> setChecked(centre_p->communicate_by_tcp);
-  communications_choice_box_layout_p = new QVBoxLayout;
-  communications_choice_box_layout_p -> addWidget(communicate_by_keyboard_cable_button_p);
-  communications_choice_box_layout_p -> addWidget(communicate_by_tcp_button_p);
+  tcp_setup_button_p = new button("Set up TCP communications");
+  communications_choice_box_layout_p = new QGridLayout;
+  communications_choice_box_layout_p -> addWidget(communicate_by_keyboard_cable_button_p, 0, 0);
+  communications_choice_box_layout_p -> addWidget(communicate_by_tcp_button_p, 1, 0);
+  communications_choice_box_layout_p -> addWidget(tcp_setup_button_p, 1, 1);
   communications_choice_box_p -> setLayout(communications_choice_box_layout_p);
   
   tableWidget_p = new QTableWidget(this);
@@ -104,6 +110,8 @@ them as keyboard input.");
   //tableWidget_p->setDisabled(true);  
   tableWidget_p->setStyleSheet("QTableWidget { font: 15pt;}");
   tableWidget_p->verticalHeader()->setDefaultSectionSize(45);
+  
+  connect(tcp_setup_button_p, SIGNAL(clicked()), this, SLOT(tcp_setup_button_clicked()));
 }
 
 void macro_screen::check_serial_connection()
@@ -148,6 +156,12 @@ void macro_screen::communications_choice_toggled(bool)
   cout<<"centre_p->communicate_by_tcp = "<<centre_p->communicate_by_tcp<<endl;
   
   
+}
+
+void macro_screen::tcp_setup_button_clicked()
+{
+  centre_p->add_waiting_screen(40);//tcp_mode_choice
+  centre_p->screen_done=true;
 }
 
 void macro_screen::back_button_clicked()
@@ -334,6 +348,9 @@ void macro_screen::help_button_clicked()
 //modified to handle barcodes as characters instead of integers// 11_02_2018~~~//
 void macro_screen::usb_serial_out(QString bar_str_1, QString bar_str_2, QString bar_str_3, QString bar_str_4, QString totalize_count_str, QString weight_str)
 {
+  
+  cout<<"2 centre_p = "<<centre_p<<endl;
+  
   cout<<endl<<"USB2SERIAL QStringVariant"<<endl;                                        //OMIT~~~
   cout<<"bar_1: "<<bar_str_1.toUtf8().constData();                                      //OMIT~~~
   cout<<"\tbar_2: "<<bar_str_2.toUtf8().constData();                                    //
@@ -354,11 +371,20 @@ void macro_screen::usb_serial_out(QString bar_str_1, QString bar_str_2, QString 
   QString combined_macro_functions;
   QString count_string;
   QString barcode_string;
+  
+  cout<<"3 centre_p = "<<centre_p<<endl;
+  
         
   {
     ifstream macros("macro_table");
     for(int i=0; i<10; ++i)		//searches all 10 macros available
     {
+  
+      cout<<"usb_serial_out 1\n";
+  
+      cout<<"4 centre_p = "<<centre_p<<endl;
+  
+  
 	    macros>>macro_status_bool;
 	    macros>>macro_numb_int;
 	    macros>>macro_name_char;
@@ -418,16 +444,49 @@ void macro_screen::usb_serial_out(QString bar_str_1, QString bar_str_2, QString 
 	    }
 	    if(macros.eof()) break;
     }
+  
+  cout<<"usb_serial_out 2\n";
+  
     cout<<endl<<combined_macro_functions.toUtf8().constData()<<endl;  //OMIT~~~
+  
+  cout<<"usb_serial_out 3\n";
+  
     macros.close();
   }
 //--------------------------------------------------------------OUTPUT TO SERIAL--------------------------------------------------------------//
+  
+  cout<<"usb_serial_out 4\n";
+  
   int size_string_macros = combined_macro_functions.size();
-  //int filedesc = open("/dev/TTL232RG", O_WRONLY);
-  int filedesc = open("/dev/usb2serial", O_WRONLY);
-  //int filedesc = open("/dev/ttyUSB0", O_WRONLY);  //if udev rules are not applied//
-  //write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros) != size_string_macros;
-  cout<<endl<<"serial string buffer length: "<<write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros)<<endl;
+  
+  cout<<"usb_serial_out 5\n";
+  
+  cout<<"2 centre_p = "<<centre_p<<endl;
+  
+  cout<<"centre_p->communicate_by_keyboard_cable = "<<centre_p->communicate_by_keyboard_cable<<endl;
+  
+  if(centre_p->communicate_by_keyboard_cable==true)
+  {
+    //int filedesc = open("/dev/TTL232RG", O_WRONLY);
+    int filedesc = open("/dev/usb2serial", O_WRONLY);
+    //int filedesc = open("/dev/ttyUSB0", O_WRONLY);  //if udev rules are not applied//
+    //write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros) != size_string_macros;
+  
+    cout<<endl<<"serial string buffer length: "<<write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros)<<endl;
+  }
+  
+  cout<<"usb_serial_out 6\n";
+  
+  if(centre_p->communicate_by_tcp==true)
+  {
+    cout<<"centre_p->tcp_socket_p = "<<centre_p->tcp_socket_p<<endl;
+//    centre_p->tcp_write(combined_macro_functions);
+//    centre_p->tcp_socket_p->write("test2\n");
+//    cout<<"after write\n";
+  }
+  
+  
+  
 //--------------------------------------------------------------------------------------------------------------------------------------------//
   //serial terminal write function with slight delay between commands//
   /*int write_output = 0;         //TEST~~~

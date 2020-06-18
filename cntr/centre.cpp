@@ -51,6 +51,9 @@
 #include "position_envelope_field.hpp"
 #include "select_field_data_source.hpp"
 #include "macro_screen.hpp"	//TEST~~~
+#include "tcp_mode_choice.hpp"
+#include "tcp_server_addr_choice.hpp"
+#include "tcp_client_server_addr_entry.hpp"
 //#include "table.hpp"        //TEST~~~ //access barcodes and count from table
 #include "brother_envelope_feeder.hpp"
 #include "signal_port.hpp"
@@ -240,6 +243,7 @@ void centre::init()
   connect(diagnostics_console_p, SIGNAL(reset_time_tests_signal()), processor_p, SLOT(reset_time_tests()));
   connect(cutgate_p, SIGNAL(closed_while_opening()), batch_mode_driver_p, SLOT(cutgate_timing_error()));
   connect(cutgate_p, SIGNAL(opened_while_closing()), batch_mode_driver_p, SLOT(cutgate_timing_error()));
+  connect(tcp_server_p, SIGNAL(newConnection()), this, SLOT(tcp_connection_detected())); 
 //  connect(batch_mode_driver_p->count_rate_predictor_p, SIGNAL(send_message(QString)), diagnostics_console_p, SLOT(receive_message3(QString)));
   
   tm_macro_updated = 0; 
@@ -327,6 +331,11 @@ void centre::end_of_playback()
 void centre::get_cycle_time(int value)//value is msec.
 {
   if(value>0) measured_line_frequency = float(image_lines)/float(value)*1000.0;
+}
+
+void centre::tcp_connection_detected()
+{
+  tcp_socket_p = tcp_server_p->nextPendingConnection();
 }
 
 void centre::run()
@@ -516,8 +525,13 @@ void centre::run()
 //      case : screen_p=new (this); break;
 //      case : screen_p=new (this); break;
       case 40: screen_p=new tcp_mode_choice(this); break;
-      case 41: screen_p=new tcp_server_addr_choice(this); break;
-      case 42: screen_p=new tcp_client_server_addr_entry(this); break;
+      case 41: screen_p=new tcp_server_addr_choice(this); 
+               cout<<"before connect\n";
+               connect(tcp_server_p, SIGNAL(newConnection()), screen_p, SLOT(connection_detected())); 
+               cout<<"after connect\n";
+               break;
+      case 42: screen_p=new tcp_client_server_addr_entry(this);
+               connect(tcp_socket_p, SIGNAL(connected()), screen_p, SLOT(connection_detected())); break;
 //      case : screen_p=new (this); break;
 //      case : screen_p=new (this); break;
 //      case : screen_p=new (this); break;
@@ -1189,5 +1203,31 @@ void centre::load_macros()	//TEST~~~ connecting macros screen
   tm_macro_updated = true;
 }
 
-  
+QString centre::choose_tcp_network(int choice)//choice 1 -> 192.168.100.1.  choice 2 -> 192.168.200.1.  Empty return -> success.  Error string returned for failure
+{
+  if(choice == 1)
+  {
+    network = 1;
+    if(tcp_server_p->listen(QHostAddress("192.168.100.1"), 50000) == false)
+    {
+      return tcp_server_p->errorString();
+    }
+    return QString("");
+  }
+  if(choice == 2)
+  {
+    network = 2;
+    if(tcp_server_p->listen(QHostAddress("192.168.200.1"), 50000) == false)
+    {
+      return tcp_server_p->errorString();
+    }
+    return QString("");
+  }
+  return QString("choice not found");
+}
+
+void centre::tcp_write(QString string)
+{
+  tcp_socket_p->write(string.toLatin1());
+}
 

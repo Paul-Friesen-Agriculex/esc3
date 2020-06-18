@@ -33,7 +33,7 @@ class tcp_client_server_addr_entry : public screen
   QSpinBox* addr3_p;
   QSpinBox* addr4_p;
   QLabel* message_p;
-  button* ok_button_p
+  button* ok_button_p;
   button* help_button_p;
 
   QGridLayout* main_layout_p;

@@ -20,8 +20,8 @@ class tcp_mode_choice : public screen
   
   private slots:
   void back_button_clicked();
-  void function_as_server(bool value);
-  void function_as_client(int value);
+  void function_as_server();
+  void function_as_client();
   void help_button_clicked();
 
   private:
