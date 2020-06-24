@@ -29,11 +29,12 @@ class macro_screen : public screen
   
   public:
   macro_screen(centre*set_centre_p);
+  ~macro_screen();
   QString text;
   
   public slots:  
-  void usb_serial_out(QString bar_str_1, QString bar_str_2, QString bar_str_3, QString bar_str_4, QString totalize_str_count, QString totalize_str_weight);
-  void usb_serial_out(QString lotcode_str, QString packcode_str, QString batch_count_str, QString substitution_str, QString dump_count_str);
+//  void usb_serial_out(QString bar_str_1, QString bar_str_2, QString bar_str_3, QString bar_str_4, QString totalize_str_count, QString totalize_str_weight);
+//  void usb_serial_out(QString lotcode_str, QString packcode_str, QString batch_count_str, QString substitution_str, QString dump_count_str);
   
   private slots:
   void back_button_clicked();

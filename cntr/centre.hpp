@@ -182,6 +182,8 @@ class centre : public QObject
   
   batch_mode_driver* batch_mode_driver_p;
   macro_screen* macro_screen_p; //TEST~~~ 11_13_2018//
+  void communicate_out_totalize(QString bar_str_1, QString bar_str_2, QString bar_str_3, QString bar_str_4, QString totalize_count_str, QString weight_str);
+  void communicate_out_batch(QString lotcode_str, QString packcode_str, QString batch_count_str, QString substitution_str, QString dump_count_str);
 };
 
 class screen : public QWidget

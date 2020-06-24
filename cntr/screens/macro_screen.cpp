@@ -21,7 +21,7 @@
 #include <fcntl.h>	//library used to use system call command "open()" used to check available serial
 #include <unistd.h>	//library to enable write() function
 
-#include <QtGui>  //included to implement delay in serial output//
+//#include <QtGui>  //included to implement delay in serial output//
 #include <QTime>  //
 #include <QTcpSocket>
   //explore some databases that may be used and spreadsheet programs, may need to include more features 
@@ -112,6 +112,13 @@ them as keyboard input.");
   tableWidget_p->verticalHeader()->setDefaultSectionSize(45);
   
   connect(tcp_setup_button_p, SIGNAL(clicked()), this, SLOT(tcp_setup_button_clicked()));
+  
+  help_screen_p = 0;
+}
+
+macro_screen::~macro_screen()
+{
+//  if(help_screen_p!=0) delete help_screen_p;
 }
 
 void macro_screen::check_serial_connection()
@@ -319,7 +326,7 @@ void macro_screen::help_button_clicked()
 
 void macro_screen::help_button_clicked()
 { 
-  help_screen_p = new help_screen;
+  help_screen_p = new help_screen();
   			   
   help_screen_p->set_text("The ESC-3 is able to send data to a computer through the USB Communications Cable provided.  "
            "The data sent will appear to the computer as keyboard input.  This allows flexible "
@@ -342,311 +349,6 @@ void macro_screen::help_button_clicked()
            "items will be sent out in the order they appear.");
 
   help_screen_p->show();
-}
-
-
-//modified to handle barcodes as characters instead of integers// 11_02_2018~~~//
-void macro_screen::usb_serial_out(QString bar_str_1, QString bar_str_2, QString bar_str_3, QString bar_str_4, QString totalize_count_str, QString weight_str)
-{
-  
-  cout<<"2 centre_p = "<<centre_p<<endl;
-  
-  cout<<endl<<"USB2SERIAL QStringVariant"<<endl;                                        //OMIT~~~
-  cout<<"bar_1: "<<bar_str_1.toUtf8().constData();                                      //OMIT~~~
-  cout<<"\tbar_2: "<<bar_str_2.toUtf8().constData();                                    //
-  cout<<"\tbar_3: "<<bar_str_3.toUtf8().constData();                                    //
-  cout<<"\tbar_4: "<<bar_str_4.toUtf8().constData()<<endl;                              //
-//  cout<<endl<<"totalize_str_count: "<<totalize_count_str.toUtf8().constData()<<endl;    //
-//  cout<<endl<<"totalize_str_weight: "<<weight_str.toUtf8().constData()<<endl;           //
-  //----------------------------------------------------------------------------------------//
-  
-  bool macro_status_bool;			      //temporary variable to transfer ifstream to tablewidget
-  int macro_numb_int;				        //
-  char macro_name_char[30];			    //
-  char macro_mask_char[30];			    //
-  char macro_function_char[30];		  //
- 
-  //QString combined_macro_functions;	//new char to combine all macros 
-  QString macro_string;
-  QString combined_macro_functions;
-  QString count_string;
-  QString barcode_string;
-  
-  cout<<"3 centre_p = "<<centre_p<<endl;
-  
-        
-  {
-    ifstream macros("macro_table");
-    for(int i=0; i<10; ++i)		//searches all 10 macros available
-    {
-  
-      cout<<"usb_serial_out 1\n";
-  
-      cout<<"4 centre_p = "<<centre_p<<endl;
-  
-  
-	    macros>>macro_status_bool;
-	    macros>>macro_numb_int;
-	    macros>>macro_name_char;
-	    macros>>macro_mask_char;
-	    macros>>macro_function_char;
-
-	    if(macro_status_bool != 0)
-      {
-        QString macro_string;
-	      for(unsigned int j=0; j<strlen(macro_function_char); ++j)
-	      {
-		      if(macro_function_char[j] == '\\')
-		      {
-            if(macro_function_char[j+1] == 'C')
-	          {
-	            macro_string = macro_string + totalize_count_str;
-	          }
-  	        else if(macro_function_char[j+1] == '1')		//Barcodes
-	          {
-              macro_string = macro_string + bar_str_1;
-              cout<<"bar_1: "<<bar_str_1.toUtf8().constData()<<endl;  //OMIT~~~
-  	        }
-	          else if(macro_function_char[j+1] == '2')
-	          {
-              macro_string = macro_string + bar_str_2;
-              cout<<"bar_2: "<<bar_str_2.toUtf8().constData()<<endl;  //OMIT~~~
-	          }
-	          else if(macro_function_char[j+1] == '3')
-	          {
-              macro_string = macro_string + bar_str_3;
-              cout<<"bar_3: "<<bar_str_3.toUtf8().constData()<<endl;  //OMIT~~~
-	          }
-	          else if(macro_function_char[j+1] == '4')
-	          {
-              macro_string = macro_string + bar_str_4;
-              cout<<"bar_4: "<<bar_str_4.toUtf8().constData()<<endl;  //OMIT~~~
-	          }
-  	        /*else if(macro_function_char[j+1] == 'T')		//Lot code
- 	          {
-	   		      //macro_string = macro_string + lotcode;
-            }
-	          else if(macro_function_char[j+1] == 'P')		//Pack code
-	          {
-			        //macro_string = macro_string + packcode;
-	          }*/
-	          else
-	          {
-			        macro_string = macro_string + macro_function_char[j] + macro_function_char[j+1];
-	          }
-	        }
-	      }
-        /*for(int j=0; j<strlen(macro_function_char); ++j)
-        {
-          macro_string.append(macro_function_char[j]);
-        }*/
-        combined_macro_functions = combined_macro_functions + macro_string;
-	    }
-	    if(macros.eof()) break;
-    }
-  
-  cout<<"usb_serial_out 2\n";
-  
-    cout<<endl<<combined_macro_functions.toUtf8().constData()<<endl;  //OMIT~~~
-  
-  cout<<"usb_serial_out 3\n";
-  
-    macros.close();
-  }
-//--------------------------------------------------------------OUTPUT TO SERIAL--------------------------------------------------------------//
-  
-  cout<<"usb_serial_out 4\n";
-  
-  int size_string_macros = combined_macro_functions.size();
-  
-  cout<<"usb_serial_out 5\n";
-  
-  cout<<"2 centre_p = "<<centre_p<<endl;
-  
-  cout<<"centre_p->communicate_by_keyboard_cable = "<<centre_p->communicate_by_keyboard_cable<<endl;
-  
-  if(centre_p->communicate_by_keyboard_cable==true)
-  {
-    //int filedesc = open("/dev/TTL232RG", O_WRONLY);
-    int filedesc = open("/dev/usb2serial", O_WRONLY);
-    //int filedesc = open("/dev/ttyUSB0", O_WRONLY);  //if udev rules are not applied//
-    //write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros) != size_string_macros;
-  
-    cout<<endl<<"serial string buffer length: "<<write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros)<<endl;
-  }
-  
-  cout<<"usb_serial_out 6\n";
-  
-  if(centre_p->communicate_by_tcp==true)
-  {
-    cout<<"centre_p->tcp_socket_p = "<<centre_p->tcp_socket_p<<endl;
-//    centre_p->tcp_write(combined_macro_functions);
-//    centre_p->tcp_socket_p->write("test2\n");
-//    cout<<"after write\n";
-  }
-  
-  
-  
-//--------------------------------------------------------------------------------------------------------------------------------------------//
-  //serial terminal write function with slight delay between commands//
-  /*int write_output = 0;         //TEST~~~
-  QString current_char_string;  //TEST~~~
-  
-  for(int xy = 0; xy< size_string_macros; ++xy)
-  {
-    if(combined_macro_functions.at(xy) == '\\')
-    {
-      QTime dieTime= QTime::currentTime().addMSecs(250);
-      while (QTime::currentTime() < dieTime)
-      {
-        QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
-      }
-      ++xy;
-      if(combined_macro_functions.at(xy) == 'Q')
-      {
-        QTime dieTime= QTime::currentTime().addMSecs(350);
-        while (QTime::currentTime() < dieTime)
-        {
-          QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
-        }
-      }
-      current_char_string = '\\' + combined_macro_functions.at(xy);
-      write_output = write(filedesc, current_char_string.toUtf8().constData(), 2);
-    }
-    else
-    {
-      current_char_string = combined_macro_functions.at(xy);
-      write_output = write(filedesc, current_char_string.toUtf8().constData(), 2);
-    }
-  }
-  cout<<current_char_string.toUtf8().constData();  //OMIT~~~
-  cout<<write_output<<endl; //TEST~~~*/
-//--------------------------------------------------------------------------------------------------------------------------------------------//
-}
-
-void macro_screen::usb_serial_out(QString lotcode_str, QString packcode_str, QString batch_count_str, QString substitution_str, QString dump_count_str)
-{
-  
-  /*
-  cout<<endl<<"QString Variant BATCHMODE"<<endl;                         //OMIT~~~//
-  cout<<"lotcode: "<<lotcode_str.toUtf8().constData();                   //OMIT~~~
-  cout<<endl<<"packcode: "<<packcode_str.toUtf8().constData();           //
-  cout<<endl<<"batch count: "<<batch_count_str.toUtf8().constData();     //
-  cout<<endl<<"substitution: "<<substitution_str.toUtf8().constData();   //
-  cout<<endl<<"dump count: "<<dump_count_str.toUtf8().constData();       //
-  cout<<endl<<endl;                                                      //
-  */
-//----------------------------------------------------------------------------------------//
-    
-  bool macro_status_bool;			      //temporary variable to transfer ifstream to tablewidget
-  int macro_numb_int;				        //
-  char macro_name_char[300];			  //
-  char macro_mask_char[300];			  //
-  char macro_function_char[300];		//
- 
-  QString macro_string;
-  QString combined_macro_functions;
-  QString count_string;
-  QString barcode_string;
-        
-  {
-    ifstream macros("macro_table");
-    for(int i=0; i<10; ++i)
-    {
-	    macros>>macro_status_bool;
-	    macros>>macro_numb_int;
-	    macros>>macro_name_char;
-	    macros>>macro_mask_char;
-	    macros>>macro_function_char;
-    
-	    if(macro_status_bool != 0)
-      {
-        QString macro_string;
-	      for(unsigned int j=0; j<strlen(macro_function_char); ++j)
-	      {
-		      if(macro_function_char[j] == '\\')
-		      {
-            if(macro_function_char[j+1] == 'C')
-	          {
-	            macro_string = macro_string + batch_count_str;
-	          }
-  	        else if(macro_function_char[j+1] == 'T')		  //Lot code
- 	          {
-	   		      macro_string = macro_string + lotcode_str;
-            }
-	          else if(macro_function_char[j+1] == 'P')		  //Pack code
-	          {
-			        macro_string = macro_string + packcode_str;
-	          }
-            else if(macro_function_char[j+1] == 'Q')		  //Dump count
-	          {
-			        macro_string = macro_string + dump_count_str;
-	          }
-            //else if(macro_function_char[j+1] == '1') {}		//Barcodes
-	          //else if(macro_function_char[j+1] == '2') {}
-	          //else if(macro_function_char[j+1] == '3') {}
-	          //else if(macro_function_char[j+1] == '4') {}
-	          else
-	          {
-			        macro_string = macro_string + macro_function_char[j] + macro_function_char[j+1];
-	          }
-	        }
-	      }
-        /*for(int j=0; j<strlen(macro_function_char); ++j)
-        {
-          macro_string.append(macro_function_char[j]);
-        }*/
-        combined_macro_functions = combined_macro_functions + macro_string;
-	    }
-	    if(macros.eof()) break;
-    }
-//    cout<<endl<<combined_macro_functions.toUtf8().constData()<<endl;  //OMIT~~~
-    macros.close();
-  }  
-//--------------------------------------------------------------OUTPUT TO SERIAL--------------------------------------------------------------//
-  //cout<<"Macros loaded"<<endl;  //OMIT~~~
-//  int size_string_macros = combined_macro_functions.size();
-  //int filedesc = open("/dev/TTL232RG", O_WRONLY);
-//  int filedesc = open("/dev/usb2serial", O_WRONLY);
-  //int filedesc = open("/dev/ttyUSB0", O_WRONLY);  //if udev rules are not applied//
-  //write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros) != size_string_macros;
-  //write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros);
-//  cout<<endl<<"serial string buffer length: "<<write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros)<<endl; //ORIGINAL~~~
-//--------------------------------------------------------------------------------------------------------------------------------------------//
-  //serial terminal write function with slight delay between commands//
-  /*int write_output = 0; //TEST~~~
-  QString current_char_string;
-  
-  for(int xy = 0; xy< size_string_macros; ++xy)
-  {
-    if(combined_macro_functions.at(xy) == '\\')
-    {
-      QTime dieTime= QTime::currentTime().addMSecs(250);
-      while (QTime::currentTime() < dieTime)
-      {
-        QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
-      }
-      ++xy;
-      if(combined_macro_functions.at(xy) == 'Q')
-      {
-        QTime dieTime= QTime::currentTime().addMSecs(350);
-        while (QTime::currentTime() < dieTime)
-        {
-          QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
-        }
-      }
-      current_char_string = '\\' + combined_macro_functions.at(xy);
-      write_output = write(filedesc, current_char_string.toUtf8().constData(), 2);
-    }
-    else
-    {
-      current_char_string = combined_macro_functions.at(xy);
-      write_output = write(filedesc, current_char_string.toUtf8().constData(), 2);
-    }
-  }
-  //cout<<current_char_string.toUtf8().constData();  //OMIT~~~
-  cout<<write_output<<endl; //TEST~~~*/
-//--------------------------------------------------------------------------------------------------------------------------------------------//
 }
 
 void macro_screen::initialize_macro_menu()

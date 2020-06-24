@@ -12,6 +12,8 @@
 //#include <QLabel>
 #include "message_box.hpp"
 #include <time.h>
+#include <fcntl.h>	//library used to use system call command "open()" used to check available serial
+#include <unistd.h>	//library to enable write() function
 
 #include "centre.hpp"
 #include "processor.hpp"
@@ -802,6 +804,225 @@ float centre::dust_streak_percentage()
   return processor_p->dust_streak_percentage();
 }
 
+
+
+
+
+
+
+
+//modified to handle barcodes as characters instead of integers// 11_02_2018~~~//
+void centre::communicate_out_totalize(QString bar_str_1, QString bar_str_2, QString bar_str_3, QString bar_str_4, QString totalize_count_str, QString weight_str)
+{
+  cout<<endl<<"USB2SERIAL QStringVariant"<<endl;                                        //OMIT~~~
+  cout<<"bar_1: "<<bar_str_1.toUtf8().constData();                                      //OMIT~~~
+  cout<<"\tbar_2: "<<bar_str_2.toUtf8().constData();                                    //
+  cout<<"\tbar_3: "<<bar_str_3.toUtf8().constData();                                    //
+  cout<<"\tbar_4: "<<bar_str_4.toUtf8().constData()<<endl;                              //
+  
+  bool macro_status_bool;			      //temporary variable to transfer ifstream to tablewidget
+  int macro_numb_int;				        //
+  char macro_name_char[30];			    //
+  char macro_mask_char[30];			    //
+  char macro_function_char[30];		  //
+ 
+  //QString combined_macro_functions;	//new char to combine all macros 
+  QString macro_string;
+  QString combined_macro_functions;
+  QString count_string;
+  QString barcode_string;
+        
+  {
+    ifstream macros("macro_table");
+    for(int i=0; i<10; ++i)		//searches all 10 macros available
+    {
+	    macros>>macro_status_bool;
+	    macros>>macro_numb_int;
+	    macros>>macro_name_char;
+	    macros>>macro_mask_char;
+	    macros>>macro_function_char;
+	    if(macro_status_bool != 0)
+      {
+        QString macro_string;
+	      for(unsigned int j=0; j<strlen(macro_function_char); ++j)
+	      {
+		      if(macro_function_char[j] == '\\')
+		      {
+            if(macro_function_char[j+1] == 'C')
+	          {
+	            macro_string = macro_string + totalize_count_str;
+	          }
+  	        else if(macro_function_char[j+1] == '1')		//Barcodes
+	          {
+              macro_string = macro_string + bar_str_1;
+              cout<<"bar_1: "<<bar_str_1.toUtf8().constData()<<endl;  //OMIT~~~
+  	        }
+	          else if(macro_function_char[j+1] == '2')
+	          {
+              macro_string = macro_string + bar_str_2;
+              cout<<"bar_2: "<<bar_str_2.toUtf8().constData()<<endl;  //OMIT~~~
+	          }
+	          else if(macro_function_char[j+1] == '3')
+	          {
+              macro_string = macro_string + bar_str_3;
+              cout<<"bar_3: "<<bar_str_3.toUtf8().constData()<<endl;  //OMIT~~~
+	          }
+	          else if(macro_function_char[j+1] == '4')
+	          {
+              macro_string = macro_string + bar_str_4;
+              cout<<"bar_4: "<<bar_str_4.toUtf8().constData()<<endl;  //OMIT~~~
+	          }
+	          else if(macro_function_char[j+1] == 'n')
+	          {
+              macro_string = macro_string + QString("\r\n");
+              cout<<"newline"<<endl;  //OMIT~~~
+	          }
+	          else if(macro_function_char[j+1] == 't')
+	          {
+              macro_string = macro_string + QString("\t");
+              cout<<"tab"<<endl;  //OMIT~~~
+	          }
+	          else
+	          {
+			        macro_string = macro_string + macro_function_char[j] + macro_function_char[j+1];
+	          }
+	        }
+	      }
+        combined_macro_functions = combined_macro_functions + macro_string;
+	    }
+	    if(macros.eof()) break;
+    }
+    cout<<endl<<combined_macro_functions.toUtf8().constData()<<endl;  //OMIT~~~
+    macros.close();
+  }
+//--------------------------------------------------------------OUTPUT TO SERIAL--------------------------------------------------------------//
+  int size_string_macros = combined_macro_functions.size();
+  if(communicate_by_keyboard_cable==true)
+  {
+    //int filedesc = open("/dev/TTL232RG", O_WRONLY);
+    int filedesc = open("/dev/usb2serial", O_WRONLY);
+    //int filedesc = open("/dev/ttyUSB0", O_WRONLY);  //if udev rules are not applied//
+    //write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros) != size_string_macros;
+  
+    cout<<endl<<"serial string buffer length: "<<write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros)<<endl;
+  }
+  if(communicate_by_tcp==true)
+  {
+    tcp_write(combined_macro_functions);
+  }
+}
+
+void centre::communicate_out_batch(QString lotcode_str, QString packcode_str, QString batch_count_str, QString substitution_str, QString dump_count_str)
+{
+    
+  bool macro_status_bool;			      //temporary variable to transfer ifstream to tablewidget
+  int macro_numb_int;				        //
+  char macro_name_char[300];			  //
+  char macro_mask_char[300];			  //
+  char macro_function_char[300];		//
+ 
+  QString macro_string;
+  QString combined_macro_functions;
+  QString count_string;
+  QString barcode_string;
+        
+  {
+    ifstream macros("macro_table");
+    for(int i=0; i<10; ++i)
+    {
+	    macros>>macro_status_bool;
+	    macros>>macro_numb_int;
+	    macros>>macro_name_char;
+	    macros>>macro_mask_char;
+	    macros>>macro_function_char;
+    
+	    if(macro_status_bool != 0)
+      {
+        QString macro_string;
+	      for(unsigned int j=0; j<strlen(macro_function_char); ++j)
+	      {
+		      if(macro_function_char[j] == '\\')
+		      {
+            if(macro_function_char[j+1] == 'C')
+	          {
+	            macro_string = macro_string + batch_count_str;
+	          }
+  	        else if(macro_function_char[j+1] == 'T')		  //Lot code
+ 	          {
+	   		      macro_string = macro_string + lotcode_str;
+            }
+	          else if(macro_function_char[j+1] == 'P')		  //Pack code
+	          {
+			        macro_string = macro_string + packcode_str;
+	          }
+            else if(macro_function_char[j+1] == 'Q')		  //Dump count
+	          {
+			        macro_string = macro_string + dump_count_str;
+	          }
+	          else
+	          {
+			        macro_string = macro_string + macro_function_char[j] + macro_function_char[j+1];
+	          }
+	        }
+	      }
+        combined_macro_functions = combined_macro_functions + macro_string;
+	    }
+	    if(macros.eof()) break;
+    }
+    macros.close();
+  }  
+//--------------------------------------------------------------OUTPUT TO SERIAL--------------------------------------------------------------//
+  //cout<<"Macros loaded"<<endl;  //OMIT~~~
+//  int size_string_macros = combined_macro_functions.size();
+  //int filedesc = open("/dev/TTL232RG", O_WRONLY);
+//  int filedesc = open("/dev/usb2serial", O_WRONLY);
+  //int filedesc = open("/dev/ttyUSB0", O_WRONLY);  //if udev rules are not applied//
+  //write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros) != size_string_macros;
+  //write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros);
+//  cout<<endl<<"serial string buffer length: "<<write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros)<<endl; //ORIGINAL~~~
+//--------------------------------------------------------------------------------------------------------------------------------------------//
+  //serial terminal write function with slight delay between commands//
+  /*int write_output = 0; //TEST~~~
+  QString current_char_string;
+  
+  for(int xy = 0; xy< size_string_macros; ++xy)
+  {
+    if(combined_macro_functions.at(xy) == '\\')
+    {
+      QTime dieTime= QTime::currentTime().addMSecs(250);
+      while (QTime::currentTime() < dieTime)
+      {
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+      }
+      ++xy;
+      if(combined_macro_functions.at(xy) == 'Q')
+      {
+        QTime dieTime= QTime::currentTime().addMSecs(350);
+        while (QTime::currentTime() < dieTime)
+        {
+          QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+        }
+      }
+      current_char_string = '\\' + combined_macro_functions.at(xy);
+      write_output = write(filedesc, current_char_string.toUtf8().constData(), 2);
+    }
+    else
+    {
+      current_char_string = combined_macro_functions.at(xy);
+      write_output = write(filedesc, current_char_string.toUtf8().constData(), 2);
+    }
+  }
+  //cout<<current_char_string.toUtf8().constData();  //OMIT~~~
+  cout<<write_output<<endl; //TEST~~~*/
+//--------------------------------------------------------------------------------------------------------------------------------------------//
+}
+
+
+
+
+
+
+
 screen::screen(centre* set_centre_p)
  :QWidget()
 {
@@ -1228,6 +1449,12 @@ QString centre::choose_tcp_network(int choice)//choice 1 -> 192.168.100.1.  choi
 
 void centre::tcp_write(QString string)
 {
+  QByteArray array = string.toLatin1();
+  cout<<"start tcp_write\n";
+  for(int i=0; i<array.size(); ++i)
+  {
+    cout<<"array ["<<i<<"] = "<<int(array[i])<<endl;
+  }
   tcp_socket_p->write(string.toLatin1());
 }
 
