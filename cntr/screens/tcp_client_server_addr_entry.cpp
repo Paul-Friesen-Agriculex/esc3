@@ -49,7 +49,7 @@ tcp_client_server_addr_entry::tcp_client_server_addr_entry(centre*set_centre_p)
   addr4_p->setPrefix(".");
   
   addr1_p->setValue(192);
-  addr1_p->setValue(168);
+  addr2_p->setValue(168);
   
   setLayout(main_layout_p);
   
@@ -57,7 +57,7 @@ tcp_client_server_addr_entry::tcp_client_server_addr_entry(centre*set_centre_p)
   connect(connect_button_p, SIGNAL(clicked()), this, SLOT(connect_button_clicked()));
   connect(help_button_p, SIGNAL(clicked()), this, SLOT(help_button_clicked()));
   connect(ok_button_p, SIGNAL(clicked()), this, SLOT(ok_button_clicked()));
-//  connect(centre_p->tcp_socket_p, SIGNAL(connected()), this, SLOT(connection_detected()));
+  connect(centre_p, SIGNAL(tcp_connection_detected_signal()), this, SLOT(connection_detected()));
   
   message_p->setText("Enter the IP address of the host and touch \"connect\".");
 }

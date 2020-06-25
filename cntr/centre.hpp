@@ -57,6 +57,7 @@ class centre : public QObject
   void restart_calibration_signal();
   void save_image_signal(QString filename);	
   void load_image_signal(QString filename);	
+  void tcp_connection_detected_signal();
 
   private: 
   bool init_ran;

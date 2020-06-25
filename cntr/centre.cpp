@@ -337,7 +337,11 @@ void centre::get_cycle_time(int value)//value is msec.
 
 void centre::tcp_connection_detected()
 {
+  
+  cout<<"centre::tcp_connection_detected()\n";
+  
   tcp_socket_p = tcp_server_p->nextPendingConnection();
+  emit tcp_connection_detected_signal();
 }
 
 void centre::run()
