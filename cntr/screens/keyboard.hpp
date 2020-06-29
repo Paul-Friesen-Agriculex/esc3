@@ -29,7 +29,7 @@ class keyboard : public screen
   Q_OBJECT
   
   public:
-  keyboard(centre*set_centre_p);
+  keyboard(centre*set_centre_p, QString* out_string_s = 0);
   
   private slots:
   void back_clicked();
@@ -77,6 +77,7 @@ class keyboard : public screen
   
   signals:
   void external_keyboard_enter();
+  void finished(int r);
   
   protected:
 //  QLabel* message_p;
@@ -85,6 +86,9 @@ class keyboard : public screen
   QLineEdit* entry_line_display_p;
   button* back_button_p;
   QPushButton* enter_key_p;
+  QString* out_string_p;
+  
+  
   
   virtual void keyPressEvent(QKeyEvent* event) Q_DECL_OVERRIDE;
   

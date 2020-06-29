@@ -53,7 +53,7 @@
 #include "position_envelope_field.hpp"
 #include "select_field_data_source.hpp"
 #include "macro_screen.hpp"	//TEST~~~
-#include "tcp_mode_choice.hpp"
+#include "communications_menu.hpp"
 #include "tcp_server_addr_choice.hpp"
 #include "tcp_client_server_addr_entry.hpp"
 //#include "table.hpp"        //TEST~~~ //access barcodes and count from table
@@ -228,7 +228,7 @@ void centre::init()
   block_endgate_opening = false;//true prevents endgate from opening.  Used if barcode test fails in batch.
   communicate_by_keyboard_cable = true;
   communicate_by_tcp = false;
-  tcp_server = true;
+//  tcp_server = true;
   network = 0;//0-> not set.  1->use 192.168.100.1.  2->use 192.168.200.1.
   QString tcp_client_server_addr = "";
   tcp_server_p = new QTcpServer;
@@ -246,6 +246,7 @@ void centre::init()
   connect(cutgate_p, SIGNAL(closed_while_opening()), batch_mode_driver_p, SLOT(cutgate_timing_error()));
   connect(cutgate_p, SIGNAL(opened_while_closing()), batch_mode_driver_p, SLOT(cutgate_timing_error()));
   connect(tcp_server_p, SIGNAL(newConnection()), this, SLOT(tcp_connection_detected())); 
+  connect(tcp_socket_p, SIGNAL(connected()), this, SIGNAL(tcp_connection_detected_signal())); 
 //  connect(batch_mode_driver_p->count_rate_predictor_p, SIGNAL(send_message(QString)), diagnostics_console_p, SLOT(receive_message3(QString)));
   
   tm_macro_updated = 0; 
@@ -530,14 +531,15 @@ void centre::run()
       case 37: screen_p=new enter_field_text(this, batch_mode_driver_p); break;
 //      case : screen_p=new (this); break;
 //      case : screen_p=new (this); break;
-      case 40: screen_p=new tcp_mode_choice(this); break;
+      case 40: screen_p=new communications_menu(this); break;
       case 41: screen_p=new tcp_server_addr_choice(this); 
-               cout<<"before connect\n";
-               connect(tcp_server_p, SIGNAL(newConnection()), screen_p, SLOT(connection_detected())); 
-               cout<<"after connect\n";
+//               cout<<"before connect\n";
+//               connect(tcp_server_p, SIGNAL(newConnection()), screen_p, SLOT(connection_detected())); 
+//               cout<<"after connect\n";
                break;
       case 42: screen_p=new tcp_client_server_addr_entry(this);
-               connect(tcp_socket_p, SIGNAL(connected()), screen_p, SLOT(connection_detected())); break;
+//               connect(tcp_socket_p, SIGNAL(connected()), screen_p, SLOT(connection_detected())); 
+               break;
 //      case : screen_p=new (this); break;
 //      case : screen_p=new (this); break;
 //      case : screen_p=new (this); break;

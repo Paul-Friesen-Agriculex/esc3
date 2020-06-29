@@ -163,7 +163,7 @@ class centre : public QObject
   QString combined_macro_functions;	//new char to combine all macros
   bool communicate_by_keyboard_cable;
   bool communicate_by_tcp;
-  bool tcp_server;
+//  bool tcp_server;
   int network;
   QString tcp_client_server_addr;
   QTcpServer* tcp_server_p;

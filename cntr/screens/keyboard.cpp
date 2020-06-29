@@ -22,9 +22,11 @@ kb_key::kb_key(const QString & text, QWidget* parent)
   setMaximumSize(65,50);  //
 }
   
-keyboard::keyboard(centre* set_centre_p)
+keyboard::keyboard(centre* set_centre_p, QString* out_string_p_s)
 :screen(set_centre_p)
 {
+  out_string_p = out_string_p_s;
+  
 //  message_p=new QLabel;
   message_p=new QTextEdit;
   message_p->setMaximumSize(500,40);
@@ -174,6 +176,7 @@ keyboard::keyboard(centre* set_centre_p)
   connect(M_key_p, SIGNAL(clicked()), this, SLOT(M_clicked()));
   
   connect(this, SIGNAL(external_keyboard_enter()), enter_key_p, SIGNAL(clicked()));
+//  connect(this, SIGNAL(finished()), this
   
   entry_line_display_p -> setStyleSheet( "font-size: 15pt;");
       
@@ -379,6 +382,12 @@ void keyboard::M_clicked()
 
 void keyboard::enter_clicked()
 {
+  if(out_string_p!=0)
+  {
+    out_string_p->append(*entry_line_p);
+  }
+  emit finished(0);
+//  deleteLater();
 }
 
 void keyboard::keyPressEvent(QKeyEvent* event)

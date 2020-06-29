@@ -89,6 +89,9 @@ void tcp_client_server_addr_entry::help_button_clicked()
 void tcp_client_server_addr_entry::connection_detected()
 {
   message_p->setText("Connection established");
+  centre_p->communicate_by_keyboard_cable = false;
+  centre_p->communicate_by_tcp = true;
+  
 }
 
 

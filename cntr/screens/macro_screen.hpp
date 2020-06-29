@@ -22,6 +22,7 @@ class QLabel;
 class QRadioButton;
 class QSpinBox;
 class help_screen;
+//class keyboard;
 
 class macro_screen : public screen
 {
@@ -47,10 +48,11 @@ class macro_screen : public screen
   void load_macro_table();
   void store_macro_table();
   void dialogbox_buttons(int n);
+  /*
   void check_serial_connection();		  //TEST~~~
   void communications_choice_toggled(bool);
   void tcp_setup_button_clicked();
-
+  */
   private:
   button* back_button_p;
   button* ok_button_p;
@@ -58,13 +60,13 @@ class macro_screen : public screen
   button* disable_all_button_p;
   button* enable_all_button_p;
   help_screen* help_screen_p;
-  
+  /*
   QGroupBox* communications_choice_box_p;
   QGridLayout* communications_choice_box_layout_p;
   QRadioButton* communicate_by_keyboard_cable_button_p;
   QRadioButton* communicate_by_tcp_button_p;
   button* tcp_setup_button_p;
-  
+  */
   QLabel* instruction_label_p;
   QLineEdit *lineEdit;
   bool serialusb_connected;
@@ -80,6 +82,7 @@ class macro_screen : public screen
   QLabel* tableWidget_label_p;
   QLabel* screen_title_label_p;
   QLabel* description_p;
+//  keyboard* keyboard_p;
   QMessageBox msgBox;
   QString macro_function_string;
 

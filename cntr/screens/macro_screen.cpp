@@ -9,6 +9,7 @@
 #include "macro_screen.hpp"
 #include "button.hpp"
 #include "help_screen.hpp"
+#include "keyboard_dialog.hpp"
 
 #include <QHeaderView>
 #include <fstream>
@@ -47,7 +48,7 @@ macro_screen::macro_screen(centre*set_centre_p)
   help_button_p = new button("Help");
   disable_all_button_p = new button("Disable All");
   enable_all_button_p = new button("Enable All");
-  
+  /*
   communications_choice_box_p = new QGroupBox;
   communicate_by_keyboard_cable_button_p = new QRadioButton("Communicate By Keyboard Cable");
   communicate_by_keyboard_cable_button_p -> setChecked(centre_p->communicate_by_keyboard_cable);
@@ -59,7 +60,7 @@ macro_screen::macro_screen(centre*set_centre_p)
   communications_choice_box_layout_p -> addWidget(communicate_by_tcp_button_p, 1, 0);
   communications_choice_box_layout_p -> addWidget(tcp_setup_button_p, 1, 1);
   communications_choice_box_p -> setLayout(communications_choice_box_layout_p);
-  
+  */
   tableWidget_p = new QTableWidget(this);
   tableWidget_p->setRowCount(macro_rows);
   tableWidget_p->setColumnCount(macro_cols);
@@ -76,7 +77,7 @@ macro_screen::macro_screen(centre*set_centre_p)
   
   main_layout_p = new QGridLayout;
   main_layout_p->addWidget(screen_title_label_p, 0, 0);
-  main_layout_p->addWidget(communications_choice_box_p, 1, 0, 1, 4);
+//  main_layout_p->addWidget(communications_choice_box_p, 1, 0, 1, 4);
   main_layout_p->addWidget(description_p, 2, 0, 1, 4);
   main_layout_p->addWidget(back_button_p, 0, 3);
   main_layout_p->addWidget(help_button_p, 5, 2);
@@ -93,7 +94,7 @@ macro_screen::macro_screen(centre*set_centre_p)
   connect(enable_all_button_p, SIGNAL(clicked()), this, SLOT(enable_all_clicked()));
   connect(tableWidget_p, SIGNAL(cellClicked(int, int)), this, SLOT(cellSelected(int, int)));
   
-  connect(communicate_by_keyboard_cable_button_p, SIGNAL(toggled(bool)), this, SLOT(communications_choice_toggled(bool)));
+//  connect(communicate_by_keyboard_cable_button_p, SIGNAL(toggled(bool)), this, SLOT(communications_choice_toggled(bool)));
 //  connect(communicate_by_tcp_button_p, SIGNAL(toggled()), this, SLOT(communications_choice_toggled()));
 
   screen_title_label_p->setText("Communications Menu");
@@ -105,13 +106,13 @@ them as keyboard input.");
   initialize_macro_menu();
 
   load_macro_table();  
-  check_serial_connection();	//checks connection with serial communication line//
+//  check_serial_connection();	//checks connection with serial communication line//
   
   //tableWidget_p->setDisabled(true);  
   tableWidget_p->setStyleSheet("QTableWidget { font: 15pt;}");
   tableWidget_p->verticalHeader()->setDefaultSectionSize(45);
   
-  connect(tcp_setup_button_p, SIGNAL(clicked()), this, SLOT(tcp_setup_button_clicked()));
+//  connect(tcp_setup_button_p, SIGNAL(clicked()), this, SLOT(tcp_setup_button_clicked()));
   
   help_screen_p = 0;
 }
@@ -120,7 +121,7 @@ macro_screen::~macro_screen()
 {
 //  if(help_screen_p!=0) delete help_screen_p;
 }
-
+/*
 void macro_screen::check_serial_connection()
 {
   int filedesc = open("/dev/usb2serial", O_WRONLY);
@@ -170,7 +171,7 @@ void macro_screen::tcp_setup_button_clicked()
   centre_p->add_waiting_screen(40);//tcp_mode_choice
   centre_p->screen_done=true;
 }
-
+*/
 void macro_screen::back_button_clicked()
 {
   centre_p->add_waiting_screen(centre_p->get_previous_screen());
@@ -179,7 +180,7 @@ void macro_screen::back_button_clicked()
 
 void macro_screen::ok_button_clicked()
 {
-  centre_p->screen_done = true;
+  centre_p->screen_done = true;//go to waiting screen
   cout<<"ok clicked\n";
 }
 
@@ -599,6 +600,7 @@ barcode 1 and the count in a spreadsheet on the computer.  Touch the buttons to 
     }
 		
     QPushButton *totalize_count_button = new QPushButton(tr("Count"), this);
+    QPushButton *text_entry_button = new QPushButton(tr("Enter text"), this);
 //    QPushButton *batch_count_button = new QPushButton(tr("Count"), this);
 //    QPushButton *seed_button = new QPushButton(tr("Seed name"), this);
     QPushButton *barcode_button1 = new QPushButton(tr("Barcode 1"), this);
@@ -621,6 +623,7 @@ barcode 1 and the count in a spreadsheet on the computer.  Touch the buttons to 
     QPushButton *remove_last = new QPushButton(tr("Remove Last"), this);
 
     totalize_count_button->setFixedSize(macro_button_width,macro_button_height);
+    text_entry_button->setFixedSize(macro_button_width,macro_button_height);
 //    batch_count_button->setFixedSize(macro_button_width,macro_button_height);
 //    seed_button->setFixedSize(macro_button_width,macro_button_height);
     barcode_button1->setFixedSize(macro_button_width,macro_button_height);
@@ -659,6 +662,7 @@ barcode 1 and the count in a spreadsheet on the computer.  Touch the buttons to 
 	
     barcodes->addWidget(totalize_box_label);
     barcodes_left->addWidget(totalize_count_button);
+    barcodes_left->addWidget(text_entry_button);
 //    barcodes_left->addWidget(weight_button);		//yet to be implemented
     barcodes_right->addWidget(barcode_button1);
     barcodes_right->addWidget(barcode_button2);
@@ -750,6 +754,7 @@ barcode 1 and the count in a spreadsheet on the computer.  Touch the buttons to 
     form.addRow(macro_menu_main_horizontal);
 //==================================================================================================================//
     connect(totalize_count_button, SIGNAL(clicked()), signalMapper, SLOT(map()));	//totalize mode variables
+    connect(text_entry_button, SIGNAL(clicked()), signalMapper, SLOT(map()));
 //    connect(seed_button, SIGNAL(clicked()), signalMapper, SLOT(map()));
     connect(barcode_button1, SIGNAL(clicked()), signalMapper, SLOT(map()));
     connect(barcode_button2, SIGNAL(clicked()), signalMapper, SLOT(map()));
@@ -773,6 +778,7 @@ barcode 1 and the count in a spreadsheet on the computer.  Touch the buttons to 
     connect(remove_last, SIGNAL(clicked()), signalMapper, SLOT(map()));
     
     signalMapper -> setMapping (totalize_count_button, 1);		//totalize mode variables
+    signalMapper -> setMapping (text_entry_button, 20);		//totalize mode variables
 //    signalMapper -> setMapping (seed_button, 2);
     signalMapper -> setMapping (barcode_button1, 3);
     signalMapper -> setMapping (barcode_button2, 4);
@@ -1036,7 +1042,17 @@ void macro_screen::dialogbox_buttons(int n)
       
       break;
     }
-    
+    case 20:
+    {
+      QString string;
+      keyboard_dialog kbd(this, centre_p, &string);
+      kbd.raise();
+      kbd.exec();
+      lineEdit->setText(macro_creation_string + string);
+		  macro_function_string.append("\\");
+		  macro_function_string.append(string);
+      break;
+    }  
 	  default:
 	  {
       //cout<<"default"<<endl;	//omit~~~
