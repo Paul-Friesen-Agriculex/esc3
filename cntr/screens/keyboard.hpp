@@ -29,7 +29,7 @@ class keyboard : public screen
   Q_OBJECT
   
   public:
-  keyboard(centre*set_centre_p, QString* out_string_s = 0);
+  keyboard(centre*set_centre_p);
   
   private slots:
   void back_clicked();

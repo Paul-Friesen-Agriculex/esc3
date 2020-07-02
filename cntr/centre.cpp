@@ -95,7 +95,7 @@ centre::centre():
 
   run_timer_p = new QTimer;
   connect(run_timer_p, SIGNAL(timeout()), this, SLOT(run()));
-  run_timer_p->start(10);
+  run_timer_p->start(1000);
 }
 
 void centre::init()
@@ -251,6 +251,8 @@ void centre::init()
   
   tm_macro_updated = 0; 
   count=0;
+  new_keyboard_entry=false;
+  for(int i=0; i<10; ++i) control_int[i] = 0;
   
 //  delete startup_progress_label_p;
 //  startup_progress_label_p = 0;
@@ -348,7 +350,7 @@ void centre::tcp_connection_detected()
 void centre::run()
 {
   
-//  cout<<"centre::run\n";
+  cout<<"centre::run.  new_keyboard_entry = "<<new_keyboard_entry<<"\n";
   
   if(init_ran == false)
   {
@@ -452,6 +454,9 @@ void centre::run()
     
 //    cout<<"screen_done was true\n";
     
+      
+    cout<<"start screen_done.  new_keyboard_entry = "<<new_keyboard_entry<<endl;
+      
     screen_done=false;
     if(previous_screen_going_back == false)//add the current screen to previous_screen_list
     {
@@ -545,12 +550,14 @@ void centre::run()
 //      case : screen_p=new (this); break;
 //      case : screen_p=new (this); break;
 //      case : screen_p=new (this); break;
-//      case : screen_p=new (this); break;
+      case 100 : screen_p=new keyboard(this); break;
       default: screen_p=new start_screen(this);
                cout<<"default screen_p case\n";
     }
     screen_p->show();
+//    cout<<"centre::run 1\n";
     delete old_screen_p;
+//    cout<<"centre::run 2\n";
     old_screen_p = 0;
   }
 }
@@ -850,8 +857,26 @@ void centre::communicate_out_totalize(QString bar_str_1, QString bar_str_2, QStr
 	    if(macro_status_bool != 0)
       {
         QString macro_string;
-	      for(unsigned int j=0; j<strlen(macro_function_char); ++j)
+        bool sending_string = false;//true indicates that we are sending out a string of characters
+	      for(unsigned int j=0; j<strlen(macro_function_char)-1; ++j)
 	      {
+            
+          cout<<"j = "<<j<<"   sending_string = "<<sending_string<<"    macro_function_char[j] = "<<macro_function_char[j]<<endl;
+            
+          if(sending_string)
+          {
+            
+            cout<<"sending string.  j = "<<j<<endl;
+            
+            if(macro_function_char[j+1] == '"') 
+            {
+              sending_string = false;
+            }
+            else
+            {
+              macro_string += macro_function_char[j+1];
+            }
+          }
 		      if(macro_function_char[j] == '\\')
 		      {
             if(macro_function_char[j+1] == 'C')
@@ -887,6 +912,11 @@ void centre::communicate_out_totalize(QString bar_str_1, QString bar_str_2, QStr
 	          {
               macro_string = macro_string + QString("\t");
               cout<<"tab"<<endl;  //OMIT~~~
+	          }
+	          else if(macro_function_char[j+1] == '"')
+	          {
+              sending_string = true;
+              cout<<"sending_string set true.  j = "<<j<<"\n";
 	          }
 	          else
 	          {

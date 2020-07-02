@@ -185,6 +185,12 @@ class centre : public QObject
   macro_screen* macro_screen_p; //TEST~~~ 11_13_2018//
   void communicate_out_totalize(QString bar_str_1, QString bar_str_2, QString bar_str_3, QString bar_str_4, QString totalize_count_str, QString weight_str);
   void communicate_out_batch(QString lotcode_str, QString packcode_str, QString batch_count_str, QString substitution_str, QString dump_count_str);
+  
+  //general keyboard entry
+  bool new_keyboard_entry;//true indicates that a keyboard screen has just run.  Use to signal the screen needing keyboard data that it asked for it.
+  QString keyboard_message_string;
+  QString keyboard_return_string;
+  int control_int[10];//use to set conditions on return to asking screen
 };
 
 class screen : public QWidget

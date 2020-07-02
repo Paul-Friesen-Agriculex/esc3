@@ -22,10 +22,16 @@ kb_key::kb_key(const QString & text, QWidget* parent)
   setMaximumSize(65,50);  //
 }
   
-keyboard::keyboard(centre* set_centre_p, QString* out_string_p_s)
+keyboard::keyboard(centre* set_centre_p)
 :screen(set_centre_p)
 {
-  out_string_p = out_string_p_s;
+      
+  cout<<"start keyboard constructor.  new_keyboard_entry = "<<centre_p->new_keyboard_entry<<endl;
+      
+  
+//  cout<<"keyboard::keyboard 1\n";
+
+//  out_string_p = out_string_p_s;
   
 //  message_p=new QLabel;
   message_p=new QTextEdit;
@@ -174,13 +180,28 @@ keyboard::keyboard(centre* set_centre_p, QString* out_string_p_s)
   connect(B_key_p, SIGNAL(clicked()), this, SLOT(B_clicked()));
   connect(N_key_p, SIGNAL(clicked()), this, SLOT(N_clicked()));
   connect(M_key_p, SIGNAL(clicked()), this, SLOT(M_clicked()));
+  connect(enter_key_p, SIGNAL(clicked()), this, SLOT(enter_clicked()));
   
   connect(this, SIGNAL(external_keyboard_enter()), enter_key_p, SIGNAL(clicked()));
 //  connect(this, SIGNAL(finished()), this
   
+//  cout<<"keyboard::keyboard 2\n";
+  if(centre_p->new_keyboard_entry)//this is a general keyboard entry screen
+  {
+    message_p->setText(centre_p->keyboard_message_string);
+  }
+
+//  cout<<"keyboard::keyboard 3\n";
+  
   entry_line_display_p -> setStyleSheet( "font-size: 15pt;");
       
   setFocus();
+
+//  cout<<"keyboard::keyboard 4\n";
+      
+  cout<<"end keyboard constructor.  new_keyboard_entry = "<<centre_p->new_keyboard_entry<<endl;
+      
+  
 }
 
 void keyboard::back_clicked()
@@ -382,12 +403,12 @@ void keyboard::M_clicked()
 
 void keyboard::enter_clicked()
 {
-  if(out_string_p!=0)
-  {
-    out_string_p->append(*entry_line_p);
-  }
-  emit finished(0);
-//  deleteLater();
+      
+  cout<<"start keyboard::enter_clicked.  new_keyboard_entry = "<<centre_p->new_keyboard_entry<<endl;
+      
+  centre_p->keyboard_return_string.clear();
+  centre_p->keyboard_return_string.append(*entry_line_p);
+  centre_p->screen_done = true;//go to waiting screen
 }
 
 void keyboard::keyPressEvent(QKeyEvent* event)

@@ -114,6 +114,10 @@ class macro_screen : public screen
   
   protected:
   QString* macro_name_string;  //TEST~~~ 11_13_2018//
+  
+  signals:
+  void close_dialog(int r);
+  void return_with_keyboard_entry(int, int);
 };
 
 #endif

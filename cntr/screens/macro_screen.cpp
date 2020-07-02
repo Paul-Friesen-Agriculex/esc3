@@ -9,7 +9,7 @@
 #include "macro_screen.hpp"
 #include "button.hpp"
 #include "help_screen.hpp"
-#include "keyboard_dialog.hpp"
+//#include "keyboard_dialog.hpp"
 
 #include <QHeaderView>
 #include <fstream>
@@ -37,8 +37,11 @@ macro_screen::macro_screen(centre*set_centre_p)
 	:screen(set_centre_p)
 {
   centre_p=set_centre_p;
+      
+  cout<<"start maco_screen constructor.  new_keyboard_entry = "<<centre_p->new_keyboard_entry<<endl;
+      
   
-  cout<<"1 centre_p = "<<centre_p<<endl;
+//  cout<<"1 centre_p = "<<centre_p<<endl;
   
   screen_title_label_p = new QLabel;
   description_p = new QLabel;
@@ -93,6 +96,7 @@ macro_screen::macro_screen(centre*set_centre_p)
   connect(disable_all_button_p, SIGNAL(clicked()), this, SLOT(disable_all_clicked()));
   connect(enable_all_button_p, SIGNAL(clicked()), this, SLOT(enable_all_clicked()));
   connect(tableWidget_p, SIGNAL(cellClicked(int, int)), this, SLOT(cellSelected(int, int)));
+  connect(this, SIGNAL(return_with_keyboard_entry(int, int)), this, SLOT(cellSelected(int, int)));
   
 //  connect(communicate_by_keyboard_cable_button_p, SIGNAL(toggled(bool)), this, SLOT(communications_choice_toggled(bool)));
 //  connect(communicate_by_tcp_button_p, SIGNAL(toggled()), this, SLOT(communications_choice_toggled()));
@@ -115,6 +119,22 @@ them as keyboard input.");
 //  connect(tcp_setup_button_p, SIGNAL(clicked()), this, SLOT(tcp_setup_button_clicked()));
   
   help_screen_p = 0;
+  current_row = 0;
+  current_column = 0;
+  
+  
+  
+  
+  if(centre_p->new_keyboard_entry == true) //returning after entering a line of text for the macro builder using a keyboard screen
+  {        
+    cout<<"centre_p->new_keyboard_entry == true\n";
+    
+//    cellSelected(centre_p->control_int[0], centre_p->control_int[1]); //control_int entries were used to save row and column numbers for return
+    emit return_with_keyboard_entry(centre_p->control_int[0], centre_p->control_int[1]); //control_int entries were used to save row and column numbers for return
+    centre_p->new_keyboard_entry = false;
+    centre_p->keyboard_message_string = "";
+    centre_p->keyboard_return_string = "";
+  }
 }
 
 macro_screen::~macro_screen()
@@ -508,7 +528,10 @@ void macro_screen::store_macro_table()
 
 void macro_screen::cellSelected(int nRow, int nCol)	
 {
-  cout<<endl<<"Row: "<<nRow<<"	Column: "<<nCol;	//OMIT~~~//
+  current_row = nRow;
+  current_column = nCol;
+  
+//  cout<<endl<<"Row: "<<nRow<<"	Column: "<<nCol<<endl;	//OMIT~~~//
   if(nCol == 0)
   {
     for(int i=0; i<macro_rows; ++i)//clear selection in all rows, then set selected row.  At most 1 row selected.
@@ -572,6 +595,8 @@ void macro_screen::cellSelected(int nRow, int nCol)
 //    dialog.setGeometry(0, 0, 800, 360);   //defines starting position and dimensions//
 //    dialog.setMaximumSize(800, 480);      //defines size macro builder pop-up window//
     dialog.setGeometry(0, 0, 800, 450);   //defines starting position and dimensions//
+    
+    connect(this, SIGNAL(close_dialog(int)), &dialog, SLOT(done(int)));
     
     QFormLayout form(&dialog);
     dialog.setWindowTitle("USB Communications Macro Builder");
@@ -812,6 +837,18 @@ barcode 1 and the count in a spreadsheet on the computer.  Touch the buttons to 
     buttonBox.button(QDialogButtonBox::Save)->setFixedSize(macro_button_width-20, macro_button_height);
     buttonBox.button(QDialogButtonBox::Cancel)->setFixedSize(macro_button_width-20, macro_button_height);
     
+    if(centre_p->new_keyboard_entry)
+    {          
+      QString string = "\"";
+      string += centre_p->keyboard_return_string;
+      string += "\"";
+      cout<<"\nadding string to lineEdit.  string = "<<string.toStdString()<<" end\n";
+      lineEdit->setText(lineEdit->text() + "," + string);
+      macro_function_string.append("\\");
+      macro_function_string.append(string);
+    }
+
+    
     //=============================================================//
     //Style sheet specific for macro builder screen//
       setStyleSheet(
@@ -1042,15 +1079,21 @@ void macro_screen::dialogbox_buttons(int n)
       
       break;
     }
-    case 20:
+    case 20://exit this screen for keyboard entry
     {
-      QString string;
-      keyboard_dialog kbd(this, centre_p, &string);
-      kbd.raise();
-      kbd.exec();
-      lineEdit->setText(macro_creation_string + string);
-		  macro_function_string.append("\\");
-		  macro_function_string.append(string);
+      cout<<"case 20\n";
+      
+      centre_p->new_keyboard_entry = true;//This will tell this screen's constructor that it is returning from keyboard entry
+      centre_p->keyboard_message_string = "Enter characters to add to the macro.";
+      centre_p->control_int[0] = current_row; //remember for return to this screen
+      centre_p->control_int[1] = current_column; //remember for return to this screen
+      centre_p->add_waiting_screen(28);//come back here to macro_screen
+      centre_p->add_waiting_screen(100);//keyboard
+      centre_p->screen_done = true;
+      emit close_dialog(0);
+      
+      cout<<"end of case 20.  new_keyboard_entry = "<<centre_p->new_keyboard_entry<<endl;
+      
       break;
     }  
 	  default:
