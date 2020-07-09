@@ -49,6 +49,8 @@ communications_menu::communications_menu(centre*set_centre_p)
   connect(help_button_p, SIGNAL(clicked()), this, SLOT(help_button_clicked()));
   connect(ok_button_p, SIGNAL(clicked()), this, SLOT(ok_button_clicked()));
   connect(centre_p, SIGNAL(tcp_connection_detected_signal()), this, SLOT(connection_detected()));
+  
+  ok_button_p->setEnabled(false);
 }
 
 void communications_menu::back_button_clicked()
@@ -64,6 +66,7 @@ void communications_menu::communicate_by_keyboard_cable_button_clicked()
     message_p->setText("Ready to communicate.");
     centre_p->communicate_by_keyboard_cable = true;
     centre_p->communicate_by_tcp = false;
+    ok_button_p->setEnabled(true);
   }
   else
   {
@@ -150,6 +153,8 @@ void communications_menu::connection_detected()
   }
   centre_p->communicate_by_keyboard_cable = false;
   centre_p->communicate_by_tcp = true;
+  centre_p->tcp_link_established = true;
+  ok_button_p->setEnabled(true);
   
 //  centre_p->tcp_write("test\n");
   
@@ -157,8 +162,8 @@ void communications_menu::connection_detected()
   
 void communications_menu::ok_button_clicked() 
 { 
-  centre_p->add_waiting_screen(28);//macro_screen
-  centre_p->screen_done = true;
+//  centre_p->add_waiting_screen(28);//macro_screen
+  centre_p->screen_done = true;//go to waiting screen
 }
 
 

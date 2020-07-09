@@ -52,7 +52,8 @@
 #include "select_envelope_field.hpp"
 #include "position_envelope_field.hpp"
 #include "select_field_data_source.hpp"
-#include "macro_screen.hpp"	//TEST~~~
+#include "macro_screen.hpp"	
+#include "macro_builder.hpp"
 #include "communications_menu.hpp"
 #include "tcp_server_addr_choice.hpp"
 #include "tcp_client_server_addr_entry.hpp"
@@ -95,7 +96,7 @@ centre::centre():
 
   run_timer_p = new QTimer;
   connect(run_timer_p, SIGNAL(timeout()), this, SLOT(run()));
-  run_timer_p->start(1000);
+  run_timer_p->start(10);
 }
 
 void centre::init()
@@ -228,6 +229,7 @@ void centre::init()
   block_endgate_opening = false;//true prevents endgate from opening.  Used if barcode test fails in batch.
   communicate_by_keyboard_cable = true;
   communicate_by_tcp = false;
+  tcp_link_established = false;
 //  tcp_server = true;
   network = 0;//0-> not set.  1->use 192.168.100.1.  2->use 192.168.200.1.
   QString tcp_client_server_addr = "";
@@ -253,6 +255,10 @@ void centre::init()
   count=0;
   new_keyboard_entry=false;
   for(int i=0; i<10; ++i) control_int[i] = 0;
+  
+  build_macro = false;//set true when leaving macro_screen for macro_builder.  signals that macro_builder will run.
+  macro_row = 0;// remember row for return to macro_screen.
+  
   
 //  delete startup_progress_label_p;
 //  startup_progress_label_p = 0;
@@ -304,6 +310,7 @@ centre::~centre()
   }
   f.close();
   save_settings("default");
+
 }
 
 void centre::increase_count(int to_add)
@@ -350,7 +357,7 @@ void centre::tcp_connection_detected()
 void centre::run()
 {
   
-  cout<<"centre::run.  new_keyboard_entry = "<<new_keyboard_entry<<"\n";
+  if(screen_done) cout<<"centre::run.  screen_done true.  new_keyboard_entry = "<<new_keyboard_entry<<"\n";
   
   if(init_ran == false)
   {
@@ -523,7 +530,7 @@ void centre::run()
 //      case : screen_p=new (this); break;
 //      case : screen_p=new (this); break;
 //      case : screen_p=new (this); break;
-      case 27: screen_p=new macro_name_entry(this);  break;    //TEST~~~ 11_13_2018//
+//      case 27: screen_p=new macro_name_entry(this);  break;    //TEST~~~ 11_13_2018//
       case 28: screen_p=new macro_screen(this); break;	    //TEST~~~ macro_menu
       case 29: screen_p=new batch_save_ss_setup(this, batch_mode_driver_p); break;
       case 30: screen_p=new ss_setup_delete(this, batch_mode_driver_p); break;
@@ -534,7 +541,7 @@ void centre::run()
       case 35: screen_p=new position_envelope_field(this, batch_mode_driver_p); break;
       case 36: screen_p=new select_field_data_source(this, batch_mode_driver_p); break;
       case 37: screen_p=new enter_field_text(this, batch_mode_driver_p); break;
-//      case : screen_p=new (this); break;
+      case 38: screen_p=new macro_builder(this); break;
 //      case : screen_p=new (this); break;
       case 40: screen_p=new communications_menu(this); break;
       case 41: screen_p=new tcp_server_addr_choice(this); 
@@ -1213,6 +1220,7 @@ screen::screen(centre* set_centre_p)
   );
 }
 //==============================================================================================================//  //TEST~~~ 11_14_2018
+/*
 void centre::macro_name_cell(int row, int col)  //FROM MACRO_SCREEN.CPP//
 {
   nRow = row;
@@ -1259,6 +1267,8 @@ void centre::macro_name_keyboard(QString macro_name) //FROM KEYBOARD.CPP//
   macros_out.close();
   macros_out.clear();
 }
+*/ 
+
 //==============================================================================================================//
 void centre::load_macros()	//TEST~~~ connecting macros screen
 {
@@ -1462,6 +1472,7 @@ void centre::load_macros()	//TEST~~~ connecting macros screen
 
 QString centre::choose_tcp_network(int choice)//choice 1 -> 192.168.100.1.  choice 2 -> 192.168.200.1.  Empty return -> success.  Error string returned for failure
 {
+  if(tcp_socket_p) tcp_socket_p->disconnectFromHost();
   if(choice == 1)
   {
     network = 1;

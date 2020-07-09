@@ -47,7 +47,8 @@ class macro_screen : public screen
   void cellSelected(int nRow, int nCol);
   void load_macro_table();
   void store_macro_table();
-  void dialogbox_buttons(int n);
+  void toggle_macro(int macro_number);
+//  void dialogbox_buttons(int n);
   /*
   void check_serial_connection();		  //TEST~~~
   void communications_choice_toggled(bool);
@@ -84,10 +85,10 @@ class macro_screen : public screen
   QLabel* description_p;
 //  keyboard* keyboard_p;
   QMessageBox msgBox;
-  QString macro_function_string;
+//  QString macro_function_string;
 
-  static const int macro_button_width = 135;
-  static const int macro_button_height = 35;
+//  static const int macro_button_width = 135;
+//  static const int macro_button_height = 35;
   static const int macro_cols = 5;
   static const int macro_rows = 10;
   centre* centre_p;
@@ -115,9 +116,9 @@ class macro_screen : public screen
   protected:
   QString* macro_name_string;  //TEST~~~ 11_13_2018//
   
-  signals:
-  void close_dialog(int r);
-  void return_with_keyboard_entry(int, int);
+//  signals:
+//  void close_dialog(int r);
+//  void return_with_keyboard_entry(int, int);
 };
 
 #endif

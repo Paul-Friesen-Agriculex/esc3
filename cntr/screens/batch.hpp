@@ -147,7 +147,7 @@ class batch : public screen
   
   barcode_entry_mode old_barcode_mode;
   
-  macro_screen* macro_screen_p;
+//  macro_screen* macro_screen_p;
   QString count_string;				//seed count access from gpio_keyboard
   QTimer* run_timer_p;
   

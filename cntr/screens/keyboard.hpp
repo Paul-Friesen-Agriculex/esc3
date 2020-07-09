@@ -145,6 +145,7 @@ class keyboard : public screen
 };
 
 //=======================================================================================// TEST~~~ 11_13_2018//
+/*
 class macro_name_entry : public keyboard
 {
   Q_OBJECT
@@ -155,6 +156,7 @@ class macro_name_entry : public keyboard
   public slots:
   void macro_name_entered();
 };
+*/
 //=======================================================================================//
 
 class crop_name_entry : public keyboard

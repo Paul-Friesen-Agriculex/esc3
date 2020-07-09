@@ -60,6 +60,7 @@ tcp_client_server_addr_entry::tcp_client_server_addr_entry(centre*set_centre_p)
   connect(centre_p, SIGNAL(tcp_connection_detected_signal()), this, SLOT(connection_detected()));
   
   message_p->setText("Enter the IP address of the host and touch \"connect\".");
+  ok_button_p->setEnabled(false);
 }
 
 void tcp_client_server_addr_entry::back_button_clicked()
@@ -91,7 +92,8 @@ void tcp_client_server_addr_entry::connection_detected()
   message_p->setText("Connection established");
   centre_p->communicate_by_keyboard_cable = false;
   centre_p->communicate_by_tcp = true;
-  
+  centre_p->tcp_link_established = true;
+  ok_button_p->setEnabled(true);
 }
 
 

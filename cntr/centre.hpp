@@ -116,9 +116,9 @@ class centre : public QObject
   void load_macros();	//original~~~
   
 //=========================================================//  
-  void macro_name_cell(int row, int col);
-  void macro_name_keyboard(QString);
-  int nRow, nCol;
+//  void macro_name_cell(int row, int col);
+//  void macro_name_keyboard(QString);
+//  int nRow, nCol;
 //=========================================================//
   
   processor* processor_p;
@@ -163,6 +163,7 @@ class centre : public QObject
   QString combined_macro_functions;	//new char to combine all macros
   bool communicate_by_keyboard_cable;
   bool communicate_by_tcp;
+  bool tcp_link_established;
 //  bool tcp_server;
   int network;
   QString tcp_client_server_addr;
@@ -182,7 +183,7 @@ class centre : public QObject
   QString macro_name; //TEST~~~11_13_2018//
   
   batch_mode_driver* batch_mode_driver_p;
-  macro_screen* macro_screen_p; //TEST~~~ 11_13_2018//
+//  macro_screen* macro_screen_p; //TEST~~~ 11_13_2018//
   void communicate_out_totalize(QString bar_str_1, QString bar_str_2, QString bar_str_3, QString bar_str_4, QString totalize_count_str, QString weight_str);
   void communicate_out_batch(QString lotcode_str, QString packcode_str, QString batch_count_str, QString substitution_str, QString dump_count_str);
   
@@ -191,6 +192,12 @@ class centre : public QObject
   QString keyboard_message_string;
   QString keyboard_return_string;
   int control_int[10];//use to set conditions on return to asking screen
+  
+  //macro_builder
+  bool build_macro;//set true when leaving macro_screen for macro_builder.  signals that macro_builder will run.
+  int macro_row;// remember row for return to macro_screen.
+  QString macro_display_string;
+  QString macro_function_string;
 };
 
 class screen : public QWidget

@@ -9,7 +9,6 @@
 #include "macro_screen.hpp"
 #include "button.hpp"
 #include "help_screen.hpp"
-//#include "keyboard_dialog.hpp"
 
 #include <QHeaderView>
 #include <fstream>
@@ -22,14 +21,10 @@
 #include <fcntl.h>	//library used to use system call command "open()" used to check available serial
 #include <unistd.h>	//library to enable write() function
 
-//#include <QtGui>  //included to implement delay in serial output//
 #include <QTime>  //
 #include <QTcpSocket>
   //explore some databases that may be used and spreadsheet programs, may need to include more features 
   //such as moving to or creating another sheet/file
-
-//#include <QSize>      //OMIT~~~
-//#include <QCheckBox>  //OMIT~~~
 
 using namespace std;
 
@@ -37,11 +32,9 @@ macro_screen::macro_screen(centre*set_centre_p)
 	:screen(set_centre_p)
 {
   centre_p=set_centre_p;
-      
-  cout<<"start maco_screen constructor.  new_keyboard_entry = "<<centre_p->new_keyboard_entry<<endl;
-      
   
-//  cout<<"1 centre_p = "<<centre_p<<endl;
+  
+  cout<<"start macro_screen::macro_screen.  macro_display_string = "<<centre_p->macro_display_string.toStdString()<<"    macro_function_string = "<<centre_p->macro_function_string.toStdString()<<endl;
   
   screen_title_label_p = new QLabel;
   description_p = new QLabel;
@@ -51,23 +44,10 @@ macro_screen::macro_screen(centre*set_centre_p)
   help_button_p = new button("Help");
   disable_all_button_p = new button("Disable All");
   enable_all_button_p = new button("Enable All");
-  /*
-  communications_choice_box_p = new QGroupBox;
-  communicate_by_keyboard_cable_button_p = new QRadioButton("Communicate By Keyboard Cable");
-  communicate_by_keyboard_cable_button_p -> setChecked(centre_p->communicate_by_keyboard_cable);
-  communicate_by_tcp_button_p = new QRadioButton("Communicate By TCP");
-  communicate_by_tcp_button_p -> setChecked(centre_p->communicate_by_tcp);
-  tcp_setup_button_p = new button("Set up TCP communications");
-  communications_choice_box_layout_p = new QGridLayout;
-  communications_choice_box_layout_p -> addWidget(communicate_by_keyboard_cable_button_p, 0, 0);
-  communications_choice_box_layout_p -> addWidget(communicate_by_tcp_button_p, 1, 0);
-  communications_choice_box_layout_p -> addWidget(tcp_setup_button_p, 1, 1);
-  communications_choice_box_p -> setLayout(communications_choice_box_layout_p);
-  */
   tableWidget_p = new QTableWidget(this);
   tableWidget_p->setRowCount(macro_rows);
   tableWidget_p->setColumnCount(macro_cols);
-  m_TableHeader<<"On/Off"<<"#"<<"Name"<<"Macro"<<"Functions";
+  m_TableHeader<<"On/Off"<<"#"<<"Name\nTouch cell to edit."<<"Macro\nTouch cell to edit."<<"Functions";
   tableWidget_p->setHorizontalHeaderLabels(m_TableHeader);
   tableWidget_p->verticalHeader()->setVisible(false);
   tableWidget_p->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -80,13 +60,11 @@ macro_screen::macro_screen(centre*set_centre_p)
   
   main_layout_p = new QGridLayout;
   main_layout_p->addWidget(screen_title_label_p, 0, 0);
-//  main_layout_p->addWidget(communications_choice_box_p, 1, 0, 1, 4);
   main_layout_p->addWidget(description_p, 2, 0, 1, 4);
   main_layout_p->addWidget(back_button_p, 0, 3);
   main_layout_p->addWidget(help_button_p, 5, 2);
   main_layout_p->addWidget(ok_button_p, 5, 3);
   main_layout_p->addWidget(disable_all_button_p, 5, 0);
-//  main_layout_p->addWidget(enable_all_button_p, 4, 1);
   main_layout_p->addWidget(tableWidget_p,3,0,2,4);
   setLayout(main_layout_p);
   
@@ -96,42 +74,70 @@ macro_screen::macro_screen(centre*set_centre_p)
   connect(disable_all_button_p, SIGNAL(clicked()), this, SLOT(disable_all_clicked()));
   connect(enable_all_button_p, SIGNAL(clicked()), this, SLOT(enable_all_clicked()));
   connect(tableWidget_p, SIGNAL(cellClicked(int, int)), this, SLOT(cellSelected(int, int)));
-  connect(this, SIGNAL(return_with_keyboard_entry(int, int)), this, SLOT(cellSelected(int, int)));
+//  connect(this, SIGNAL(return_with_keyboard_entry(int, int)), this, SLOT(cellSelected(int, int)));
   
-//  connect(communicate_by_keyboard_cable_button_p, SIGNAL(toggled(bool)), this, SLOT(communications_choice_toggled(bool)));
-//  connect(communicate_by_tcp_button_p, SIGNAL(toggled()), this, SLOT(communications_choice_toggled()));
-
   screen_title_label_p->setText("Communications Menu");
   screen_title_label_p->setStyleSheet("QLabel { font: bold }");
-  description_p->setText("If the special USB Communications cable is connected to a computer, \
+  if(centre_p->communicate_by_keyboard_cable)
+  {
+    description_p->setText("If the special USB Communications cable is connected to a computer, \
 items listed in the selected macro will be sent to the computer, which will see \
 them as keyboard input.");
+  }
+  if(centre_p->tcp_link_established)
+  {
+    description_p->setText("A TCP connection has been established to another device. \
+Items listed in the selected macro will be sent to that device.");
+  }
   description_p->setWordWrap(true);
   initialize_macro_menu();
 
   load_macro_table();  
-//  check_serial_connection();	//checks connection with serial communication line//
-  
-  //tableWidget_p->setDisabled(true);  
   tableWidget_p->setStyleSheet("QTableWidget { font: 15pt;}");
   tableWidget_p->verticalHeader()->setDefaultSectionSize(45);
-  
-//  connect(tcp_setup_button_p, SIGNAL(clicked()), this, SLOT(tcp_setup_button_clicked()));
   
   help_screen_p = 0;
   current_row = 0;
   current_column = 0;
   
+  if(centre_p->build_macro) //returning from macro_builder screen with a new macro
+  {
+    centre_p->build_macro = false;
+    int row = centre_p->macro_row;
+    centre_p->macro_row = 0;
+    tableWidget_p->item(row, 3)->setText(centre_p->macro_display_string);
+    tableWidget_p->item(row, 4)->setText(centre_p->macro_function_string);
+    if(tableWidget_p->item(row, 0)->checkState() == Qt::Unchecked)
+    {
+      toggle_macro(row);
+    }
+//    store_macro_table();
+  }
+    
   
-  
-  
-  if(centre_p->new_keyboard_entry == true) //returning after entering a line of text for the macro builder using a keyboard screen
+  if(centre_p->new_keyboard_entry == true) //returning after entering a macro name using a keyboard screen
   {        
     cout<<"centre_p->new_keyboard_entry == true\n";
+    cout<<"centre_p->keyboard_return_string = "<<centre_p->keyboard_return_string.toStdString()<<endl;
+    cout<<"centre_p->macro_row = "<<centre_p->macro_row<<endl;
     
-//    cellSelected(centre_p->control_int[0], centre_p->control_int[1]); //control_int entries were used to save row and column numbers for return
-    emit return_with_keyboard_entry(centre_p->control_int[0], centre_p->control_int[1]); //control_int entries were used to save row and column numbers for return
     centre_p->new_keyboard_entry = false;
+    
+//    QWidget* cell_widget_p = tableWidget_p->cellWidget(centre_p->macro_row, 2
+    tableWidget_p->item(centre_p->macro_row, 2)->setText(centre_p->keyboard_return_string);
+    
+//    QTableWidgetItem *item = new QTableWidgetItem;
+//    item->setText(centre_p->keyboard_return_string);
+//    item->setTextAlignment (Qt::AlignCenter);
+//    tableWidget_p->setItem(centre_p->macro_row, 2, item);
+
+//    QLabel *placement_holder_text_label = new QLabel(this);
+//    placement_holder_text_label->setText(centre_p->keyboard_return_string);
+//    tableWidget_p->setCellWidget (centre_p->macro_row, 2, placement_holder_text_label);
+
+    
+    cout<<"tableWidget_p->item(centre_p->macro_row, 2)->text().toStdString()  "<<tableWidget_p->item(centre_p->macro_row, 2)->text().toStdString()<<endl;
+    
     centre_p->keyboard_message_string = "";
     centre_p->keyboard_return_string = "";
   }
@@ -139,59 +145,9 @@ them as keyboard input.");
 
 macro_screen::~macro_screen()
 {
-//  if(help_screen_p!=0) delete help_screen_p;
-}
-/*
-void macro_screen::check_serial_connection()
-{
-  int filedesc = open("/dev/usb2serial", O_WRONLY);
-  if(filedesc < 0)
-  {
-    cout<<"serial NOT available"<<endl;
-    serialusb_connected = false;
-  }
-  else
-  {
-	cout<<"serial available"<<endl;
-	serialusb_connected = true;
-	if(write(filedesc,"", 0) != 0){
-    int system_int; //TEST~~~
-    system_int = system("stty -F /dev/usb2serial cs8 9600 ignbrk -brkint -icrnl -imaxbel -opost -onlcr -isig -icanon -iexten -echo -echoe -echok -echoctl -echoke noflsh -ixon -crtscts");
-    cout<<system_int<<endl; //TEST~~~
-    
-	  if(write(filedesc,"", 0) != 0)
-	  {
-		cout<<"check connection"<<endl;
-	  }
-	  else
-      {
-	    cout<<"initialization sent"<<endl;
-      }
-    }
-    else
-    {
-	  cout<<"initialization sent"<<endl;
-    }
-  }
+  store_macro_table();
 }
 
-void macro_screen::communications_choice_toggled(bool)
-{
-  centre_p->communicate_by_keyboard_cable = communicate_by_keyboard_cable_button_p->isChecked();
-  centre_p->communicate_by_tcp = communicate_by_tcp_button_p->isChecked();
-  
-  cout<<"centre_p->communicate_by_keyboard_cable = "<<centre_p->communicate_by_keyboard_cable<<endl;
-  cout<<"centre_p->communicate_by_tcp = "<<centre_p->communicate_by_tcp<<endl;
-  
-  
-}
-
-void macro_screen::tcp_setup_button_clicked()
-{
-  centre_p->add_waiting_screen(40);//tcp_mode_choice
-  centre_p->screen_done=true;
-}
-*/
 void macro_screen::back_button_clicked()
 {
   centre_p->add_waiting_screen(centre_p->get_previous_screen());
@@ -250,101 +206,6 @@ void macro_screen::enable_all_clicked()
   }
 }
 
-
-/*
-void macro_screen::help_button_clicked()
-{ 
-  QFormLayout *help_form = new QFormLayout;
-
-  QTabWidget *tab_widget_box = new QTabWidget();
-  tab_widget_box->setFixedWidth(800);
-  tab_widget_box->setFixedHeight(300);
-  tab_widget_box->show();
-  
-  QLabel *label_1 = new QLabel(this);
-  /
-  label_1->setText("* HELP BUTTON INTRODUCTION *\nThe macro builder will help export and format data "
-				   "generated by the <CNTR Model> to an external database or data storage program.\n\n"
-				   "1. Macros Menu table components:\nThis menu contains a table that will organize your "
-				   "macros and provide information on how the exported data will be formatted. The four "
-				   "columns headings include:\n\n"
-				   "On/Off:\nThis column indicates whether the macro is active. When ON (indicated by a "
-				   "green check mark in the check box), the macro in this row will be transmitted when a "
-				   "seed count is to be transmitted. Simply click the cells in this column to toggle the "
-				   "state of the macro.\n"
-				   "#:\nThis column indicates the order the macros are transmitted when multiple macros "
-				   "are active.\n"
-				   "Name:\nThis column is used to create custom labels to identify each macro.\n"
-				   "Macro:\nThis column is used to generate the macro commands. Macro commands contain a "
-				   "sequence of keyboard keystrokes and specified variables for each counting mode.");
-	*
-  			   
-  label_1->setText("The ESC-3 is able to send data to a computer through the USB Communications Cable provided.  "
-           "The data sent will appear to the computer as keyboard input.  This allows flexible "
-           "entry into spreadsheets or database programs.\n\n"
-           
-           "If you think this might work for you, try entering data of the sort you wish to use in your computer "
-           "using the keyboard only (no use of the mouse).  Often, you can use TAB, ENTER, or ARROW characters to "
-           "move from field to field.  If you can do this, the ESC-3 may be able to do it automatically.\n\n"
-           
-           "In totalize mode, the ESC-3 sends out data after each sample.  It happens when a new line "
-           "starts in the table on the ESC-3 screen.");
-           
-  /         
-  QLabel *label_2 = new QLabel(this);
-  label_2->setText("Building your own macro:\nHardware Setup: Before using the macro builder, ensure the "
-				   "end with the box compartment of the <USB keyboard emulator> is connected to the back "
-				   "of the <CNTR Model> and the other end is connected to the target computer. (When connected, "
-				   "an LED indicator on the <USB keyboard emulator> box compartment will turn on.)");
-  *
-
-  QLabel *label_2 = new QLabel(this);
-  label_2->setText("Connect the communications cable between the ESC-3 and the computer.  The label on the cable "
-           "indicates which end goes where.\n\n"
-           
-           "In totalize mode, select OPTIONS -> USB COMMUNICATIONS MENU.  Select a cell under NAME "
-           "and enter a name for your macro.\n\n"
-           
-           "Select the corresponding cell under MACRO.  Build your maco by touching the buttons.  The corresponding "
-           "items will be sent out in the order they appear.");
-
-
-  /
-  QLabel *label_3 = new QLabel(this);
-  label_3->setText("General Notes/Tips:\nFor use with spreadsheets like Excel or LibreOffice Calc, using the arrow "
-				   "keys is recommended for navigating to different cells in the spreadsheet.\n<note "
-				   "implemented yet: You may also navigate between multiple sheets using Ctrl+PgUp/PgDn>\n"
-				   "For use with databases with multiple input lines or buttons, using Tab and Ctrl+ Tab is "
-				   "recommended for navigating to the next/previous element in the database.");
-  *
-  
-  label_1->setWordWrap(true);
-  label_2->setWordWrap(true);
-//  label_3->setWordWrap(true);
-
-  tab_widget_box->addTab(label_1,"Introduction");
-  tab_widget_box->addTab(label_2,"Instructions");
-//  tab_widget_box->addTab(label_3,"3");
-  
-  label_1->setAlignment(Qt::AlignTop);
-  label_2->setAlignment(Qt::AlignTop);
-//  label_3->setAlignment(Qt::AlignTop);
-
-  //tab_widget_box->setStyleSheet("QTabBar::tab { height: 0px; width: 0px; }");	
-  //tab_widget_box->tabBar()->setStyleSheet("QTabBar::tab:selected { font: bold;}");
-  //tab_widget_box->tabBar()->hide();
-  //tab_widget_box->tabBar()->setVisible(false);
-
-  //help_form->addRow(msgBox);
-  help_form->addRow(tab_widget_box);
-  
-  button* close_button_p = new button("Close");
-  connect(close_button_p, SIGNAL(clicked()), help_form, SLOT(deleteLater()));
-//  close_button_p -> show();
-  help_form->addRow(close_button_p);
-}
-*/
-
 void macro_screen::help_button_clicked()
 { 
   help_screen_p = new help_screen();
@@ -374,6 +235,9 @@ void macro_screen::help_button_clicked()
 
 void macro_screen::initialize_macro_menu()
 {
+  
+  cout<<"macro_screen::initialize_macro_menu\n";
+  
   for (int i=0; i < macro_rows; ++i)
   {
     for (int j=0; j < macro_cols; ++j)
@@ -415,6 +279,9 @@ void macro_screen::initialize_macro_menu()
  
 void macro_screen::load_macro_table()
 {  
+  
+  cout<<"macro_screen::load_macro_table()\n";
+  
   bool temp_state;
   int temp_num;
   char temp_name[300];
@@ -461,15 +328,16 @@ void macro_screen::load_macro_table()
       }
       tableWidget_p->item(i, 1)->setText(QString("%1").arg(temp_num));
       
-      if(QString(temp_name) == "-")
-      {
-        QLabel *placement_holder_text_label = new QLabel(this);
-        placement_holder_text_label->setText("< Click to edit name >");
-        tableWidget_p->setCellWidget (i, 2, placement_holder_text_label);
-        placement_holder_text_label->setAlignment(Qt::AlignCenter);
-        placement_holder_text_label->setStyleSheet("font: italic; color: grey; background-color: white;");
-      }
-      else if(QString(temp_name).contains("_"))                                     //TEST~~~ 11_19_2018//
+//      if(QString(temp_name) == "-")
+//      {
+//        QLabel *placement_holder_text_label = new QLabel(this);
+//        placement_holder_text_label->setText("< Click to edit name >");
+//        tableWidget_p->setCellWidget (i, 2, placement_holder_text_label);
+//        placement_holder_text_label->setAlignment(Qt::AlignCenter);
+//        placement_holder_text_label->setStyleSheet("font: italic; color: grey; background-color: white;");
+//      }
+//      else if(QString(temp_name).contains("_"))                                     //TEST~~~ 11_19_2018//
+      if(QString(temp_name).contains("_"))                                     //TEST~~~ 11_19_2018//
       {                                                                             //TEST~~~
         for(int mn = 0; mn<300; ++mn) if(temp_name[mn] == '_') temp_name[mn] = ' '; //TEST~~~
       }                                                                             //TEST~~~
@@ -477,23 +345,60 @@ void macro_screen::load_macro_table()
       tableWidget_p->item(i, 2)->setText(temp_name);
       tableWidget_p->item(i, 3)->setText(temp_mask);
         
-      if(QString(temp_mask) == "-")
-      {
-        QLabel *placement_holder_text_label = new QLabel(this);
-        placement_holder_text_label->setText("< Click to edit/create macro >");
-        tableWidget_p->setCellWidget (i, 3, placement_holder_text_label);
-        placement_holder_text_label->setAlignment(Qt::AlignCenter);
-        placement_holder_text_label->setStyleSheet("font: italic; color: grey; background-color: white;");
-      }
+//      if(QString(temp_mask) == "-")
+//      {
+//        QLabel *placement_holder_text_label = new QLabel(this);
+//        placement_holder_text_label->setText("< Click to edit/create macro >");
+//        tableWidget_p->setCellWidget (i, 3, placement_holder_text_label);
+//        placement_holder_text_label->setAlignment(Qt::AlignCenter);
+//        placement_holder_text_label->setStyleSheet("font: italic; color: grey; background-color: white;");
+//      }
       tableWidget_p->item(i, 4)->setText(temp_func);
       if(macros.eof()) break;
     }
     macros.close();
   }
+  else//macro_table file did not open.  probably does not exist
+  {
+    for(int i=0; i<10; ++i)
+    {
+      tableWidget_p->item(i, 0)->setCheckState ( Qt::Unchecked );
+      QLabel *on_off_label_p = new QLabel("OFF");
+      tableWidget_p->setCellWidget (i, 0, on_off_label_p);
+      on_off_label_p->setAlignment(Qt::AlignCenter);
+
+      tableWidget_p->item(i,0)->setBackground(QColor(255, 255, 255));
+      tableWidget_p->item(i,1)->setBackground(QColor(255, 255, 255));
+      tableWidget_p->item(i,2)->setBackground(QColor(255, 255, 255));
+      tableWidget_p->item(i,3)->setBackground(QColor(255, 255, 255));
+      tableWidget_p->item(i,4)->setBackground(QColor(255, 255, 255));
+
+      tableWidget_p->item(i, 1)->setText(QString("%1").arg(i));
+      
+//      QLabel *placement_holder_text_label = new QLabel(this);
+//      placement_holder_text_label->setText("< Click to edit name >");
+//      tableWidget_p->setCellWidget (i, 2, placement_holder_text_label);
+//      placement_holder_text_label->setAlignment(Qt::AlignCenter);
+//      placement_holder_text_label->setStyleSheet("font: italic; color: grey; background-color: white;");
+      
+      tableWidget_p->item(i, 2)->setText("-");
+      tableWidget_p->item(i, 3)->setText("-");
+        
+      QLabel* placement_holder_text_label = new QLabel(this);
+      placement_holder_text_label->setText("< Click to edit/create macro >");
+      tableWidget_p->setCellWidget (i, 3, placement_holder_text_label);
+      placement_holder_text_label->setAlignment(Qt::AlignCenter);
+      placement_holder_text_label->setStyleSheet("font: italic; color: grey; background-color: white;");
+      tableWidget_p->item(i, 4)->setText("-");
+    }
+  }
 }
 
 void macro_screen::store_macro_table()
 {  
+  
+  cout<<"macro_screen::store_macro_table()\n";
+  
   std::ofstream macros("macro_table",(std::ofstream::out));
   for(int i=0; i<10; ++i)
   {  
@@ -515,9 +420,6 @@ void macro_screen::store_macro_table()
       macros<<endl<<macro_temp_name_str.toLatin1().constData();
     }
     else macros<<endl<<(tableWidget_p->item(i, 2)->text()).toUtf8().constData();		//macro name  //TEST~~~//
-    
-    
-    //macros<<endl<<(tableWidget_p->item(i, 2)->text()).toUtf8().constData();		//macro name  //ORIGINAL~~~//
     macros<<endl<<(tableWidget_p->item(i, 3)->text()).toUtf8().constData();		//macro mask
     macros<<endl<<(tableWidget_p->item(i, 4)->text()).toUtf8().constData();		//macro function
   }
@@ -528,12 +430,15 @@ void macro_screen::store_macro_table()
 
 void macro_screen::cellSelected(int nRow, int nCol)	
 {
+  
+  cout<<"macro_screen::cellSelected(int nRow, int nCol)	\n";
+  
   current_row = nRow;
   current_column = nCol;
-  
-//  cout<<endl<<"Row: "<<nRow<<"	Column: "<<nCol<<endl;	//OMIT~~~//
   if(nCol == 0)
   {
+    toggle_macro(nRow);
+    /*
     for(int i=0; i<macro_rows; ++i)//clear selection in all rows, then set selected row.  At most 1 row selected.
     {
       tableWidget_p->item(i, 0)->setCheckState ( Qt::Unchecked );
@@ -578,22 +483,83 @@ void macro_screen::cellSelected(int nRow, int nCol)
       tableWidget_p->item(nRow,3)->setBackground(QColor(154, 229, 154));
       tableWidget_p->item(nRow,4)->setBackground(QColor(154, 229, 154));
     }
+    */ 
   }
   else if(nCol == 2)
   { 
-    centre_p -> macro_name_cell(nRow, nCol);
-    centre_p -> add_waiting_screen(27);
+//    centre_p -> macro_name_cell(nRow, nCol);
+//    centre_p -> add_waiting_screen(27);
+
+    centre_p->new_keyboard_entry = true;
+    centre_p -> keyboard_message_string = "Enter Macro Name";
+    centre_p -> add_waiting_screen(28);//come back here
+    centre_p -> add_waiting_screen(100);//keyboard
+    centre_p -> macro_row = nRow;
 	  centre_p -> screen_done=true;
   }
   else if(nCol == 3)
   {    
+    centre_p->macro_row = nRow;
+    centre_p->build_macro = true;
+    centre_p->macro_display_string = tableWidget_p->item(nRow, 3)->text();
+    centre_p->macro_function_string = tableWidget_p->item(nRow, 4)->text();
+    centre_p->add_waiting_screen(38);//macro_builder
+    centre_p->screen_done = true;
+  }
+}
+
+void macro_screen::toggle_macro(int macro_number)
+{
+  for(int i=0; i<macro_rows; ++i)//clear selection in all rows, then set selected row.  At most 1 row selected.
+  {
+    tableWidget_p->item(i, 0)->setCheckState ( Qt::Unchecked );
+
+    QLabel *on_off_label_p = new QLabel("OFF");
+    tableWidget_p->setCellWidget (i, 0, on_off_label_p);
+    on_off_label_p->setAlignment(Qt::AlignCenter);
+                                  
+    tableWidget_p->item(i,0)->setBackground(QColor(255, 255, 255));
+    tableWidget_p->item(i,1)->setBackground(QColor(255, 255, 255));
+    tableWidget_p->item(i,2)->setBackground(QColor(255, 255, 255));
+    tableWidget_p->item(i,3)->setBackground(QColor(255, 255, 255));
+    tableWidget_p->item(i,4)->setBackground(QColor(255, 255, 255));
+  }
+  if(tableWidget_p->item(macro_number, 0)->checkState())
+  {
+    tableWidget_p->item(macro_number, 0)->setCheckState ( Qt::Unchecked );
+    store_macro_table();
+    
+    QLabel *on_off_label_p = new QLabel("OFF");
+    tableWidget_p->setCellWidget (macro_number, 0, on_off_label_p);
+    on_off_label_p->setAlignment(Qt::AlignCenter);
+                                  
+    tableWidget_p->item(macro_number,0)->setBackground(QColor(255, 255, 255));
+    tableWidget_p->item(macro_number,1)->setBackground(QColor(255, 255, 255));
+    tableWidget_p->item(macro_number,2)->setBackground(QColor(255, 255, 255));
+    tableWidget_p->item(macro_number,3)->setBackground(QColor(255, 255, 255));
+    tableWidget_p->item(macro_number,4)->setBackground(QColor(255, 255, 255));
+  }
+  else
+  {
+    tableWidget_p->item(macro_number, 0)->setCheckState ( Qt::Checked );
+    store_macro_table();
+    
+    QLabel *on_off_label_p = new QLabel("ON");
+    tableWidget_p->setCellWidget (macro_number, 0, on_off_label_p);
+    on_off_label_p->setAlignment(Qt::AlignCenter);
+                                  
+    tableWidget_p->item(macro_number,0)->setBackground(QColor(154, 229, 154));
+    tableWidget_p->item(macro_number,1)->setBackground(QColor(154, 229, 154));
+    tableWidget_p->item(macro_number,2)->setBackground(QColor(154, 229, 154));
+    tableWidget_p->item(macro_number,3)->setBackground(QColor(154, 229, 154));
+    tableWidget_p->item(macro_number,4)->setBackground(QColor(154, 229, 154));
+  }
+}    
+    /*
     macro_function_string.clear();
     macro_function_string.append("-");
 	
     QDialog dialog(this);
-//    dialog.setMaximumSize(800, 360);      //defines size macro builder pop-up window//
-//    dialog.setGeometry(0, 0, 800, 360);   //defines starting position and dimensions//
-//    dialog.setMaximumSize(800, 480);      //defines size macro builder pop-up window//
     dialog.setGeometry(0, 0, 800, 450);   //defines starting position and dimensions//
     
     connect(this, SIGNAL(close_dialog(int)), &dialog, SLOT(done(int)));
@@ -605,12 +571,6 @@ void macro_screen::cellSelected(int nRow, int nCol)
 
     instruction_label_p = new QLabel("If this entry is active and the special USB communication cable is "
                                      "connected to a computer, items listed go to the computer as keyboard input");  
-/*    
-attached, the items you list will be sent out on the cable after each sample.  \
-If the cable is attached to a computer, the items sent will appear on the computer \
-as if typed on a keyboard.  For example, \"bar 1, right, count, down, left\" would enter \
-barcode 1 and the count in a spreadsheet on the computer.  Touch the buttons to add items to the list.");
-*/
     instruction_label_p -> setWordWrap(true);
     lineEdit = new QLineEdit(&dialog);
     lineEdit->setPlaceholderText("Click buttons to add preloaded values or type custom text here.");
@@ -717,29 +677,6 @@ barcode 1 and the count in a spreadsheet on the computer.  Touch the buttons to 
     totalize_box->setStyleSheet("QGroupBox {  border: 2px solid gray;"
 											 "border-radius: 4px;"
 											 "background-color: transparent;}");
-//==================================================================================================================//	
-//    QGroupBox *batchmode_button_box = new QGroupBox();
-//    QVBoxLayout *batchcodes = new QVBoxLayout;
-//    QLabel *batchmode_box_label = new QLabel(tr("Batch Mode"));
-        
-//    batchcodes->addWidget(batchmode_box_label);
-//    batchcodes->addWidget(batch_count_button);
-//    batchcodes->addWidget(lotcode_button);
-//    batchcodes->addWidget(packcode_button);
-//    batchcodes->addWidget(substitution_button);	//yet to be implemented
-//    batchcodes->addWidget(dump_count_button);
-    
-//    batchmode_button_box->setLayout(batchcodes);
-//    batchmode_button_box->show();
-    
-//    substitution_button->setDisabled(true);
-    
-//    batchcodes->setAlignment(Qt::AlignTop);
-//    batchmode_box_label->setStyleSheet("QLabel { font: bold;}");
-//    batchmode_button_box->setStyleSheet("QGroupBox {  border: 2px solid gray;"
-//                                        "border-radius: 4px;"
-//                                        "background-color: transparent;}");
-//==================================================================================================================//
     QGroupBox *accessibility_button_box = new QGroupBox();
     QVBoxLayout *accessibility_keys_container = new QVBoxLayout;
     QHBoxLayout *accessibility_keys = new QHBoxLayout;
@@ -1102,3 +1039,4 @@ void macro_screen::dialogbox_buttons(int n)
 	  }
   }
 }
+*/

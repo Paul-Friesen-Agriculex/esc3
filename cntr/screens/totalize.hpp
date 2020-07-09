@@ -71,7 +71,7 @@ class totalize : public screen
   bool old_envelope_present;
   
   QTimer* run_timer_p;
-  macro_screen* macro_screen_p;
+//  macro_screen* macro_screen_p;
   QString count_string;
   
 };

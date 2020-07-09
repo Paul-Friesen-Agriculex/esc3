@@ -404,11 +404,15 @@ void keyboard::M_clicked()
 void keyboard::enter_clicked()
 {
       
-  cout<<"start keyboard::enter_clicked.  new_keyboard_entry = "<<centre_p->new_keyboard_entry<<endl;
+//  cout<<"start keyboard::enter_clicked.  new_keyboard_entry = "<<centre_p->new_keyboard_entry<<endl;
       
+//  centre_p->new_keyboard_entry = true;
   centre_p->keyboard_return_string.clear();
   centre_p->keyboard_return_string.append(*entry_line_p);
   centre_p->screen_done = true;//go to waiting screen
+  
+  cout<<"end keyboard::enter_clicked.  keyboard_return_string = "<<centre_p->keyboard_return_string.toStdString()<<endl;
+  
 }
 
 void keyboard::keyPressEvent(QKeyEvent* event)
@@ -429,6 +433,7 @@ void keyboard::keyPressEvent(QKeyEvent* event)
 }
 
 //===============================================================================================//TEST~~~ 11_13_2018//
+/*
 macro_name_entry::macro_name_entry(centre* centre_p)
 :keyboard(centre_p)
 {
@@ -444,6 +449,7 @@ void macro_name_entry::macro_name_entered()
   centre_p->add_waiting_screen(centre_p->get_previous_screen());
   centre_p->screen_done=true;
 }
+*/
 //===============================================================================================//
 
 crop_name_entry::crop_name_entry(centre* centre_p)

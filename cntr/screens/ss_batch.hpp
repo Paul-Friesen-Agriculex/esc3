@@ -147,7 +147,7 @@ class ss_batch : public screen
   int reprint_line_manual;//line number that will be reprinted on envelope if manual reprint button is clicked
   void update_reprint_buttons();
   
-  macro_screen* macro_screen_p;
+//  macro_screen* macro_screen_p;
   QString count_string;				//seed count access from gpio_keyboard
   QTimer* run_timer_p;
   
