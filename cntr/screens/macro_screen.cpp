@@ -157,7 +157,7 @@ void macro_screen::back_button_clicked()
 void macro_screen::ok_button_clicked()
 {
   centre_p->screen_done = true;//go to waiting screen
-  cout<<"ok clicked\n";
+//  cout<<"ok clicked\n";
 }
 
 void macro_screen::disable_all_clicked()
@@ -236,7 +236,7 @@ void macro_screen::help_button_clicked()
 void macro_screen::initialize_macro_menu()
 {
   
-  cout<<"macro_screen::initialize_macro_menu\n";
+//  cout<<"macro_screen::initialize_macro_menu\n";
   
   for (int i=0; i < macro_rows; ++i)
   {
@@ -280,7 +280,7 @@ void macro_screen::initialize_macro_menu()
 void macro_screen::load_macro_table()
 {  
   
-  cout<<"macro_screen::load_macro_table()\n";
+//  cout<<"macro_screen::load_macro_table()\n";
   
   bool temp_state;
   int temp_num;
@@ -397,7 +397,7 @@ void macro_screen::load_macro_table()
 void macro_screen::store_macro_table()
 {  
   
-  cout<<"macro_screen::store_macro_table()\n";
+//  cout<<"macro_screen::store_macro_table()\n";
   
   std::ofstream macros("macro_table",(std::ofstream::out));
   for(int i=0; i<10; ++i)

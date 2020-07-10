@@ -72,7 +72,7 @@ void tcp_client_server_addr_entry::back_button_clicked()
 void tcp_client_server_addr_entry::connect_button_clicked()
 {
   QString addr_string = QString::number(addr1_p->value()) + "." + QString::number(addr2_p->value()) + "." + QString::number(addr3_p->value()) + "." + QString::number(addr4_p->value());
-  cout<<"addr_string = "<<addr_string.toStdString()<<endl;
+//  cout<<"addr_string = "<<addr_string.toStdString()<<endl;
   centre_p->tcp_socket_p->connectToHost(addr_string, 50000);
   message_p->setText("Attempting connection");
 }

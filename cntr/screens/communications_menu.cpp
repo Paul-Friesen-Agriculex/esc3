@@ -141,7 +141,7 @@ void communications_menu::help_button_clicked()
 
 void communications_menu::connection_detected()
 {
-  cout<<"connection_detected\n";
+//  cout<<"connection_detected\n";
 
   if(centre_p->network == 1)
   {

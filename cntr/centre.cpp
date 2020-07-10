@@ -348,7 +348,7 @@ void centre::get_cycle_time(int value)//value is msec.
 void centre::tcp_connection_detected()
 {
   
-  cout<<"centre::tcp_connection_detected()\n";
+//  cout<<"centre::tcp_connection_detected()\n";
   
   tcp_socket_p = tcp_server_p->nextPendingConnection();
   emit tcp_connection_detected_signal();
@@ -357,7 +357,7 @@ void centre::tcp_connection_detected()
 void centre::run()
 {
   
-  if(screen_done) cout<<"centre::run.  screen_done true.  new_keyboard_entry = "<<new_keyboard_entry<<"\n";
+//  if(screen_done) cout<<"centre::run.  screen_done true.  new_keyboard_entry = "<<new_keyboard_entry<<"\n";
   
   if(init_ran == false)
   {
@@ -462,7 +462,7 @@ void centre::run()
 //    cout<<"screen_done was true\n";
     
       
-    cout<<"start screen_done.  new_keyboard_entry = "<<new_keyboard_entry<<endl;
+//    cout<<"start screen_done.  new_keyboard_entry = "<<new_keyboard_entry<<endl;
       
     screen_done=false;
     if(previous_screen_going_back == false)//add the current screen to previous_screen_list
@@ -834,11 +834,11 @@ float centre::dust_streak_percentage()
 //modified to handle barcodes as characters instead of integers// 11_02_2018~~~//
 void centre::communicate_out_totalize(QString bar_str_1, QString bar_str_2, QString bar_str_3, QString bar_str_4, QString totalize_count_str, QString weight_str)
 {
-  cout<<endl<<"USB2SERIAL QStringVariant"<<endl;                                        //OMIT~~~
-  cout<<"bar_1: "<<bar_str_1.toUtf8().constData();                                      //OMIT~~~
-  cout<<"\tbar_2: "<<bar_str_2.toUtf8().constData();                                    //
-  cout<<"\tbar_3: "<<bar_str_3.toUtf8().constData();                                    //
-  cout<<"\tbar_4: "<<bar_str_4.toUtf8().constData()<<endl;                              //
+//  cout<<endl<<"USB2SERIAL QStringVariant"<<endl;                                        //OMIT~~~
+//  cout<<"bar_1: "<<bar_str_1.toUtf8().constData();                                      //OMIT~~~
+//  cout<<"\tbar_2: "<<bar_str_2.toUtf8().constData();                                    //
+//  cout<<"\tbar_3: "<<bar_str_3.toUtf8().constData();                                    //
+//  cout<<"\tbar_4: "<<bar_str_4.toUtf8().constData()<<endl;                              //
   
   bool macro_status_bool;			      //temporary variable to transfer ifstream to tablewidget
   int macro_numb_int;				        //
@@ -868,12 +868,12 @@ void centre::communicate_out_totalize(QString bar_str_1, QString bar_str_2, QStr
 	      for(unsigned int j=0; j<strlen(macro_function_char)-1; ++j)
 	      {
             
-          cout<<"j = "<<j<<"   sending_string = "<<sending_string<<"    macro_function_char[j] = "<<macro_function_char[j]<<endl;
+//          cout<<"j = "<<j<<"   sending_string = "<<sending_string<<"    macro_function_char[j] = "<<macro_function_char[j]<<endl;
             
           if(sending_string)
           {
             
-            cout<<"sending string.  j = "<<j<<endl;
+//            cout<<"sending string.  j = "<<j<<endl;
             
             if(macro_function_char[j+1] == '"') 
             {
@@ -893,37 +893,37 @@ void centre::communicate_out_totalize(QString bar_str_1, QString bar_str_2, QStr
   	        else if(macro_function_char[j+1] == '1')		//Barcodes
 	          {
               macro_string = macro_string + bar_str_1;
-              cout<<"bar_1: "<<bar_str_1.toUtf8().constData()<<endl;  //OMIT~~~
+//              cout<<"bar_1: "<<bar_str_1.toUtf8().constData()<<endl;  //OMIT~~~
   	        }
 	          else if(macro_function_char[j+1] == '2')
 	          {
               macro_string = macro_string + bar_str_2;
-              cout<<"bar_2: "<<bar_str_2.toUtf8().constData()<<endl;  //OMIT~~~
+//              cout<<"bar_2: "<<bar_str_2.toUtf8().constData()<<endl;  //OMIT~~~
 	          }
 	          else if(macro_function_char[j+1] == '3')
 	          {
               macro_string = macro_string + bar_str_3;
-              cout<<"bar_3: "<<bar_str_3.toUtf8().constData()<<endl;  //OMIT~~~
+//              cout<<"bar_3: "<<bar_str_3.toUtf8().constData()<<endl;  //OMIT~~~
 	          }
 	          else if(macro_function_char[j+1] == '4')
 	          {
               macro_string = macro_string + bar_str_4;
-              cout<<"bar_4: "<<bar_str_4.toUtf8().constData()<<endl;  //OMIT~~~
+//              cout<<"bar_4: "<<bar_str_4.toUtf8().constData()<<endl;  //OMIT~~~
 	          }
 	          else if(macro_function_char[j+1] == 'n')
 	          {
               macro_string = macro_string + QString("\r\n");
-              cout<<"newline"<<endl;  //OMIT~~~
+//              cout<<"newline"<<endl;  //OMIT~~~
 	          }
 	          else if(macro_function_char[j+1] == 't')
 	          {
               macro_string = macro_string + QString("\t");
-              cout<<"tab"<<endl;  //OMIT~~~
+//              cout<<"tab"<<endl;  //OMIT~~~
 	          }
 	          else if(macro_function_char[j+1] == '"')
 	          {
               sending_string = true;
-              cout<<"sending_string set true.  j = "<<j<<"\n";
+//              cout<<"sending_string set true.  j = "<<j<<"\n";
 	          }
 	          else
 	          {
@@ -947,7 +947,9 @@ void centre::communicate_out_totalize(QString bar_str_1, QString bar_str_2, QStr
     //int filedesc = open("/dev/ttyUSB0", O_WRONLY);  //if udev rules are not applied//
     //write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros) != size_string_macros;
   
-    cout<<endl<<"serial string buffer length: "<<write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros)<<endl;
+//    cout<<endl<<"serial string buffer length: "<<write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros)<<endl;
+    int ret_val = write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros);
+    if(ret_val<0) cout<<"write error writing to keyboard cable\n";
   }
   if(communicate_by_tcp==true)
   {
@@ -1308,12 +1310,12 @@ void centre::load_macros()	//TEST~~~ connecting macros screen
       barcodes>>seed_count;
     }
     
-    cout<<endl<<endl<<"LOADING TOTALIZEMODE"<<endl;		//OMIT~~~
-    cout<<"\t"<<"barcode_1: "<<barcode_1<<endl		    //
-		<<"\t"<<"barcode_2: "<<barcode_2<<endl		        //
-		<<"\t"<<"barcode_3: "<<barcode_3<<endl		        //
-		<<"\t"<<"barcode_4: "<<barcode_4<<endl		        //
-		<<"\t"<<"seed_count: "<<seed_count<<endl;	        //
+//    cout<<endl<<endl<<"LOADING TOTALIZEMODE"<<endl;		//OMIT~~~
+//    cout<<"\t"<<"barcode_1: "<<barcode_1<<endl		    //
+//		<<"\t"<<"barcode_2: "<<barcode_2<<endl		        //
+//		<<"\t"<<"barcode_3: "<<barcode_3<<endl		        //
+//		<<"\t"<<"barcode_4: "<<barcode_4<<endl		        //
+//		<<"\t"<<"seed_count: "<<seed_count<<endl;	        //
     barcodes.close();
     
     for(int q=0; q<30; ++q)
@@ -1354,11 +1356,11 @@ void centre::load_macros()	//TEST~~~ connecting macros screen
 	    //batchcodes>>substitution;
     }
     
-    cout<<endl<<endl<<"LOADING BATCHMODE"<<endl;			  //OMIT~~~
-    cout<<"\t"<<"lotcode: "<<lotcode<<endl				      //
-		    <<"\t"<<"packcode: "<<packcode<<endl			      //
-		    //<<"\t"<<"substitution: "<<substitution<<endl	//
-        <<"\t"<<"seed_count: "<<seed_count<<endl;		    //
+//    cout<<endl<<endl<<"LOADING BATCHMODE"<<endl;			  //OMIT~~~
+//    cout<<"\t"<<"lotcode: "<<lotcode<<endl				      //
+//		    <<"\t"<<"packcode: "<<packcode<<endl			      //
+//		    //<<"\t"<<"substitution: "<<substitution<<endl	//
+//        <<"\t"<<"seed_count: "<<seed_count<<endl;		    //
     batchcodes.close();									                //
     
     for(int q=0; q<30; ++q)
@@ -1497,11 +1499,11 @@ QString centre::choose_tcp_network(int choice)//choice 1 -> 192.168.100.1.  choi
 void centre::tcp_write(QString string)
 {
   QByteArray array = string.toLatin1();
-  cout<<"start tcp_write\n";
-  for(int i=0; i<array.size(); ++i)
-  {
-    cout<<"array ["<<i<<"] = "<<int(array[i])<<endl;
-  }
+//  cout<<"start tcp_write\n";
+//  for(int i=0; i<array.size(); ++i)
+//  {
+//    cout<<"array ["<<i<<"] = "<<int(array[i])<<endl;
+//  }
   tcp_socket_p->write(string.toLatin1());
 }
 

@@ -119,7 +119,7 @@ totalize::totalize(centre* set_centre_p)
   connect(run_timer_p, SIGNAL(timeout()), this, SLOT(run()));
   run_timer_p->start(100);
   
-  cout<<"totalize::totalize svc ";
+//  cout<<"totalize::totalize svc ";
   table_p->load_file(QString("settings/totalize_backup"));
   table_p->set_visible_columns(centre_p->tm_barcode_columns);
   
@@ -391,12 +391,12 @@ void totalize::run()
     if(!(centre_p->tm_macro_updated))
     {
       centre_p->load_macros();
-      cout<<"loading macros"<<endl;
+//      cout<<"loading macros"<<endl;
 	  }
-	  else
-	  {
-	    cout<<"macros already loaded"<<endl;
-	  }
+//	  else
+//	  {
+//	    cout<<"macros already loaded"<<endl;
+//	  }
 	  
     //load totalize table variables//
     QString bar_str_1, bar_str_2, bar_str_3, bar_str_4, totalize_str_count, totalize_str_weight;      //modified to handle barcodes as characters instead of integers// 11_02_2018~~~//
