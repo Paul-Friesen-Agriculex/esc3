@@ -19,6 +19,7 @@ class tool_choice : public screen
   
   private slots:
   void crop_edit_clicked();
+  void communications_setup_button_clicked();
   void diagnostics_clicked();
   void stop_program_clicked();
   void back_button_clicked();
@@ -26,6 +27,7 @@ class tool_choice : public screen
 
   private:
   button* crop_edit_button_p;
+  button* communications_setup_button_p;
   button* diagnostics_button_p;
   button* stop_program_button_p;
   button* back_button_p;

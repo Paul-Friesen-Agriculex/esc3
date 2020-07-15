@@ -34,7 +34,7 @@ macro_screen::macro_screen(centre*set_centre_p)
   centre_p=set_centre_p;
   
   
-  cout<<"start macro_screen::macro_screen.  macro_display_string = "<<centre_p->macro_display_string.toStdString()<<"    macro_function_string = "<<centre_p->macro_function_string.toStdString()<<endl;
+//  cout<<"start macro_screen::macro_screen.  macro_display_string = "<<centre_p->macro_display_string.toStdString()<<"    macro_function_string = "<<centre_p->macro_function_string.toStdString()<<endl;
   
   screen_title_label_p = new QLabel;
   description_p = new QLabel;
@@ -76,7 +76,7 @@ macro_screen::macro_screen(centre*set_centre_p)
   connect(tableWidget_p, SIGNAL(cellClicked(int, int)), this, SLOT(cellSelected(int, int)));
 //  connect(this, SIGNAL(return_with_keyboard_entry(int, int)), this, SLOT(cellSelected(int, int)));
   
-  screen_title_label_p->setText("Communications Menu");
+  screen_title_label_p->setText("Communication Macros");
   screen_title_label_p->setStyleSheet("QLabel { font: bold }");
   if(centre_p->communicate_by_keyboard_cable)
   {

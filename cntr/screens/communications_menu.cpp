@@ -27,6 +27,14 @@ communications_menu::communications_menu(centre*set_centre_p)
   help_button_p = new button("Help");
   ok_button_p = new button("OK");
   message_p = new QLabel("Choose communication method");
+  if(centre_p->communicate_by_keyboard_cable)
+  {
+    message_p->setText("Set up to communicate by Keyboard Cable");
+  }
+  if(centre_p->tcp_link_established)
+  {
+    message_p->setText("Set up to communicate by TCP");
+  }
 
   main_layout_p=new QGridLayout;
   
@@ -51,6 +59,10 @@ communications_menu::communications_menu(centre*set_centre_p)
   connect(centre_p, SIGNAL(tcp_connection_detected_signal()), this, SLOT(connection_detected()));
   
   ok_button_p->setEnabled(false);
+  if(   (centre_p->communicate_by_keyboard_cable)   ||   (centre_p->communicate_by_tcp)   )
+  {
+    ok_button_p->setEnabled(true);
+  }
 }
 
 void communications_menu::back_button_clicked()

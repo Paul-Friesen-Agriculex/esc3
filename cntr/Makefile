@@ -1048,7 +1048,13 @@ moc_communications_menu.cpp: centre.hpp \
 		screens/communications_menu.hpp
 	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/git_repo/esc3/cntr -I/home/odroid/Documents/git_repo/esc3/cntr -I/home/odroid/Documents/git_repo/esc3/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtNetwork -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/communications_menu.hpp -o moc_communications_menu.cpp
 
-moc_macro_builder.cpp: screens/macro_builder.hpp
+moc_macro_builder.cpp: centre.hpp \
+		cutgate.hpp \
+		endgate.hpp \
+		envelope_sensor.hpp \
+		feeder.hpp \
+		crop.hpp \
+		screens/macro_builder.hpp
 	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/git_repo/esc3/cntr -I/home/odroid/Documents/git_repo/esc3/cntr -I/home/odroid/Documents/git_repo/esc3/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtNetwork -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/macro_builder.hpp -o moc_macro_builder.cpp
 
 compiler_moc_source_make_all:
