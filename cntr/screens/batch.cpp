@@ -397,6 +397,8 @@ void batch::dump_complete(int dump_count)
 //  dump_container_can_be_removed = true;
 //  dump_container_ready_count = dump_count;
   
+  table_p->enter_dump_count(dump_count);
+  
   end_valve_mode = dump_open_empty;
   barcode_line_p->setFocus();
   

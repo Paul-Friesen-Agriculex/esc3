@@ -156,9 +156,13 @@ void ss_setup_entry::enter_choice(int column)
   else if(mode=='f')
   {
     batch_mode_driver_p -> ss_setup_p -> fill_time_column = column;
+    mode = 'd';
+  }
+  else if(mode=='d')
+  {
+    batch_mode_driver_p -> ss_setup_p -> dump_count_column = column;
     centre_p -> add_waiting_screen(25);//set_envelope_size
     centre_p -> screen_done = true;
-    
   }
   display_headings();
 }
@@ -257,7 +261,11 @@ will be recorded here. ");
 Pick fill time column (optional).\n\n \
 If selected, time of filling packet \n \
 will be recorded here. ");
-
+  if(mode=='d') message_p->setText(" \
+Pick dump count column (optional).\n\n \
+If selected, number of seeds dumped \n \
+will be recorded here, beside last \n \
+packet for seed lot.");
 
   
   spreadsheet_column* column_p;

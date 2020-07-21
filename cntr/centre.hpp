@@ -198,6 +198,11 @@ class centre : public QObject
   int macro_row;// remember row for return to macro_screen.
   QString macro_display_string;
   QString macro_function_string;
+  
+  //flags indicating type of macro being entered
+  bool entering_totalize_macros;
+  bool entering_batch_mode_pack_macros;//issued after each pack in batch mode
+  bool entering_batch_mode_dump_macros;//issued after each seed lot dumped in batch mode
 };
 
 class screen : public QWidget

@@ -21,7 +21,7 @@ class ss_batch_table:public QTableView
   QStandardItemModel* model_p;
   centre* centre_p;
   batch_mode_driver* batch_mode_driver_p;
-  friend class batch;  //TEST~~~
+//  friend class batch;  //TEST~~~
   QList<spreadsheet_column*> display_column_pointers;
 
   public:

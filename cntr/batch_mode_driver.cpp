@@ -1101,6 +1101,19 @@ void batch_mode_driver::run()
         if(centre_p->count == old_count)
         {
           emit dump_complete(old_count);
+          if(ss_setup_p->dump_count_column >= 0)// -1 value signals not to record
+          {
+            cout<<"before ss_dump_count_p\n";
+            cout<<"ss_dump_count_p = "<<ss_dump_count_p<<endl;
+            cout<<"data_list size = "<<ss_dump_count_p->data_list.size()<<endl;
+            cout<<"spreadsheet_line_number = "<<spreadsheet_line_number<<endl;
+            cout<<"end_valve_spreadsheet_line_number = "<<end_valve_spreadsheet_line_number<<endl;
+            cout<<"dump count = "<<QString::number(old_count).toStdString()<<endl;
+            ss_dump_count_p -> data_list[end_valve_spreadsheet_line_number] = QString::number(old_count);
+            cout<<"after ss_dump_count_p\n";
+            emit refresh_screen();
+          }
+          
           centre_p -> count = 0;
           mode = wait_for_dump_container_removal;
           cout<<"mode wait_for_dump_container_removal\n";
@@ -1279,6 +1292,7 @@ void batch_mode_driver::clear_ss_setup()
   ss_setup_p -> actual_count_column = -1;
   ss_setup_p -> print_time_column = -1;
   ss_setup_p -> fill_time_column = -1;
+  ss_setup_p -> dump_count_column = -1;
 }
 
 void batch_mode_driver::fill_ss_column_pointers()
@@ -1289,6 +1303,7 @@ void batch_mode_driver::fill_ss_column_pointers()
   ss_actual_count_p = get_spreadsheet_column_pointer(ss_setup_p -> actual_count_column);
   ss_print_time_p = get_spreadsheet_column_pointer(ss_setup_p -> print_time_column);
   ss_fill_time_p = get_spreadsheet_column_pointer(ss_setup_p -> fill_time_column);
+  ss_dump_count_p = get_spreadsheet_column_pointer(ss_setup_p -> dump_count_column);
 }
 /*
 void batch_mode_driver::load_envelope_layout()
@@ -1321,6 +1336,8 @@ void batch_mode_driver::save_ss_setup(QString filename)
   stream<<ss_setup_p->print_time_column<<endl;
   stream<<"fill_time_column\n";
   stream<<ss_setup_p->fill_time_column<<endl;
+  stream<<"dump_count_column\n";
+  stream<<ss_setup_p->dump_count_column<<endl;
 
   stream<<"high_feed_speed\n";
   stream<<high_feed_speed<<endl;
@@ -1477,6 +1494,16 @@ void batch_mode_driver::load_ss_setup()//load the ss_setup indicated by ss_setup
     {
       stream.readLineInto(&subline);
       ss_setup_p->fill_time_column = subline.toInt(&conversion_ok_flag);
+      if(conversion_ok_flag==false)
+      {
+        cout<<"failed to convert   "<<subline.toStdString()<<"   to int\n";
+        return;
+      }
+    }
+    else if(line == "dump_count_column")
+    {
+      stream.readLineInto(&subline);
+      ss_setup_p->dump_count_column = subline.toInt(&conversion_ok_flag);
       if(conversion_ok_flag==false)
       {
         cout<<"failed to convert   "<<subline.toStdString()<<"   to int\n";

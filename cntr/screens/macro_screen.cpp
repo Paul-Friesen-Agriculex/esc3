@@ -76,7 +76,7 @@ macro_screen::macro_screen(centre*set_centre_p)
   connect(tableWidget_p, SIGNAL(cellClicked(int, int)), this, SLOT(cellSelected(int, int)));
 //  connect(this, SIGNAL(return_with_keyboard_entry(int, int)), this, SLOT(cellSelected(int, int)));
   
-  screen_title_label_p->setText("Communication Macros");
+  screen_title_label_p->setText("Totalize Mode Communication Macros");
   screen_title_label_p->setStyleSheet("QLabel { font: bold }");
   if(centre_p->communicate_by_keyboard_cable)
   {

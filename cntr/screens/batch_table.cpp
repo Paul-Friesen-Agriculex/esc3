@@ -187,6 +187,33 @@ void batch_table::enter_pack_barcode(QString barcode)
 //    model_p -> setItem(model_row, j, item_p);
 //  }
 }
+
+void batch_table::enter_dump_count(int num)
+{
+//  QStandardItem* item_p = new QStandardItem(QString("%1").arg(num));
+//  model_p -> setItem(model_row, 2, item_p);
+  
+//  cout<<"batch_table::enter_seeds("<<num<<")\n";
+  
+  model_p -> item(model_row, 1) -> setData(QVariant("DUMP"), Qt::DisplayRole);
+  model_p -> item(model_row, 2) -> setData(QVariant(num), Qt::DisplayRole);
+  
+  ++model_row;
+  filled_rows = model_row;
+  
+  for(int j=0; j<4; ++j)
+  {
+    QStandardItem* item_p = new QStandardItem("");
+    model_p -> setItem(model_row, j, item_p);
+  }
+  
+  model_column = 1;
+  QModelIndex next_index = model_p->index(model_row, model_column);
+  setCurrentIndex(next_index);
+  resizeColumnsToContents();
+  emit focus_on_barcode();
+}
+
 /*
 void batch_table::keyPressEvent(QKeyEvent* event)
 {

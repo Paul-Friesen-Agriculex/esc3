@@ -33,6 +33,7 @@ class batch_table:public QTableView
   void enter_seeds(int num);
   void enter_seed_lot_barcode(QString barcode);
   void enter_pack_barcode(QString barcode);
+  void enter_dump_count(int num);
   void save_file(QString file_name);
   void load_file(QString file_name);
   void clear();

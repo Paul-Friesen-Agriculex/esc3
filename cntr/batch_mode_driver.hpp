@@ -60,6 +60,7 @@ struct ss_setup
   int actual_count_column;
   int print_time_column;
   int fill_time_column;
+  int dump_count_column;
 };
 
 enum print_control_mode_e
@@ -178,6 +179,7 @@ class batch_mode_driver : public QObject
   spreadsheet_column* ss_actual_count_p;
   spreadsheet_column* ss_print_time_p;
   spreadsheet_column* ss_fill_time_p;
+  spreadsheet_column* ss_dump_count_p;
   spreadsheet_column* get_spreadsheet_column_pointer(int column_number);
   spreadsheet_column* get_spreadsheet_column_pointer(QString column_heading);
   int spreadsheet_number_of_lines;//does not include heading line
