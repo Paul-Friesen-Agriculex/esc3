@@ -105,8 +105,16 @@ Items listed in the selected macro will be sent to that device.");
     centre_p->build_macro = false;
     int row = centre_p->macro_row;
     centre_p->macro_row = 0;
-    tableWidget_p->item(row, 3)->setText(centre_p->macro_display_string);
-    tableWidget_p->item(row, 4)->setText(centre_p->macro_function_string);
+    if(centre_p->macro_display_string == "")
+    {
+      tableWidget_p->item(row, 3)->setText("-");
+      tableWidget_p->item(row, 4)->setText("-");
+    }
+    else
+    {
+      tableWidget_p->item(row, 3)->setText(centre_p->macro_display_string);
+      tableWidget_p->item(row, 4)->setText(centre_p->macro_function_string);
+    }
     if(tableWidget_p->item(row, 0)->checkState() == Qt::Unchecked)
     {
       toggle_macro(row);
@@ -124,8 +132,14 @@ Items listed in the selected macro will be sent to that device.");
     centre_p->new_keyboard_entry = false;
     
 //    QWidget* cell_widget_p = tableWidget_p->cellWidget(centre_p->macro_row, 2
-    tableWidget_p->item(centre_p->macro_row, 2)->setText(centre_p->keyboard_return_string);
-    
+    if(centre_p->keyboard_return_string=="")
+    {
+      tableWidget_p->item(centre_p->macro_row, 2)->setText("-");
+    }
+    else 
+    {
+      tableWidget_p->item(centre_p->macro_row, 2)->setText(centre_p->keyboard_return_string);
+    }
 //    QTableWidgetItem *item = new QTableWidgetItem;
 //    item->setText(centre_p->keyboard_return_string);
 //    item->setTextAlignment (Qt::AlignCenter);
@@ -298,6 +312,12 @@ void macro_screen::load_macro_table()
       macros>>temp_num;
       macros>>temp_name;
       macros>>temp_mask;
+      
+      
+//      macros.getline(temp_mask, 299);
+//      cout << "temp_mask = "<<temp_mask<<endl;
+      
+      
       macros>>temp_func;
       
       if(temp_state == 0)

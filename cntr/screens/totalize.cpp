@@ -390,7 +390,7 @@ void totalize::run()
     
     if(!(centre_p->tm_macro_updated))
     {
-      centre_p->load_macros();
+//      centre_p->load_macros();
 //      cout<<"loading macros"<<endl;
 	  }
 //	  else
@@ -399,18 +399,28 @@ void totalize::run()
 //	  }
 	  
     //load totalize table variables//
-    QString bar_str_1, bar_str_2, bar_str_3, bar_str_4, totalize_str_count, totalize_str_weight;      //modified to handle barcodes as characters instead of integers// 11_02_2018~~~//
+//    QString bar_str_1, bar_str_2, bar_str_3, bar_str_4, totalize_str_count, totalize_str_weight;      //modified to handle barcodes as characters instead of integers// 11_02_2018~~~//
     int current_totalize_table_row;    
     current_totalize_table_row = table_p -> model_row - 1;
-    
+    /*
     bar_str_1 = (table_p -> model_p -> item(current_totalize_table_row,0) -> text());
     bar_str_2 = (table_p -> model_p -> item(current_totalize_table_row,1) -> text());
     bar_str_3 = (table_p -> model_p -> item(current_totalize_table_row,2) -> text()); 
     bar_str_4 = (table_p -> model_p -> item(current_totalize_table_row,3) -> text());
     totalize_str_count = (table_p -> model_p -> item(current_totalize_table_row,4) -> text());
+    */
+
+    centre_p->bar_str_1 = (table_p -> model_p -> item(current_totalize_table_row,0) -> text());
+    centre_p->bar_str_2 = (table_p -> model_p -> item(current_totalize_table_row,1) -> text());
+    centre_p->bar_str_3 = (table_p -> model_p -> item(current_totalize_table_row,2) -> text()); 
+    centre_p->bar_str_4 = (table_p -> model_p -> item(current_totalize_table_row,3) -> text());
+    centre_p->totalize_count_str = (table_p -> model_p -> item(current_totalize_table_row,4) -> text());
+
+
 //    totalize_str_weight = (table_p -> model_p -> item(current_totalize_table_row,5) -> text());
 
-    centre_p -> communicate_out_totalize(bar_str_1, bar_str_2, bar_str_3, bar_str_4, totalize_str_count, totalize_str_weight);	  //TEST~~~ Strings instead of ints 11_02_2018~~~//
+//    centre_p -> communicate_out(bar_str_1, bar_str_2, bar_str_3, bar_str_4, totalize_str_count, totalize_str_weight);	  //TEST~~~ Strings instead of ints 11_02_2018~~~//
+    centre_p -> communicate_out('t');
 
     table_p->save_file(QString("settings/totalize_backup"));
   }

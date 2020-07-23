@@ -184,8 +184,8 @@ class centre : public QObject
   
   batch_mode_driver* batch_mode_driver_p;
 //  macro_screen* macro_screen_p; //TEST~~~ 11_13_2018//
-  void communicate_out_totalize(QString bar_str_1, QString bar_str_2, QString bar_str_3, QString bar_str_4, QString totalize_count_str, QString weight_str);
-  void communicate_out_batch(QString lotcode_str, QString packcode_str, QString batch_count_str, QString substitution_str, QString dump_count_str);
+  void communicate_out(char type);//'t'->totalize.  'p'->batch pack.  'd'->batch dump.
+//  void communicate_out_batch(QString lotcode_str, QString packcode_str, QString batch_count_str, QString substitution_str, QString dump_count_str);
   
   //general keyboard entry
   bool new_keyboard_entry;//true indicates that a keyboard screen has just run.  Use to signal the screen needing keyboard data that it asked for it.
@@ -203,6 +203,19 @@ class centre : public QObject
   bool entering_totalize_macros;
   bool entering_batch_mode_pack_macros;//issued after each pack in batch mode
   bool entering_batch_mode_dump_macros;//issued after each seed lot dumped in batch mode
+  
+  //macro variables
+  QString bar_str_1;
+  QString bar_str_2;
+  QString bar_str_3;
+  QString bar_str_4;
+  QString totalize_count_str;
+  QString weight_str;
+  QString lotcode_str;
+  QString packcode_str;
+  QString batch_count_str;
+  QString substitution_str;
+  QString dump_count_str;
 };
 
 class screen : public QWidget

@@ -389,7 +389,8 @@ void batch::pack_collected(int count_to_record)
   batch_count_str = QString::number(count_to_record);
   substitution_str = table_p -> model_p -> item(row-1, 3) -> text();
   
-  centre_p -> communicate_out_batch(lotcode_str, packcode_str, batch_count_str, substitution_str, dump_count_str);
+//  centre_p -> communicate_out_batch(lotcode_str, packcode_str, batch_count_str, substitution_str, dump_count_str);
+  centre_p -> communicate_out('b');
 }  
 
 void batch::dump_complete(int dump_count)
@@ -405,7 +406,7 @@ void batch::dump_complete(int dump_count)
   //QString variant to integers//	11_02_2018//
   QString lotcode_str, packcode_str, batch_count_str, substitution_str, dump_count_str;
   dump_count_str = QString::number(dump_count);
-  centre_p->communicate_out_batch(lotcode_str, packcode_str, batch_count_str, substitution_str, dump_count_str);
+  centre_p->communicate_out('d');
 }
 
 void batch::dumping()

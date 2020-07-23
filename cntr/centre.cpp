@@ -832,7 +832,7 @@ float centre::dust_streak_percentage()
 
 
 //modified to handle barcodes as characters instead of integers// 11_02_2018~~~//
-void centre::communicate_out_totalize(QString bar_str_1, QString bar_str_2, QString bar_str_3, QString bar_str_4, QString totalize_count_str, QString weight_str)
+void centre::communicate_out(char type)//'t'->totalize.  'p'->batch pack.  'd'->batch dump.
 {
 //  cout<<endl<<"USB2SERIAL QStringVariant"<<endl;                                        //OMIT~~~
 //  cout<<"bar_1: "<<bar_str_1.toUtf8().constData();                                      //OMIT~~~
@@ -852,8 +852,13 @@ void centre::communicate_out_totalize(QString bar_str_1, QString bar_str_2, QStr
   QString count_string;
   QString barcode_string;
         
+  ifstream macros;
+  if(type=='t') macros.open("macro_table");
+  if(type=='p') macros.open("macro_table_batch_pack");
+  if(type=='d') macros.open("macro_table_batch_dump");
+  
+  if(macros.good())
   {
-    ifstream macros("macro_table");
     for(int i=0; i<10; ++i)		//searches all 10 macros available
     {
 	    macros>>macro_status_bool;
@@ -889,25 +894,30 @@ void centre::communicate_out_totalize(QString bar_str_1, QString bar_str_2, QStr
             if(macro_function_char[j+1] == 'C')
 	          {
 	            macro_string = macro_string + totalize_count_str;
+              totalize_count_str = "";
 	          }
   	        else if(macro_function_char[j+1] == '1')		//Barcodes
 	          {
               macro_string = macro_string + bar_str_1;
+              bar_str_1 = "";
 //              cout<<"bar_1: "<<bar_str_1.toUtf8().constData()<<endl;  //OMIT~~~
   	        }
 	          else if(macro_function_char[j+1] == '2')
 	          {
               macro_string = macro_string + bar_str_2;
+              bar_str_2 = "";
 //              cout<<"bar_2: "<<bar_str_2.toUtf8().constData()<<endl;  //OMIT~~~
 	          }
 	          else if(macro_function_char[j+1] == '3')
 	          {
               macro_string = macro_string + bar_str_3;
+              bar_str_3 = "";
 //              cout<<"bar_3: "<<bar_str_3.toUtf8().constData()<<endl;  //OMIT~~~
 	          }
 	          else if(macro_function_char[j+1] == '4')
 	          {
               macro_string = macro_string + bar_str_4;
+              bar_str_4 = "";
 //              cout<<"bar_4: "<<bar_str_4.toUtf8().constData()<<endl;  //OMIT~~~
 	          }
 	          else if(macro_function_char[j+1] == 'n')
@@ -938,6 +948,7 @@ void centre::communicate_out_totalize(QString bar_str_1, QString bar_str_2, QStr
     cout<<endl<<combined_macro_functions.toUtf8().constData()<<endl;  //OMIT~~~
     macros.close();
   }
+//  else//macro file did not open.  probably does not exist
 //--------------------------------------------------------------OUTPUT TO SERIAL--------------------------------------------------------------//
   int size_string_macros = combined_macro_functions.size();
   if(communicate_by_keyboard_cable==true)
@@ -956,7 +967,7 @@ void centre::communicate_out_totalize(QString bar_str_1, QString bar_str_2, QStr
     tcp_write(combined_macro_functions);
   }
 }
-
+/*
 void centre::communicate_out_batch(QString lotcode_str, QString packcode_str, QString batch_count_str, QString substitution_str, QString dump_count_str)
 {
     
@@ -1026,7 +1037,7 @@ void centre::communicate_out_batch(QString lotcode_str, QString packcode_str, QS
   //write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros);
 //  cout<<endl<<"serial string buffer length: "<<write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros)<<endl; //ORIGINAL~~~
 //--------------------------------------------------------------------------------------------------------------------------------------------//
-  //serial terminal write function with slight delay between commands//
+  //serial terminal write function with slight delay between commands//*/
   /*int write_output = 0; //TEST~~~
   QString current_char_string;
   
@@ -1060,7 +1071,7 @@ void centre::communicate_out_batch(QString lotcode_str, QString packcode_str, QS
   //cout<<current_char_string.toUtf8().constData();  //OMIT~~~
   cout<<write_output<<endl; //TEST~~~*/
 //--------------------------------------------------------------------------------------------------------------------------------------------//
-}
+//}
 
 
 
