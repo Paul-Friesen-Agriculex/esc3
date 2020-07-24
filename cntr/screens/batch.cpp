@@ -21,7 +21,6 @@ void barcode_line::keyPressEvent(QKeyEvent* event)
   QLineEdit::keyPressEvent(event); //TEST~~~
   if(event->key() == Qt::Key_Return)
   {
-//    cout<<"about to emit barcode_entered("<<displayText().toStdString()<<")\n";
     emit barcode_entered(displayText());  //TEST~~~
     cout<<"emitted barcode_entered("<<displayText().toStdString()<<")\n";
     clear();
@@ -67,10 +66,6 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
   dump_speed_set_p->setOrientation(Qt::Horizontal);
   dump_speed_set_p->setFocusPolicy(Qt::NoFocus);
   
-  
-  
-  
-  
   //calculate speed slider positions from speed values.  This is needed because the speed values are piecewise linear functions of the slider positions.
   
   int high_speed_value = batch_mode_driver_p->high_feed_speed;
@@ -91,14 +86,6 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
   high_speed_set_p->setValue(high_speed_position);
   low_speed_set_p->setValue(low_speed_position);
   dump_speed_set_p->setValue(dump_speed_position);
-  
-  
-  
-  
-  
-//  high_speed_set_p->setValue(batch_mode_driver_p->high_feed_speed);
-//  low_speed_set_p->setValue(batch_mode_driver_p->low_feed_speed);
-//  dump_speed_set_p->setValue(batch_mode_driver_p->dump_speed);
   
   table_p = new batch_table(centre_p, batch_mode_driver_p);
   status_box_p = new message_box;
@@ -193,21 +180,12 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
   end_valve_mode = old_end_valve_mode = closed_empty;
   
   
-//  pack_was_placed = false;
-//  pack_was_removed = false;
-//  seed_for_pack_ready = false;
-//  pack_can_be_removed = false;
-//  pack_removed_too_soon = false;
   pack_ready_message = "Pack Ready";
   pack_removed_too_soon_message = "Pack Not Ready\nPut Back";
-//  dump_container_was_placed = false;
-//  dump_container_can_be_removed = false;
-//  dump_container_removed_too_soon = false;
   dump_container_needed_message = "Place Dump\nContainer";
   dump_container_ready_message = "Finished Dumping";
   dump_container_removed_too_soon_message = "Dumping Not\nFinished";
   bad_seed_lot_message = "Count went over limit.\nDiscard seed lot.\nReduce feed speed.";
-//  dump_flag = false;
   old_barcode_mode = pack;
   
   end_valve_empty_counter = 0;
@@ -215,8 +193,6 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
   connect(batch_mode_driver_p, SIGNAL(dump_complete(int)), this, SLOT(dump_complete(int)));
   connect(batch_mode_driver_p, SIGNAL(dumping()), this, SLOT(dumping()));
   connect(table_p, SIGNAL(focus_on_barcode()), this, SLOT(focus_on_barcode()));
-//  connect(batch_mode_driver_p, SIGNAL(pack_ready()), this, SLOT(pack_ready()));
-  
   connect(batch_mode_driver_p, SIGNAL(bad_lot_signal()), this, SLOT(bad_lot_slot()));
     
   table_p->load_file("settings/batch_backup");
@@ -226,13 +202,6 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
     batch_mode_driver_p->save_program(batch_mode_driver_p->bm_save_program_filename);   
     batch_mode_driver_p->bm_save_program_filename = "";
   }
-/*
-  if(batch_mode_driver_p->bm_save_ss_setup_filename != "")//returning from batch_save_ss_setup screen with name of file to save
-  {
-    batch_mode_driver_p->save_ss_setup(batch_mode_driver_p->bm_save_ss_setup_filename);
-    batch_mode_driver_p->bm_save_ss_setup_filename = "";
-  }
-  */
   if(batch_mode_driver_p->bm_save_table_filename != "")//returning from batch_save_table_file screen with name of file to save
   {
     
@@ -300,12 +269,6 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
 
     batch_mode_driver_p->bm_save_table_filename = "";
   }
-  /*
-  if(batch_mode_driver_p -> use_spreadsheet)
-  {
-    batch_mode_driver_p ->fill_ss_column_pointers();
-  }  
-  */
   barcode_line_p->setFocus();
 
   top_layout_p->setContentsMargins(0,0,0,0);        //set layout margins to shrink to designated container dimensions//
@@ -360,26 +323,14 @@ batch::~batch()
   
   if(repeat_pack_window_exists) delete repeat_pack_window_p;
 }
-/*
-void batch::pack_ready()
-{
-  seed_for_pack_ready = true;//will stay true until pack is removed
-}  
-*/
 void batch::pack_collected(int count_to_record)
 {
-//  pack_can_be_removed = false;
-//  pack_removed_too_soon = false;
-//  pack_was_placed = false;
-  
   if( (end_valve_mode==closed_bad_lot) || (end_valve_mode==open_emptying_bad_lot) ) return;
   
   table_p->enter_seeds(count_to_record);
 
   barcode_line_p->setFocus();
-//  pack_was_removed = true;
-  
-  //QString Alternative  to Integers//  //11_02_2018~~~//
+
   int row;
   row = table_p -> model_row;
   QString lotcode_str, packcode_str, batch_count_str, substitution_str, dump_count_str;
@@ -389,21 +340,16 @@ void batch::pack_collected(int count_to_record)
   batch_count_str = QString::number(count_to_record);
   substitution_str = table_p -> model_p -> item(row-1, 3) -> text();
   
-//  centre_p -> communicate_out_batch(lotcode_str, packcode_str, batch_count_str, substitution_str, dump_count_str);
   centre_p -> communicate_out('b');
 }  
 
 void batch::dump_complete(int dump_count)
 {
-//  dump_container_can_be_removed = true;
-//  dump_container_ready_count = dump_count;
-  
   table_p->enter_dump_count(dump_count);
   
   end_valve_mode = dump_open_empty;
   barcode_line_p->setFocus();
   
-  //QString variant to integers//	11_02_2018//
   QString lotcode_str, packcode_str, batch_count_str, substitution_str, dump_count_str;
   dump_count_str = QString::number(dump_count);
   centre_p->communicate_out('d');
@@ -454,11 +400,6 @@ void batch::repeat_pack_clicked()
 void batch::restart_clicked()
 {
   batch_mode_driver_p -> restart();
-//  pack_can_be_removed = false;
-//  pack_removed_too_soon = false;
-//  dump_container_can_be_removed = false;
-//  dump_flag = true;
-//  dump_container_removed_too_soon = false;
 }
 
 void batch::save_program_clicked()
@@ -592,12 +533,7 @@ void batch::run()
       if(centre_p->get_endgate_state() == ENDGATE_CLOSED)
       {
         end_valve_mode = closed_empty;
-        
-        
-//        cout<<"        batch::run.  batch_mode_driver_p->pack_complete = "<<batch_mode_driver_p->pack_complete<<".  setting true.\n";
         batch_mode_driver_p->pack_complete = true;
-        
-        
       }
       break;
     case pack_removed_too_soon:
@@ -665,7 +601,6 @@ void batch::run()
       }
       break;
     case dump_pass_through:
-//      cout<<"mode dump_pass_through\n";
       if(centre_p->cutgate_p->get_state() == CUTGATE_CLOSED)//not expected
       {
         cout<<"cutgate closed in end_valve_mode dump_pass_through\n";
@@ -699,21 +634,6 @@ void batch::run()
       cout<<"end_valve_mode not found\n";
   }
       
-
-
-
-
-
-
-
-
-
-
-
-
-
-//  if( (pack_can_be_removed==true) && (pack_removed_too_soon==false) && (dump_flag==false) )
-  
   if( (end_valve_mode==closed_full) || (end_valve_mode==open_emptying) || (end_valve_mode==open_empty) )
   {
     QString number;
@@ -738,8 +658,6 @@ void batch::run()
     status_box_p->set_background(0, 255, 0);
     status_box_p->update();
   }
-//  else if(pack_removed_too_soon)
-  
   else if(end_valve_mode==pack_removed_too_soon)
   {
     status_box_p->set_text(pack_removed_too_soon_message);
@@ -747,7 +665,6 @@ void batch::run()
     status_box_p->set_background(255, 0, 0);
     status_box_p->update();
   }
-//  else if(dump_container_can_be_removed)
   else if(end_valve_mode==dump_open_empty)
   {
     status_box_p->set_text(dump_container_ready_message);
@@ -755,7 +672,6 @@ void batch::run()
     status_box_p->set_background(0, 255, 0);
     status_box_p->update();
   }
-//  else if(dump_container_removed_too_soon)
   else if(end_valve_mode==dump_container_removed_too_soon)
   {
     status_box_p->set_text(dump_container_removed_too_soon_message);
@@ -763,7 +679,6 @@ void batch::run()
     status_box_p->set_background(255, 0, 0);
     status_box_p->update();
   }
-//  else if(batch_mode_driver_p->mode == wait_for_bad_lot_cleanout)
   else if( (end_valve_mode==closed_bad_lot) || (end_valve_mode==open_emptying_bad_lot) )
   {
     status_box_p->set_text(bad_seed_lot_message);
@@ -773,7 +688,6 @@ void batch::run()
   }    
   else
   {
-//    if(dump_flag == true)
     if( (end_valve_mode==dump_closed_filling) || (end_valve_mode==dump_pass_through) || (end_valve_mode==dump_open_empty) )
     {
       status_box_p->set_text(dump_container_needed_message);
@@ -898,8 +812,6 @@ repeat_pack_window::repeat_pack_window(batch_mode_driver* batch_mode_driver_p_s,
   
   setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
   show();
-  
-//  batch_mode_driver_p->extra_pack_window_active = true;
 }
   
 void repeat_pack_window::set_message(QString message)
@@ -916,7 +828,6 @@ void repeat_pack_window::entry_button_clicked()
 void repeat_pack_window::cancel_button_clicked()
 {
   batch_p->repeat_pack_window_exists = false;
-//  batch_mode_driver_p->extra_pack_window_active = false;
   deleteLater();
 }
 
@@ -925,5 +836,4 @@ void repeat_pack_window::number_entered(int val)
   batch_mode_driver_p -> extra_pack_count_limit = val;
   batch_mode_driver_p -> fill_extra_pack = true;
   barcode_line_p -> setFocus();
-//  message_p -> setText("Collect pack in end gate");
 }

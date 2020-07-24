@@ -35,14 +35,11 @@
 #include "batch_mode_driver.hpp"
 #include "batch_options.hpp"
 #include "program_delete.hpp"
-//#include "batch_save_file.hpp"
-//#include "delete_program.hpp"
 #include "crop_name_exists.hpp"
 #include "diagnostics_console.hpp"
 #include "spreadsheet_choice.hpp"
 #include "ss_setup_choice.hpp"
 #include "ss_setup_entry.hpp"
-//#include "envelope_layout_choice.hpp"
 #include "set_envelope_size.hpp"
 
 #include "ss_setup_delete.hpp"
@@ -57,7 +54,6 @@
 #include "communications_menu.hpp"
 #include "tcp_server_addr_choice.hpp"
 #include "tcp_client_server_addr_entry.hpp"
-//#include "table.hpp"        //TEST~~~ //access barcodes and count from table
 #include "brother_envelope_feeder.hpp"
 #include "signal_port.hpp"
 
@@ -86,12 +82,6 @@ centre::centre():
 {
   qRegisterMetaType<crop>();
   
-//  startup_progress_label_p = new QLabel("Starting ESC-3 Program");
-//  startup_progress_label_p = new message_box;
-//  startup_progress_label_p -> set_text("Starting ESC-3 Program");
-//  startup_progress_label_p -> show();
-//  startup_progress_label_p -> update();
-  
   init_ran = false;
 
   run_timer_p = new QTimer;
@@ -101,16 +91,9 @@ centre::centre():
 
 void centre::init()
 {
-  cout<<"before processor_thread_p\n";
-  
   processor_p = new processor();
   processor_thread_p = new QThread(this);
   processor_p -> moveToThread(processor_thread_p);
-  
-//  startup_progress_label_p ->setText("Done Camera and Processor Setup");
-  
-  cout<<"after processor creation\n";
-  
   connect(this, SIGNAL(set_camera_processing(bool)), processor_p, SLOT(set_camera_processing(bool)), Qt::BlockingQueuedConnection);
   connect(this, SIGNAL(playback_line()), processor_p, SLOT(playback_line()), Qt::QueuedConnection);
   connect(this, SIGNAL(get_qimage()), processor_p, SLOT(get_qimage()), Qt::QueuedConnection);
@@ -180,7 +163,6 @@ void centre::init()
     f>>crops[i].max_inflection_3;
     f>>crops[i].max_inflection_9;
     f>>crops[i].calibrated;
-//    f.get();
     f>>crops[i].high_feed_speed;
     f>>crops[i].low_feed_speed;
     f>>crops[i].dump_speed;
@@ -189,13 +171,6 @@ void centre::init()
   }
   f.close();
 
-//  cout<<"crops after load in centre::centre\n";
-//  for(int i=0;i<100;++i)
-//  {
-//    cout<<i<<"     "<<crops[i].name.toStdString()<<endl;
-//  }
-  
-  
   crop_list_changed = false;
   
   cutgate_p -> open();
@@ -222,7 +197,6 @@ void centre::init()
   
   //totalize mode
   tm_barcode_columns = 0;
-//  tm_zero_when_seed_discharged = false;
   tm_autosave_count_limit = 0;//after this many counts are recorded, autosaves the file
   tm_autosave_count = 0;//counts how many counts were recorded;
   tm_save_filename = "";
@@ -230,7 +204,6 @@ void centre::init()
   communicate_by_keyboard_cable = true;
   communicate_by_tcp = false;
   tcp_link_established = false;
-//  tcp_server = true;
   network = 0;//0-> not set.  1->use 192.168.100.1.  2->use 192.168.200.1.
   QString tcp_client_server_addr = "";
   tcp_server_p = new QTcpServer;
@@ -249,7 +222,6 @@ void centre::init()
   connect(cutgate_p, SIGNAL(opened_while_closing()), batch_mode_driver_p, SLOT(cutgate_timing_error()));
   connect(tcp_server_p, SIGNAL(newConnection()), this, SLOT(tcp_connection_detected())); 
   connect(tcp_socket_p, SIGNAL(connected()), this, SIGNAL(tcp_connection_detected_signal())); 
-//  connect(batch_mode_driver_p->count_rate_predictor_p, SIGNAL(send_message(QString)), diagnostics_console_p, SLOT(receive_message3(QString)));
   
   tm_macro_updated = 0; 
   count=0;
@@ -258,10 +230,6 @@ void centre::init()
   
   build_macro = false;//set true when leaving macro_screen for macro_builder.  signals that macro_builder will run.
   macro_row = 0;// remember row for return to macro_screen.
-  
-  
-//  delete startup_progress_label_p;
-//  startup_progress_label_p = 0;
 }
 
 centre::~centre()
@@ -316,7 +284,6 @@ centre::~centre()
 void centre::increase_count(int to_add)
 {
   count += to_add;
-//  batch_mode_driver_p->count_rate_predictor_p->add_counts(to_add, feed_speed);
 }
 
 void centre::receive_qimage(QImage qimage_set)
@@ -326,13 +293,7 @@ void centre::receive_qimage(QImage qimage_set)
 
 void centre::receive_calibrated_crop(crop calibrated_crop)
 {
-//  cout<<"\ncentre::receive_calibrated_crop.\n";
-//  cout<<"  calibrated_crop.name="<<calibrated_crop.name.toStdString()<<endl;
-  
   crops[0] = calibrated_crop;
-  
-//  cout<<"crops[0].calibrated="<<crops[0].calibrated<<endl;
-//  cout<<"end centre::receive_calibrated_crop\n\n";
 }
 
 void centre::end_of_playback()
@@ -347,18 +308,12 @@ void centre::get_cycle_time(int value)//value is msec.
 
 void centre::tcp_connection_detected()
 {
-  
-//  cout<<"centre::tcp_connection_detected()\n";
-  
   tcp_socket_p = tcp_server_p->nextPendingConnection();
   emit tcp_connection_detected_signal();
 }
 
 void centre::run()
 {
-  
-//  if(screen_done) cout<<"centre::run.  screen_done true.  new_keyboard_entry = "<<new_keyboard_entry<<"\n";
-  
   if(init_ran == false)
   {
     init();
@@ -366,7 +321,6 @@ void centre::run()
   }
     
   emit set_crop(crops[0]);
-//  cutgate_state = cutgate_p->get_state();
   endgate_state = endgate_p->get_state();
   envelope_present = envelope_sensor_p->read();
   brother_envelope_feeder_p -> run();
@@ -377,7 +331,6 @@ void centre::run()
     {
       if(totalize_force_endgate_open==true || envelope_present==true)
       {
-//        endgate_p -> open();
         set_endgate_state(ENDGATE_OPEN);
       }
     }
@@ -385,40 +338,10 @@ void centre::run()
     {
       if(totalize_force_endgate_open==false && envelope_present==false)
       {
-//        endgate_p -> close();
         set_endgate_state(ENDGATE_CLOSED);
       }
     }
   }
-  /*
-  else if(current_screen==15)//batch
-  {
-    
-//    cout<<"screen 15.  endgate_state "<<endgate_state<<endl;
-    
-    if(endgate_state == ENDGATE_CLOSED)
-    {
-      if(batch_mode_driver_p->force_endgate_open==true || envelope_present==true)
-      {
-//        cout<<"block_endgate_opening "<<block_endgate_opening<<endl;
-//        if (block_endgate_opening == false) endgate_p -> open();
-        if (block_endgate_opening == false) 
-        {
-          cout<<"opening endgate\n";
-          set_endgate_state(ENDGATE_OPEN);
-        }
-      }
-    }
-    else //endgate is open
-    {
-      if(batch_mode_driver_p->force_endgate_open==false && envelope_present==false)
-      {
-//        endgate_p -> close();
-        set_endgate_state(ENDGATE_CLOSED);
-      }
-    }
-  }
-  */
   else if( (current_screen==15) || (current_screen==33) )//batch or ss_batch
   {
     if(endgate_state == ENDGATE_CLOSED)
@@ -443,7 +366,6 @@ void centre::run()
     {
       if(envelope_present==true)
       {
-//        endgate_p -> open();
         set_endgate_state(ENDGATE_OPEN);
       }
     }
@@ -451,25 +373,15 @@ void centre::run()
     {
       if(envelope_present==false)
       {
-//        endgate_p -> close();
         set_endgate_state(ENDGATE_CLOSED);
       }
     }
   }
   if(screen_done)
   {
-    
-//    cout<<"screen_done was true\n";
-    
-      
-//    cout<<"start screen_done.  new_keyboard_entry = "<<new_keyboard_entry<<endl;
-      
     screen_done=false;
     if(previous_screen_going_back == false)//add the current screen to previous_screen_list
     {
-      
-//      cout<<"adding to previous_scree_list "<<current_screen<<endl;
-      
       previous_screen_index++;
       if(previous_screen_index >=10)
       {
@@ -480,7 +392,6 @@ void centre::run()
         previous_screen_index = 9;
       }
       previous_screen_list[previous_screen_index] = current_screen;
-//      cout<<"done adding to previous_screen_list\n";
     }
     current_screen = screen_wait_list[0];
     previous_screen_going_back = false;//will be set true if get_previous_screen is called again
@@ -489,10 +400,6 @@ void centre::run()
       screen_wait_list[i]=screen_wait_list[i+1];
     }
     screen_wait_list[screen_wait_list_size-1]=0;
-    
-//    cout<<"deleting screen_p\n";
-    
-//    delete screen_p;
     screen* old_screen_p = screen_p;
     
     cout<<"current_screen="<<current_screen<<endl;
@@ -562,9 +469,7 @@ void centre::run()
                cout<<"default screen_p case\n";
     }
     screen_p->show();
-//    cout<<"centre::run 1\n";
     delete old_screen_p;
-//    cout<<"centre::run 2\n";
     old_screen_p = 0;
   }
 }
@@ -647,17 +552,11 @@ bool centre::load_settings(QString file_name)
 
 void centre::add_waiting_screen(int screen_to_add)
 {
-  
-  cout<<"add_waiting_screen("<<screen_to_add<<")\n";
-//  cout<<"screen_wait_list_size="<<screen_wait_list_size<<endl;
-  
   for(int i=screen_wait_list_size-1; i>0; --i)
   {
-//    cout<<"centre::add_waiting_screen.  i="<<i<<endl;
     screen_wait_list[i]=screen_wait_list[i-1];
   }
   screen_wait_list[0]=screen_to_add;
-//  cout<<"end of add_waiting_screen\n";
 }
 
 int centre::get_previous_screen()
@@ -727,21 +626,7 @@ void centre::delete_crop(int crop_index)
     crops[99].calibrated=0;
   }
 }
-/*  
-void centre::set_cutgate_state(CUTGATE_STATE set_state)
-{
-  if(set_state==CUTGATE_OPEN)
-  {
-    cutgate_p->open();
-    cutgate_state = CUTGATE_OPEN;
-  }
-  else
-  {
-    cutgate_p->close();
-    cutgate_state = CUTGATE_CLOSED;
-  }
-}
-*/
+
 void centre::set_endgate_state(ENDGATE_STATE set_state)
 {
   if(set_state==ENDGATE_OPEN)
@@ -755,12 +640,7 @@ void centre::set_endgate_state(ENDGATE_STATE set_state)
     endgate_p->close();
   }
 }
-/*
-CUTGATE_STATE centre::get_cutgate_state()
-{
-  return cutgate_state;
-}
-*/
+
 ENDGATE_STATE centre::get_endgate_state()
 {
   return endgate_state;
@@ -824,22 +704,8 @@ float centre::dust_streak_percentage()
   return processor_p->dust_streak_percentage();
 }
 
-
-
-
-
-
-
-
-//modified to handle barcodes as characters instead of integers// 11_02_2018~~~//
 void centre::communicate_out(char type)//'t'->totalize.  'p'->batch pack.  'd'->batch dump.
 {
-//  cout<<endl<<"USB2SERIAL QStringVariant"<<endl;                                        //OMIT~~~
-//  cout<<"bar_1: "<<bar_str_1.toUtf8().constData();                                      //OMIT~~~
-//  cout<<"\tbar_2: "<<bar_str_2.toUtf8().constData();                                    //
-//  cout<<"\tbar_3: "<<bar_str_3.toUtf8().constData();                                    //
-//  cout<<"\tbar_4: "<<bar_str_4.toUtf8().constData()<<endl;                              //
-  
   bool macro_status_bool;			      //temporary variable to transfer ifstream to tablewidget
   int macro_numb_int;				        //
   char macro_name_char[30];			    //
@@ -872,14 +738,8 @@ void centre::communicate_out(char type)//'t'->totalize.  'p'->batch pack.  'd'->
         bool sending_string = false;//true indicates that we are sending out a string of characters
 	      for(unsigned int j=0; j<strlen(macro_function_char)-1; ++j)
 	      {
-            
-//          cout<<"j = "<<j<<"   sending_string = "<<sending_string<<"    macro_function_char[j] = "<<macro_function_char[j]<<endl;
-            
           if(sending_string)
           {
-            
-//            cout<<"sending string.  j = "<<j<<endl;
-            
             if(macro_function_char[j+1] == '"') 
             {
               sending_string = false;
@@ -900,40 +760,33 @@ void centre::communicate_out(char type)//'t'->totalize.  'p'->batch pack.  'd'->
 	          {
               macro_string = macro_string + bar_str_1;
               bar_str_1 = "";
-//              cout<<"bar_1: "<<bar_str_1.toUtf8().constData()<<endl;  //OMIT~~~
   	        }
 	          else if(macro_function_char[j+1] == '2')
 	          {
               macro_string = macro_string + bar_str_2;
               bar_str_2 = "";
-//              cout<<"bar_2: "<<bar_str_2.toUtf8().constData()<<endl;  //OMIT~~~
 	          }
 	          else if(macro_function_char[j+1] == '3')
 	          {
               macro_string = macro_string + bar_str_3;
               bar_str_3 = "";
-//              cout<<"bar_3: "<<bar_str_3.toUtf8().constData()<<endl;  //OMIT~~~
 	          }
 	          else if(macro_function_char[j+1] == '4')
 	          {
               macro_string = macro_string + bar_str_4;
               bar_str_4 = "";
-//              cout<<"bar_4: "<<bar_str_4.toUtf8().constData()<<endl;  //OMIT~~~
 	          }
 	          else if(macro_function_char[j+1] == 'n')
 	          {
               macro_string = macro_string + QString("\r\n");
-//              cout<<"newline"<<endl;  //OMIT~~~
 	          }
 	          else if(macro_function_char[j+1] == 't')
 	          {
               macro_string = macro_string + QString("\t");
-//              cout<<"tab"<<endl;  //OMIT~~~
 	          }
 	          else if(macro_function_char[j+1] == '"')
 	          {
               sending_string = true;
-//              cout<<"sending_string set true.  j = "<<j<<"\n";
 	          }
 	          else
 	          {
@@ -953,12 +806,7 @@ void centre::communicate_out(char type)//'t'->totalize.  'p'->batch pack.  'd'->
   int size_string_macros = combined_macro_functions.size();
   if(communicate_by_keyboard_cable==true)
   {
-    //int filedesc = open("/dev/TTL232RG", O_WRONLY);
     int filedesc = open("/dev/usb2serial", O_WRONLY);
-    //int filedesc = open("/dev/ttyUSB0", O_WRONLY);  //if udev rules are not applied//
-    //write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros) != size_string_macros;
-  
-//    cout<<endl<<"serial string buffer length: "<<write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros)<<endl;
     int ret_val = write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros);
     if(ret_val<0) cout<<"write error writing to keyboard cable\n";
   }
@@ -967,117 +815,6 @@ void centre::communicate_out(char type)//'t'->totalize.  'p'->batch pack.  'd'->
     tcp_write(combined_macro_functions);
   }
 }
-/*
-void centre::communicate_out_batch(QString lotcode_str, QString packcode_str, QString batch_count_str, QString substitution_str, QString dump_count_str)
-{
-    
-  bool macro_status_bool;			      //temporary variable to transfer ifstream to tablewidget
-  int macro_numb_int;				        //
-  char macro_name_char[300];			  //
-  char macro_mask_char[300];			  //
-  char macro_function_char[300];		//
- 
-  QString macro_string;
-  QString combined_macro_functions;
-  QString count_string;
-  QString barcode_string;
-        
-  {
-    ifstream macros("macro_table");
-    for(int i=0; i<10; ++i)
-    {
-	    macros>>macro_status_bool;
-	    macros>>macro_numb_int;
-	    macros>>macro_name_char;
-	    macros>>macro_mask_char;
-	    macros>>macro_function_char;
-    
-	    if(macro_status_bool != 0)
-      {
-        QString macro_string;
-	      for(unsigned int j=0; j<strlen(macro_function_char); ++j)
-	      {
-		      if(macro_function_char[j] == '\\')
-		      {
-            if(macro_function_char[j+1] == 'C')
-	          {
-	            macro_string = macro_string + batch_count_str;
-	          }
-  	        else if(macro_function_char[j+1] == 'T')		  //Lot code
- 	          {
-	   		      macro_string = macro_string + lotcode_str;
-            }
-	          else if(macro_function_char[j+1] == 'P')		  //Pack code
-	          {
-			        macro_string = macro_string + packcode_str;
-	          }
-            else if(macro_function_char[j+1] == 'Q')		  //Dump count
-	          {
-			        macro_string = macro_string + dump_count_str;
-	          }
-	          else
-	          {
-			        macro_string = macro_string + macro_function_char[j] + macro_function_char[j+1];
-	          }
-	        }
-	      }
-        combined_macro_functions = combined_macro_functions + macro_string;
-	    }
-	    if(macros.eof()) break;
-    }
-    macros.close();
-  }  
-//--------------------------------------------------------------OUTPUT TO SERIAL--------------------------------------------------------------//
-  //cout<<"Macros loaded"<<endl;  //OMIT~~~
-//  int size_string_macros = combined_macro_functions.size();
-  //int filedesc = open("/dev/TTL232RG", O_WRONLY);
-//  int filedesc = open("/dev/usb2serial", O_WRONLY);
-  //int filedesc = open("/dev/ttyUSB0", O_WRONLY);  //if udev rules are not applied//
-  //write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros) != size_string_macros;
-  //write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros);
-//  cout<<endl<<"serial string buffer length: "<<write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros)<<endl; //ORIGINAL~~~
-//--------------------------------------------------------------------------------------------------------------------------------------------//
-  //serial terminal write function with slight delay between commands//*/
-  /*int write_output = 0; //TEST~~~
-  QString current_char_string;
-  
-  for(int xy = 0; xy< size_string_macros; ++xy)
-  {
-    if(combined_macro_functions.at(xy) == '\\')
-    {
-      QTime dieTime= QTime::currentTime().addMSecs(250);
-      while (QTime::currentTime() < dieTime)
-      {
-        QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
-      }
-      ++xy;
-      if(combined_macro_functions.at(xy) == 'Q')
-      {
-        QTime dieTime= QTime::currentTime().addMSecs(350);
-        while (QTime::currentTime() < dieTime)
-        {
-          QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
-        }
-      }
-      current_char_string = '\\' + combined_macro_functions.at(xy);
-      write_output = write(filedesc, current_char_string.toUtf8().constData(), 2);
-    }
-    else
-    {
-      current_char_string = combined_macro_functions.at(xy);
-      write_output = write(filedesc, current_char_string.toUtf8().constData(), 2);
-    }
-  }
-  //cout<<current_char_string.toUtf8().constData();  //OMIT~~~
-  cout<<write_output<<endl; //TEST~~~*/
-//--------------------------------------------------------------------------------------------------------------------------------------------//
-//}
-
-
-
-
-
-
 
 screen::screen(centre* set_centre_p)
  :QWidget()
@@ -1085,9 +822,6 @@ screen::screen(centre* set_centre_p)
   centre_p=set_centre_p;
   setMaximumSize(800, 480);		//Original~~~
   setGeometry(0,0,800,480);		//Original~~~
-  //setMaximumSize(1000,600);		  //TEST~~~
-  //setGeometry(0,0,1000,600);		//TEST~~~
-
   
   setStyleSheet(
     "button {"
@@ -1120,11 +854,9 @@ screen::screen(centre* set_centre_p)
         "background: #8c8c8c;}"
 
     ".QSlider::handle {"
-        //"background: e1e8a7;"
         "background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
         "stop: 0 #f6f7fa, stop: 1 #dadbde);"
         "border: 3px solid #404040;"  //TEST~~~
-        //"border: 3px solid black;"
         "width: 60px;"
         "margin: -13px 0;"
         "border-radius: 15px;}"
@@ -1160,7 +892,6 @@ screen::screen(centre* set_centre_p)
         "}"
         
     "QScrollBar::handle {"
-        //"border: 3px solid black;"
         "border: 3px solid #595959;"
         "min-height: 40px;"
         "border-radius: 12px;"
@@ -1227,60 +958,10 @@ screen::screen(centre* set_centre_p)
         "font-size: 13pt;}"
         
     "QGroupBox{"
-//        "background: white}"
         "border: 1px solid black}"
         "margin: 2px"
   );
 }
-//==============================================================================================================//  //TEST~~~ 11_14_2018
-/*
-void centre::macro_name_cell(int row, int col)  //FROM MACRO_SCREEN.CPP//
-{
-  nRow = row;
-  nCol = col;
-}
-
-void centre::macro_name_keyboard(QString macro_name) //FROM KEYBOARD.CPP//
-{
-  QList<QString> macro_file_list;
-  QString macro_strings;
-  char temp_name[300];
-  
-  if(macro_name.isEmpty()) macro_name = "-";
-  if(macro_name.contains(" ")) macro_name.replace(" ", "_");
-  
-  ifstream macros_in("macro_table");  //INPUT FROM FILE//
-  
-  if(macros_in)
-  {
-    for(int i=1; i<=10; ++i)
-    {
-      for(int j=1; j<=5; ++j)
-      {        
-        macros_in>>temp_name;
-        macro_file_list << QString::fromLatin1(temp_name);
-      }
-      if(macros_in.eof()) break;
-    }
-    macros_in.close();
-  }
-  macro_file_list.replace((nRow*5+nCol), macro_name);
-      
-  std::ofstream macros_out("macro_table",(std::ofstream::out));   //OUTPUT TO FILE//
-  
-  for(int i=0; i<10; ++i)
-  {  
-    macros_out<<endl;
-    for(int j=0; j<5; ++j)
-    {
-      macros_out<<macro_file_list.at(i*5+j).toLatin1().data();
-      macros_out<<" ";
-    }
-  }
-  macros_out.close();
-  macros_out.clear();
-}
-*/ 
 
 //==============================================================================================================//
 void centre::load_macros()	//TEST~~~ connecting macros screen
@@ -1289,7 +970,6 @@ void centre::load_macros()	//TEST~~~ connecting macros screen
   combined_macro_functions.clear();
   QString count_string;
   
-  //int char_array_it = 0;
   char barcode_1[30];		//TEST~~~ totalize_mode variables
   char barcode_2[30];
   char barcode_3[30];
@@ -1321,12 +1001,6 @@ void centre::load_macros()	//TEST~~~ connecting macros screen
       barcodes>>seed_count;
     }
     
-//    cout<<endl<<endl<<"LOADING TOTALIZEMODE"<<endl;		//OMIT~~~
-//    cout<<"\t"<<"barcode_1: "<<barcode_1<<endl		    //
-//		<<"\t"<<"barcode_2: "<<barcode_2<<endl		        //
-//		<<"\t"<<"barcode_3: "<<barcode_3<<endl		        //
-//		<<"\t"<<"barcode_4: "<<barcode_4<<endl		        //
-//		<<"\t"<<"seed_count: "<<seed_count<<endl;	        //
     barcodes.close();
     
     for(int q=0; q<30; ++q)
@@ -1367,11 +1041,6 @@ void centre::load_macros()	//TEST~~~ connecting macros screen
 	    //batchcodes>>substitution;
     }
     
-//    cout<<endl<<endl<<"LOADING BATCHMODE"<<endl;			  //OMIT~~~
-//    cout<<"\t"<<"lotcode: "<<lotcode<<endl				      //
-//		    <<"\t"<<"packcode: "<<packcode<<endl			      //
-//		    //<<"\t"<<"substitution: "<<substitution<<endl	//
-//        <<"\t"<<"seed_count: "<<seed_count<<endl;		    //
     batchcodes.close();									                //
     
     for(int q=0; q<30; ++q)
@@ -1510,11 +1179,6 @@ QString centre::choose_tcp_network(int choice)//choice 1 -> 192.168.100.1.  choi
 void centre::tcp_write(QString string)
 {
   QByteArray array = string.toLatin1();
-//  cout<<"start tcp_write\n";
-//  for(int i=0; i<array.size(); ++i)
-//  {
-//    cout<<"array ["<<i<<"] = "<<int(array[i])<<endl;
-//  }
   tcp_socket_p->write(string.toLatin1());
 }
 

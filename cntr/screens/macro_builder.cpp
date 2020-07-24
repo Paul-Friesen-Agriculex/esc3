@@ -3,19 +3,12 @@
 #include <QHBoxLayout>
 #include <QGroupBox>
 #include <QLabel>
-//#include <QRadioButton>
-//#include <QSpinBox>
 #include "centre.hpp"
 #include "macro_screen.hpp"
 #include "button.hpp"
 #include "help_screen.hpp"
 #include "macro_builder.hpp"
 
-//#include <QHeaderView>
-//#include <fstream>
-//#include <QFormLayout>
-//#include <QDialogButtonBox>
-//#include <QDialog>
 #include <QSignalMapper>
 #include <QTabWidget>
 #include <QFormLayout>
@@ -31,18 +24,8 @@ macro_builder::macro_builder(centre* centre_p_s)
   macro_function_string.clear();
   macro_function_string.append("-");
 
-//  QDialog dialog(this);
-//  dialog.setGeometry(0, 0, 800, 450);   //defines starting position and dimensions//
-  
-//  connect(this, SIGNAL(close_dialog(int)), &dialog, SLOT(done(int)));
-  
-  form_p = new QFormLayout(this);
-//  dialog.setWindowTitle("USB Communications Macro Builder");
-
+  form_p = new QVBoxLayout(this);
   QSignalMapper* signalMapper = new QSignalMapper (this);
-
-//  instruction_label_p = new QLabel("If this entry is active and the special USB communication cable is "
-//                                   "connected to a computer, items listed go to the computer as keyboard input");  
   instruction_label_p = new QLabel("If this entry is active, items listed will be sent out using the selected communications method.");  
   instruction_label_p -> setWordWrap(true);
   lineEdit = new QLineEdit;//(&dialog);
@@ -50,13 +33,6 @@ macro_builder::macro_builder(centre* centre_p_s)
   lineEdit->setAlignment(Qt::AlignCenter);
   lineEdit->setFixedWidth(650);
   lineEdit->setFixedHeight(50);
-  /*
-  if(!tableWidget_p->item(nRow,3)->text().startsWith("-"))
-  {
-    lineEdit->setText(tableWidget_p->item(nRow, 3)->text());
-    macro_function_string.append(tableWidget_p->item(nRow, 4)->text());
-  }
-  */
   if((centre_p->macro_display_string).startsWith("-") == false)
   {
     lineEdit->setText(centre_p->macro_display_string);
@@ -65,17 +41,10 @@ macro_builder::macro_builder(centre* centre_p_s)
   
   totalize_count_button = new QPushButton(tr("Count"), this);
   text_entry_button = new QPushButton(tr("Enter text"), this);
-//    batch_count_button = new QPushButton(tr("Count"), this);
-//    seed_button = new QPushButton(tr("Seed name"), this);
   barcode_button1 = new QPushButton(tr("Barcode 1"), this);
   barcode_button2 = new QPushButton(tr("Barcode 2"), this);
   barcode_button3 = new QPushButton(tr("Barcode 3"), this);
   barcode_button4 = new QPushButton(tr("Barcode 4"), this);
-//    weight_button = new QPushButton(tr("Weight"), this);		      //yet to be implemented
-//    lotcode_button = new QPushButton(tr("Lot Code"), this);
-//    packcode_button = new QPushButton(tr("Pack Code"), this);
-//    substitution_button = new QPushButton(tr("Substitution"), this);
-//    dump_count_button = new QPushButton(tr("Dump Count"), this);
   newline = new QPushButton(tr("Enter ↵"), this);
   horizontal_tab = new QPushButton(tr("Tab ↹"), this);
   spacebar = new QPushButton(tr("Spacebar ␣"), this);
@@ -91,11 +60,8 @@ macro_builder::macro_builder(centre* centre_p_s)
   
   cout<<"macro_builder::macro_builder 2\n";
   
-
   totalize_count_button->setFixedSize(macro_button_width,macro_button_height);
   text_entry_button->setFixedSize(macro_button_width,macro_button_height);
-//    batch_count_button->setFixedSize(macro_button_width,macro_button_height);
-//    seed_button->setFixedSize(macro_button_width,macro_button_height);
   barcode_button1->setFixedSize(macro_button_width,macro_button_height);
   barcode_button2->setFixedSize(macro_button_width,macro_button_height);
   barcode_button3->setFixedSize(macro_button_width,macro_button_height);
@@ -122,16 +88,24 @@ macro_builder::macro_builder(centre* centre_p_s)
   cout<<"macro_builder::macro_builder 2b\n";
   
   top_line_p = new QHBoxLayout(this);
+  
+  cout<<"macro_builder::macro_builder 2ba\n";
+  
   top_line_p->addWidget(instruction_label_p);
   top_line_p->addWidget(back_button_p);
+  
+  cout<<"macro_builder::macro_builder 2b1\n";
+  
 
   input_line_modify = new QHBoxLayout(this);
   input_line_modify->addWidget(lineEdit);
   input_line_modify->addWidget(remove_last);
+  
+  cout<<"macro_builder::macro_builder 2b2\n";
+  
 
-//  form_p->addRow(instruction_label_p);
-  form_p->addRow(top_line_p);
-  form_p->addRow(input_line_modify);
+  form_p->addLayout(top_line_p);
+  form_p->addLayout(input_line_modify);
 //==================================================================================================================//	
   totalize_box = new QGroupBox();
   barcodes = new QVBoxLayout;
@@ -152,12 +126,22 @@ macro_builder::macro_builder(centre* centre_p_s)
   barcodes_right->addWidget(barcode_button3);
   barcodes_right->addWidget(barcode_button4);
   
-  cout<<"macro_builder::macro_builder 2d\n";
+//  cout<<"macro_builder::macro_builder 2d\n";
   
-
+  cout<<"1\n";
+  
   barcodes_columns->addLayout(barcodes_left);
+  
+  cout<<"2\n";
+  
   barcodes_columns->addLayout(barcodes_right);
+  
+  cout<<"3\n";
+  
   barcodes->addLayout(barcodes_columns);
+  
+  cout<<"4\n";
+  
   totalize_box->setLayout(barcodes);
 //  totalize_box->show();
   
@@ -166,10 +150,6 @@ macro_builder::macro_builder(centre* centre_p_s)
   barcode_button2->setDisabled(true);
   barcode_button3->setDisabled(true);
   barcode_button4->setDisabled(true);
-
-  
-  cout<<"macro_builder::macro_builder 2e\n";
-  
   if(centre_p->tm_barcode_columns > 0) barcode_button1->setEnabled(true);
   if(centre_p->tm_barcode_columns > 1) barcode_button2->setEnabled(true);
   if(centre_p->tm_barcode_columns > 2) barcode_button3->setEnabled(true);
@@ -188,9 +168,6 @@ macro_builder::macro_builder(centre* centre_p_s)
   QVBoxLayout *accessibility_keys_right = new QVBoxLayout;
   QLabel *accessibility_box_label = new QLabel(tr("Navigation and Formatting"));
   
-  
-  cout<<"macro_builder::macro_builder 2f\n";
-  
 //    accessibility_keys_left->addWidget(seed_button);
   accessibility_keys_left->addWidget(newline);
   accessibility_keys_left->addWidget(horizontal_tab);
@@ -205,12 +182,18 @@ macro_builder::macro_builder(centre* centre_p_s)
   accessibility_keys->addLayout(accessibility_keys_right);
   accessibility_keys_container->addWidget(clear_entry);
   accessibility_keys_container->setAlignment(Qt::AlignHCenter);
+  
+  cout<<"5\n";
+  
   accessibility_keys_container->addLayout(accessibility_keys);
+  
+  cout<<"6\n";
+  
   accessibility_button_box->setLayout(accessibility_keys_container);
+  
+  cout<<"7\n";
+  
 
-  
-  cout<<"macro_builder::macro_builder 2g\n";
-  
 //    seed_button->setDisabled(true);
   
   accessibility_keys_container->setAlignment(Qt::AlignTop);
@@ -223,13 +206,13 @@ macro_builder::macro_builder(centre* centre_p_s)
   macro_menu_main_horizontal->addWidget(totalize_box);
 //    macro_menu_main_horizontal->addWidget(batchmode_button_box);
   macro_menu_main_horizontal->addWidget(accessibility_button_box);
-  form_p->addRow(macro_menu_main_horizontal);
-  
-  cout<<"macro_builder::macro_builder 2h\n";
-  
+  form_p->addLayout(macro_menu_main_horizontal);
   bottom_line_p = new QHBoxLayout(this);
   bottom_line_p->addWidget(save_button_p);
-  form_p->addRow(bottom_line_p);
+  form_p->addLayout(bottom_line_p);
+  
+  cout<<"8\n";
+  
 //==================================================================================================================//
   connect(totalize_count_button, SIGNAL(clicked()), signalMapper, SLOT(map()));	//totalize mode variables
   connect(text_entry_button, SIGNAL(clicked()), signalMapper, SLOT(map()));
@@ -238,9 +221,6 @@ macro_builder::macro_builder(centre* centre_p_s)
   connect(barcode_button2, SIGNAL(clicked()), signalMapper, SLOT(map()));
   connect(barcode_button3, SIGNAL(clicked()), signalMapper, SLOT(map()));
   connect(barcode_button4, SIGNAL(clicked()), signalMapper, SLOT(map()));
-  
-  
-  cout<<"macro_builder::macro_builder 2i\n";
   
 //    connect(batch_count_button, SIGNAL(clicked()), signalMapper, SLOT(map()));		//batch mode variables
 //    connect(lotcode_button, SIGNAL(clicked()), signalMapper, SLOT(map()));
@@ -266,9 +246,6 @@ macro_builder::macro_builder(centre* centre_p_s)
   signalMapper -> setMapping (barcode_button3, 5);
   signalMapper -> setMapping (barcode_button4, 6);
   
-  
-  cout<<"macro_builder::macro_builder 2j\n";
-  
 //    signalMapper -> setMapping (batch_count_button, 1);			  //batch mode variables
 //    signalMapper -> setMapping (lotcode_button, 15);
 //    signalMapper -> setMapping (packcode_button, 16);	
@@ -283,33 +260,18 @@ macro_builder::macro_builder(centre* centre_p_s)
   signalMapper -> setMapping (arrow_right, 13);
   signalMapper -> setMapping (clear_entry, 14);
   signalMapper -> setMapping (remove_last, 17);
-  
-  cout<<"macro_builder::macro_builder 3\n";
-  
 
   connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(dialogbox_buttons(int)));
   
   connect(back_button_p, SIGNAL(clicked()), this, SLOT(back_button_clicked()));
   connect(save_button_p, SIGNAL(clicked()), this, SLOT(save_button_clicked()));
 
-//  QDialogButtonBox buttonBox(QDialogButtonBox::Save | QDialogButtonBox::Cancel,	Qt::Horizontal, &dialog);  //standard buttons
-//  QObject::connect(&buttonBox, SIGNAL(accepted()), &dialog, SLOT(accept()));
-//  QObject::connect(&buttonBox, SIGNAL(rejected()), &dialog, SLOT(reject()));
-//  form_p->addRow(&buttonBox);
-  
-  //buttonBox.button(QDialogButtonBox::Save)->setStyleSheet("QPushButton { font: bold;}");
-  //buttonBox.button(QDialogButtonBox::Cancel)->setStyleSheet("QPushButton { font: bold;}");
-//  buttonBox.button(QDialogButtonBox::Save)->setFixedSize(macro_button_width-20, macro_button_height);
-//  buttonBox.button(QDialogButtonBox::Cancel)->setFixedSize(macro_button_width-20, macro_button_height);
-  
   if(centre_p->new_keyboard_entry)//signals that a string was entered on the keyboard to add to the macro
   {          
     QString string = "\"";
     string += centre_p->keyboard_return_string;
     string += "\"";
-    cout<<"\nadding string to lineEdit.  string = "<<string.toStdString()<<" end\n";
     
-//    lineEdit->setText(centre_p->macro_display_string);
     if(centre_p->macro_display_string.size() > 1)
     {
       centre_p->macro_display_string.append(",");
@@ -324,7 +286,8 @@ macro_builder::macro_builder(centre* centre_p_s)
     centre_p->keyboard_return_string = "";
     
   }
-
+  
+  cout<<"20\n";
   
   //=============================================================//
   //Style sheet specific for macro builder screen//
@@ -384,40 +347,8 @@ macro_builder::macro_builder(centre* centre_p_s)
         "background: none;}"
   );
 
-  //=============================================================//
-  /*
-  if (dialog.exec() == QDialog::Accepted)
-  {
-    if(lineEdit->text().isEmpty())
-    {
-      lineEdit->setText("-");
-      macro_function_string.clear();
-      macro_function_string.append("-");
-      
-      QLabel *placement_holder_text_label = new QLabel(this);                                            //TEST~~~
-      placement_holder_text_label->setText("< Click to edit/create macro >");                            //TEST~~~
-      tableWidget_p->setCellWidget (nRow, nCol, placement_holder_text_label);                            //TEST~~~
-      placement_holder_text_label->setAlignment(Qt::AlignCenter);                                        //TEST~~~
-      placement_holder_text_label->setStyleSheet("font: italic; color: grey; background-color: white;"); //TEST~~~       
-    }
-    else
-    {
-      QLabel *placement_holder_text_label = new QLabel(this);                   //TEST~~~
-      placement_holder_text_label->setText("");                                 //TEST~~~
-      tableWidget_p->setCellWidget (nRow, nCol, placement_holder_text_label);   //TEST~~~ 
-    }
-    if(macro_function_string.startsWith("-") && lineEdit->text().size() > 1)
-    {
-      macro_function_string.remove(0,1);
-    }
-    tableWidget_p->item(nRow, 3)->setText(lineEdit->text());
-    tableWidget_p->item(nRow, 4)->setText(macro_function_string);
-    store_macro_table();
-  }
-  */
-  
+  setLayout(form_p);
   cout<<"macro_builder::macro_builder 4\n";
-  
 }
 
 void macro_builder::dialogbox_buttons(int n)
@@ -510,9 +441,6 @@ void macro_builder::dialogbox_buttons(int n)
 	  }
 	  case 14:
 	  {
-      
-      cout<<"clearing\n";
-      
       lineEdit->setText("");
       macro_function_string.clear();
       macro_function_string.append("-");
@@ -565,26 +493,19 @@ void macro_builder::dialogbox_buttons(int n)
     }
     case 20://exit this screen for keyboard entry
     {
-      cout<<"case 20\n";
       
       centre_p->new_keyboard_entry = true;//This will tell this screen's constructor that it is returning from keyboard entry
       centre_p->keyboard_message_string = "Enter characters to add to the macro.";
       centre_p->macro_display_string = lineEdit->text();
       centre_p->macro_function_string = macro_function_string;
-//      centre_p->control_int[0] = current_row; //remember for return to this screen
-//      centre_p->control_int[1] = current_column; //remember for return to this screen
       centre_p->add_waiting_screen(38);//come back here to macro_builder
       centre_p->add_waiting_screen(100);//keyboard
       centre_p->screen_done = true;
-//      emit close_dialog(0);
-      
-      cout<<"end of case 20.  new_keyboard_entry = "<<centre_p->new_keyboard_entry<<endl;
-      
       break;
     }  
 	  default:
 	  {
-      //cout<<"default"<<endl;	//omit~~~
+      cout<<"macro_builder::dialogbox_buttons default"<<endl;	//omit~~~
 	  }
   }
 }

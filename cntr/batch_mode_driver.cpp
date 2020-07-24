@@ -1766,37 +1766,3 @@ int batch_mode_driver::get_spreadsheet_line_number_after(int val)//look for line
   }
   return(-1);
 }
-/*
-count_rate_predictor::count_rate_predictor(centre* centre_p_s)
-{
-  centre_p = centre_p_s;
-  count_rate_multiplier = 1;
-  old_count = 0;
-  connect(&timer, SIGNAL(timeout()), this, SLOT(run()));
-  timer.start(100);
-}
-
-count_rate_predictor::~count_rate_predictor()
-{
-  timer.stop();
-}
-
-void count_rate_predictor::run()
-{
-  float current_rate = float(centre_p->count-old_count)*10.0;
-  old_count = centre_p->count;
-  if(current_rate>0 && centre_p->feed_speed>0)//if rate is 0, feeder is empty.  do not calculate.
-  {
-    float current_count_rate_multiplier = current_rate/float(centre_p->feed_speed);
-    count_rate_multiplier = (1.0-averaging_weight) * count_rate_multiplier   +   averaging_weight * current_count_rate_multiplier;
-  }
-  
-  emit send_message(QString("count rate multiplier %1.  Predicted rate %2.").arg(count_rate_multiplier).arg(count_rate_multiplier*float(centre_p->feed_speed)));
-}
-
-float count_rate_predictor::get_rate()
-{
-  return (count_rate_multiplier * float(centre_p->feed_speed));
-}
-*/
-    

@@ -11,7 +11,6 @@
 #include "envelope.hpp"
 
 class QTimer;
-//class count_rate_predictor;
 class envelope;
 
 struct bm_set //batch mode set of packs
@@ -132,7 +131,6 @@ class batch_mode_driver : public QObject
   int pack_ready_pack_limit;
   
   bool discharge_next_packet;
-//  count_rate_predictor* count_rate_predictor_p;
   int slowdown_count_diff;//seed feeder slows down when count is this many seeds from limit
   bool slowdown_count_diff_set;//if this is false, run function will estimate a default starting value.  Otherwise, the set value will be used.  The set value will be adjusted continuously.
   QTime low_speed_mode_time;
@@ -197,8 +195,6 @@ class batch_mode_driver : public QObject
   void fill_ss_column_pointers();
   QList<int> display_column_numbers;
   QString envelope_layout_path;
-//  void load_envelope_layout();
-//  void clear_envelope_layout();
 
   //saving spreadsheet setup files
   QString bm_save_ss_setup_filename;//new filename just entered.  Set back to blank when file is saved.
@@ -249,28 +245,5 @@ class batch_mode_driver : public QObject
   void send_message2(QString);
   void send_message_time_to_end(QString);
 };
-/*	
-class count_rate_predictor : public QObject
-{
-  Q_OBJECT
-  
-  centre* centre_p;
-  float count_rate_multiplier;
-  QTimer timer;
-  int old_count;
-  const static float averaging_weight = .01;
-  
-  private slots:
-  void run();
-  
-  public:
-  count_rate_predictor(centre* centre_p_s);
-  ~count_rate_predictor();
-  void set_initial_count_rate_multiplier(float multiplier_s) {count_rate_multiplier = multiplier_s;};
-  float get_rate();
-  
-  signals:
-  void send_message(QString message);
-};
-*/
+
 #endif

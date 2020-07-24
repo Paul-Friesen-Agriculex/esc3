@@ -198,7 +198,6 @@ totalize::totalize(centre* set_centre_p)
   }
   
   speed_label_p->setAlignment(Qt::AlignCenter);
-//  speed_set_p->setFixedHeight(100);
   top_layout_p->setContentsMargins(0,0,0,0);        //set layout margins to shrink to designated container dimensions//
   control_layout_p->setContentsMargins(0,0,0,0);
   speed_layout_p->setContentsMargins(0,0,0,0);
@@ -210,14 +209,9 @@ totalize::totalize(centre* set_centre_p)
 
 totalize::~totalize()
 {
-  
-//  cout<<"start totalize::~totalize\n";
-  
   run_timer_p -> stop();
   centre_p->set_to_record_f(false);
   table_p->save_file(QString("settings/totalize_backup"));
-  
-//  cout<<"end totalize::~totalize\n";
 }
 
 void totalize::options_clicked()
@@ -274,13 +268,10 @@ void totalize::startstop_clicked()
 void totalize::change_speed(int value)
 {
   centre_p->totalize_feed_speed=value;
-//  cout<<"totalize_feed_speed set to "<<value<<endl;
   
   //~~~feeder speed behaviour~~~//
   if(value <= 500) value = value/2;         //~~~piece-wise linear, 2 parts~~~//
   else value = 1.5*value-500;
-  //value = pow(1.0069, value) - 1;          //~~~exponential~~~//
-  
   
   if(feeder_is_running)
   {
@@ -351,10 +342,8 @@ void totalize::run()
   int slider_position_num;
   if(speed_set_p->sliderPosition() <= 500) slider_position_num = (speed_set_p->sliderPosition())/2;      //piece-wise linear, 2 sections//
   else slider_position_num = 1.5*(speed_set_p->sliderPosition())-500;
-  //slider_position_num = pow(1.0069, (speed_set_p->sliderPosition())) - 1;         //exponential function//
 
   QString slider_position_message = QString("Speed:  %1 \%").arg(1.0*slider_position_num/10);    //TEST~~~
-  //QString slider_position_message = QString("Speed:  %1 \%").arg(1.0*speed_set_p->sliderPosition()/10);    //ORIGINAL~~~
   speed_label_p->setText(slider_position_message);                                                         //TEST~~~
   speed_label_p->setStyleSheet("QLabel {"
           "font: bold;}");
@@ -364,13 +353,11 @@ void totalize::run()
   {
     centre_p -> totalize_force_endgate_open = true;
     endgate_button_p->setText("Close Endgate\nHold Seed");
-//    centre_p->tm_zero_when_seed_discharged = false;
   }
   else //endgate is closed
   {      
     centre_p -> totalize_force_endgate_open = false;
     endgate_button_p->setText("Open Endgate\nDischarge Seed");
-//    centre_p->tm_zero_when_seed_discharged = true;
   }
   
   old_count = count;
@@ -388,27 +375,8 @@ void totalize::run()
     
     count_string = QString::number(old_count);
     
-    if(!(centre_p->tm_macro_updated))
-    {
-//      centre_p->load_macros();
-//      cout<<"loading macros"<<endl;
-	  }
-//	  else
-//	  {
-//	    cout<<"macros already loaded"<<endl;
-//	  }
-	  
-    //load totalize table variables//
-//    QString bar_str_1, bar_str_2, bar_str_3, bar_str_4, totalize_str_count, totalize_str_weight;      //modified to handle barcodes as characters instead of integers// 11_02_2018~~~//
     int current_totalize_table_row;    
     current_totalize_table_row = table_p -> model_row - 1;
-    /*
-    bar_str_1 = (table_p -> model_p -> item(current_totalize_table_row,0) -> text());
-    bar_str_2 = (table_p -> model_p -> item(current_totalize_table_row,1) -> text());
-    bar_str_3 = (table_p -> model_p -> item(current_totalize_table_row,2) -> text()); 
-    bar_str_4 = (table_p -> model_p -> item(current_totalize_table_row,3) -> text());
-    totalize_str_count = (table_p -> model_p -> item(current_totalize_table_row,4) -> text());
-    */
 
     centre_p->bar_str_1 = (table_p -> model_p -> item(current_totalize_table_row,0) -> text());
     centre_p->bar_str_2 = (table_p -> model_p -> item(current_totalize_table_row,1) -> text());
@@ -416,10 +384,6 @@ void totalize::run()
     centre_p->bar_str_4 = (table_p -> model_p -> item(current_totalize_table_row,3) -> text());
     centre_p->totalize_count_str = (table_p -> model_p -> item(current_totalize_table_row,4) -> text());
 
-
-//    totalize_str_weight = (table_p -> model_p -> item(current_totalize_table_row,5) -> text());
-
-//    centre_p -> communicate_out(bar_str_1, bar_str_2, bar_str_3, bar_str_4, totalize_str_count, totalize_str_weight);	  //TEST~~~ Strings instead of ints 11_02_2018~~~//
     centre_p -> communicate_out('t');
 
     table_p->save_file(QString("settings/totalize_backup"));
