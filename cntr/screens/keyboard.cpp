@@ -19,7 +19,7 @@ kb_key::kb_key(const QString & text, QWidget* parent)
 :QPushButton(text, parent)
 {
   setMinimumSize(65,50);  //TEST~~~
-  setMaximumSize(65,50);  //
+//  setMaximumSize(65,50);  //
 }
   
 keyboard::keyboard(centre* set_centre_p)
@@ -38,7 +38,7 @@ keyboard::keyboard(centre* set_centre_p)
   message_p->setMaximumSize(500,40);
   message_p->setFocusPolicy(Qt::NoFocus);
   entry_line_display_p=new QLineEdit;
-  entry_line_display_p -> setMinimumHeight(50);
+//  entry_line_display_p -> setMinimumHeight(50);
   entry_line_display_p->setFocusPolicy(Qt::NoFocus);
   back_button_p=new button("BACK");
   entry_line_p=new QString;
@@ -194,7 +194,8 @@ keyboard::keyboard(centre* set_centre_p)
 //  cout<<"keyboard::keyboard 3\n";
   
   entry_line_display_p -> setStyleSheet( "font-size: 15pt;");
-      
+  
+//  setMaximumSize(800, 480);	
   setFocus();
 
 //  cout<<"keyboard::keyboard 4\n";

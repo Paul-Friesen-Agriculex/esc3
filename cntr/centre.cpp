@@ -1072,10 +1072,13 @@ screen::screen(centre* set_centre_p)
  :QWidget()
 {
   centre_p=set_centre_p;
-  setMaximumSize(800, 480);		//Original~~~
-  setGeometry(0,0,800,480);		//Original~~~
-  //setMaximumSize(1000,600);		  //TEST~~~
-  //setGeometry(0,0,1000,600);		//TEST~~~
+  
+//  setWindowState(Qt::WindowMaximized);
+  setWindowState(Qt::WindowFullScreen);
+//  setMaximumSize(800, 480);		//Original~~~
+//  setGeometry(0,0,800,480);		//Original~~~
+
+
 
   
   setStyleSheet(
