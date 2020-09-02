@@ -3,6 +3,7 @@
 #include <QGroupBox>
 #include <QDir>
 #include <QMessageBox>
+#include <QApplication>
 #include "centre.hpp"
 #include "start_screen.hpp"
 #include "button.hpp"
@@ -78,7 +79,7 @@ void start_screen::batch_from_spreadsheet_clicked()
 
 void start_screen::tools_clicked()
 {
-  centre_p->add_waiting_screen(9);
+  centre_p->add_waiting_screen(9);//tool choice
   centre_p->screen_done=true;
 }
 
@@ -156,7 +157,7 @@ void start_screen::help_button_clicked()
 void start_screen::shutdown()
 {
   centre_p->~centre();
-  exit(1);
+  centre_p->application_p->exit(1);
 }
 /*
 void start_screen::exit_program()

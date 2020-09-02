@@ -9,6 +9,7 @@
 #include <QList>  //add for modifying specific position in file// 11_14_2018
 #include <QTcpServer>
 #include <QTcpSocket>
+#include <QScreen>
 //#include <QLabel>
 #include "message_box.hpp"
 #include <time.h>
@@ -91,6 +92,16 @@ centre::centre():
 //  startup_progress_label_p -> set_text("Starting ESC-3 Program");
 //  startup_progress_label_p -> show();
 //  startup_progress_label_p -> update();
+  
+  diagnostics_console_p = new diagnostics_console(this);
+  diagnostics_console_p -> show();
+
+  base_widget_p = new QWidget;
+  base_widget_p->setWindowState(Qt::WindowFullScreen);
+  base_widget_p->show();
+//  base_widget_p->update();
+//  QRect rect = base_widget_p->geometry();
+//  cout <<"constructor base widget width "<<rect.width()<<endl;
   
   init_ran = false;
 
@@ -238,8 +249,8 @@ void centre::init()
 
   load_settings("default");
   
-  diagnostics_console_p = new diagnostics_console(this);
-  diagnostics_console_p -> show();
+//  diagnostics_console_p = new diagnostics_console(this);
+//  diagnostics_console_p -> show();
 
   connect(processor_p, SIGNAL(send_message(QString)), diagnostics_console_p, SLOT(receive_message1(QString)));
   connect(batch_mode_driver_p, SIGNAL(send_message2(QString)), diagnostics_console_p, SLOT(receive_message2(QString)));
@@ -266,13 +277,14 @@ void centre::init()
 
 centre::~centre()
 {
+  delete base_widget_p;
   delete diagnostics_console_p;
 
-  if(screen_p) 
-  {
-    delete screen_p;
-    screen_p = 0;
-  }
+//  if(screen_p) 
+//  {
+//    delete screen_p;
+//    screen_p = 0;
+//  }
   if(brother_envelope_feeder_p)
   {
 	delete brother_envelope_feeder_p;
@@ -561,12 +573,24 @@ void centre::run()
       default: screen_p=new start_screen(this);
                cout<<"default screen_p case\n";
     }
+//    QRect rect = base_widget_p->geometry();
+//    cout <<"run base widget width "<<rect.width()<<endl;
+    screen_p->setParent(base_widget_p, Qt::Widget);
+//    screen_p->setWindowState(Qt::WindowMaximized);
+//    screen_p->setGeometry(rect);
+    
+//    QScreen display_screen;
+//    screen_p->setGeometry(display_screen.availableGeometry());
     screen_p->show();
 //    cout<<"centre::run 1\n";
     delete old_screen_p;
 //    cout<<"centre::run 2\n";
     old_screen_p = 0;
   }
+  QRect rect = base_widget_p->geometry();
+//  cout <<"run base widget width "<<rect.width()<<endl;
+//  screen_p->setParent(base_widget_p, Qt::Widget);
+  screen_p->setGeometry(rect);
 }
 
 bool centre::save_settings(QString file_name)
@@ -1074,7 +1098,7 @@ screen::screen(centre* set_centre_p)
   centre_p=set_centre_p;
   
 //  setWindowState(Qt::WindowMaximized);
-  setWindowState(Qt::WindowFullScreen);
+//  setWindowState(Qt::WindowFullScreen);
 //  setMaximumSize(800, 480);		//Original~~~
 //  setGeometry(0,0,800,480);		//Original~~~
 

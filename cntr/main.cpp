@@ -1,19 +1,17 @@
 #include <QApplication>
 #include "centre.hpp"
+#include <iostream>
 
-//#include <QTimer>
+using namespace std;
+
+centre* centre_p;
 
 int main(int argc, char ** argv)
 {
-  /*
-  QTimer start_delay;
-  start_delay.start();
-  while(1)
-  {
-    if(start_delay.elapsed()>1000) break;
-  }
-  */
   QApplication a(argc, argv);
-  centre c;
-  return a.exec();
+  centre_p = new centre;
+  centre_p->application_p = &a;
+  int ret_val = a.exec();
+  cout<<"ret_val = "<<ret_val<<endl;
+  return ret_val;
 }
