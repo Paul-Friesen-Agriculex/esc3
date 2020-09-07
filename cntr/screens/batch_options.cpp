@@ -95,6 +95,7 @@ void batch_options::barcode_switch_toggled(bool checked)
 void batch_options::macro_menu_button_clicked()	//TEST~~~
 {
   cout<<"macro_menu_button_click"<<endl;	//OMIT~~~
-  centre_p->add_waiting_screen(28);
+  centre_p->enter_totalize_macro = true;
+  centre_p->add_waiting_screen(28);//macro_screen
   centre_p->screen_done=true;
 }

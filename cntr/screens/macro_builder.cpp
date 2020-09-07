@@ -21,8 +21,8 @@ macro_builder::macro_builder(centre* centre_p_s)
   
   cout<<"macro_builder::macro_builder 1\n";
   
-  macro_function_string.clear();
-  macro_function_string.append("-");
+//  macro_function_string.clear();
+//  macro_function_string.append("-");
 
   form_p = new QVBoxLayout(this);
   QSignalMapper* signalMapper = new QSignalMapper (this);
@@ -33,11 +33,7 @@ macro_builder::macro_builder(centre* centre_p_s)
   lineEdit->setAlignment(Qt::AlignCenter);
   lineEdit->setFixedWidth(650);
   lineEdit->setFixedHeight(50);
-  if((centre_p->macro_display_string).startsWith("-") == false)
-  {
-    lineEdit->setText(centre_p->macro_display_string);
-    macro_function_string.append(centre_p->macro_function_string);
-  }
+  lineEdit->setText(centre_p->get_macro_display_string());
   
   totalize_count_button = new QPushButton(tr("Count"), this);
   text_entry_button = new QPushButton(tr("Enter text"), this);
@@ -268,26 +264,16 @@ macro_builder::macro_builder(centre* centre_p_s)
 
   if(centre_p->new_keyboard_entry)//signals that a string was entered on the keyboard to add to the macro
   {          
-    QString string = "\"";
-    string += centre_p->keyboard_return_string;
-    string += "\"";
-    
-    if(centre_p->macro_display_string.size() > 1)
-    {
-      centre_p->macro_display_string.append(",");
-    }
-    lineEdit->setText(centre_p->macro_display_string + string);
-    macro_function_string = centre_p->macro_function_string;
-    macro_function_string.append("\\");
-    macro_function_string.append(string);
-    
     centre_p->new_keyboard_entry = false;
-    centre_p->keyboard_message_string = "";
-    centre_p->keyboard_return_string = "";
-    
+    QString string = centre_p->get_macro();
+    string.append(QChar(2));//start of text
+    string.append(centre_p->keyboard_return_string);
+    string . append(QChar(3));//end of text
+    centre_p->set_macro(string);
+    lineEdit->setText(centre_p->get_macro_display_string());
   }
   
-  cout<<"20\n";
+//  cout<<"20\n";
   
   //=============================================================//
   //Style sheet specific for macro builder screen//
@@ -351,6 +337,134 @@ macro_builder::macro_builder(centre* centre_p_s)
   cout<<"macro_builder::macro_builder 4\n";
 }
 
+void macro_builder::dialogbox_buttons(int n)
+{
+  QString macro_string = centre_p->get_macro();
+
+  switch(n){	  //Generate macro key display sequence and output sequence
+	  case 1:
+	  {
+      macro_string.append("c");
+      break;
+	  }
+	  case 2:
+	  {
+      macro_string.append("s");
+      break;
+	  }
+	  case 3:
+	  {
+      macro_string.append("1");
+      break;
+	  }
+	  case 4:
+	  {
+      macro_string.append("2");
+      break;
+	  }
+	  case 5:
+	  {
+      macro_string.append("3");
+      break;
+	  }
+	  case 6:
+	  {
+      macro_string.append("4");
+      break;
+	  }
+	  case 7:
+	  {
+      macro_string.append("N");
+      break;
+	  }
+	  case 8:
+	  {
+      macro_string.append("T");
+      break;
+	  }
+	  case 9:
+	  {
+      macro_string.append("S");
+      break;
+	  }
+	  case 10:
+	  {
+      macro_string.append("U");
+      break;
+	  }
+	  case 11:
+	  {
+      macro_string.append("D");
+      break;
+	  }
+	  case 12:
+	  {
+      macro_string.append("L");
+      break;
+	  }
+	  case 13:
+	  {
+      macro_string.append("R");
+      break;
+	  }
+	  case 14:
+	  {
+      macro_string.clear();
+      break;
+	  }
+	  case 15:
+	  {
+      macro_string.append("l");
+      break;
+	  }
+  	case 16:
+  	{
+      macro_string.append("u");
+      break;
+	  }
+  	case 17: //remove_last
+  	{
+      if(macro_string.size()-1 == QChar(3))//last item is a text string.  Remove whole text string
+      {
+        while(macro_string.size() > 0)
+        {
+          QChar end_char = macro_string[macro_string.size()-1];
+          macro_string.remove(macro_string.size()-1, 1);
+          if(end_char == QChar(2)) break;
+        }
+      }
+      else
+      {
+        macro_string.remove(macro_string.size()-1, 1);
+      }
+      break;
+	  }
+    case 18:
+    {
+		  macro_string.append("d");
+      break;
+    }
+    case 20://exit this screen for keyboard entry
+    {
+      
+      centre_p->new_keyboard_entry = true;//This will tell this screen's constructor that it is returning from keyboard entry
+      centre_p->keyboard_message_string = "Enter characters to add to the macro.";
+//      centre_p->macro_display_string = lineEdit->text();
+//      centre_p->macro_string = macro_string;
+      centre_p->add_waiting_screen(38);//come back here to macro_builder
+      centre_p->add_waiting_screen(100);//keyboard
+      centre_p->screen_done = true;
+      break;
+    }  
+	  default:
+	  {
+      cout<<"macro_builder::dialogbox_buttons default"<<endl;	//omit~~~
+	  }
+  }
+  centre_p->set_macro(macro_string);
+  lineEdit->setText(centre_p->get_macro_display_string());
+}
+/*
 void macro_builder::dialogbox_buttons(int n)
 {
   QString macro_creation_string = lineEdit->text();
@@ -509,7 +623,7 @@ void macro_builder::dialogbox_buttons(int n)
 	  }
   }
 }
-
+*/
 void macro_builder::back_button_clicked()
 {
   centre_p->add_waiting_screen(centre_p->get_previous_screen());
@@ -518,12 +632,15 @@ void macro_builder::back_button_clicked()
 
 void macro_builder::save_button_clicked()
 {
+  /*
   if(macro_function_string.startsWith("-") && macro_function_string.size() > 1)
   {
     macro_function_string.remove(0,1);
   }
   centre_p->macro_function_string = macro_function_string;
   centre_p->macro_display_string = lineEdit->text(); //macro_display_string;
-  centre_p->add_waiting_screen(28);//macro_screen.  Will save macro table (see constructor)
+  */
+  centre_p->save_macros();
+  centre_p->add_waiting_screen(28);//macro_screen.
   centre_p->screen_done = true;
 }

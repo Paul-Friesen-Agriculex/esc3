@@ -19,7 +19,7 @@ class macro_builder:public screen
 {
   Q_OBJECT
   
-  QString macro_function_string;
+//  QString macro_function_string;
   QSignalMapper* signalMapper;
   QLabel* instruction_label_p;
   QLineEdit* lineEdit;

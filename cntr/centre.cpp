@@ -223,13 +223,30 @@ void centre::init()
   connect(tcp_server_p, SIGNAL(newConnection()), this, SLOT(tcp_connection_detected())); 
   connect(tcp_socket_p, SIGNAL(connected()), this, SIGNAL(tcp_connection_detected_signal())); 
   
-  tm_macro_updated = 0; 
+//  tm_macro_updated = 0; 
   count=0;
   new_keyboard_entry=false;
   for(int i=0; i<10; ++i) control_int[i] = 0;
   
-  build_macro = false;//set true when leaving macro_screen for macro_builder.  signals that macro_builder will run.
-  macro_row = 0;// remember row for return to macro_screen.
+//  build_macro = false;//set true when leaving macro_screen for macro_builder.  signals that macro_builder will run.
+//  macro_row = 0;// remember row for return to macro_screen.
+
+//  totalize_macros_index = 0;
+//  batch_pack_macros_index = 0;
+//  batch_dump_macros_index = 0;
+//  batch_substitution_macros_index = 0;
+  /*
+  totalize_macro_index = -1;//indicates nothing being entered
+  batch_pack_macro_index = -1;
+  batch_dump_macro_index = -1;
+  batch_substitution_macro_index = -1;
+  */
+  enter_totalize_macro = false;
+  enter_batch_pack_macro = false;
+  enter_batch_dump_macro = false;
+  enter_batch_substitution_macro = false;
+  
+  load_macros();
 }
 
 centre::~centre()
@@ -278,7 +295,7 @@ centre::~centre()
   }
   f.close();
   save_settings("default");
-
+  save_macros();
 }
 
 void centre::increase_count(int to_add)
@@ -704,6 +721,158 @@ float centre::dust_streak_percentage()
   return processor_p->dust_streak_percentage();
 }
 
+void centre::communicate_out(char type)//'t'->totalize.  'p'->batch pack.  'd'->batch dump.  's'->batch substitution
+{
+  QString out_string;
+  QStringList* macro_list_p = &totalize_macros;
+  if(type == 'p')
+  {
+    macro_list_p = &batch_pack_macros;
+  }
+  if(type == 'd')
+  {
+    macro_list_p = &batch_dump_macros;
+  }
+  if(type == 's')
+  {
+    macro_list_p = &batch_substitution_macros;
+  }
+  
+  int index = -1;//to hold index of active macro.  -1 indicates invalid
+  for(int i=0; i<macro_list_p->size(); ++i)
+  {
+    if( (macro_list_p->at(i)).size() > 0)//normally expected, but check
+    {
+      if( (macro_list_p->at(i))[0] == '1') //this is the active macro
+      {
+        index = i;
+        break;
+      }
+    }
+  }
+  if(index == -1)
+  {
+    cout<<"no active macro\n";
+    return;
+  }
+
+  QString m_string = macro_list_p->at(index);
+  //remove active indication character and name
+  while(m_string.size()>0)
+  {
+    if(m_string[0] == QChar(23))
+    {
+      m_string.remove(0,1);
+      break;
+    }
+    m_string.remove(0,1);
+  }
+  
+  //remaining m_string is the macro itself
+  bool in_text = false;//true indicates that characters in macro should be sent as characters.  Otherwise, interpret as codes
+  for(int i=0; i<m_string.size(); ++i)
+  {
+    if(m_string[i] == 2)//start of text
+    {
+      in_text = true;
+    }
+    else if(in_text)
+    {
+      if(m_string[i] == 3)//end of text
+      {
+        in_text = false;
+      }
+      else out_string += m_string[i];
+    }
+    else if(m_string[i] == 'c')
+    {
+      out_string += pack_count_str;
+    }
+    else if(m_string[i] == 's')
+    {
+      out_string += seed_type_str;
+    }
+    else if(m_string[i] == 'd')
+    {
+      out_string += dump_count_str;
+    }
+    else if(m_string[i] == 'w')
+    {
+      out_string += weight_str;
+    }
+    else if(m_string[i] == 'a')
+    {
+      out_string += av_seed_weight_str;
+    }
+    else if(m_string[i] == '1')
+    {
+      out_string += bar_str_1;
+    }
+    else if(m_string[i] == '2')
+    {
+      out_string += bar_str_2;
+    }
+    else if(m_string[i] == '3')
+    {
+      out_string += bar_str_3;
+    }
+    else if(m_string[i] == '4')
+    {
+      out_string += bar_str_4;
+    }
+    else if(m_string[i] == 'l')
+    {
+      out_string += lotcode_str;
+    }
+    else if(m_string[i] == 'u')
+    {
+      out_string += substitution_str;
+    }
+    else if(m_string[i] == 'N')
+    {
+      out_string += "\n";
+    }
+    else if(m_string[i] == 'T')
+    {
+      out_string += "\t";
+    }
+    else if(m_string[i] == 'S')
+    {
+      out_string += " ";
+    }
+    else if(m_string[i] == 'U')
+    {
+      out_string += "\\U";
+    }
+    else if(m_string[i] == 'D')
+    {
+      out_string += "\\D";
+    }
+    else if(m_string[i] == 'R')
+    {
+      out_string += "\\R";
+    }
+    else if(m_string[i] == 'L')
+    {
+      out_string += "\\L";
+    }
+  }  
+
+  if(communicate_by_keyboard_cable==true)
+  {
+    int filedesc = open("/dev/usb2serial", O_WRONLY);
+//    int ret_val = write(filedesc,(out_string.toUtf8().constData()), size_string_macros);
+    int ret_val = write(filedesc,(out_string.toUtf8().constData()), out_string.size());
+    if(ret_val<0) cout<<"write error writing to keyboard cable\n";
+  }
+  if(communicate_by_tcp==true)
+  {
+    tcp_write(out_string);
+  }
+}
+
+
+/*
 void centre::communicate_out(char type)//'t'->totalize.  'p'->batch pack.  'd'->batch dump.
 {
   bool macro_status_bool;			      //temporary variable to transfer ifstream to tablewidget
@@ -815,6 +984,7 @@ void centre::communicate_out(char type)//'t'->totalize.  'p'->batch pack.  'd'->
     tcp_write(combined_macro_functions);
   }
 }
+*/
 
 screen::screen(centre* set_centre_p)
  :QWidget()
@@ -962,7 +1132,7 @@ screen::screen(centre* set_centre_p)
         "margin: 2px"
   );
 }
-
+/*
 //==============================================================================================================//
 void centre::load_macros()	//TEST~~~ connecting macros screen
 {
@@ -1149,9 +1319,9 @@ void centre::load_macros()	//TEST~~~ connecting macros screen
     }
     macros.close();
   }
-  tm_macro_updated = true;
+//  tm_macro_updated = true;
 }
-
+*/
 QString centre::choose_tcp_network(int choice)//choice 1 -> 192.168.100.1.  choice 2 -> 192.168.200.1.  Empty return -> success.  Error string returned for failure
 {
   if(tcp_socket_p) tcp_socket_p->disconnectFromHost();
@@ -1182,3 +1352,355 @@ void centre::tcp_write(QString string)
   tcp_socket_p->write(string.toLatin1());
 }
 
+int centre::number_of_macros()
+{
+  QStringList* list_p = 0;
+  if(macro_type_for_entry==0) list_p = &totalize_macros;
+  if(macro_type_for_entry==1) list_p = &batch_pack_macros;
+  if(macro_type_for_entry==2) list_p = &batch_dump_macros;
+  if(macro_type_for_entry==3) list_p = &batch_substitution_macros;
+  return(list_p->size());
+}
+
+void centre::set_macro_selection(bool select)
+{
+  QStringList* list_p = 0;
+  if(macro_type_for_entry==0) list_p = &totalize_macros;
+  if(macro_type_for_entry==1) list_p = &batch_pack_macros;
+  if(macro_type_for_entry==2) list_p = &batch_dump_macros;
+  if(macro_type_for_entry==3) list_p = &batch_substitution_macros;
+  
+  QString string = list_p->at(macro_row_for_entry);
+  if(select) string.replace(0, 1, "1");
+  else string.replace(0, 1, "0");
+  list_p->replace(macro_row_for_entry, string);
+}
+
+bool centre::get_macro_selection()
+{
+  QStringList* list_p = 0;
+  if(macro_type_for_entry==0) list_p = &totalize_macros;
+  if(macro_type_for_entry==1) list_p = &batch_pack_macros;
+  if(macro_type_for_entry==2) list_p = &batch_dump_macros;
+  if(macro_type_for_entry==3) list_p = &batch_substitution_macros;
+  
+  QString string = list_p->at(macro_row_for_entry);
+  if(string[0] == '1') return true;
+  return false;
+}
+
+void centre::set_macro_name(QString name)
+{
+  
+  cout<<"centre::set_macro_name 1\n";
+  cout<<"macro_type_for_entry = "<<macro_type_for_entry<<endl;
+  
+  QStringList* list_p = 0;
+  if(macro_type_for_entry==0) list_p = &totalize_macros;
+  if(macro_type_for_entry==1) list_p = &batch_pack_macros;
+  if(macro_type_for_entry==2) list_p = &batch_dump_macros;
+  if(macro_type_for_entry==3) list_p = &batch_substitution_macros;
+  
+  cout<<"centre::set_macro_name 2\n";
+  
+  for(int i=0; i<list_p->size(); ++i)//mark all macros of this type de-selected
+  {
+//    if(list_p->at(i).size()>0) (list_p->at(i))[0] = QChar('0');
+    if(list_p->at(i).size()>0) 
+    {
+      QString string = list_p->at(i);
+      string.replace(0, 1, "0");
+      list_p->replace(i, string);
+    }
+  }
+  
+  cout<<"centre::set_macro_name 3\n";
+  
+  QString string = list_p->at(macro_row_for_entry);
+  int name_end = string.indexOf(QChar(23));
+  string = string.right(string.size()-name_end);//remove old name plus selection character at start
+  string.prepend(name);//add new name
+  string.prepend("1");//select this macro.  add new selection character
+  list_p->replace(macro_row_for_entry, string);
+  
+  cout<<"centre::set_macro_name 4\n";
+  
+}
+
+QString centre::get_macro_name()
+{
+  QStringList* list_p = 0;
+  if(macro_type_for_entry==0) list_p = &totalize_macros;
+  if(macro_type_for_entry==1) list_p = &batch_pack_macros;
+  if(macro_type_for_entry==2) list_p = &batch_dump_macros;
+  if(macro_type_for_entry==3) list_p = &batch_substitution_macros;
+  
+  QString string = list_p->at(macro_row_for_entry);
+  int name_end = string.indexOf(QChar(23));
+  string = string.left(name_end);
+  string = string.remove(0,1);//remove selection character at start
+  return string;
+}
+  
+void centre::set_macro(QString macro)
+{
+  QStringList* list_p = 0;
+  if(macro_type_for_entry==0) list_p = &totalize_macros;
+  if(macro_type_for_entry==1) list_p = &batch_pack_macros;
+  if(macro_type_for_entry==2) list_p = &batch_dump_macros;
+  if(macro_type_for_entry==3) list_p = &batch_substitution_macros;
+
+  QString string = list_p->at(macro_row_for_entry);
+  int name_end = string.indexOf(QChar(23));
+  string = string.left(name_end+1);//remove old macro
+  string.append(macro);
+  list_p->replace(macro_row_for_entry, string);
+}
+  
+QString centre::get_macro()
+{
+  QStringList* list_p = 0;
+  if(macro_type_for_entry==0) list_p = &totalize_macros;
+  if(macro_type_for_entry==1) list_p = &batch_pack_macros;
+  if(macro_type_for_entry==2) list_p = &batch_dump_macros;
+  if(macro_type_for_entry==3) list_p = &batch_substitution_macros;
+  
+  QString string = list_p->at(macro_row_for_entry);
+  int name_end = string.indexOf(QChar(23));
+  cout<<"name_end = "<<name_end<<endl;
+  cout<<"string.size = "<<string.size()<<endl;
+  string = string.right(string.size()-name_end-1);
+  cout<<"string-"<<string.toStdString()<<"-\n";
+  return string;
+}
+  
+QString centre::get_macro_display_string()
+{
+  QString macro_display_string;
+  QString macro_string=get_macro();
+  bool in_text = false;
+  if(macro_string.size() == 0)//not expected
+  {
+    cout<<"centre::get_macro_display_string.  macro_string empty\n";
+    return "";
+  }
+  for(int j=0; j<macro_string.size(); ++j)
+  {
+    if(macro_string[j] == QChar(2))//start of text
+    {
+      in_text = true;
+      macro_display_string.append(" \"");
+      continue;
+    }
+    if(macro_string[j] == QChar(3))//end of text. characters outside of text are codes
+    {
+      in_text = false;
+      macro_display_string.append("\" ");
+      continue;
+    }
+    if(in_text)
+    {
+      macro_display_string.append(macro_string[j]);
+    }
+    else
+    {
+      if(macro_string[j] == 'c')
+      {
+        macro_display_string.append("<pack count>");
+      }
+      if(macro_string[j] == 's')
+      {
+        macro_display_string.append("<seed type>");
+      }
+      if(macro_string[j] == 'd')
+      {
+        macro_display_string.append("<dump count>");
+      }
+      if(macro_string[j] == 'w')
+      {
+        macro_display_string.append("<weight>");
+      }
+      if(macro_string[j] == 'a')
+      {
+        macro_display_string.append("<average seed weight>");
+      }
+      if(macro_string[j] == '1')
+      {
+        macro_display_string.append("<barcode 1>");
+      }
+      if(macro_string[j] == '2')
+      {
+        macro_display_string.append("<barcode 2>");
+      }
+      if(macro_string[j] == '3')
+      {
+        macro_display_string.append("<barcode 3>");
+      }
+      if(macro_string[j] == '4')
+      {
+        macro_display_string.append("<barcode 4>");
+      }
+      if(macro_string[j] == 'l')
+      {
+        macro_display_string.append("<seed lot barcode>");
+      }
+      if(macro_string[j] == 'u')
+      {
+        macro_display_string.append("<substitution bar code>");
+      }
+      if(macro_string[j] == 'N')
+      {
+        macro_display_string.append("<new line>");
+      }
+      if(macro_string[j] == 'T')
+      {
+        macro_display_string.append("<tab>");
+      }
+      if(macro_string[j] == 'S')
+      {
+        macro_display_string.append("<space>");
+      }
+      if(macro_string[j] == 'U')
+      {
+        macro_display_string.append("<up arrow>");
+      }
+      if(macro_string[j] == 'D')
+      {
+        macro_display_string.append("<down arrow>");
+      }
+      if(macro_string[j] == 'R')
+      {
+        macro_display_string.append("<right arrow>");
+      }
+      if(macro_string[j] == 'L')
+      {
+        macro_display_string.append("<left arrow>");
+      }
+    }
+  }
+  return macro_display_string;
+}
+
+void centre::load_macros()
+{
+  QFile file("communication_macros");
+  char ch;
+  QString string;
+  bool getting_totalize_macros = true;
+  bool getting_batch_pack_macros = false;
+  bool getting_batch_dump_macros = false;
+  bool getting_batch_substitution_macros = false;
+  if(!file.open(QIODevice::ReadOnly | QIODevice::Text))//file does not exist.  initialize macro lists with blank entries
+  {
+    string = "0";//first character indicates not selected
+    string.append(QChar(23));//ASCII code 23 used to mark end of macro name, blank in this case
+    for(int i=0; i<10; ++i)
+    {
+      totalize_macros.append(string);
+      batch_pack_macros.append(string);
+      batch_dump_macros.append(string);
+      batch_substitution_macros.append(string);
+    }
+    return;
+  }
+  cout<<"communication_macros file\n";
+  while(!file.atEnd())
+  {
+    file.getChar(&ch);
+    if(ch<32) cout<<"character "<<int(ch)<<endl;
+    else cout<<ch<<endl;
+    if(ch == 0)//marks end of macro
+    {
+      if(getting_totalize_macros)
+      {
+        totalize_macros.append(string);
+        string.clear();
+      }
+      if(getting_batch_pack_macros)
+      {
+        batch_pack_macros.append(string);
+        string.clear();
+      }
+      if(getting_batch_dump_macros)
+      {
+        batch_dump_macros.append(string);
+        string.clear();
+      }
+      if(getting_batch_substitution_macros)
+      {
+        batch_substitution_macros.append(string);
+        string.clear();
+      }
+    }
+    else if(ch == 1)//marks end of macro type
+    {
+      if(getting_totalize_macros)
+      {
+        getting_totalize_macros = false;
+        getting_batch_pack_macros = true;
+      }
+      else if(getting_batch_pack_macros)
+      {
+        getting_batch_pack_macros = false;
+        getting_batch_dump_macros = true;
+      }
+      else if(getting_batch_dump_macros)
+      {
+        getting_batch_dump_macros = false;
+        getting_batch_substitution_macros = true;
+      }
+    }
+    else
+    {
+      string.append(ch);
+    }
+  }
+  cout<<"end communication_macros file\n";
+}
+
+void centre::save_macros()
+{
+  QFile file("communication_macros");
+  QString string;
+  if(!file.open(QIODevice::WriteOnly | QIODevice::Text)) return;
+  for(int i=0; i<totalize_macros.size(); ++i)
+  {
+    string = totalize_macros[i];
+    for(int j=0; j<string.size(); ++j)
+    {
+      file.putChar(string[j].toLatin1());
+    }
+    file.putChar(0);
+  }
+  file.putChar(1);//mark end of macro type
+  for(int i=0; i<batch_pack_macros.size(); ++i)
+  {
+    string = batch_pack_macros[i];
+    for(int j=0; j<string.size(); ++j)
+    {
+      file.putChar(string[j].toLatin1());
+    }
+    file.putChar(0);
+  }
+  file.putChar(1);//mark end of macro type
+  for(int i=0; i<batch_dump_macros.size(); ++i)
+  {
+    string = batch_dump_macros[i];
+    for(int j=0; j<string.size(); ++j)
+    {
+      file.putChar(string[j].toLatin1());
+    }
+    file.putChar(0);
+  }
+  file.putChar(1);//mark end of macro type
+  for(int i=0; i<batch_substitution_macros.size(); ++i)
+  {
+    string = batch_substitution_macros[i];
+    for(int j=0; j<string.size(); ++j)
+    {
+      file.putChar(string[j].toLatin1());
+    }
+    file.putChar(0);
+  }
+}
+  

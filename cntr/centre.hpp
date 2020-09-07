@@ -3,6 +3,7 @@
 
 #include <QThread>
 #include <QString>
+#include <QStringList>
 #include <QWidget>
 #include <QImage>
 #include <QFile>
@@ -113,7 +114,7 @@ class centre : public QObject
   void restart_calibration_f();
   void save_image(QString filename);
   void load_image(QString filename);
-  void load_macros();	//original~~~
+//  void load_macros();	//original~~~
   
 //=========================================================//  
 //  void macro_name_cell(int row, int col);
@@ -149,18 +150,18 @@ class centre : public QObject
   //totalize mode
   int tm_barcode_columns;
   bool tm_zero_when_seed_discharged;
-  bool tm_macro_updated;	//TEST~~~
+//  bool tm_macro_updated;	//TEST~~~
   int tm_autosave_count_limit;//after this many counts are recorded, autosaves the file
   int tm_autosave_count;//counts how many counts were recorded;
   QString tm_save_filename;//if this is not blank, a file save is triggered with this name.  Includes directory info.
   QString tm_last_filename;//holds the name last used to save a file.  No directory info or extension.
   
-  bool macro_status_bool;			  //temporary variable to transfer ifstream to tablewidget
-  int macro_numb_int;				    //
-  char macro_name_char[30];			//
-  char macro_mask_char[30];			//
-  char macro_function_char[30];		//
-  QString combined_macro_functions;	//new char to combine all macros
+//  bool macro_status_bool;			  //temporary variable to transfer ifstream to tablewidget
+//  int macro_numb_int;				    //
+//  char macro_name_char[30];			//
+//  char macro_mask_char[30];			//
+//  char macro_function_char[30];		//
+//  QString combined_macro_functions;	//new char to combine all macros
   bool communicate_by_keyboard_cable;
   bool communicate_by_tcp;
   bool tcp_link_established;
@@ -183,9 +184,7 @@ class centre : public QObject
   QString macro_name; //TEST~~~11_13_2018//
   
   batch_mode_driver* batch_mode_driver_p;
-//  macro_screen* macro_screen_p; //TEST~~~ 11_13_2018//
-  void communicate_out(char type);//'t'->totalize.  'p'->batch pack.  'd'->batch dump.
-//  void communicate_out_batch(QString lotcode_str, QString packcode_str, QString batch_count_str, QString substitution_str, QString dump_count_str);
+  void communicate_out(char type);//'t'->totalize.  'p'->batch pack.  'd'->batch dump.  's'->batch substitution
   
   //general keyboard entry
   bool new_keyboard_entry;//true indicates that a keyboard screen has just run.  Use to signal the screen needing keyboard data that it asked for it.
@@ -194,28 +193,65 @@ class centre : public QObject
   int control_int[10];//use to set conditions on return to asking screen
   
   //macro_builder
-  bool build_macro;//set true when leaving macro_screen for macro_builder.  signals that macro_builder will run.
-  int macro_row;// remember row for return to macro_screen.
-  QString macro_display_string;
-  QString macro_function_string;
+//  bool build_macro;//set true when leaving macro_screen for macro_builder.  signals that macro_builder will run.
+//  int macro_row;// remember row for return to macro_screen.
   
-  //flags indicating type of macro being entered
-  bool entering_totalize_macros;
-  bool entering_batch_mode_pack_macros;//issued after each pack in batch mode
-  bool entering_batch_mode_dump_macros;//issued after each seed lot dumped in batch mode
+  //Macro types
+  QStringList totalize_macros;//issued after each pack in totalize
+  QStringList batch_pack_macros;//issued after each pack in batch mode
+  QStringList batch_dump_macros;//issued after each seed lot dumped in batch mode
+  QStringList batch_substitution_macros;//issued if user substitutes seed for a lot that is short in batch
+  /*
+  //index number of macro being entered.  -1 indicates nothing being entered of that type
+  int totalize_macro_index;
+  int batch_pack_macro_index;
+  int batch_dump_macro_index;
+  int batch_substitution_macro_index;
+  */
+  
+  //macro_type: 0->totalize_macros, 1->batch_pack_macros, 2->batch_dump_macros, 4->batch_substitution_macros
+  
+  //for macro or macro name entry
+  int macro_type_for_entry;
+  int macro_row_for_entry;
+  int number_of_macros();//of above type
+  
+  //following functions use macro_type_for_entry and macro_row_for_entry to determine which macro to operate on
+  void set_macro_selection(bool select);
+  bool get_macro_selection();
+  void set_macro_name(QString name);
+  QString get_macro_name();
+  void set_macro(QString macro);
+  QString get_macro();
+  QString get_macro_display_string();
+  /*
+  void set_totalize_macro_name(int row, QString name);
+  void set_batch_pack_macro_name(int row, QString name);
+  void set_batch_dump_macro_name(int row, QString name);
+  void set_batch_substitution_macro_name(int row, QString name);
+  */
+  
+  //macro type to enter
+  bool enter_totalize_macro;
+  bool enter_batch_pack_macro;
+  bool enter_batch_dump_macro;
+  bool enter_batch_substitution_macro;
   
   //macro variables
   QString bar_str_1;
   QString bar_str_2;
   QString bar_str_3;
   QString bar_str_4;
-  QString totalize_count_str;
+  QString seed_type_str;
+  QString pack_count_str;
   QString weight_str;
+  QString av_seed_weight_str;
   QString lotcode_str;
-  QString packcode_str;
-  QString batch_count_str;
   QString substitution_str;
   QString dump_count_str;
+  
+  void load_macros();
+  void save_macros();
 };
 
 class screen : public QWidget

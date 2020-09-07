@@ -382,7 +382,8 @@ void totalize::run()
     centre_p->bar_str_2 = (table_p -> model_p -> item(current_totalize_table_row,1) -> text());
     centre_p->bar_str_3 = (table_p -> model_p -> item(current_totalize_table_row,2) -> text()); 
     centre_p->bar_str_4 = (table_p -> model_p -> item(current_totalize_table_row,3) -> text());
-    centre_p->totalize_count_str = (table_p -> model_p -> item(current_totalize_table_row,4) -> text());
+    centre_p->pack_count_str = (table_p -> model_p -> item(current_totalize_table_row,4) -> text());
+    centre_p->seed_type_str = centre_p->crops[0].name;
 
     centre_p -> communicate_out('t');
 

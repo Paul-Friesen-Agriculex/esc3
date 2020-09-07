@@ -41,12 +41,12 @@ class macro_screen : public screen
   void back_button_clicked();
   void ok_button_clicked();
   void help_button_clicked();
-  void enable_all_clicked();
-  void disable_all_clicked();
+//  void enable_all_clicked();
+//  void disable_all_clicked();
   void initialize_macro_menu();
   void cellSelected(int nRow, int nCol);
   void load_macro_table();
-  void store_macro_table();
+//  void store_macro_table();
   void toggle_macro(int macro_number);
 //  void dialogbox_buttons(int n);
   /*
@@ -58,8 +58,8 @@ class macro_screen : public screen
   button* back_button_p;
   button* ok_button_p;
   button* help_button_p;
-  button* disable_all_button_p;
-  button* enable_all_button_p;
+//  button* disable_all_button_p;
+//  button* enable_all_button_p;
   help_screen* help_screen_p;
   /*
   QGroupBox* communications_choice_box_p;
@@ -92,7 +92,7 @@ class macro_screen : public screen
   static const int macro_cols = 5;
   static const int macro_rows = 10;
   centre* centre_p;
-  
+  /*
   QString bar_str_1;            //Totalize variables//
   QString bar_str_2;
   QString bar_str_3;
@@ -109,7 +109,7 @@ class macro_screen : public screen
   QString batch_count_str;
   QString substitution_str;
   QString dump_count_str;
-  
+  */
   int current_row;
   int current_column;
   

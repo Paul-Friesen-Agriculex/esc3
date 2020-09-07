@@ -99,6 +99,7 @@ void totalize_options::ok_button_clicked()
 void totalize_options::macro_menu_button_clicked()	//TEST~~~
 {
   //cout<<"macro_menu_button_click"<<endl;	//OMIT~~~
+  centre_p->macro_type_for_entry = 0;//totalize macro
   centre_p->add_waiting_screen(5);//totalize
   centre_p->add_waiting_screen(28);//macro_screen
   centre_p->add_waiting_screen(40);//communications_menu
