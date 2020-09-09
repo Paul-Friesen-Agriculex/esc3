@@ -10,6 +10,10 @@ help_screen::help_screen()
 //  setMaximumSize(800, 470);
 //  setMinimumSize(800, 470);
   
+  setWindowState(Qt::WindowFullScreen);
+
+
+
   text_edit_p = new QTextEdit;
   text_edit_p -> setReadOnly(true);
   

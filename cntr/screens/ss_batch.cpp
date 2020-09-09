@@ -227,8 +227,6 @@ ss_batch::ss_batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_drive
   reprint_line_1 = reprint_line_2 = 0;
   update_reprint_buttons();
    
-  barcode_line_p->setFocus();
-
   top_layout_p->setContentsMargins(0,0,0,0);        //set layout margins to shrink to designated container dimensions//
   control_layout_p->setContentsMargins(0,0,0,0);
   speed_layout_p->setContentsMargins(0,0,0,0);
@@ -252,7 +250,10 @@ ss_batch::ss_batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_drive
 
   eject_memory_sticks = false;
   
-  cout<<"end of ss_batch::ss_batch.  spreadsheet_line_number = "<<batch_mode_driver_p->spreadsheet_line_number<<endl;
+  barcode_line_p->setFocus();
+  batch_mode_driver_p -> restart();
+
+//  cout<<"end of ss_batch::ss_batch.  spreadsheet_line_number = "<<batch_mode_driver_p->spreadsheet_line_number<<endl;
 }
 
 ss_batch::~ss_batch()
