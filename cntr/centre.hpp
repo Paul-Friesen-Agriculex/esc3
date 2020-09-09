@@ -26,6 +26,7 @@ class macro_screen; //TEST~~~
 class brother_envelope_feeder;
 class QTcpServer;
 class QTcpSocket;
+class QApplication;
 
 const int screen_wait_list_size=10;
 
@@ -61,6 +62,9 @@ class centre : public QObject
   void tcp_connection_detected_signal();
 
   private: 
+  
+  QWidget* base_widget_p;
+  
   bool init_ran;
   void init();
   
@@ -96,6 +100,7 @@ class centre : public QObject
   */
   
   public:
+  QApplication* application_p;
   void add_waiting_screen(int screen_to_add);
   int get_previous_screen();
   void select_crop(int crop_index);//moves the selected crop to position 0 in the array.  Crop in position 0 becomes the current crop.

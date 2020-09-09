@@ -10,6 +10,7 @@ class QHBoxLayout;
 class QLabel;
 class QRadioButton;
 class QSpinBox;
+class help_screen;
 
 class communications_menu : public screen
 {
@@ -17,6 +18,7 @@ class communications_menu : public screen
   
   public:
   communications_menu(centre*set_centre_p);
+  ~communications_menu();
   
   private slots:
   void back_button_clicked();
@@ -37,6 +39,7 @@ class communications_menu : public screen
   button* help_button_p;
   button* ok_button_p;
   QLabel* message_p;
+  help_screen* help_screen_p;
 
   QGridLayout* main_layout_p;
 

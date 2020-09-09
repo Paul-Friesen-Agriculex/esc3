@@ -36,7 +36,7 @@ tcp_client_server_addr_entry::tcp_client_server_addr_entry(centre*set_centre_p)
   main_layout_p->addWidget(addr4_p, 1, 3);
   main_layout_p->addWidget(connect_button_p, 2, 0);
   main_layout_p->addWidget(message_p, 3, 0, 1, 4);
-  main_layout_p->addWidget(help_button_p, 4, 0);
+//  main_layout_p->addWidget(help_button_p, 4, 0);
   main_layout_p->addWidget(ok_button_p, 4, 3);
   
   addr1_p->setRange(0,255);
@@ -79,7 +79,7 @@ void tcp_client_server_addr_entry::connect_button_clicked()
   
 void tcp_client_server_addr_entry::ok_button_clicked()
 {
-  centre_p->add_waiting_screen(5);//totalize
+//  centre_p->add_waiting_screen(5);//totalize
   centre_p->screen_done = true;
 }
   

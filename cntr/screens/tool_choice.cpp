@@ -4,6 +4,7 @@
 #include <QGroupBox>
 #include <QLabel>
 #include <QRadioButton>
+#include <QApplication>
 #include "centre.hpp"
 #include "tool_choice.hpp"
 #include "button.hpp"
@@ -68,7 +69,7 @@ void tool_choice::back_button_clicked()
 void tool_choice::stop_program_clicked()
 {
   centre_p->~centre();
-  exit(0);
+  centre_p->application_p->exit(0);
 }
 
 void tool_choice::signal_port_pulse_when_endgate_closes(bool state)
