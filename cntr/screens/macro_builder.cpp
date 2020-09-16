@@ -37,10 +37,17 @@ macro_builder::macro_builder(centre* centre_p_s)
   
   totalize_count_button = new QPushButton(tr("Count"), this);
   text_entry_button = new QPushButton(tr("Enter text"), this);
+  batch_count_button = new QPushButton(tr("Batch count"), this);
+  seed_button = new QPushButton(tr("Seed type"), this);
   barcode_button1 = new QPushButton(tr("Barcode 1"), this);
   barcode_button2 = new QPushButton(tr("Barcode 2"), this);
   barcode_button3 = new QPushButton(tr("Barcode 3"), this);
   barcode_button4 = new QPushButton(tr("Barcode 4"), this);
+  weight_button = new QPushButton(tr("Weight"), this);
+  lotcode_button = new QPushButton(tr("Seed lot barcode"), this);
+  packcode_button = new QPushButton(tr("Pack barcode"), this);
+  substitution_button = new QPushButton(tr("Substitution barcode"), this);
+  dump_count_button = new QPushButton(tr("Dump count"), this);
   newline = new QPushButton(tr("Enter ↵"), this);
   horizontal_tab = new QPushButton(tr("Tab ↹"), this);
   spacebar = new QPushButton(tr("Spacebar ␣"), this);
@@ -58,6 +65,7 @@ macro_builder::macro_builder(centre* centre_p_s)
   
   totalize_count_button->setFixedSize(macro_button_width,macro_button_height);
   text_entry_button->setFixedSize(macro_button_width,macro_button_height);
+  seed_button->setFixedSize(macro_button_width,macro_button_height);
   barcode_button1->setFixedSize(macro_button_width,macro_button_height);
   barcode_button2->setFixedSize(macro_button_width,macro_button_height);
   barcode_button3->setFixedSize(macro_button_width,macro_button_height);
@@ -65,11 +73,12 @@ macro_builder::macro_builder(centre* centre_p_s)
   
   cout<<"macro_builder::macro_builder 2a\n";
   
-//    weight_button->setFixedSize(macro_button_width,macro_button_height);
-//    lotcode_button->setFixedSize(macro_button_width,macro_button_height);
-//    packcode_button->setFixedSize(macro_button_width,macro_button_height);
-//    substitution_button->setFixedSize(macro_button_width,macro_button_height);
-//    dump_count_button->setFixedSize(macro_button_width,macro_button_height);
+  weight_button->setFixedSize(macro_button_width,macro_button_height);
+  lotcode_button->setFixedSize(macro_button_width,macro_button_height);
+  packcode_button->setFixedSize(macro_button_width,macro_button_height);
+  substitution_button->setFixedSize(macro_button_width,macro_button_height);
+  dump_count_button->setFixedSize(macro_button_width,macro_button_height);
+  batch_count_button->setFixedSize(macro_button_width,macro_button_height);
   newline->setFixedSize(macro_button_width,macro_button_height);
   horizontal_tab->setFixedSize(macro_button_width,macro_button_height);
   spacebar->setFixedSize(macro_button_width,macro_button_height);
@@ -115,13 +124,21 @@ macro_builder::macro_builder(centre* centre_p_s)
 
   barcodes->addWidget(totalize_box_label);
   barcodes_left->addWidget(totalize_count_button);
+  barcodes_left->addWidget(weight_button);		//yet to be implemented
+  barcodes_left->addWidget(batch_count_button);
+  barcodes_left->addWidget(dump_count_button);
   barcodes_left->addWidget(text_entry_button);
-//    barcodes_left->addWidget(weight_button);		//yet to be implemented
+  barcodes_left->addWidget(seed_button);
+
   barcodes_right->addWidget(barcode_button1);
   barcodes_right->addWidget(barcode_button2);
   barcodes_right->addWidget(barcode_button3);
   barcodes_right->addWidget(barcode_button4);
-  
+  barcodes_right->addWidget(lotcode_button);  
+  barcodes_right->addWidget(packcode_button);  
+  barcodes_right->addWidget(substitution_button);  
+//  barcodes_right->addWidget();  
+
 //  cout<<"macro_builder::macro_builder 2d\n";
   
   cout<<"1\n";
@@ -182,6 +199,7 @@ macro_builder::macro_builder(centre* centre_p_s)
   cout<<"5\n";
   
   accessibility_keys_container->addLayout(accessibility_keys);
+  accessibility_keys_container->addWidget(save_button_p);
   
   cout<<"6\n";
   
@@ -203,26 +221,27 @@ macro_builder::macro_builder(centre* centre_p_s)
 //    macro_menu_main_horizontal->addWidget(batchmode_button_box);
   macro_menu_main_horizontal->addWidget(accessibility_button_box);
   form_p->addLayout(macro_menu_main_horizontal);
-  bottom_line_p = new QHBoxLayout(this);
-  bottom_line_p->addWidget(save_button_p);
-  form_p->addLayout(bottom_line_p);
+//  bottom_line_p = new QHBoxLayout(this);
+//  bottom_line_p->addWidget(save_button_p);
+//  form_p->addLayout(bottom_line_p);
   
   cout<<"8\n";
   
 //==================================================================================================================//
   connect(totalize_count_button, SIGNAL(clicked()), signalMapper, SLOT(map()));	//totalize mode variables
   connect(text_entry_button, SIGNAL(clicked()), signalMapper, SLOT(map()));
-//    connect(seed_button, SIGNAL(clicked()), signalMapper, SLOT(map()));
+  connect(seed_button, SIGNAL(clicked()), signalMapper, SLOT(map()));
+  connect(weight_button, SIGNAL(clicked()), signalMapper, SLOT(map()));
   connect(barcode_button1, SIGNAL(clicked()), signalMapper, SLOT(map()));
   connect(barcode_button2, SIGNAL(clicked()), signalMapper, SLOT(map()));
   connect(barcode_button3, SIGNAL(clicked()), signalMapper, SLOT(map()));
   connect(barcode_button4, SIGNAL(clicked()), signalMapper, SLOT(map()));
   
-//    connect(batch_count_button, SIGNAL(clicked()), signalMapper, SLOT(map()));		//batch mode variables
-//    connect(lotcode_button, SIGNAL(clicked()), signalMapper, SLOT(map()));
-//    connect(packcode_button, SIGNAL(clicked()), signalMapper, SLOT(map()));
-  //connect(subsitution_button, SIGNAL(clicked()), signalMapper, SLOT(map()));  //not yet implemented~~~~
-//    connect(dump_count_button, SIGNAL(clicked()), signalMapper, SLOT(map()));
+  connect(batch_count_button, SIGNAL(clicked()), signalMapper, SLOT(map()));		//batch mode variables
+  connect(lotcode_button, SIGNAL(clicked()), signalMapper, SLOT(map()));
+  connect(packcode_button, SIGNAL(clicked()), signalMapper, SLOT(map()));
+  connect(substitution_button, SIGNAL(clicked()), signalMapper, SLOT(map()));  //not yet implemented~~~~
+  connect(dump_count_button, SIGNAL(clicked()), signalMapper, SLOT(map()));
   
   connect(newline, SIGNAL(clicked()), signalMapper, SLOT(map()));					      //accessibility keys
   connect(horizontal_tab, SIGNAL(clicked()), signalMapper, SLOT(map()));
@@ -236,16 +255,18 @@ macro_builder::macro_builder(centre* centre_p_s)
   
   signalMapper -> setMapping (totalize_count_button, 1);		//totalize mode variables
   signalMapper -> setMapping (text_entry_button, 20);		//totalize mode variables
-//    signalMapper -> setMapping (seed_button, 2);
+  signalMapper -> setMapping (seed_button, 2);
+  signalMapper -> setMapping (weight_button, 18);
   signalMapper -> setMapping (barcode_button1, 3);
   signalMapper -> setMapping (barcode_button2, 4);
   signalMapper -> setMapping (barcode_button3, 5);
   signalMapper -> setMapping (barcode_button4, 6);
   
-//    signalMapper -> setMapping (batch_count_button, 1);			  //batch mode variables
-//    signalMapper -> setMapping (lotcode_button, 15);
-//    signalMapper -> setMapping (packcode_button, 16);	
-//    signalMapper -> setMapping (dump_count_button, 18);	  
+  signalMapper -> setMapping (batch_count_button, 19);			  //batch mode variables
+  signalMapper -> setMapping (lotcode_button, 15);
+  signalMapper -> setMapping (packcode_button, 16);	
+  signalMapper -> setMapping (dump_count_button, 18);	  
+  signalMapper -> setMapping (substitution_button, 21);	  
   
   signalMapper -> setMapping (newline, 7);					        //accessibility keys
   signalMapper -> setMapping (horizontal_tab, 8);
@@ -419,12 +440,12 @@ void macro_builder::dialogbox_buttons(int n)
 	  }
   	case 16:
   	{
-      macro_string.append("u");
+      macro_string.append("1");
       break;
 	  }
   	case 17: //remove_last
   	{
-      if(macro_string.size()-1 == QChar(3))//last item is a text string.  Remove whole text string
+      if(macro_string[macro_string.size()-1] == QChar(3))//last item is a text string.  Remove whole text string
       {
         while(macro_string.size() > 0)
         {
@@ -444,21 +465,29 @@ void macro_builder::dialogbox_buttons(int n)
 		  macro_string.append("d");
       break;
     }
+    case 19:
+    {
+		  macro_string.append("c");
+      break;
+    }
     case 20://exit this screen for keyboard entry
     {
       
       centre_p->new_keyboard_entry = true;//This will tell this screen's constructor that it is returning from keyboard entry
       centre_p->keyboard_message_string = "Enter characters to add to the macro.";
-//      centre_p->macro_display_string = lineEdit->text();
-//      centre_p->macro_string = macro_string;
       centre_p->add_waiting_screen(38);//come back here to macro_builder
       centre_p->add_waiting_screen(100);//keyboard
       centre_p->screen_done = true;
       break;
     }  
+    case 21:
+    {
+		  macro_string.append("u");
+      break;
+    }
 	  default:
 	  {
-      cout<<"macro_builder::dialogbox_buttons default"<<endl;	//omit~~~
+      cout<<"macro_builder::dialogbox_buttons default"<<endl;
 	  }
   }
   centre_p->set_macro(macro_string);

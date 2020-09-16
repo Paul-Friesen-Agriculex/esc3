@@ -57,7 +57,7 @@
 #include "tcp_client_server_addr_entry.hpp"
 #include "brother_envelope_feeder.hpp"
 #include "signal_port.hpp"
-
+#include "batch_macro_type_choice.hpp"
 
 Q_DECLARE_METATYPE(crop)
 
@@ -93,7 +93,12 @@ centre::centre():
   diagnostics_console_p -> show();
 
   base_widget_p = new QWidget;
-  base_widget_p->setWindowState(Qt::WindowFullScreen);
+  
+  
+//  base_widget_p->setWindowState(Qt::WindowFullScreen);
+  base_widget_p->setGeometry(0, 0, 800, 480);
+  
+  
   base_widget_p->show();
 //  base_widget_p->update();
 //  QRect rect = base_widget_p->geometry();
@@ -494,7 +499,7 @@ void centre::run()
       case 42: screen_p=new tcp_client_server_addr_entry(this);
 //               connect(tcp_socket_p, SIGNAL(connected()), screen_p, SLOT(connection_detected())); 
                break;
-//      case : screen_p=new (this); break;
+      case 50: screen_p=new batch_macro_type_choice(this, batch_mode_driver_p); break;
 //      case : screen_p=new (this); break;
 //      case : screen_p=new (this); break;
 //      case : screen_p=new (this); break;
@@ -505,7 +510,12 @@ void centre::run()
     }
 //    QRect rect = base_widget_p->geometry();
 //    cout <<"run base widget width "<<rect.width()<<endl;
-    screen_p->setParent(base_widget_p, Qt::Widget);
+
+
+//    screen_p->setParent(base_widget_p, Qt::Widget);
+
+
+//    screen_p->setFocus();
 //    screen_p->setWindowState(Qt::WindowMaximized);
 //    screen_p->setGeometry(rect);
     
@@ -516,8 +526,6 @@ void centre::run()
     old_screen_p = 0;
   }
   QRect rect = base_widget_p->geometry();
-//  cout <<"run base widget width "<<rect.width()<<endl;
-//  screen_p->setParent(base_widget_p, Qt::Widget);
   screen_p->setGeometry(rect);
 }
 
@@ -815,6 +823,10 @@ void centre::communicate_out(char type)//'t'->totalize.  'p'->batch pack.  'd'->
       else out_string += m_string[i];
     }
     else if(m_string[i] == 'c')
+    {
+      out_string += pack_count_str;
+    }
+    else if(m_string[i] == 'p')
     {
       out_string += pack_count_str;
     }
@@ -1507,11 +1519,11 @@ QString centre::get_macro_display_string()
   QString macro_display_string;
   QString macro_string=get_macro();
   bool in_text = false;
-  if(macro_string.size() == 0)//not expected
-  {
-    cout<<"centre::get_macro_display_string.  macro_string empty\n";
-    return "";
-  }
+//  if(macro_string.size() == 0)
+//  {
+//    cout<<"centre::get_macro_display_string.  macro_string empty\n";
+//    return "";
+//  }
   for(int j=0; j<macro_string.size(); ++j)
   {
     if(macro_string[j] == QChar(2))//start of text

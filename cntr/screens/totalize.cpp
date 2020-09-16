@@ -125,7 +125,7 @@ totalize::totalize(centre* set_centre_p)
   
   centre_p->count = 0;
   count = old_count = 0;
-  table_p->setFocus();
+//  table_p->setFocus();
   
   centre_p->processor_display_blobs(true);
   centre_p->set_to_record(true);
@@ -205,6 +205,7 @@ totalize::totalize(centre* set_centre_p)
   main_layout_p->setContentsMargins(0,0,10,10);
   
   table_p->resizeColumnsToContents();
+  table_p->setFocus();
 }
 
 totalize::~totalize()
@@ -406,5 +407,6 @@ void totalize::run()
     }
   }
   table_p -> resizeColumnsToContents();
+//  table_p->setFocus();
 }
 

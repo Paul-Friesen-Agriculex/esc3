@@ -32,17 +32,17 @@ class macro_builder:public screen
     
   QPushButton *totalize_count_button;
   QPushButton *text_entry_button;
-//    QPushButton *batch_count_button = new QPushButton(tr("Count"), this);
-//    QPushButton *seed_button = new QPushButton(tr("Seed name"), this);
+  QPushButton *batch_count_button;
+  QPushButton *seed_button;
   QPushButton *barcode_button1;
   QPushButton *barcode_button2;
   QPushButton *barcode_button3;
   QPushButton *barcode_button4;
-//    QPushButton *weight_button = new QPushButton(tr("Weight"), this);		      //yet to be implemented
-//    QPushButton *lotcode_button = new QPushButton(tr("Lot Code"), this);
-//    QPushButton *packcode_button = new QPushButton(tr("Pack Code"), this);
-//    QPushButton *substitution_button = new QPushButton(tr("Substitution"), this);
-//    QPushButton *dump_count_button = new QPushButton(tr("Dump Count"), this);
+  QPushButton *weight_button;
+  QPushButton *lotcode_button;
+  QPushButton *packcode_button;
+  QPushButton *substitution_button;
+  QPushButton *dump_count_button;
   QPushButton *newline;
   QPushButton *horizontal_tab;
   QPushButton *spacebar;
@@ -70,7 +70,7 @@ class macro_builder:public screen
   button* save_button_p;
   button* back_button_p;
   
-  static const int macro_button_width = 135;
+  static const int macro_button_width = 160;
   static const int macro_button_height = 35;  
   
   public:

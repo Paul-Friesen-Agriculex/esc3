@@ -159,6 +159,8 @@ void batch_table::enter_seed_lot_barcode(QString barcode)
   model_column = 1;
   QModelIndex next_index = model_p->index(model_row, model_column);
   setCurrentIndex(next_index);
+  
+  centre_p->lotcode_str = barcode;
 
   emit focus_on_barcode();
   
@@ -178,6 +180,9 @@ void batch_table::enter_pack_barcode(QString barcode)
   setCurrentIndex(next_index);
   model_p -> item(model_row, model_column) -> setData(QVariant(barcode), Qt::DisplayRole);
   resizeColumnsToContents();
+  
+  centre_p->bar_str_1 = barcode;
+  
   emit focus_on_barcode();
 
 //  ++model_row;

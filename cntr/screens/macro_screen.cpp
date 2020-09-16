@@ -268,7 +268,7 @@ void macro_screen::initialize_macro_menu()
       {
         tableWidget_p->item(i, 0)->setCheckState ( Qt::Unchecked );
         QLabel *on_off_label_p = new QLabel("OFF");
-        tableWidget_p->setCellWidget (i, j, on_off_label_p);
+        tableWidget_p->setCellWidget (i, j, on_off_label_p);//QTableWidget automatically deletes any previous label
         on_off_label_p->setAlignment(Qt::AlignCenter);
       }
       if(j==1)
@@ -302,8 +302,20 @@ void macro_screen::load_macro_table()
     bool selected = centre_p->get_macro_selection();
     QString name = centre_p->get_macro_name();
     QString display = centre_p->get_macro_display_string();
-    if(selected) tableWidget_p->item(i, 0)->setCheckState (Qt::Checked);
-    else tableWidget_p->item(i, 0)->setCheckState (Qt::Unchecked);
+    if(selected) 
+    {
+      tableWidget_p->item(i, 0)->setCheckState (Qt::Checked);
+      QLabel *on_off_label_p = new QLabel("ON");
+      on_off_label_p->setAlignment(Qt::AlignCenter);
+      tableWidget_p->setCellWidget (i, 0, on_off_label_p);//QTableWidget automatically deletes any previous label
+    }
+    else 
+    {
+      tableWidget_p->item(i, 0)->setCheckState (Qt::Unchecked);
+      QLabel *on_off_label_p = new QLabel("OFF");
+      on_off_label_p->setAlignment(Qt::AlignCenter);
+      tableWidget_p->setCellWidget (i, 0, on_off_label_p);//QTableWidget automatically deletes any previous label
+    }
     tableWidget_p->item(i,2)->setText(name);
     tableWidget_p->item(i,3)->setText(display);
   }

@@ -64,7 +64,8 @@ HEADERS += batch_mode_driver.hpp \
            screens/tcp_mode_choice.hpp \
            screens/tcp_server_addr_choice.hpp \
            screens/communications_menu.hpp \
-           screens/macro_builder.hpp
+           screens/macro_builder.hpp \
+           screens/batch_macro_type_choice.hpp
 SOURCES += batch_mode_driver.cpp \
            brother_envelope_feeder.cpp \
            button.cpp \
@@ -121,7 +122,9 @@ SOURCES += batch_mode_driver.cpp \
            screens/tcp_mode_choice.cpp \
            screens/tcp_server_addr_choice.cpp \
            screens/communications_menu.cpp \
-           screens/macro_builder.cpp
+           screens/macro_builder.cpp \
+           screens/batch_macro_type_choice.cpp
+           
 
 QT += widgets
 QT += printsupport

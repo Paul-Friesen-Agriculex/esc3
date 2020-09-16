@@ -38,6 +38,7 @@ class batch_options : public screen
   QRadioButton* lot_contain_pack_p;
   QRadioButton* pack_match_spreadsheet_p;
   QRadioButton* record_only_p;
+  button* back_button_p;
   button* done_button_p;
   button* macro_menu_button_p;
   
@@ -47,6 +48,7 @@ class batch_options : public screen
   
   public slots:
   void done_button_clicked();
+  void back_button_clicked();
 };
 
 

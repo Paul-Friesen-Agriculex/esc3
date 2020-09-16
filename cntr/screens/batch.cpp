@@ -323,6 +323,7 @@ batch::~batch()
   
   if(repeat_pack_window_exists) delete repeat_pack_window_p;
 }
+
 void batch::pack_collected(int count_to_record)
 {
   if( (end_valve_mode==closed_bad_lot) || (end_valve_mode==open_emptying_bad_lot) ) return;
@@ -331,16 +332,19 @@ void batch::pack_collected(int count_to_record)
 
   barcode_line_p->setFocus();
 
-  int row;
-  row = table_p -> model_row;
-  QString lotcode_str, packcode_str, batch_count_str, substitution_str, dump_count_str;
+//  int row;
+//  row = table_p -> model_row;
   
-  lotcode_str = table_p -> model_p -> item(row-1, 0) -> text();
-  packcode_str = table_p -> model_p -> item(row-1, 1) -> text();
-  batch_count_str = QString::number(count_to_record);
-  substitution_str = table_p -> model_p -> item(row-1, 3) -> text();
+  centre_p->pack_count_str = QString::number(count_to_record);
   
-  centre_p -> communicate_out('b');
+//  QString lotcode_str, packcode_str, batch_count_str, substitution_str, dump_count_str;
+  
+//  lotcode_str = table_p -> model_p -> item(row-1, 0) -> text();
+//  packcode_str = table_p -> model_p -> item(row-1, 1) -> text();
+//  batch_count_str = QString::number(count_to_record);
+//  substitution_str = table_p -> model_p -> item(row-1, 3) -> text();
+  
+  centre_p -> communicate_out('p');
 }  
 
 void batch::dump_complete(int dump_count)
@@ -350,8 +354,8 @@ void batch::dump_complete(int dump_count)
   end_valve_mode = dump_open_empty;
   barcode_line_p->setFocus();
   
-  QString lotcode_str, packcode_str, batch_count_str, substitution_str, dump_count_str;
-  dump_count_str = QString::number(dump_count);
+//  QString lotcode_str, packcode_str, batch_count_str, substitution_str, dump_count_str;
+  centre_p->dump_count_str = QString::number(dump_count);
   centre_p->communicate_out('d');
 }
 
