@@ -63,7 +63,6 @@ class batch : public screen
   batch_mode_driver* batch_mode_driver_p;
   
   public slots:
-//  void pack_ready();
   void pack_collected(int count);
   void dump_complete(int dump_count);
   void dumping();
@@ -128,26 +127,15 @@ class batch : public screen
   
   
   
-//  bool pack_was_placed;
-//  bool pack_was_removed;
-//  bool seed_for_pack_ready;
-//  bool pack_can_be_removed;
   QString pack_ready_message;
-//  bool pack_removed_too_soon;
   QString pack_removed_too_soon_message;
-//  bool dump_container_was_placed;
-//  bool dump_container_can_be_removed;
   QString dump_container_needed_message;
   QString dump_container_ready_message;
-//  int dump_container_ready_count;
-//  bool dump_container_removed_too_soon;
   QString dump_container_removed_too_soon_message;
   QString bad_seed_lot_message;
-//  bool dump_flag;//true -> dumping
   
   barcode_entry_mode old_barcode_mode;
   
-//  macro_screen* macro_screen_p;
   QString count_string;				//seed count access from gpio_keyboard
   QTimer* run_timer_p;
   

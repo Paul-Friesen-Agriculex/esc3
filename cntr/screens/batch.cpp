@@ -10,7 +10,6 @@
 #include "centre.hpp"
 #include "batch.hpp"
 #include "button.hpp"
-//#include "batch_mode_driver.hpp"
 #include "message_box.hpp"
 
 
@@ -18,10 +17,10 @@ using namespace std;
 
 void barcode_line::keyPressEvent(QKeyEvent* event)
 {
-  QLineEdit::keyPressEvent(event); //TEST~~~
+  QLineEdit::keyPressEvent(event);
   if(event->key() == Qt::Key_Return)
   {
-    emit barcode_entered(displayText());  //TEST~~~
+    emit barcode_entered(displayText());
     cout<<"emitted barcode_entered("<<displayText().toStdString()<<")\n";
     clear();
   }
@@ -329,20 +328,8 @@ void batch::pack_collected(int count_to_record)
   if( (end_valve_mode==closed_bad_lot) || (end_valve_mode==open_emptying_bad_lot) ) return;
   
   table_p->enter_seeds(count_to_record);
-
   barcode_line_p->setFocus();
-
-//  int row;
-//  row = table_p -> model_row;
-  
   centre_p->pack_count_str = QString::number(count_to_record);
-  
-//  QString lotcode_str, packcode_str, batch_count_str, substitution_str, dump_count_str;
-  
-//  lotcode_str = table_p -> model_p -> item(row-1, 0) -> text();
-//  packcode_str = table_p -> model_p -> item(row-1, 1) -> text();
-//  batch_count_str = QString::number(count_to_record);
-//  substitution_str = table_p -> model_p -> item(row-1, 3) -> text();
   
   centre_p -> communicate_out('p');
 }  
@@ -353,8 +340,6 @@ void batch::dump_complete(int dump_count)
   
   end_valve_mode = dump_open_empty;
   barcode_line_p->setFocus();
-  
-//  QString lotcode_str, packcode_str, batch_count_str, substitution_str, dump_count_str;
   centre_p->dump_count_str = QString::number(dump_count);
   centre_p->communicate_out('d');
 }
@@ -366,7 +351,6 @@ void batch::dumping()
 
 void batch::focus_on_barcode()
 {
-  cout<<"start batch::focus_on_barcode \n";
   barcode_line_p -> setFocus();
 }
 

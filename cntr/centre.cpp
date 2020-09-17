@@ -10,7 +10,6 @@
 #include <QTcpServer>
 #include <QTcpSocket>
 #include <QScreen>
-//#include <QLabel>
 #include "message_box.hpp"
 #include <time.h>
 #include <fcntl.h>	//library used to use system call command "open()" used to check available serial
@@ -83,26 +82,15 @@ centre::centre():
 {
   qRegisterMetaType<crop>();
   
-//  startup_progress_label_p = new QLabel("Starting ESC-3 Program");
-//  startup_progress_label_p = new message_box;
-//  startup_progress_label_p -> set_text("Starting ESC-3 Program");
-//  startup_progress_label_p -> show();
-//  startup_progress_label_p -> update();
-  
   diagnostics_console_p = new diagnostics_console(this);
   diagnostics_console_p -> show();
 
   base_widget_p = new QWidget;
-  
-  
+    
 //  base_widget_p->setWindowState(Qt::WindowFullScreen);
   base_widget_p->setGeometry(0, 0, 800, 480);
-  
-  
+    
   base_widget_p->show();
-//  base_widget_p->update();
-//  QRect rect = base_widget_p->geometry();
-//  cout <<"constructor base widget width "<<rect.width()<<endl;
   
   init_ran = false;
 

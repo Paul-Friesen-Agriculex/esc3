@@ -8,7 +8,6 @@
 class QSignalMapper;
 class QLabel;
 class QLineEdit;
-//class QFormLayout;
 class QHBoxLayout;
 class QVBoxLayout;
 class QPushButton;
@@ -19,15 +18,12 @@ class macro_builder:public screen
 {
   Q_OBJECT
   
-//  QString macro_function_string;
   QSignalMapper* signalMapper;
   QLabel* instruction_label_p;
   QLineEdit* lineEdit;
   QHBoxLayout *top_line_p;
   QHBoxLayout *input_line_modify;
-//  QFormLayout* form_p;
   QVBoxLayout* form_p;
-//  QHBoxLayout *input_line_modify;
   QHBoxLayout *bottom_line_p;
     
   QPushButton *totalize_count_button;

@@ -25,20 +25,10 @@ kb_key::kb_key(const QString & text, QWidget* parent)
 keyboard::keyboard(centre* set_centre_p)
 :screen(set_centre_p)
 {
-      
-  cout<<"start keyboard constructor.  new_keyboard_entry = "<<centre_p->new_keyboard_entry<<endl;
-      
-  
-//  cout<<"keyboard::keyboard 1\n";
-
-//  out_string_p = out_string_p_s;
-  
-//  message_p=new QLabel;
   message_p=new QTextEdit;
   message_p->setMaximumSize(500,40);
   message_p->setFocusPolicy(Qt::NoFocus);
   entry_line_display_p=new QLineEdit;
-//  entry_line_display_p -> setMinimumHeight(50);
   entry_line_display_p->setFocusPolicy(Qt::NoFocus);
   back_button_p=new button("BACK");
   entry_line_p=new QString;
@@ -183,26 +173,14 @@ keyboard::keyboard(centre* set_centre_p)
   connect(enter_key_p, SIGNAL(clicked()), this, SLOT(enter_clicked()));
   
   connect(this, SIGNAL(external_keyboard_enter()), enter_key_p, SIGNAL(clicked()));
-//  connect(this, SIGNAL(finished()), this
-  
-//  cout<<"keyboard::keyboard 2\n";
+
   if(centre_p->new_keyboard_entry)//this is a general keyboard entry screen
   {
     message_p->setText(centre_p->keyboard_message_string);
   }
-
-//  cout<<"keyboard::keyboard 3\n";
-  
   entry_line_display_p -> setStyleSheet( "font-size: 15pt;");
   
-//  setMaximumSize(800, 480);	
   setFocus();
-
-//  cout<<"keyboard::keyboard 4\n";
-      
-  cout<<"end keyboard constructor.  new_keyboard_entry = "<<centre_p->new_keyboard_entry<<endl;
-      
-  
 }
 
 void keyboard::back_clicked()
@@ -433,26 +411,6 @@ void keyboard::keyPressEvent(QKeyEvent* event)
   }
 }
 
-//===============================================================================================//TEST~~~ 11_13_2018//
-/*
-macro_name_entry::macro_name_entry(centre* centre_p)
-:keyboard(centre_p)
-{
-  QString message("Enter macro name.");
-  message_p->setText(message);
-  connect(enter_key_p, SIGNAL(clicked()), this, SLOT(macro_name_entered()));
-}
-
-void macro_name_entry::macro_name_entered()
-{
-  centre_p -> macro_name_keyboard(*entry_line_p);
-
-  centre_p->add_waiting_screen(centre_p->get_previous_screen());
-  centre_p->screen_done=true;
-}
-*/
-//===============================================================================================//
-
 crop_name_entry::crop_name_entry(centre* centre_p)
 :keyboard(centre_p)
 {
@@ -565,7 +523,6 @@ batch_save_program::batch_save_program(centre* centre_p, batch_mode_driver* batc
     QString name = program_list[i];
     name.remove(".ESC3");
     message.append(name);
-//    message.append("\n");
   }
   message_p->setText(message);
   
@@ -684,17 +641,13 @@ batch_save_ss_setup::batch_save_ss_setup(centre* centre_p, batch_mode_driver* ba
     QString name = program_list[i];
     name.remove(".ESC3sss");
     message.append(name);
-//    message.append("\n");
   }
   message_p->setText(message);
   
   QString path(batch_mode_driver_p->ss_setup_path);
-//  cout<<"path = "<<path.toStdString()<<endl;
   int slash_index = path.lastIndexOf("/");
   int chars_to_take = path.length() - slash_index - 1;
-//  cout<<"chars_to_take = "<<chars_to_take<<endl;
   QString file_name = path.right(chars_to_take);
-//  cout<<"file_name = "<<file_name.toStdString();
   file_name.remove(".ESC3sss");
   *entry_line_p = file_name;
   entry_line_display_p->setText(*entry_line_p);

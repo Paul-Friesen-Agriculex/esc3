@@ -6,12 +6,9 @@
 #include <QString>
 #include <QMessageBox>			//help menu popup//
 #include <QInputDialog>			//TEST~~~ alternative to dialog window, retrieve user input
-//#include <QStringList>			  //TEST~~~
-//#include <QTextStream>			  //TEST~~~ for streaming out Qstrings
 
 #include "table.hpp"
 #include "centre.hpp"
-//#include <QDialogButtonBox>		//TEST~~~
 
 class button;
 class QGridLayout;
@@ -22,7 +19,6 @@ class QLabel;
 class QRadioButton;
 class QSpinBox;
 class help_screen;
-//class keyboard;
 
 class macro_screen : public screen
 {
@@ -33,41 +29,20 @@ class macro_screen : public screen
   ~macro_screen();
   QString text;
   
-  public slots:  
-//  void usb_serial_out(QString bar_str_1, QString bar_str_2, QString bar_str_3, QString bar_str_4, QString totalize_str_count, QString totalize_str_weight);
-//  void usb_serial_out(QString lotcode_str, QString packcode_str, QString batch_count_str, QString substitution_str, QString dump_count_str);
-  
   private slots:
   void back_button_clicked();
   void ok_button_clicked();
   void help_button_clicked();
-//  void enable_all_clicked();
-//  void disable_all_clicked();
   void initialize_macro_menu();
   void cellSelected(int nRow, int nCol);
   void load_macro_table();
-//  void store_macro_table();
   void toggle_macro(int macro_number);
-//  void dialogbox_buttons(int n);
-  /*
-  void check_serial_connection();		  //TEST~~~
-  void communications_choice_toggled(bool);
-  void tcp_setup_button_clicked();
-  */
+
   private:
   button* back_button_p;
   button* ok_button_p;
   button* help_button_p;
-//  button* disable_all_button_p;
-//  button* enable_all_button_p;
   help_screen* help_screen_p;
-  /*
-  QGroupBox* communications_choice_box_p;
-  QGridLayout* communications_choice_box_layout_p;
-  QRadioButton* communicate_by_keyboard_cable_button_p;
-  QRadioButton* communicate_by_tcp_button_p;
-  button* tcp_setup_button_p;
-  */
   QLabel* instruction_label_p;
   QLineEdit *lineEdit;
   bool serialusb_connected;
@@ -83,42 +58,16 @@ class macro_screen : public screen
   QLabel* tableWidget_label_p;
   QLabel* screen_title_label_p;
   QLabel* description_p;
-//  keyboard* keyboard_p;
   QMessageBox msgBox;
-//  QString macro_function_string;
-
-//  static const int macro_button_width = 135;
-//  static const int macro_button_height = 35;
   static const int macro_cols = 5;
   static const int macro_rows = 10;
   centre* centre_p;
-  /*
-  QString bar_str_1;            //Totalize variables//
-  QString bar_str_2;
-  QString bar_str_3;
-  QString bar_str_4;
-  QString totalize_str_count;
-  QString totalize_str_weight;
-  //============================================//
-  QString totalize_count_str;
-  QString weight_str;
-  //============================================//
-  
-  QString lotcode_str;         //Batch variables//
-  QString packcode_str; 
-  QString batch_count_str;
-  QString substitution_str;
-  QString dump_count_str;
-  */
+
   int current_row;
   int current_column;
   
   protected:
-  QString* macro_name_string;  //TEST~~~ 11_13_2018//
-  
-//  signals:
-//  void close_dialog(int r);
-//  void return_with_keyboard_entry(int, int);
+  QString* macro_name_string;
 };
 
 #endif

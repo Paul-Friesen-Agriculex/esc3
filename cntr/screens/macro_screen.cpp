@@ -42,8 +42,6 @@ macro_screen::macro_screen(centre*set_centre_p)
   back_button_p = new button("Back");
   ok_button_p = new button("OK");
   help_button_p = new button("Help");
-//  disable_all_button_p = new button("Disable All");
-//  enable_all_button_p = new button("Enable All");
   tableWidget_p = new QTableWidget(this);
   tableWidget_p->setRowCount(macro_rows);
   tableWidget_p->setColumnCount(macro_cols);
@@ -64,15 +62,12 @@ macro_screen::macro_screen(centre*set_centre_p)
   main_layout_p->addWidget(back_button_p, 0, 3);
   main_layout_p->addWidget(help_button_p, 5, 2);
   main_layout_p->addWidget(ok_button_p, 5, 3);
-//  main_layout_p->addWidget(disable_all_button_p, 5, 0);
   main_layout_p->addWidget(tableWidget_p,3,0,2,4);
   setLayout(main_layout_p);
   
   connect(back_button_p, SIGNAL(clicked()), this, SLOT(back_button_clicked()));
   connect(ok_button_p, SIGNAL(clicked()), this, SLOT(ok_button_clicked()));
   connect(help_button_p, SIGNAL(clicked()), this, SLOT(help_button_clicked()));
-//  connect(disable_all_button_p, SIGNAL(clicked()), this, SLOT(disable_all_clicked()));
-//  connect(enable_all_button_p, SIGNAL(clicked()), this, SLOT(enable_all_clicked()));
   connect(tableWidget_p, SIGNAL(cellClicked(int, int)), this, SLOT(cellSelected(int, int)));
   
   if(centre_p->macro_type_for_entry == 0)
@@ -105,60 +100,20 @@ Items listed in the selected macro will be sent to that device.");
   }
   description_p->setWordWrap(true);
   
-  cout<<"macro_screen::macro_screen 2\n";
-  
-  /*
   if(centre_p->new_keyboard_entry == true) //returning after entering a macro name using a keyboard screen
   {        
     centre_p->new_keyboard_entry = false;
-    QString new_string;
     centre_p->set_macro_name(centre_p->keyboard_return_string);
   }
-  */
-  if(centre_p->new_keyboard_entry == true) //returning after entering a macro name using a keyboard screen
-  {        
-    cout<<"centre_p->new_keyboard_entry == true\n";
-    cout<<"centre_p->keyboard_return_string = "<<centre_p->keyboard_return_string.toStdString()<<endl;
-//    cout<<"centre_p->macro_row = "<<centre_p->macro_row<<endl;
-    
-    centre_p->new_keyboard_entry = false;
-    centre_p->set_macro_name(centre_p->keyboard_return_string);
-  }
-  
-  cout<<"macro_screen::macro_screen 3\n";
-  
 
   initialize_macro_menu();
-  
-  cout<<"macro_screen::macro_screen 4\n";
-  
   load_macro_table();  
-  
-  cout<<"macro_screen::macro_screen 5\n";
-  
   tableWidget_p->setStyleSheet("QTableWidget { font: 15pt;}");
   tableWidget_p->verticalHeader()->setDefaultSectionSize(45);
   
   help_screen_p = 0;
   current_row = 0;
   current_column = 0;
-/*  
-  if(centre_p->build_macro) //returning from macro_builder screen with a new macro
-  {
-    centre_p->build_macro = false;
-    int row = centre_p->macro_row;
-    centre_p->macro_row = 0;
-    if(tableWidget_p->item(row, 0)->checkState() == Qt::Unchecked)
-    {
-      toggle_macro(row);
-    }
-  }
-*/    
-  
-  cout<<"macro_screen::macro_screen 6\n";
-  
-  
-  
 }
 
 macro_screen::~macro_screen()
@@ -176,53 +131,7 @@ void macro_screen::ok_button_clicked()
 {
   centre_p->screen_done = true;//go to waiting screen
 }
-/*
-void macro_screen::disable_all_clicked()
-{
-  cout<<endl<<"Disable_ALL()"<<endl;
-  for(int j=0; j<10; ++j)
-  {
-    if(tableWidget_p->item(j, 0)->checkState())
-    {
-      tableWidget_p->item(j, 0)->setCheckState ( Qt::Unchecked );
 
-      QLabel *on_off_label_p = new QLabel("OFF");
-      tableWidget_p->setCellWidget (j, 0, on_off_label_p);
-      on_off_label_p->setAlignment(Qt::AlignCenter);
-                                    
-      tableWidget_p->item(j,0)->setBackground(QColor(255, 255, 255));
-      tableWidget_p->item(j,1)->setBackground(QColor(255, 255, 255));
-      tableWidget_p->item(j,2)->setBackground(QColor(255, 255, 255));
-      tableWidget_p->item(j,3)->setBackground(QColor(255, 255, 255));
-      tableWidget_p->item(j,4)->setBackground(QColor(255, 255, 255));
-    }
-//    store_macro_table();
-  }
-}
-
-void macro_screen::enable_all_clicked()
-{
-  cout<<endl<<"Enable_ALL()"<<endl;
-  for(int j=0; j<10; ++j)
-  {
-    if(!tableWidget_p->item(j, 0)->checkState())
-    {
-      tableWidget_p->item(j, 0)->setCheckState ( Qt::Checked );
-      
-      QLabel *on_off_label_p = new QLabel("ON");
-      tableWidget_p->setCellWidget (j, 0, on_off_label_p);
-      on_off_label_p->setAlignment(Qt::AlignCenter);
-                                    
-      tableWidget_p->item(j,0)->setBackground(QColor(154, 229, 154));
-      tableWidget_p->item(j,1)->setBackground(QColor(154, 229, 154));
-      tableWidget_p->item(j,2)->setBackground(QColor(154, 229, 154));
-      tableWidget_p->item(j,3)->setBackground(QColor(154, 229, 154));
-      tableWidget_p->item(j,4)->setBackground(QColor(154, 229, 154));
-    }
-//    store_macro_table();
-  }
-}
-*/
 void macro_screen::help_button_clicked()
 { 
   help_screen_p = new help_screen();
@@ -252,9 +161,6 @@ void macro_screen::help_button_clicked()
 
 void macro_screen::initialize_macro_menu()
 {
-  
-//  cout<<"macro_screen::initialize_macro_menu\n";
-  
   for (int i=0; i < macro_rows; ++i)
   {
     for (int j=0; j < macro_cols; ++j)
@@ -289,9 +195,6 @@ void macro_screen::initialize_macro_menu()
       }
     }
   }
-  //QTableView class, considering hiding actual function code
-  //hideRow(), hideColumn(), showRow(), and showColumn()
-  //tableWidget_p->setColumnWidth(0, (tableWidget_p->item(0, 0)->sizeHint()).width());  //TEST~~~    
 }
  
 void macro_screen::load_macro_table()
@@ -321,143 +224,8 @@ void macro_screen::load_macro_table()
   }
 }
 
-/*
-void macro_screen::load_macro_table()
-{  
-  
-//  cout<<"macro_screen::load_macro_table()\n";
-  
-  bool temp_state;
-  int temp_num;
-  char temp_name[300];
-  char temp_mask[300];
-  char temp_func[300];
-
-  ifstream macros("macro_table");  
-  
-  if(macros)
-  {
-    for(int i=0; i<10; ++i)
-    {
-      macros>>temp_state;
-      macros>>temp_num;
-      macros>>temp_name;
-      macros>>temp_mask;
-      
-      macros>>temp_func;
-      
-      if(temp_state == 0)
-      {
-        tableWidget_p->item(i, 0)->setCheckState ( Qt::Unchecked );
-        QLabel *on_off_label_p = new QLabel("OFF");
-        tableWidget_p->setCellWidget (i, 0, on_off_label_p);
-        on_off_label_p->setAlignment(Qt::AlignCenter);
-
-        tableWidget_p->item(i,0)->setBackground(QColor(255, 255, 255));
-        tableWidget_p->item(i,1)->setBackground(QColor(255, 255, 255));
-        tableWidget_p->item(i,2)->setBackground(QColor(255, 255, 255));
-        tableWidget_p->item(i,3)->setBackground(QColor(255, 255, 255));
-        tableWidget_p->item(i,4)->setBackground(QColor(255, 255, 255));
-      }
-      else
-      {
-        tableWidget_p->item(i, 0)->setCheckState ( Qt::Checked );
-        QLabel *on_off_label_p = new QLabel("ON");
-        tableWidget_p->setCellWidget (i, 0, on_off_label_p);
-        on_off_label_p->setAlignment(Qt::AlignCenter);
-                                      
-        tableWidget_p->item(i,0)->setBackground(QColor(154, 229, 154));
-        tableWidget_p->item(i,1)->setBackground(QColor(154, 229, 154));
-        tableWidget_p->item(i,2)->setBackground(QColor(154, 229, 154));
-        tableWidget_p->item(i,3)->setBackground(QColor(154, 229, 154));
-        tableWidget_p->item(i,4)->setBackground(QColor(154, 229, 154));
-      }
-      tableWidget_p->item(i, 1)->setText(QString("%1").arg(temp_num));
-      
-      if(QString(temp_name).contains("_"))                                     //TEST~~~ 11_19_2018//
-      {                                                                             //TEST~~~
-        for(int mn = 0; mn<300; ++mn) if(temp_name[mn] == '_') temp_name[mn] = ' '; //TEST~~~
-      }                                                                             //TEST~~~
-      
-      tableWidget_p->item(i, 2)->setText(temp_name);
-      tableWidget_p->item(i, 3)->setText(temp_mask);
-        
-      tableWidget_p->item(i, 4)->setText(temp_func);
-      if(macros.eof()) break;
-    }
-    macros.close();
-  }
-  else//macro_table file did not open.  probably does not exist
-  {
-    for(int i=0; i<10; ++i)
-    {
-      tableWidget_p->item(i, 0)->setCheckState ( Qt::Unchecked );
-      QLabel *on_off_label_p = new QLabel("OFF");
-      tableWidget_p->setCellWidget (i, 0, on_off_label_p);
-      on_off_label_p->setAlignment(Qt::AlignCenter);
-
-      tableWidget_p->item(i,0)->setBackground(QColor(255, 255, 255));
-      tableWidget_p->item(i,1)->setBackground(QColor(255, 255, 255));
-      tableWidget_p->item(i,2)->setBackground(QColor(255, 255, 255));
-      tableWidget_p->item(i,3)->setBackground(QColor(255, 255, 255));
-      tableWidget_p->item(i,4)->setBackground(QColor(255, 255, 255));
-
-      tableWidget_p->item(i, 1)->setText(QString("%1").arg(i));
-      
-      tableWidget_p->item(i, 2)->setText("-");
-      tableWidget_p->item(i, 3)->setText("-");
-        
-      QLabel* placement_holder_text_label = new QLabel(this);
-      placement_holder_text_label->setText("< Click to edit/create macro >");
-      tableWidget_p->setCellWidget (i, 3, placement_holder_text_label);
-      placement_holder_text_label->setAlignment(Qt::AlignCenter);
-      placement_holder_text_label->setStyleSheet("font: italic; color: grey; background-color: white;");
-      tableWidget_p->item(i, 4)->setText("-");
-    }
-  }
-}
-*/
-/*
-void macro_screen::store_macro_table()
-{  
-  
-//  cout<<"macro_screen::store_macro_table()\n";
-  
-  std::ofstream macros("macro_table",(std::ofstream::out));
-  for(int i=0; i<10; ++i)
-  {  
-    macros<<endl;
-    if(tableWidget_p->item(i, 0)->checkState())			 //macro state
-    {
-      macros<<1<<" ";
-    }
-    else
-    {
-      macros<<0<<" ";
-    }
-    macros<<i+1;																                              //macro number
-    
-    QString macro_temp_name_str = (tableWidget_p->item(i, 2)->text().toUtf8().constData());
-    if(macro_temp_name_str.contains(" "))
-    {
-      macro_temp_name_str.replace(QString(" "), QString("_"));
-      macros<<endl<<macro_temp_name_str.toLatin1().constData();
-    }
-    else macros<<endl<<(tableWidget_p->item(i, 2)->text()).toUtf8().constData();		//macro name  //TEST~~~//
-    macros<<endl<<(tableWidget_p->item(i, 3)->text()).toUtf8().constData();		//macro mask
-    macros<<endl<<(tableWidget_p->item(i, 4)->text()).toUtf8().constData();		//macro function
-  }
-  macros.close();
-  macros.clear();
-//  centre_p->tm_macro_updated = false;
-}
-*/
-
 void macro_screen::cellSelected(int nRow, int nCol)	
 {
-  
-  cout<<"macro_screen::cellSelected(int nRow, int nCol)	\n";
-  
   current_row = nRow;
   current_column = nCol;
   if(nCol == 0)
@@ -476,9 +244,6 @@ void macro_screen::cellSelected(int nRow, int nCol)
   else if(nCol == 3)
   {    
     centre_p->macro_row_for_entry = nRow;
-//    centre_p->build_macro = true;
-//    centre_p->macro_display_string = tableWidget_p->item(nRow, 3)->text();
-//    centre_p->macro_function_string = tableWidget_p->item(nRow, 4)->text();
     centre_p->add_waiting_screen(38);//macro_builder
     centre_p->screen_done = true;
   }
@@ -499,50 +264,4 @@ void macro_screen::toggle_macro(int macro_number)
   load_macro_table();
 }
   
-  /*
-  for(int i=0; i<macro_rows; ++i)//clear selection in all rows, then set selected row.  At most 1 row selected.
-  {
-    tableWidget_p->item(i, 0)->setCheckState ( Qt::Unchecked );
 
-    QLabel *on_off_label_p = new QLabel("OFF");
-    tableWidget_p->setCellWidget (i, 0, on_off_label_p);
-    on_off_label_p->setAlignment(Qt::AlignCenter);
-                                  
-    tableWidget_p->item(i,0)->setBackground(QColor(255, 255, 255));
-    tableWidget_p->item(i,1)->setBackground(QColor(255, 255, 255));
-    tableWidget_p->item(i,2)->setBackground(QColor(255, 255, 255));
-    tableWidget_p->item(i,3)->setBackground(QColor(255, 255, 255));
-    tableWidget_p->item(i,4)->setBackground(QColor(255, 255, 255));
-  }
-  if(tableWidget_p->item(macro_number, 0)->checkState())
-  {
-    tableWidget_p->item(macro_number, 0)->setCheckState ( Qt::Unchecked );
-//    store_macro_table();
-    
-    QLabel *on_off_label_p = new QLabel("OFF");
-    tableWidget_p->setCellWidget (macro_number, 0, on_off_label_p);
-    on_off_label_p->setAlignment(Qt::AlignCenter);
-                                  
-    tableWidget_p->item(macro_number,0)->setBackground(QColor(255, 255, 255));
-    tableWidget_p->item(macro_number,1)->setBackground(QColor(255, 255, 255));
-    tableWidget_p->item(macro_number,2)->setBackground(QColor(255, 255, 255));
-    tableWidget_p->item(macro_number,3)->setBackground(QColor(255, 255, 255));
-    tableWidget_p->item(macro_number,4)->setBackground(QColor(255, 255, 255));
-  }
-  else
-  {
-    tableWidget_p->item(macro_number, 0)->setCheckState ( Qt::Checked );
-//    store_macro_table();
-    
-    QLabel *on_off_label_p = new QLabel("ON");
-    tableWidget_p->setCellWidget (macro_number, 0, on_off_label_p);
-    on_off_label_p->setAlignment(Qt::AlignCenter);
-                                  
-    tableWidget_p->item(macro_number,0)->setBackground(QColor(154, 229, 154));
-    tableWidget_p->item(macro_number,1)->setBackground(QColor(154, 229, 154));
-    tableWidget_p->item(macro_number,2)->setBackground(QColor(154, 229, 154));
-    tableWidget_p->item(macro_number,3)->setBackground(QColor(154, 229, 154));
-    tableWidget_p->item(macro_number,4)->setBackground(QColor(154, 229, 154));
-  }
-}    
-*/

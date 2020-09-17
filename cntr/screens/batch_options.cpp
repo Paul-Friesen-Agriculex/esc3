@@ -21,7 +21,6 @@ batch_options::batch_options(centre*set_centre_p, batch_mode_driver* set_batch_m
   pack_match_lot_p = new QRadioButton("Pack barcode must match seed lot barcode");
   pack_contain_lot_p = new QRadioButton("Pack barcode must contain seed lot barcode");
   lot_contain_pack_p = new QRadioButton("Seed lot barcode must contain pack barcode");
-//  pack_match_spreadsheet_p = new QRadioButton("Pack barcode must match spreadsheet");
   record_only_p = new QRadioButton("Record barcodes only - no matching");
   back_button_p = new button("Back");
   done_button_p = new button("Done");
@@ -35,7 +34,6 @@ batch_options::batch_options(centre*set_centre_p, batch_mode_driver* set_batch_m
   barcode_matching_group_layout_p -> addWidget(pack_match_lot_p,0,0);
   barcode_matching_group_layout_p -> addWidget(pack_contain_lot_p,0,1);
   barcode_matching_group_layout_p -> addWidget(lot_contain_pack_p,1,0);
-//  barcode_matching_group_layout_p -> addWidget(pack_match_spreadsheet_p);
   barcode_matching_group_layout_p -> addWidget(record_only_p,1,1);
   barcode_matching_group_p -> setLayout(barcode_matching_group_layout_p);
   
@@ -61,7 +59,6 @@ batch_options::batch_options(centre*set_centre_p, batch_mode_driver* set_batch_m
   pack_match_lot_p -> setChecked(batch_mode_driver_p->pack_match_lot);
   pack_contain_lot_p -> setChecked(batch_mode_driver_p->pack_contain_lot);
   lot_contain_pack_p -> setChecked(batch_mode_driver_p->lot_contain_pack);
-//  pack_match_spreadsheet_p -> setChecked(batch_mode_driver_p->pack_match_spreadsheet);
   record_only_p -> setChecked(batch_mode_driver_p->record_only);
 }
 
@@ -72,11 +69,10 @@ void batch_options::done_button_clicked()
   batch_mode_driver_p->pack_match_lot = pack_match_lot_p->isChecked();
   batch_mode_driver_p->pack_contain_lot = pack_contain_lot_p->isChecked();
   batch_mode_driver_p->lot_contain_pack = lot_contain_pack_p->isChecked();
-//  batch_mode_driver_p->pack_match_spreadsheet = pack_match_spreadsheet_p->isChecked();
   batch_mode_driver_p->record_only = record_only_p->isChecked();
   
   
-  cout<<"batch_options::done_button_clicked.  about to list program\n";
+//  cout<<"batch_options::done_button_clicked.  about to list program\n";
 //  batch_mode_driver_p->list_program();
   
   
@@ -104,7 +100,6 @@ void batch_options::barcode_switch_toggled(bool checked)
 void batch_options::macro_menu_button_clicked()
 {
   cout<<"macro_menu_button_click"<<endl;	//OMIT~~~
-//  centre_p->enter_totalize_macro = true;
   centre_p->add_waiting_screen(50);//batch_macro_type_choice
   centre_p->screen_done=true;
 }

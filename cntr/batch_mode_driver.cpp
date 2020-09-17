@@ -13,7 +13,6 @@ batch_mode_driver::batch_mode_driver(centre* centre_p_s, cutgate* cutgate_p_s)
 {
   centre_p = centre_p_s;
   cutgate_p = cutgate_p_s;
-//  count_rate_predictor_p = new count_rate_predictor(centre_p);
   slowdown_count_diff = 0;
   slowdown_count_diff_set = false;//will be set to true if a value is loaded from file or is estimated by run function.
     //a true value prevents the run function from estimating a new value from scratch.  It will, however, adjust the value as appropriate.
@@ -57,11 +56,9 @@ batch_mode_driver::batch_mode_driver(centre* centre_p_s, cutgate* cutgate_p_s)
   use_spreadsheet = false;
   ss_setup_p = new ss_setup;
   clear_ss_setup();
-//  clear_envelope_layout();
   ss_setup_path = "";
   envelope_layout_path = "";
   envelope_p = new envelope;
-//  column_for_next_field_p = 0;
   sample_row = 0;
   print_envelope = false;
   print_control_mode = start_on_pack_collect;
@@ -80,8 +77,6 @@ batch_mode_driver::batch_mode_driver(centre* centre_p_s, cutgate* cutgate_p_s)
   
 batch_mode_driver::~batch_mode_driver()
 {
-//  delete count_rate_predictor_p;
-//  count_rate_predictor_p = 0;
   for(int i=0; i<program_size; ++i) delete program[i];
   program.clear();
   timer_p -> stop();
@@ -395,9 +390,6 @@ void batch_mode_driver::load_spreadsheet(QString filename)
   spreadsheet_number_of_columns = 0;
   for(int i=list.size()-1; i>=0; --i)
   {
-    
-//    cout<<"0\n";
-    
     ss_column_p = ss_first_column_p;
     ss_first_column_p = new spreadsheet_column;
     ss_first_column_p->heading = list[i];
@@ -424,17 +416,11 @@ void batch_mode_driver::load_spreadsheet(QString filename)
     }
     for(int i=list.size(); i<spreadsheet_number_of_columns; ++i)//in case of empty columns, append null strings.  Not expected to execute normally
     {
-      
-      cout<<"2\n";
-      
       ss_column_p->data_list.append("");
       ss_column_p = ss_column_p->next;
     }
   }
   infile.close();
-  
-  cout<<"3\n";
-  
   
   if(ss_first_column_p->heading != "Filled")//if spreadsheet does not have this column, create it
   {
@@ -449,16 +435,7 @@ void batch_mode_driver::load_spreadsheet(QString filename)
   }
   mode = wait_for_seed_lot_barcode;
   ss_column_p = ss_first_column_p;
-  /*
-  for(int i=0; i<13; ++i) 
-  {
-    ss_column_p = ss_column_p->next;
-  }
-  for(int i=0; i<10; ++i)
-  {
-    cout<<"  i"<<i<<"   "<<(ss_column_p->data_list[i]).toStdString()<<endl;
-  }
-  */
+
   //look for first unfilled row, initialize spreadsheet_line_number
   for(int i=0; i<spreadsheet_number_of_lines; ++i)
   {
@@ -521,18 +498,6 @@ void batch_mode_driver::list_program()
 
 void batch_mode_driver::run()
 {
-  /*
-  float predicted_count_rate = (count_rate_predictor_p->get_rate());
-  float time_to_end;
-  if(predicted_count_rate > .001)
-  {
-    time_to_end = float( current_count_limit - (centre_p->count) )  /  predicted_count_rate;
-  }
-  else
-  {
-    time_to_end = 1000;
-  }
-  */
   if(   (slowdown_count_diff_set==false)   &&   (current_count_limit>=0)   )//estimate a starting value for slowdown_count_diff.
     //a negative value for current_count_limit indicates it has not been set and should not be used
   {
@@ -647,9 +612,6 @@ void batch_mode_driver::run()
           cout<<"current_count_limit = "<<current_count_limit<<endl;
   
         }
-
-//        cout<<"after mode hi_open.  pack_barcode_ok = "<<pack_barcode_ok<<endl;
-
       }
       if(restart_flag==true) 
       {
@@ -667,27 +629,11 @@ void batch_mode_driver::run()
         }
         centre_p->block_endgate_opening = !pack_barcode_ok;
         
-        
-//        if(  (time_to_end<0.4)  &&  ((centre_p->count)>current_count_limit/2)  )
-//        if(time_to_end<2)// &&  ((centre_p->count)>current_count_limit/2)  )
-        
         if(   (current_count_limit-centre_p->count) < slowdown_count_diff   )
-        
-        
-        
-        
-        
-        
         {
           mode = low_open;
           cout<<"mode low_open. count "<<centre_p->count<<"\n";
-  
-//          cout<<"current_count_limit = "<<current_count_limit<<endl;
-  
           low_speed_mode_time.restart();
-
-//          cout<<"after mode low_open.  pack_barcode_ok = "<<pack_barcode_ok<<endl;
-
         }
       }
       
@@ -702,13 +648,6 @@ void batch_mode_driver::run()
       }
       cutgate_p -> open();
       centre_p->block_endgate_opening = !pack_barcode_ok;
-      /*
-      if(time_to_end>5)
-      {
-          mode = hi_open;
-          cout<<"mode hi_open. count "<<centre_p->count<<"\n";
-      }
-      */
       if(centre_p->count >= current_count_limit)
       {
         centre_p->count = 0;
@@ -760,22 +699,15 @@ void batch_mode_driver::run()
           else//extra_pack_filling is true
           {
             current_count_limit = extra_pack_stored_count_limit;//restore previous value 
-            cout<<"extra_pack_filling was true.  current_count_limit = "<<current_count_limit<<endl;         
           }
           if(current_pack >= current_pack_limit)
           {
-            
-            cout<<"current_pack_limit = "<<current_pack_limit<<endl;
-            
             current_pack = 0;
             ++current_set;          
             if(current_set >= program_size)
             {
               mode = dump_into_cut_gate;
               cout<<"mode dump_into_cut_gate. count "<<centre_p->count<<"\n";
-  
-              cout<<"current_count_limit = "<<current_count_limit<<endl;
-  
               dump_into_cut_gate_time.restart();
               old_count = centre_p -> count;
               dump_end_qtime.restart();
@@ -786,18 +718,12 @@ void batch_mode_driver::run()
               current_pack_limit = program[current_set]->packs;
               mode = hi_closed;
               cout<<"1  from mode gate_delay to mode hi_closed. count "<<centre_p->count<<"\n";
-  
-              cout<<"current_count_limit = "<<current_count_limit<<endl;
-  
             }
           }
           else
           {
             mode = hi_closed;
             cout<<"2  from mode gate_delay to mode hi_closed. count "<<centre_p->count<<"\n";
-  
-            cout<<"current_count_limit = "<<current_count_limit<<endl;
-  
           }
         }
         else//use_spreadsheet true
@@ -844,8 +770,6 @@ void batch_mode_driver::run()
       }
       break;
     case hi_closed:
-      
-//      cout<<"mode hi_closed.  count "<<centre_p->count<<endl;
       barcode_mode = pack;
       if(centre_p->feed_speed != high_feed_speed)
       {
@@ -874,20 +798,6 @@ void batch_mode_driver::run()
           }
         }
       }
-      
-      
-      
-//      if(  (time_to_end<1.5)  &&  ((centre_p->count)>current_count_limit/2)  )
-      
-      
-      
-      
-      
-      
-      
-      
-      
-//      cout<<"stop_count_diff = "<<stop_count_diff<<"   current_count_limit = "<<current_count_limit<<endl;
       if(   (current_count_limit-centre_p->count) < stop_count_diff   )
       {
         mode = wait_for_pack;
@@ -957,7 +867,6 @@ void batch_mode_driver::run()
             if(print_control_mode==start_on_pack_collect)
             {
               envelope_p -> print(spreadsheet_line_number);
-              cout<<"printed envelope prog889 "<<spreadsheet_line_number<<endl;
             }
             else if(print_control_mode==start_on_previous_pack_collect)
             {
@@ -1305,15 +1214,7 @@ void batch_mode_driver::fill_ss_column_pointers()
   ss_fill_time_p = get_spreadsheet_column_pointer(ss_setup_p -> fill_time_column);
   ss_dump_count_p = get_spreadsheet_column_pointer(ss_setup_p -> dump_count_column);
 }
-/*
-void batch_mode_driver::load_envelope_layout()
-{
-}
 
-void batch_mode_driver::clear_envelope_layout()
-{
-}
-*/
 void batch_mode_driver::save_ss_setup(QString filename)
 {
   QFile file(filename);
@@ -1733,9 +1634,6 @@ void batch_mode_driver::load_ss_setup()//load the ss_setup indicated by ss_setup
       cout<<"batch_mode_driver::load_ss_setup.  data type identifier not found.  "<<line.toStdString()<<"\n";
     }
   }
-  
-  cout<<"print_control_mode = "<<print_control_mode<<endl;
-  
 }
 
 int batch_mode_driver::get_next_spreadsheet_line_number()//look for next line number not filled for current seed_lot_barcode.  Return -1 if no more.

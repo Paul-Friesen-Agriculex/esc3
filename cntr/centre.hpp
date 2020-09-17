@@ -15,8 +15,6 @@
 #include "crop.hpp"
 
 class QTimer;
-//class QLabel;
-//class message_box;
 class camera;
 class processor;
 class screen;
@@ -68,8 +66,6 @@ class centre : public QObject
   bool init_ran;
   void init();
   
-//  QLabel* startup_progress_label_p; 
-//  message_box* startup_progress_label_p; 
   QThread* processor_thread_p;
   endgate* endgate_p;
   envelope_sensor* envelope_sensor_p;
@@ -80,10 +76,8 @@ class centre : public QObject
   int previous_screen_list[10];
   int previous_screen_index;
   bool previous_screen_going_back;
-//  CUTGATE_STATE cutgate_state;
   ENDGATE_STATE endgate_state;
   diagnostics_console* diagnostics_console_p;
-  //table* table_p; //TEST~~~
   
   int user;
   QString user_names[100];
@@ -105,9 +99,7 @@ class centre : public QObject
   int get_previous_screen();
   void select_crop(int crop_index);//moves the selected crop to position 0 in the array.  Crop in position 0 becomes the current crop.
   void delete_crop(int crop_index);
-//  void set_cutgate_state(CUTGATE_STATE set_state);
   void set_endgate_state(ENDGATE_STATE set_state);
-//  CUTGATE_STATE get_cutgate_state();
   ENDGATE_STATE get_endgate_state();
   void set_speed(int speed_set);
   void set_camera_processing_f(bool state);
@@ -119,19 +111,10 @@ class centre : public QObject
   void restart_calibration_f();
   void save_image(QString filename);
   void load_image(QString filename);
-//  void load_macros();	//original~~~
-  
-//=========================================================//  
-//  void macro_name_cell(int row, int col);
-//  void macro_name_keyboard(QString);
-//  int nRow, nCol;
-//=========================================================//
   
   processor* processor_p;
   cutgate* cutgate_p;
   int count;
-//  CUTGATE_STATE cutgate_state;
-//  ENDGATE_STATE endgate_state;
   int feed_speed;
   int totalize_feed_speed;//feed speed while running
   bool envelope_present;
@@ -155,22 +138,14 @@ class centre : public QObject
   //totalize mode
   int tm_barcode_columns;
   bool tm_zero_when_seed_discharged;
-//  bool tm_macro_updated;	//TEST~~~
   int tm_autosave_count_limit;//after this many counts are recorded, autosaves the file
   int tm_autosave_count;//counts how many counts were recorded;
   QString tm_save_filename;//if this is not blank, a file save is triggered with this name.  Includes directory info.
   QString tm_last_filename;//holds the name last used to save a file.  No directory info or extension.
   
-//  bool macro_status_bool;			  //temporary variable to transfer ifstream to tablewidget
-//  int macro_numb_int;				    //
-//  char macro_name_char[30];			//
-//  char macro_mask_char[30];			//
-//  char macro_function_char[30];		//
-//  QString combined_macro_functions;	//new char to combine all macros
   bool communicate_by_keyboard_cable;
   bool communicate_by_tcp;
   bool tcp_link_established;
-//  bool tcp_server;
   int network;
   QString tcp_client_server_addr;
   QTcpServer* tcp_server_p;
@@ -186,7 +161,7 @@ class centre : public QObject
   
   bool signal_port_pulse_when_endgate_closes;
   
-  QString macro_name; //TEST~~~11_13_2018//
+  QString macro_name;
   
   batch_mode_driver* batch_mode_driver_p;
   void communicate_out(char type);//'t'->totalize.  'p'->batch pack.  'd'->batch dump.  's'->batch substitution
@@ -197,22 +172,11 @@ class centre : public QObject
   QString keyboard_return_string;
   int control_int[10];//use to set conditions on return to asking screen
   
-  //macro_builder
-//  bool build_macro;//set true when leaving macro_screen for macro_builder.  signals that macro_builder will run.
-//  int macro_row;// remember row for return to macro_screen.
-  
   //Macro types
   QStringList totalize_macros;//issued after each pack in totalize
   QStringList batch_pack_macros;//issued after each pack in batch mode
   QStringList batch_dump_macros;//issued after each seed lot dumped in batch mode
   QStringList batch_substitution_macros;//issued if user substitutes seed for a lot that is short in batch
-  /*
-  //index number of macro being entered.  -1 indicates nothing being entered of that type
-  int totalize_macro_index;
-  int batch_pack_macro_index;
-  int batch_dump_macro_index;
-  int batch_substitution_macro_index;
-  */
   
   //macro_type: 0->totalize_macros, 1->batch_pack_macros, 2->batch_dump_macros, 4->batch_substitution_macros
   
@@ -229,12 +193,6 @@ class centre : public QObject
   void set_macro(QString macro);
   QString get_macro();
   QString get_macro_display_string();
-  /*
-  void set_totalize_macro_name(int row, QString name);
-  void set_batch_pack_macro_name(int row, QString name);
-  void set_batch_dump_macro_name(int row, QString name);
-  void set_batch_substitution_macro_name(int row, QString name);
-  */
   
   //macro type to enter
   bool enter_totalize_macro;
