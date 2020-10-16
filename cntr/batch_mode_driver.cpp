@@ -70,6 +70,8 @@ batch_mode_driver::batch_mode_driver(centre* centre_p_s, cutgate* cutgate_p_s)
   extra_pack_stored_count_limit = 0;
   extra_pack_finished = false;
   
+  substitute_seed_lot = false;
+  
   //diagnostics
   cout_counter = 0;
   cout_counter_limit = 200;
@@ -1047,8 +1049,83 @@ void batch_mode_driver::run()
         reset_program();
       }      
       break;
-      
-    default: cout<<"mode not found\n";
+    case substitution_wait_for_cleanout_open:
+      barcode_mode = substitution;
+      if(centre_p->feed_speed != dump_speed)
+      {
+        centre_p->set_speed(dump_speed);
+      }
+      cutgate_p -> open();
+      centre_p->block_endgate_opening = false;
+      if(centre_p->get_endgate_state()==ENDGATE_OPEN)
+      {
+        centre_p->count = 0;
+        mode = substitution_wait_for_cleanout_close;
+        cout<<"mode substitution_wait_for_cleanout_close\n";
+      }  
+      break; 
+    case substitution_wait_for_cleanout_close:
+      barcode_mode = substitution;
+      if(centre_p->feed_speed != dump_speed)
+      {
+        centre_p->set_speed(dump_speed);
+      }
+      cutgate_p -> open();
+      centre_p->block_endgate_opening = false;
+      if(centre_p->get_endgate_state()==ENDGATE_CLOSED)
+      {
+        seed_lot_barcode_ok = false;
+        seed_lot_barcode_old = true;
+        mode = substitution_wait_for_barcode;
+        cout<<"mode substitution_wait_for_barcode\n";
+      }  
+      break; 
+    case substitution_wait_for_barcode:
+      barcode_mode = substitution;
+      if(centre_p->feed_speed != 0)
+      {
+        centre_p->set_speed(0);
+      }
+      cutgate_p -> open();
+      centre_p->block_endgate_opening = false;
+      if(seed_lot_barcode_ok == true)
+      {
+        mode = hi_open;
+        cout<<"mode hi_open\n";
+      }  
+      break; 
+    case cancel_substitution_wait_for_cleanout_open:
+      barcode_mode = pack;
+      if(centre_p->feed_speed != dump_speed)
+      {
+        centre_p->set_speed(dump_speed);
+      }
+      cutgate_p -> open();
+      centre_p->block_endgate_opening = false;
+      if(centre_p->get_endgate_state()==ENDGATE_OPEN)
+      {
+        centre_p->count = 0;
+        mode = cancel_substitution_wait_for_cleanout_close;
+        cout<<"mode cancel_substitution_wait_for_cleanout_close\n";
+      }  
+      break; 
+    case cancel_substitution_wait_for_cleanout_close:
+      barcode_mode = pack;
+      if(centre_p->feed_speed != dump_speed)
+      {
+        centre_p->set_speed(dump_speed);
+      }
+      cutgate_p -> open();
+      centre_p->block_endgate_opening = false;
+      if(centre_p->get_endgate_state()==ENDGATE_CLOSED)
+      {
+        seed_lot_barcode_ok = false;
+        seed_lot_barcode_old = true;
+        mode = hi_open;
+        cout<<"mode hi_open\n";
+      }  
+      break; 
+    default: cout<<"batch_mode_driver::run.  mode not found\n";
   }
   
   //diagnostics
@@ -1145,6 +1222,14 @@ void batch_mode_driver::barcode_entered(QString value)
       }
     }
     emit pack_barcode_entered(value_trimmed);
+  }
+  if(barcode_mode == substitution)
+  {
+    seed_lot_barcode_ok = true;
+    seed_lot_barcode_old = false;
+//    seed_lot_barcode = value_trimmed;
+    substitute_barcode = value_trimmed;
+    emit substitution_barcode_entered(value_trimmed);
   }
 }
 

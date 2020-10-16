@@ -35,13 +35,28 @@ enum mode_enum
   dump_into_end,
   wait_for_dump_container,
   dump_into_container,
-  wait_for_dump_container_removal
+  wait_for_dump_container_removal,
+  substitution_wait_for_cleanout_open,
+  substitution_wait_for_cleanout_close,
+  substitution_wait_for_barcode, 
+  cancel_substitution_wait_for_cleanout_open,
+  cancel_substitution_wait_for_cleanout_close,
+/*
+  substitution_hi_open,
+  substitution_low_open,
+  substitution_gate_delay,
+  substitution_hi_closed,
+  substitution_wait_for_endgate_to_close,
+  substitution_wait_for_pack,
+  substitution_wait_for_bad_lot_cleanout
+  */
 };
 
 enum barcode_entry_mode
 {
   seed_lot,
-  pack
+  pack,
+  substitution
 };
 
 struct spreadsheet_column
@@ -215,6 +230,10 @@ class batch_mode_driver : public QObject
   int extra_pack_stored_count_limit;//store current_count_limit so it can be restored after extra pack
   bool extra_pack_finished;
   
+  //substitute seed lot
+  bool substitute_seed_lot;
+  QString substitute_barcode;
+  
   //diagnostics
   void list_program();//in terminal - diagnostics
   int cout_counter;//use to count cycles to print diagnostic messages occasionally
@@ -240,6 +259,7 @@ class batch_mode_driver : public QObject
   void refresh_screen();
   void send_extra_pack_message(QString message);
   void extra_pack_finished_signal();
+  void substitution_barcode_entered(QString barcode);
   
   //testing
   void send_message2(QString);

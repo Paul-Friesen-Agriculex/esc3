@@ -50,7 +50,10 @@ enum end_valve_mode_enum
   dump_closed_filling,
   dump_pass_through,
   dump_open_empty,
-  dump_container_removed_too_soon
+  dump_container_removed_too_soon,
+  substitution_wait_for_cleanout,
+  substitution_enter_barcode,
+  cancel_substitution
 };
 
 class batch : public screen
@@ -74,6 +77,9 @@ class batch : public screen
   void back_clicked();
   void repeat_pack_clicked();
   void restart_clicked();
+  void substitution_button_clicked();
+  void cancel_substitution_button_clicked();
+  void substitution_barcode_entered(QString);
   void save_program_clicked();
   void save_table_clicked();
   void clear_table_clicked();
@@ -87,6 +93,8 @@ class batch : public screen
   barcode_line* barcode_line_p;
   button* repeat_pack_button_p;
   button* restart_button_p;
+  button* substitution_button_p;
+  button* cancel_substitution_button_p;
   QLabel* high_speed_label_p;
   QLabel* low_speed_label_p;
   QLabel* dump_speed_label_p;
@@ -133,6 +141,9 @@ class batch : public screen
   QString dump_container_ready_message;
   QString dump_container_removed_too_soon_message;
   QString bad_seed_lot_message;
+  QString substitution_cleanout_message;
+  QString substitution_barcode_message;
+  QString cancel_substitution_message;
   
   barcode_entry_mode old_barcode_mode;
   

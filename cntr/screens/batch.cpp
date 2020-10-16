@@ -46,6 +46,8 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
   barcode_line_p->setMaximumSize(120,40);  //ORIGINAL~~~
   repeat_pack_button_p = new button("Repeat a pack");
   restart_button_p = new button("Dump out and\nrestart seed lot");
+  substitution_button_p = new button("Substitute seed lot");
+  cancel_substitution_button_p = new button("Cancel substitute\nseed lot");
   high_speed_label_p = new QLabel("High");
   high_speed_set_p = new QSlider;
   high_speed_set_p->setMinimum(0);
@@ -116,7 +118,9 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
   barcode_line_p -> clear();  
   control_layout_p -> addWidget(repeat_pack_button_p, 0, 0);
   control_layout_p -> addWidget(restart_button_p, 0, 1);
-  control_layout_p -> addWidget(speed_box_p, 1, 0, 1, 2);     
+  control_layout_p -> addWidget(substitution_button_p, 1, 0);
+  control_layout_p -> addWidget(cancel_substitution_button_p, 1, 1);
+  control_layout_p -> addWidget(speed_box_p, 2, 0, 1, 2);     
   speed_layout_p -> addWidget(high_speed_label_p, 0, 0);
   speed_layout_p -> addWidget(high_speed_set_p, 0, 1);
   speed_layout_p -> addWidget(low_speed_label_p, 1, 0);
@@ -144,6 +148,8 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
   connect(back_button_p, SIGNAL(clicked()), this, SLOT(back_clicked()));
   connect(repeat_pack_button_p, SIGNAL(clicked()), this, SLOT(repeat_pack_clicked()));
   connect(restart_button_p, SIGNAL(clicked()), this, SLOT(restart_clicked()));
+  connect(substitution_button_p, SIGNAL(clicked()), this, SLOT(substitution_button_clicked()));
+  connect(cancel_substitution_button_p, SIGNAL(clicked()), this, SLOT(cancel_substitution_button_clicked()));
   connect(high_speed_set_p, SIGNAL(valueChanged(int)), batch_mode_driver_p, SLOT(set_high_feed_speed(int)));
   connect(low_speed_set_p, SIGNAL(valueChanged(int)), batch_mode_driver_p, SLOT(set_low_feed_speed(int)));
   connect(dump_speed_set_p, SIGNAL(valueChanged(int)), batch_mode_driver_p, SLOT(set_dump_feed_speed(int)));
@@ -155,6 +161,7 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
   connect(batch_mode_driver_p, SIGNAL(seed_lot_barcode_entered(QString)), table_p, SLOT(enter_seed_lot_barcode(QString)));
   connect(batch_mode_driver_p, SIGNAL(pack_barcode_entered(QString)), table_p, SLOT(enter_pack_barcode(QString)));
   connect(low_speed_set_p, SIGNAL(sliderReleased()), this, SLOT(focus_on_barcode()));
+  connect(batch_mode_driver_p, SIGNAL(substitution_barcode_entered(QString)), this, SLOT(substitution_barcode_entered(QString)));
 
   centre_p->set_endgate_state(ENDGATE_CLOSED);
   if(centre_p->totalize_force_endgate_open == true)
@@ -180,11 +187,14 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
   
   
   pack_ready_message = "Pack Ready";
-  pack_removed_too_soon_message = "Pack Not Ready\nPut Back";
+  pack_removed_too_soon_message = "Pack Not Ready\nPut Back\n(Or Touch Substitute)";
   dump_container_needed_message = "Place Dump\nContainer";
   dump_container_ready_message = "Finished Dumping";
   dump_container_removed_too_soon_message = "Dumping Not\nFinished";
   bad_seed_lot_message = "Count went over limit.\nDiscard seed lot.\nReduce feed speed.";
+  substitution_cleanout_message = "Remove seed in end valve.";
+  substitution_barcode_message = "Substituting seed.";
+  cancel_substitution_message = "Clean out and\nre-load seed";
   old_barcode_mode = pack;
   
   end_valve_empty_counter = 0;
@@ -388,6 +398,52 @@ void batch::repeat_pack_clicked()
 void batch::restart_clicked()
 {
   batch_mode_driver_p -> restart();
+}
+
+void batch::substitution_button_clicked()
+{
+  if(centre_p->get_endgate_state() == ENDGATE_CLOSED)
+  {
+    batch_mode_driver_p -> mode = substitution_wait_for_cleanout_open;
+    end_valve_mode = substitution_wait_for_cleanout;
+  }
+  else
+  {
+    batch_mode_driver_p -> mode = substitution_wait_for_cleanout_close;
+    end_valve_mode = substitution_wait_for_cleanout;
+  }
+  batch_mode_driver_p->pack_barcode_ok = false;
+  batch_mode_driver_p->pack_barcode_old = true;
+  batch_mode_driver_p->substitute_seed_lot = true;
+  batch_mode_driver_p->barcode_mode = substitution;
+  
+  focus_on_barcode();
+}
+
+void batch::cancel_substitution_button_clicked()
+{
+  batch_mode_driver_p->current_pack --;
+  if(centre_p->get_endgate_state() == ENDGATE_CLOSED)
+  {
+    batch_mode_driver_p -> mode = cancel_substitution_wait_for_cleanout_open;
+  }
+  else
+  {
+    batch_mode_driver_p -> mode = cancel_substitution_wait_for_cleanout_close;
+  }
+  end_valve_mode = cancel_substitution;
+  batch_mode_driver_p->pack_barcode_ok = false;
+  batch_mode_driver_p->pack_barcode_old = true;
+  batch_mode_driver_p->substitute_seed_lot = false;
+  batch_mode_driver_p->barcode_mode = seed_lot;
+  
+  focus_on_barcode();
+}
+
+void batch::substitution_barcode_entered(QString)
+{
+//  batch_mode_driver_p->substitute_barcode = barcode;
+//  batch_mode_driver_p->substitute_seed_lot = true;
 }
 
 void batch::save_program_clicked()
@@ -618,6 +674,25 @@ void batch::run()
         end_valve_mode = dump_pass_through;
       }
       break;
+    case substitution_wait_for_cleanout:
+      if(batch_mode_driver_p->mode==substitution_wait_for_barcode)
+      {
+        end_valve_mode = substitution_enter_barcode;
+      }
+      break;
+    case substitution_enter_barcode:
+      if(batch_mode_driver_p->seed_lot_barcode_ok == true)
+      {
+        centre_p -> communicate_out('s');
+        end_valve_mode = closed_filling;
+      }
+      break;
+    case cancel_substitution:
+      if(batch_mode_driver_p->mode == hi_open)
+      {
+        end_valve_mode = closed_filling;
+      }
+      break;
     default:
       cout<<"end_valve_mode not found\n";
   }
@@ -649,7 +724,7 @@ void batch::run()
   else if(end_valve_mode==pack_removed_too_soon)
   {
     status_box_p->set_text(pack_removed_too_soon_message);
-    status_box_p->set_text_size(30);
+    status_box_p->set_text_size(25);
     status_box_p->set_background(255, 0, 0);
     status_box_p->update();
   }
@@ -672,6 +747,27 @@ void batch::run()
     status_box_p->set_text(bad_seed_lot_message);
     status_box_p->set_text_size(15);
     status_box_p->set_background(255, 0, 0);
+    status_box_p->update();
+  }    
+  else if(end_valve_mode==substitution_wait_for_cleanout)
+  {
+    status_box_p->set_text(substitution_cleanout_message);
+    status_box_p->set_text_size(20);
+    status_box_p->set_background(255, 255, 0);
+    status_box_p->update();
+  }    
+  else if(end_valve_mode==substitution_enter_barcode)
+  {
+    status_box_p->set_text(substitution_barcode_message);
+    status_box_p->set_text_size(20);
+    status_box_p->set_background(30, 200, 255);
+    status_box_p->update();
+  }    
+  else if(end_valve_mode==cancel_substitution)
+  {
+    status_box_p->set_text(cancel_substitution_message);
+    status_box_p->set_text_size(20);
+    status_box_p->set_background(255, 255, 0);
     status_box_p->update();
   }    
   else
@@ -755,6 +851,30 @@ void batch::run()
       barcode_status_p->update();
     }
   }
+  
+  
+  
+  if(batch_mode_driver_p->barcode_mode == substitution)
+  {
+    if(end_valve_mode==substitution_enter_barcode)
+    {
+      barcode_status_p->set_text("Scan Substitution Barcode");
+      barcode_status_p->set_text_size(30); 
+      barcode_status_p->set_background(255, 255, 0);
+      barcode_status_p->update();
+    }
+    else
+    {
+      barcode_status_p->set_text("");
+      barcode_status_p->set_text_size(30); 
+      barcode_status_p->set_background(0, 255, 0);
+      barcode_status_p->update();
+    }
+  }
+  
+  
+  
+  
   if(batch_mode_driver_p->mode == wait_for_bad_lot_cleanout)
   {
     barcode_status_p->set_text("Remove over-counted seed lot.");

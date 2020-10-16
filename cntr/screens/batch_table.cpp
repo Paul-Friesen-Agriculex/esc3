@@ -1,4 +1,5 @@
 #include "batch_table.hpp"
+#include "batch_mode_driver.hpp"
 #include <QHeaderView>
 #include <QFile>
 #include <QTextStream>
@@ -19,16 +20,16 @@ batch_table::batch_table(centre* c_p, batch_mode_driver* batch_mode_driver_p_s)
   filled_rows = 0;
 //  latest_seed_lot_barcode_row = 0;
   model_p = new QStandardItemModel(1,4);
-  for(int j=0; j<3; ++j)
+  for(int j=0; j<4; ++j)
   {
     QStandardItem* item_p = new QStandardItem("");
     model_p -> setItem(0, j, item_p);
   }
   setModel(model_p);
-  model_p -> setHeaderData(0, Qt::Horizontal, "Lot code");
-  model_p -> setHeaderData(1, Qt::Horizontal, "Pack code");
+  model_p -> setHeaderData(0, Qt::Horizontal, "Lot");
+  model_p -> setHeaderData(1, Qt::Horizontal, "Pack");
   model_p -> setHeaderData(2, Qt::Horizontal, "Count");
-//  model_p -> setHeaderData(3, Qt::Horizontal, "Substitution");
+  model_p -> setHeaderData(3, Qt::Horizontal, "Subst.");
 
   setCurrentIndex(model_p->index(0,1));
   verticalHeader()->hide();
@@ -49,12 +50,12 @@ batch_table::batch_table(centre* c_p, batch_mode_driver* batch_mode_driver_p_s)
     //"QTableView::QScrollBar:vertical {"
       //"width: 100px; }"
     "QStandardItem {"
-        "font: 20px;}"
+        "font: 15px;}"
     
   );
   //QStandardItem::setFont
   //model_p.item_p->setFont(20);
-  hideColumn(3);
+//  hideColumn(3);
 }
 
 batch_table::~batch_table()
@@ -114,6 +115,18 @@ void batch_table::enter_seeds(int num)
 //  cout<<"batch_table::enter_seeds("<<num<<")\n";
   
   model_p -> item(model_row, 2) -> setData(QVariant(num), Qt::DisplayRole);
+  model_column = 0;
+  QString seed_lot_barcode;
+  if(batch_mode_driver_p->substitute_seed_lot)
+  {
+    seed_lot_barcode = batch_mode_driver_p->substitute_barcode;
+  }
+  else
+  {
+    seed_lot_barcode = batch_mode_driver_p->seed_lot_barcode;
+  }
+  model_p -> item(model_row, model_column) -> setData(QVariant(seed_lot_barcode), Qt::DisplayRole);
+  
   
   ++model_row;
   filled_rows = model_row;
@@ -133,6 +146,9 @@ void batch_table::enter_seeds(int num)
 
 void batch_table::enter_seed_lot_barcode(QString barcode)
 {
+  
+  cout<<"start batch_table::enter_seed_lot_barcode\n";
+  
   ++model_row;
   filled_rows = model_row;
   for(int j=0; j<4; ++j)
@@ -142,10 +158,9 @@ void batch_table::enter_seed_lot_barcode(QString barcode)
   }
   
   model_column = 0;
-//  QModelIndex next_index = model_p->index(model_row, model_column);
-//  setCurrentIndex(next_index);
   model_p -> item(model_row, model_column) -> setData(QVariant(barcode), Qt::DisplayRole);
-//  latest_seed_lot_barcode_row = model_row;
+  model_column = 1;
+  model_p -> item(model_row, model_column) -> setData(QVariant("LOAD"), Qt::DisplayRole);
   resizeColumnsToContents();
   
   ++model_row;  
@@ -161,6 +176,7 @@ void batch_table::enter_seed_lot_barcode(QString barcode)
   setCurrentIndex(next_index);
   
   centre_p->lotcode_str = barcode;
+  batch_mode_driver_p->substitute_seed_lot = false;
 
   emit focus_on_barcode();
   
@@ -183,6 +199,11 @@ void batch_table::enter_pack_barcode(QString barcode)
   
   centre_p->bar_str_1 = barcode;
   
+  if(batch_mode_driver_p->substitute_seed_lot)
+  {
+    enter_substitution_barcode(batch_mode_driver_p->substitute_barcode);
+  }
+  
   emit focus_on_barcode();
 
 //  ++model_row;
@@ -193,6 +214,17 @@ void batch_table::enter_pack_barcode(QString barcode)
 //  }
 }
 
+void batch_table::enter_substitution_barcode(QString barcode)
+{
+  model_column = 3;
+  QModelIndex next_index = model_p->index(model_row, model_column);
+  setCurrentIndex(next_index);
+  model_p -> item(model_row, model_column) -> setData(QVariant(barcode), Qt::DisplayRole);
+  resizeColumnsToContents();
+  
+  emit focus_on_barcode();
+}  
+
 void batch_table::enter_dump_count(int num)
 {
 //  QStandardItem* item_p = new QStandardItem(QString("%1").arg(num));
@@ -202,6 +234,18 @@ void batch_table::enter_dump_count(int num)
   
   model_p -> item(model_row, 1) -> setData(QVariant("DUMP"), Qt::DisplayRole);
   model_p -> item(model_row, 2) -> setData(QVariant(num), Qt::DisplayRole);
+
+  model_column = 0;
+  QString seed_lot_barcode;
+  if(batch_mode_driver_p->substitute_seed_lot)
+  {
+    seed_lot_barcode = batch_mode_driver_p->substitute_barcode;
+  }
+  else
+  {
+    seed_lot_barcode = batch_mode_driver_p->seed_lot_barcode;
+  }
+  model_p -> item(model_row, model_column) -> setData(QVariant(seed_lot_barcode), Qt::DisplayRole);
   
   ++model_row;
   filled_rows = model_row;
@@ -216,6 +260,9 @@ void batch_table::enter_dump_count(int num)
   QModelIndex next_index = model_p->index(model_row, model_column);
   setCurrentIndex(next_index);
   resizeColumnsToContents();
+
+  batch_mode_driver_p->substitute_seed_lot = false;
+
   emit focus_on_barcode();
 }
 
@@ -294,10 +341,10 @@ void batch_table::load_file(QString file_name)
       model_p -> setItem(0, j, item_p);
     }
     setModel(model_p);
-    model_p -> setHeaderData(0, Qt::Horizontal, "Lot code");
-    model_p -> setHeaderData(1, Qt::Horizontal, "Pack code");
+    model_p -> setHeaderData(0, Qt::Horizontal, "Lot");
+    model_p -> setHeaderData(1, Qt::Horizontal, "Pack");
     model_p -> setHeaderData(2, Qt::Horizontal, "Count");
-    model_p -> setHeaderData(3, Qt::Horizontal, "Substitution");
+    model_p -> setHeaderData(3, Qt::Horizontal, "Subst.");
     
     char c;
     QString qs = "";
@@ -359,7 +406,7 @@ void batch_table::load_file(QString file_name)
   }
   else cout<<"file failed to open for reading\n";
   
-  hideColumn(3);
+//  hideColumn(3);
   
   cout<<"end batch_table::load_file("<<file_name.toStdString()<<")\n";
   
