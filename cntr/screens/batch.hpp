@@ -79,7 +79,7 @@ class batch : public screen
   void restart_clicked();
   void substitution_button_clicked();
   void cancel_substitution_button_clicked();
-  void substitution_barcode_entered(QString);
+//  void substitution_barcode_entered(QString);
   void save_program_clicked();
   void save_table_clicked();
   void clear_table_clicked();

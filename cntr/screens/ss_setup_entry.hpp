@@ -67,7 +67,7 @@ class ss_setup_entry : public screen
   
   QDir* dir_p;
   
-  char mode;//m - material id.  r - required count.  a - actual count.  p - print time.  f - fill time.  d - dump count.
+  char mode;//m - material id.  r - required count.  a - actual count.  p - print time.  f - fill time.  d - dump count.  s - substitution.
   
   void enter_choice(int column);
   

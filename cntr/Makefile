@@ -1259,12 +1259,14 @@ batch_options.o: screens/batch_options.cpp button.hpp \
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o batch_options.o screens/batch_options.cpp
 
 batch_table.o: screens/batch_table.cpp screens/batch_table.hpp \
+		batch_mode_driver.hpp \
 		centre.hpp \
 		cutgate.hpp \
 		endgate.hpp \
 		envelope_sensor.hpp \
 		feeder.hpp \
-		crop.hpp
+		crop.hpp \
+		envelope.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o batch_table.o screens/batch_table.cpp
 
 calibrate.o: screens/calibrate.cpp centre.hpp \

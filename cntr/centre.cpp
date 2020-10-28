@@ -749,6 +749,9 @@ float centre::dust_streak_percentage()
 
 void centre::communicate_out(char type)//'t'->totalize.  'p'->batch pack.  'd'->batch dump.  's'->batch substitution
 {
+  
+  cout<<"start communicate_out.  type = "<<type<<"\n";
+  
   QString out_string;
   QStringList* macro_list_p = &totalize_macros;
   if(type == 'p')
@@ -856,6 +859,9 @@ void centre::communicate_out(char type)//'t'->totalize.  'p'->batch pack.  'd'->
     }
     else if(m_string[i] == 'u')
     {
+      
+      cout<<"m_string[i] == 'u'.  substitution_str = "<<substitution_str.toStdString()<<endl;
+      
       out_string += substitution_str;
     }
     else if(m_string[i] == 'N')
@@ -899,6 +905,9 @@ void centre::communicate_out(char type)//'t'->totalize.  'p'->batch pack.  'd'->
   {
     tcp_write(out_string);
   }
+  
+  cout<<"end communicate_out\n";
+  
 }
 
 

@@ -33,7 +33,7 @@ ss_options::ss_options(centre*set_centre_p, batch_mode_driver* set_batch_mode_dr
   back_button_p = new button("Back");
   envelope_layout_p = new button("Envelope layout");
   column_display_p = new button("Display columns");
-  macro_menu_button_p = new button("Macro Menu");
+  macro_menu_button_p = new button("Communications Macro Menu");
   done_button_p = new button("Done");
 
   barcode_matching_group_p = new QGroupBox;
@@ -63,7 +63,7 @@ ss_options::ss_options(centre*set_centre_p, batch_mode_driver* set_batch_mode_dr
   main_layout_p -> addWidget(print_control_group_p, 2, 0, 3, 1);
   main_layout_p -> addWidget(envelope_layout_p, 2, 1);
   main_layout_p -> addWidget(column_display_p, 3, 1);
-//  main_layout_p -> addWidget(macro_menu_button_p, 2, 2);
+  main_layout_p -> addWidget(macro_menu_button_p, 2, 2);
   main_layout_p -> addWidget(done_button_p, 3, 2);
   setLayout(main_layout_p);
   
@@ -77,7 +77,7 @@ ss_options::ss_options(centre*set_centre_p, batch_mode_driver* set_batch_mode_dr
   connect(envelope_layout_p, SIGNAL(clicked()), this, SLOT(envelope_layout_button_clicked()));
   connect(done_button_p, SIGNAL(clicked()), this, SLOT(done_button_clicked()));
   connect(column_display_p, SIGNAL(clicked()), this, SLOT(column_display_button_clicked()));
-  connect(macro_menu_button_p, SIGNAL(clicked()), this, SLOT(macro_menu_button_clicked()));	//TEST~~~
+  connect(macro_menu_button_p, SIGNAL(clicked()), this, SLOT(macro_menu_button_clicked()));	
 
 //  require_seed_lot_barcode_p -> setChecked(batch_mode_driver_p->require_seed_lot_barcode);
   require_pack_barcode_p -> setChecked(batch_mode_driver_p->require_pack_barcode);
@@ -147,10 +147,11 @@ void ss_options::column_display_button_clicked()
   centre_p -> screen_done = true;
 }  
   
-void ss_options::macro_menu_button_clicked()	//TEST~~~
+void ss_options::macro_menu_button_clicked()
 {
-  cout<<"macro_menu_button_click"<<endl;	//OMIT~~~
-  centre_p->add_waiting_screen(28);
+  cout<<"macro_menu_button_click"<<endl;	
+  centre_p->add_waiting_screen(33);//back to ss_batch
+  centre_p->add_waiting_screen(50);//batch_macro_type_choice
   centre_p->screen_done=true;
 }
 

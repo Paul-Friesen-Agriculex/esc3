@@ -33,6 +33,8 @@ class batch_macro_type_choice : public screen
   button* pack_macro_button_p;
   button* dump_macro_button_p;
   button* substitution_macro_button_p;
+  button* setup_button_p;
+  button* done_button_p;
   
   QLabel* pack_label_p;
   QLabel* dump_label_p;
@@ -45,6 +47,8 @@ class batch_macro_type_choice : public screen
   void pack_macro_button_clicked();
   void dump_macro_button_clicked();
   void substitution_macro_button_clicked();
+  void setup_button_clicked();
+  void done_button_clicked();
 };
 
 

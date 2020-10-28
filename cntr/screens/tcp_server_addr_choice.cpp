@@ -94,7 +94,7 @@ void tcp_server_addr_choice::connection_detected()
   
 void tcp_server_addr_choice::ok_button_clicked() 
 { 
-  centre_p->add_waiting_screen(5);//totalize
+//  centre_p->add_waiting_screen(5);//totalize
   centre_p->screen_done = true;
 }
 

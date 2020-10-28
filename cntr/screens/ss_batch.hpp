@@ -48,7 +48,10 @@ enum ss_end_valve_mode_enum
   ss_dump_closed_filling,
   ss_dump_pass_through,
   ss_dump_open_empty,
-  ss_dump_container_removed_too_soon
+  ss_dump_container_removed_too_soon,
+  ss_substitution_wait_for_cleanout,
+  ss_substitution_enter_barcode,
+  ss_cancel_substitution
 };
 
 class manual_operation_window;
@@ -77,6 +80,8 @@ class ss_batch : public screen
   void back_clicked();
   void release_pack_clicked();
   void restart_clicked();
+  void substitution_button_clicked();
+  void cancel_substitution_button_clicked();
   void save_program_clicked();
   void reprint_button_1_clicked();
   void reprint_button_2_clicked();
@@ -92,6 +97,8 @@ class ss_batch : public screen
   ss_barcode_line* barcode_line_p;
   button* release_pack_button_p;
   button* restart_button_p;
+  button* substitution_button_p;
+  button* cancel_substitution_button_p;
   QLabel* high_speed_label_p;
   QLabel* low_speed_label_p;
   QLabel* dump_speed_label_p;
@@ -139,6 +146,9 @@ class ss_batch : public screen
   QString dump_container_ready_message;
   QString dump_container_removed_too_soon_message;
   QString bad_seed_lot_message;
+  QString substitution_cleanout_message;
+  QString substitution_barcode_message;
+  QString cancel_substitution_message;
   
   barcode_entry_mode old_barcode_mode;
   

@@ -75,6 +75,7 @@ struct ss_setup
   int print_time_column;
   int fill_time_column;
   int dump_count_column;
+  int substitution_column;
 };
 
 enum print_control_mode_e
@@ -193,6 +194,7 @@ class batch_mode_driver : public QObject
   spreadsheet_column* ss_print_time_p;
   spreadsheet_column* ss_fill_time_p;
   spreadsheet_column* ss_dump_count_p;
+  spreadsheet_column* ss_substitution_p;
   spreadsheet_column* get_spreadsheet_column_pointer(int column_number);
   spreadsheet_column* get_spreadsheet_column_pointer(QString column_heading);
   int spreadsheet_number_of_lines;//does not include heading line
@@ -259,7 +261,7 @@ class batch_mode_driver : public QObject
   void refresh_screen();
   void send_extra_pack_message(QString message);
   void extra_pack_finished_signal();
-  void substitution_barcode_entered(QString barcode);
+//  void substitution_barcode_entered(QString barcode);
   
   //testing
   void send_message2(QString);

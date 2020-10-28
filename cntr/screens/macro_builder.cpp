@@ -20,7 +20,27 @@ macro_builder::macro_builder(centre* centre_p_s)
 {    
   form_p = new QVBoxLayout(this);
   QSignalMapper* signalMapper = new QSignalMapper (this);
-  instruction_label_p = new QLabel("If this entry is active, items listed will be sent out using the selected communications method.");  
+
+
+  if(centre_p->macro_type_for_entry==0) //totalize macro
+  {
+    instruction_label_p = new QLabel("If this entry is active, items listed will be sent out using the selected communications method after each pack."); 
+  } 
+  if(centre_p->macro_type_for_entry==1)//batch pack macro 
+  {
+    instruction_label_p = new QLabel("If this entry is active, items listed will be sent out using the selected communications method after each pack."); 
+  } 
+  if(centre_p->macro_type_for_entry==2)//batch dump macro
+  {
+    instruction_label_p = new QLabel("If this entry is active, items listed will be sent out using the selected communications method after seed lot is dumped."); 
+  } 
+  if(centre_p->macro_type_for_entry==3)//batch substitution macro
+  {
+    instruction_label_p = new QLabel("If this entry is active, items listed will be sent out using the selected communications method after each pack, if there is a substitution."); 
+  } 
+
+
+  
   instruction_label_p -> setWordWrap(true);
   lineEdit = new QLineEdit;//(&dialog);
   lineEdit->setPlaceholderText("Click buttons to add preloaded values or type custom text here.");

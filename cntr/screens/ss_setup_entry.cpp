@@ -161,6 +161,11 @@ void ss_setup_entry::enter_choice(int column)
   else if(mode=='d')
   {
     batch_mode_driver_p -> ss_setup_p -> dump_count_column = column;
+    mode = 's';
+  }
+  else if(mode=='s')
+  {
+    batch_mode_driver_p -> ss_setup_p -> substitution_column = column;
     centre_p -> add_waiting_screen(25);//set_envelope_size
     centre_p -> screen_done = true;
   }
@@ -211,6 +216,14 @@ void ss_setup_entry::back_clicked()
   if(mode=='f')
   {
     mode='p';
+  }
+  if(mode=='d')
+  {
+    mode='f';
+  }
+  if(mode=='s')
+  {
+    mode='d';
   }
   display_headings();
 }
@@ -266,7 +279,11 @@ Pick dump count column (optional).\n\n \
 If selected, number of seeds dumped \n \
 will be recorded here, beside last \n \
 packet for seed lot.");
-
+  if(mode=='s') message_p->setText(" \
+Pick substitution column (optional).\n\n \
+If selected, and a barcode for a \n \
+substitute seed lot is scanned, that \n \
+barcode will be entered in this column.");
   
   spreadsheet_column* column_p;
 

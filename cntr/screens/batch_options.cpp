@@ -24,7 +24,7 @@ batch_options::batch_options(centre*set_centre_p, batch_mode_driver* set_batch_m
   record_only_p = new QRadioButton("Record barcodes only - no matching");
   back_button_p = new button("Back");
   done_button_p = new button("Done");
-  macro_menu_button_p = new button("Macro Menu");
+  macro_menu_button_p = new button("Communications Macro Menu");
 
   
   barcode_matching_group_p = new QGroupBox;

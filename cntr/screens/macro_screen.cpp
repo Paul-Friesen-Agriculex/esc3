@@ -76,7 +76,7 @@ macro_screen::macro_screen(centre*set_centre_p)
   }
   if(centre_p->macro_type_for_entry == 1)
   {
-    screen_title_label_p->setText("Batch mode macro issued after each pack.");
+    screen_title_label_p->setText("Batch mode macro issued after each pack, if there is no substitution.");
   }
   if(centre_p->macro_type_for_entry == 2)
   {
@@ -84,7 +84,7 @@ macro_screen::macro_screen(centre*set_centre_p)
   }
   if(centre_p->macro_type_for_entry == 3)
   {
-    screen_title_label_p->setText("Batch mode macro issued if a seed lot substitution is made.");
+    screen_title_label_p->setText("Batch mode macro issued after each pack if a seed lot substitution is made.");
   }
   screen_title_label_p->setStyleSheet("QLabel { font: bold }");
   if(centre_p->communicate_by_keyboard_cable)
@@ -136,26 +136,117 @@ void macro_screen::help_button_clicked()
 { 
   help_screen_p = new help_screen();
   			   
-  help_screen_p->set_text("The ESC-3 is able to send data to a computer through the USB Communications Cable provided.  "
-           "The data sent will appear to the computer as keyboard input.  This allows flexible "
+  if(centre_p->macro_type_for_entry == 0)
+  {
+    help_screen_p->set_text("The ESC-3 is able to send data to a computer through the USB Communications Cable provided, "
+           "or via a TCP link over an ethernet cable.  "
+           "The method of communication is chosen in another screen.  \n\n"
+           
+           "If the USB communications cable is used, the data sent will appear to the computer as keyboard input.  This allows flexible "
            "entry into spreadsheets or database programs.\n\n"
            
            "If you think this might work for you, try entering data of the sort you wish to use in your computer "
            "using the keyboard only (no use of the mouse).  Often, you can use TAB, ENTER, or ARROW characters to "
            "move from field to field.  If you can do this, the ESC-3 may be able to do it automatically.\n\n"
            
+           "Connect the communications cable between the ESC-3 and the computer.  The label on the cable "
+           "indicates which end goes where.\n\n"
+           
+           "Communicating using a TCP link requires a program on the other computer capable of communication by this method.\n\n"
+           
+           "Select a cell under NAME "
+           "and enter a name for your macro.\n\n"
+           
+           "Select the corresponding cell under MACRO.  Build your macro by touching the buttons.  The corresponding "
+           "items will be sent out in the order they appear.\n\n"
+
            "In totalize mode, the ESC-3 sends out data after each sample.  It happens when a new line "
-           "starts in the table on the ESC-3 screen.\n\n"
+           "starts in the table on the ESC-3 screen.");
+           
+  }
+  if(centre_p->macro_type_for_entry == 1)//batch pack
+  {
+    help_screen_p->set_text("The ESC-3 is able to send data to a computer through the USB Communications Cable provided, "
+           "or via a TCP link over an ethernet cable.  "
+           "The method of communication is chosen in another screen.  \n\n"
+           
+           "If the USB communications cable is used, the data sent will appear to the computer as keyboard input.  This allows flexible "
+           "entry into spreadsheets or database programs.\n\n"
+           
+           "If you think this might work for you, try entering data of the sort you wish to use in your computer "
+           "using the keyboard only (no use of the mouse).  Often, you can use TAB, ENTER, or ARROW characters to "
+           "move from field to field.  If you can do this, the ESC-3 may be able to do it automatically.\n\n"
            
            "Connect the communications cable between the ESC-3 and the computer.  The label on the cable "
            "indicates which end goes where.\n\n"
            
-           "In totalize mode, select OPTIONS -> USB COMMUNICATIONS MENU.  Select a cell under NAME "
+           "Communicating using a TCP link requires a program on the other computer capable of communication by this method.\n\n"
+           
+           "Select a cell under NAME "
            "and enter a name for your macro.\n\n"
            
            "Select the corresponding cell under MACRO.  Build your macro by touching the buttons.  The corresponding "
-           "items will be sent out in the order they appear.");
+           "items will be sent out in the order they appear.\n\n"
 
+           "The ESC-3 sends out the data entered here after each pack in batch mode, as long as there is no substitution.  "
+           "If you use a substitute seed lot because of lack of seed, the alternative message set up in another screen will be sent instead.  ");
+           
+  }
+  if(centre_p->macro_type_for_entry == 2)//batch dump
+  {
+    help_screen_p->set_text("The ESC-3 is able to send data to a computer through the USB Communications Cable provided, "
+           "or via a TCP link over an ethernet cable.  "
+           "The method of communication is chosen in another screen.  \n\n"
+           
+           "If the USB communications cable is used, the data sent will appear to the computer as keyboard input.  This allows flexible "
+           "entry into spreadsheets or database programs.\n\n"
+           
+           "If you think this might work for you, try entering data of the sort you wish to use in your computer "
+           "using the keyboard only (no use of the mouse).  Often, you can use TAB, ENTER, or ARROW characters to "
+           "move from field to field.  If you can do this, the ESC-3 may be able to do it automatically.\n\n"
+           
+           "Connect the communications cable between the ESC-3 and the computer.  The label on the cable "
+           "indicates which end goes where.\n\n"
+           
+           "Communicating using a TCP link requires a program on the other computer capable of communication by this method.\n\n"
+           
+           "Select a cell under NAME "
+           "and enter a name for your macro.\n\n"
+           
+           "Select the corresponding cell under MACRO.  Build your macro by touching the buttons.  The corresponding "
+           "items will be sent out in the order they appear.\n\n"
+           
+           "The data entered here will be sent after each seed lot is dumped.  "
+           "You can include, for instance, the number of seeds that are dumped, for inventory purposes.");
+           
+  }
+  if(centre_p->macro_type_for_entry == 3)//batch substitution
+  {
+    help_screen_p->set_text("The ESC-3 is able to send data to a computer through the USB Communications Cable provided, "
+           "or via a TCP link over an ethernet cable.  "
+           "The method of communication is chosen in another screen.  \n\n"
+           
+           "If the USB communications cable is used, the data sent will appear to the computer as keyboard input.  This allows flexible "
+           "entry into spreadsheets or database programs.\n\n"
+           
+           "If you think this might work for you, try entering data of the sort you wish to use in your computer "
+           "using the keyboard only (no use of the mouse).  Often, you can use TAB, ENTER, or ARROW characters to "
+           "move from field to field.  If you can do this, the ESC-3 may be able to do it automatically.\n\n"
+           
+           "Connect the communications cable between the ESC-3 and the computer.  The label on the cable "
+           "indicates which end goes where.\n\n"
+           
+           "Communicating using a TCP link requires a program on the other computer capable of communication by this method.\n\n"
+           
+           "Select a cell under NAME "
+           "and enter a name for your macro.\n\n"
+           
+           "Select the corresponding cell under MACRO.  Build your macro by touching the buttons.  The corresponding "
+           "items will be sent out in the order they appear.\n\n"
+           
+           "This allows you to establish what the ESC-3 should send out after each packet, if a substitution has been made.");
+           
+  }
   help_screen_p->show();
 }
 

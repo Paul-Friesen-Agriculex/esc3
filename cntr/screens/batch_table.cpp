@@ -120,6 +120,7 @@ void batch_table::enter_seeds(int num)
   if(batch_mode_driver_p->substitute_seed_lot)
   {
     seed_lot_barcode = batch_mode_driver_p->substitute_barcode;
+    model_p -> item(model_row, 3) -> setData(QVariant(seed_lot_barcode), Qt::DisplayRole);
   }
   else
   {
@@ -199,10 +200,12 @@ void batch_table::enter_pack_barcode(QString barcode)
   
   centre_p->bar_str_1 = barcode;
   
-  if(batch_mode_driver_p->substitute_seed_lot)
-  {
-    enter_substitution_barcode(batch_mode_driver_p->substitute_barcode);
-  }
+//  cout<<"batch_table::enter_pack_barcode.  substitute_seed_lot = "<<batch_mode_driver_p->substitute_seed_lot<<endl;
+  
+//  if(batch_mode_driver_p->substitute_seed_lot)
+//  {
+//    enter_substitution_barcode(batch_mode_driver_p->substitute_barcode);
+//  }
   
   emit focus_on_barcode();
 
@@ -222,6 +225,12 @@ void batch_table::enter_substitution_barcode(QString barcode)
   model_p -> item(model_row, model_column) -> setData(QVariant(barcode), Qt::DisplayRole);
   resizeColumnsToContents();
   
+  
+  
+//  centre_p->substitution_str = barcode;
+//  cout<<"batch_table::enter_substitution_barcode.  substitution_str = "<<centre_p->substitution_str.toStdString()<<endl;
+ 
+ 
   emit focus_on_barcode();
 }  
 
@@ -261,7 +270,7 @@ void batch_table::enter_dump_count(int num)
   setCurrentIndex(next_index);
   resizeColumnsToContents();
 
-  batch_mode_driver_p->substitute_seed_lot = false;
+//  batch_mode_driver_p->substitute_seed_lot = false;
 
   emit focus_on_barcode();
 }
