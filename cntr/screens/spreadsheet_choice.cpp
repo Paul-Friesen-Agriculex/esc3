@@ -17,10 +17,6 @@ spreadsheet_choice::spreadsheet_choice(centre*set_centre_p, batch_mode_driver* b
   centre_p=set_centre_p;
   batch_mode_driver_p = batch_mode_driver_p_s;
 
-
-//  cout<<"spreadsheet_choice::spreadsheet_choice\n";
-//  batch_mode_driver_p->list_spreadsheet();
-
   choice1_p=new button("");
   choice2_p=new button("");
   choice3_p=new button("");
@@ -75,12 +71,6 @@ attached to the machine.");
   connect(more_spreadsheets_p, SIGNAL(clicked()), this, SLOT(more_spreadsheets_clicked()));
   connect(back_p, SIGNAL(clicked()), this, SLOT(back_clicked()));
   
-  cout<<"1\n";
-  
-//  spreadsheet_path = "/media/odroid/KINGSTON/";
-//  dir_p = new QDir(spreadsheet_path);
-  
-  
   first_spreadsheet_displayed = 0;
   spreadsheet_path = "/media/odroid/";
   dir_p = new QDir(spreadsheet_path);
@@ -99,21 +89,11 @@ attached to the machine.");
   {
     spreadsheet_path.append(directory_list[0]);
     spreadsheet_path.append("/");
-    cout<<"spreadsheet_path = "<<spreadsheet_path.toStdString()<<endl;
     dir_p -> setPath(spreadsheet_path);
-  
-  
-  
-    
-    cout<<"2\n";
-    
     spreadsheet_list_p = new QStringList;
     QStringList filter;
     filter<<"*.csv";
     *spreadsheet_list_p = dir_p->entryList(filter);
-    
-    cout<<"3\n";
-    
     for(int i=0; i<spreadsheet_list_p->size(); ++i)
     {
       QString temp = spreadsheet_list_p->at(i);
@@ -122,8 +102,6 @@ attached to the machine.");
     }
     display_spreadsheets();
     centre_p->batch_mode_driver_p->use_spreadsheet = true;  
-    
-    cout<<"4\n";
   }
   
 }
@@ -132,13 +110,7 @@ spreadsheet_choice::~spreadsheet_choice()
 {
   delete dir_p;
   dir_p = 0;
-  
-  cout<<"~spreadsheet 1\n";
-  
   if (spreadsheet_list_p!=0) delete spreadsheet_list_p;
-  
-  cout<<"~spreadsheet 2\n";
-  
   spreadsheet_list_p = 0;
 }
 
@@ -235,9 +207,6 @@ void spreadsheet_choice::more_spreadsheets_clicked()
 
 void spreadsheet_choice::back_clicked()
 {
-  
-  cout<<"spreadsheet_choice::back_clicked.  first_spreadsheet_displayed = "<<first_spreadsheet_displayed<<endl;
-  
   if(first_spreadsheet_displayed>5) 
   {
     first_spreadsheet_displayed -= 6;
@@ -245,14 +214,8 @@ void spreadsheet_choice::back_clicked()
   }
   else
   {
-  
-    cout<<"spreadsheet_choice::back_clicked.  p1\n";
-  
     centre_p->add_waiting_screen(centre_p->get_previous_screen());
     centre_p->screen_done=true;
-  
-    cout<<"spreadsheet_choice::back_clicked.  p2\n";
-  
   }
 }
 

@@ -71,11 +71,6 @@ void batch_options::done_button_clicked()
   batch_mode_driver_p->lot_contain_pack = lot_contain_pack_p->isChecked();
   batch_mode_driver_p->record_only = record_only_p->isChecked();
   
-  
-//  cout<<"batch_options::done_button_clicked.  about to list program\n";
-//  batch_mode_driver_p->list_program();
-  
-  
   centre_p->screen_done = true;
 }
 
@@ -100,6 +95,7 @@ void batch_options::barcode_switch_toggled(bool checked)
 void batch_options::macro_menu_button_clicked()
 {
   cout<<"macro_menu_button_click"<<endl;	//OMIT~~~
+  centre_p->add_waiting_screen(28);//macro_screen
   centre_p->add_waiting_screen(50);//batch_macro_type_choice
   centre_p->screen_done=true;
 }

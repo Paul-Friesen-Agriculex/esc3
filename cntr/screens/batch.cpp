@@ -21,7 +21,6 @@ void barcode_line::keyPressEvent(QKeyEvent* event)
   if(event->key() == Qt::Key_Return)
   {
     emit barcode_entered(displayText());
-    cout<<"emitted barcode_entered("<<displayText().toStdString()<<")\n";
     clear();
   }
 }
@@ -161,7 +160,6 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
   connect(batch_mode_driver_p, SIGNAL(seed_lot_barcode_entered(QString)), table_p, SLOT(enter_seed_lot_barcode(QString)));
   connect(batch_mode_driver_p, SIGNAL(pack_barcode_entered(QString)), table_p, SLOT(enter_pack_barcode(QString)));
   connect(low_speed_set_p, SIGNAL(sliderReleased()), this, SLOT(focus_on_barcode()));
-//  connect(batch_mode_driver_p, SIGNAL(substitution_barcode_entered(QString)), table_p, SLOT(enter_substitution_barcode(QString)));
 
   centre_p->set_endgate_state(ENDGATE_CLOSED);
   if(centre_p->totalize_force_endgate_open == true)
@@ -447,12 +445,6 @@ void batch::cancel_substitution_button_clicked()
   focus_on_barcode();
 }
 
-//void batch::substitution_barcode_entered(QString barcode)
-//{
-//  batch_mode_driver_p->substitute_barcode = barcode;
-//  batch_mode_driver_p->substitute_seed_lot = true;
-//}
-
 void batch::save_program_clicked()
 {
   batch_mode_driver_p -> stop();
@@ -690,7 +682,6 @@ void batch::run()
     case substitution_enter_barcode:
       if(batch_mode_driver_p->seed_lot_barcode_ok == true)
       {
-//        centre_p -> communicate_out('s');
         end_valve_mode = closed_filling;
       }
       break;

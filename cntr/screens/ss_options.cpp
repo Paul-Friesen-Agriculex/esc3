@@ -16,7 +16,6 @@ ss_options::ss_options(centre*set_centre_p, batch_mode_driver* set_batch_mode_dr
   batch_mode_driver_p = set_batch_mode_driver_p;
   
   title_p = new QLabel;
-//  require_seed_lot_barcode_p = new QRadioButton("Require seed lot barcode");
   require_pack_barcode_p = new QRadioButton("Require pack barcode");
   pack_match_lot_p = new QRadioButton("Pack barcode must match seed lot barcode");
   pack_contain_lot_p = new QRadioButton("Pack barcode must contain seed lot barcode");
@@ -56,7 +55,6 @@ ss_options::ss_options(centre*set_centre_p, batch_mode_driver* set_batch_mode_dr
   print_control_group_p -> setTitle("Print control");
   
   main_layout_p = new QGridLayout;
-//  main_layout_p -> addWidget(require_seed_lot_barcode_p);
   main_layout_p -> addWidget(require_pack_barcode_p, 0, 0);
   main_layout_p -> addWidget(back_button_p, 0, 2);
   main_layout_p -> addWidget(barcode_matching_group_p, 1, 0, 1, 3);
@@ -67,7 +65,6 @@ ss_options::ss_options(centre*set_centre_p, batch_mode_driver* set_batch_mode_dr
   main_layout_p -> addWidget(done_button_p, 3, 2);
   setLayout(main_layout_p);
   
-//  require_seed_lot_barcode_p -> setAutoExclusive(false);
   require_pack_barcode_p -> setAutoExclusive(false);
   
   connect(back_button_p, SIGNAL(clicked()), this, SLOT(back_button_clicked()));
@@ -79,7 +76,6 @@ ss_options::ss_options(centre*set_centre_p, batch_mode_driver* set_batch_mode_dr
   connect(column_display_p, SIGNAL(clicked()), this, SLOT(column_display_button_clicked()));
   connect(macro_menu_button_p, SIGNAL(clicked()), this, SLOT(macro_menu_button_clicked()));	
 
-//  require_seed_lot_barcode_p -> setChecked(batch_mode_driver_p->require_seed_lot_barcode);
   require_pack_barcode_p -> setChecked(batch_mode_driver_p->require_pack_barcode);
   pack_match_lot_p -> setChecked(batch_mode_driver_p->pack_match_lot);
   pack_contain_lot_p -> setChecked(batch_mode_driver_p->pack_contain_lot);
@@ -118,7 +114,6 @@ void ss_options::back_button_clicked()
 
 void ss_options::done_button_clicked()
 {
-//  batch_mode_driver_p->require_seed_lot_barcode = require_seed_lot_barcode_p->isChecked();
   batch_mode_driver_p->require_pack_barcode = require_pack_barcode_p->isChecked();
   batch_mode_driver_p->pack_match_lot = pack_match_lot_p->isChecked();
   batch_mode_driver_p->pack_contain_lot = pack_contain_lot_p->isChecked();
@@ -149,7 +144,6 @@ void ss_options::column_display_button_clicked()
   
 void ss_options::macro_menu_button_clicked()
 {
-  cout<<"macro_menu_button_click"<<endl;	
   centre_p->add_waiting_screen(33);//back to ss_batch
   centre_p->add_waiting_screen(50);//batch_macro_type_choice
   centre_p->screen_done=true;

@@ -221,9 +221,6 @@ void centre::init()
 
   load_settings("default");
   
-//  diagnostics_console_p = new diagnostics_console(this);
-//  diagnostics_console_p -> show();
-
   connect(processor_p, SIGNAL(send_message(QString)), diagnostics_console_p, SLOT(receive_message1(QString)));
   connect(batch_mode_driver_p, SIGNAL(send_message2(QString)), diagnostics_console_p, SLOT(receive_message2(QString)));
   connect(batch_mode_driver_p, SIGNAL(send_message_time_to_end(QString)), diagnostics_console_p, SLOT(receive_message3(QString)));
@@ -233,24 +230,10 @@ void centre::init()
   connect(tcp_server_p, SIGNAL(newConnection()), this, SLOT(tcp_connection_detected())); 
   connect(tcp_socket_p, SIGNAL(connected()), this, SIGNAL(tcp_connection_detected_signal())); 
   
-//  tm_macro_updated = 0; 
   count=0;
   new_keyboard_entry=false;
   for(int i=0; i<10; ++i) control_int[i] = 0;
   
-//  build_macro = false;//set true when leaving macro_screen for macro_builder.  signals that macro_builder will run.
-//  macro_row = 0;// remember row for return to macro_screen.
-
-//  totalize_macros_index = 0;
-//  batch_pack_macros_index = 0;
-//  batch_dump_macros_index = 0;
-//  batch_substitution_macros_index = 0;
-  /*
-  totalize_macro_index = -1;//indicates nothing being entered
-  batch_pack_macro_index = -1;
-  batch_dump_macro_index = -1;
-  batch_substitution_macro_index = -1;
-  */
   enter_totalize_macro = false;
   enter_batch_pack_macro = false;
   enter_batch_dump_macro = false;
@@ -479,14 +462,8 @@ void centre::run()
       case 38: screen_p=new macro_builder(this); break;
 //      case : screen_p=new (this); break;
       case 40: screen_p=new communications_menu(this); break;
-      case 41: screen_p=new tcp_server_addr_choice(this); 
-//               cout<<"before connect\n";
-//               connect(tcp_server_p, SIGNAL(newConnection()), screen_p, SLOT(connection_detected())); 
-//               cout<<"after connect\n";
-               break;
-      case 42: screen_p=new tcp_client_server_addr_entry(this);
-//               connect(tcp_socket_p, SIGNAL(connected()), screen_p, SLOT(connection_detected())); 
-               break;
+      case 41: screen_p=new tcp_server_addr_choice(this); break;
+      case 42: screen_p=new tcp_client_server_addr_entry(this); break;
       case 50: screen_p=new batch_macro_type_choice(this, batch_mode_driver_p); break;
 //      case : screen_p=new (this); break;
 //      case : screen_p=new (this); break;
@@ -496,19 +473,7 @@ void centre::run()
       default: screen_p=new start_screen(this);
                cout<<"default screen_p case\n";
     }
-//    QRect rect = base_widget_p->geometry();
-//    cout <<"run base widget width "<<rect.width()<<endl;
 
-
-//    screen_p->setParent(base_widget_p, Qt::Widget);
-
-
-//    screen_p->setFocus();
-//    screen_p->setWindowState(Qt::WindowMaximized);
-//    screen_p->setGeometry(rect);
-    
-//    QScreen display_screen;
-//    screen_p->setGeometry(display_screen.availableGeometry());
     screen_p->show();
     delete old_screen_p;
     old_screen_p = 0;
@@ -749,9 +714,6 @@ float centre::dust_streak_percentage()
 
 void centre::communicate_out(char type)//'t'->totalize.  'p'->batch pack.  'd'->batch dump.  's'->batch substitution
 {
-  
-  cout<<"start communicate_out.  type = "<<type<<"\n";
-  
   QString out_string;
   QStringList* macro_list_p = &totalize_macros;
   if(type == 'p')
@@ -859,9 +821,6 @@ void centre::communicate_out(char type)//'t'->totalize.  'p'->batch pack.  'd'->
     }
     else if(m_string[i] == 'u')
     {
-      
-      cout<<"m_string[i] == 'u'.  substitution_str = "<<substitution_str.toStdString()<<endl;
-      
       out_string += substitution_str;
     }
     else if(m_string[i] == 'N')
@@ -897,7 +856,6 @@ void centre::communicate_out(char type)//'t'->totalize.  'p'->batch pack.  'd'->
   if(communicate_by_keyboard_cable==true)
   {
     int filedesc = open("/dev/usb2serial", O_WRONLY);
-//    int ret_val = write(filedesc,(out_string.toUtf8().constData()), size_string_macros);
     int ret_val = write(filedesc,(out_string.toUtf8().constData()), out_string.size());
     if(ret_val<0) cout<<"write error writing to keyboard cable\n";
   }
@@ -905,125 +863,7 @@ void centre::communicate_out(char type)//'t'->totalize.  'p'->batch pack.  'd'->
   {
     tcp_write(out_string);
   }
-  
-  cout<<"end communicate_out\n";
-  
 }
-
-
-/*
-void centre::communicate_out(char type)//'t'->totalize.  'p'->batch pack.  'd'->batch dump.
-{
-  bool macro_status_bool;			      //temporary variable to transfer ifstream to tablewidget
-  int macro_numb_int;				        //
-  char macro_name_char[30];			    //
-  char macro_mask_char[30];			    //
-  char macro_function_char[30];		  //
- 
-  //QString combined_macro_functions;	//new char to combine all macros 
-  QString macro_string;
-  QString combined_macro_functions;
-  QString count_string;
-  QString barcode_string;
-        
-  ifstream macros;
-  if(type=='t') macros.open("macro_table");
-  if(type=='p') macros.open("macro_table_batch_pack");
-  if(type=='d') macros.open("macro_table_batch_dump");
-  
-  if(macros.good())
-  {
-    for(int i=0; i<10; ++i)		//searches all 10 macros available
-    {
-	    macros>>macro_status_bool;
-	    macros>>macro_numb_int;
-	    macros>>macro_name_char;
-	    macros>>macro_mask_char;
-	    macros>>macro_function_char;
-	    if(macro_status_bool != 0)
-      {
-        QString macro_string;
-        bool sending_string = false;//true indicates that we are sending out a string of characters
-	      for(unsigned int j=0; j<strlen(macro_function_char)-1; ++j)
-	      {
-          if(sending_string)
-          {
-            if(macro_function_char[j+1] == '"') 
-            {
-              sending_string = false;
-            }
-            else
-            {
-              macro_string += macro_function_char[j+1];
-            }
-          }
-		      if(macro_function_char[j] == '\\')
-		      {
-            if(macro_function_char[j+1] == 'C')
-	          {
-	            macro_string = macro_string + totalize_count_str;
-              totalize_count_str = "";
-	          }
-  	        else if(macro_function_char[j+1] == '1')		//Barcodes
-	          {
-              macro_string = macro_string + bar_str_1;
-              bar_str_1 = "";
-  	        }
-	          else if(macro_function_char[j+1] == '2')
-	          {
-              macro_string = macro_string + bar_str_2;
-              bar_str_2 = "";
-	          }
-	          else if(macro_function_char[j+1] == '3')
-	          {
-              macro_string = macro_string + bar_str_3;
-              bar_str_3 = "";
-	          }
-	          else if(macro_function_char[j+1] == '4')
-	          {
-              macro_string = macro_string + bar_str_4;
-              bar_str_4 = "";
-	          }
-	          else if(macro_function_char[j+1] == 'n')
-	          {
-              macro_string = macro_string + QString("\r\n");
-	          }
-	          else if(macro_function_char[j+1] == 't')
-	          {
-              macro_string = macro_string + QString("\t");
-	          }
-	          else if(macro_function_char[j+1] == '"')
-	          {
-              sending_string = true;
-	          }
-	          else
-	          {
-			        macro_string = macro_string + macro_function_char[j] + macro_function_char[j+1];
-	          }
-	        }
-	      }
-        combined_macro_functions = combined_macro_functions + macro_string;
-	    }
-	    if(macros.eof()) break;
-    }
-    cout<<endl<<combined_macro_functions.toUtf8().constData()<<endl;  //OMIT~~~
-    macros.close();
-  }
-//  else//macro file did not open.  probably does not exist
-//--------------------------------------------------------------OUTPUT TO SERIAL--------------------------------------------------------------//
-  int size_string_macros = combined_macro_functions.size();
-  if(communicate_by_keyboard_cable==true)
-  {
-    int filedesc = open("/dev/usb2serial", O_WRONLY);
-    int ret_val = write(filedesc,(combined_macro_functions.toUtf8().constData()), size_string_macros);
-    if(ret_val<0) cout<<"write error writing to keyboard cable\n";
-  }
-  if(communicate_by_tcp==true)
-  {
-    tcp_write(combined_macro_functions);
-  }
-}
-*/
 
 screen::screen(centre* set_centre_p)
  :QWidget()
@@ -1051,7 +891,6 @@ screen::screen(centre* set_centre_p)
         "border:none;"
         "margin-top: 10px;"
         "margin-bottom: 10px;"
-        //"min-width: 140px;" //TEST~~~
         "height: 5px;}"
     
     ".QSlider::sub-page {"
@@ -1169,196 +1008,7 @@ screen::screen(centre* set_centre_p)
         "margin: 2px"
   );
 }
-/*
-//==============================================================================================================//
-void centre::load_macros()	//TEST~~~ connecting macros screen
-{
-  QString macro_string;
-  combined_macro_functions.clear();
-  QString count_string;
-  
-  char barcode_1[30];		//TEST~~~ totalize_mode variables
-  char barcode_2[30];
-  char barcode_3[30];
-  char barcode_4[30];
-  char seed_count[30];
-  //char seed_weight[30];	//implement when scale is added to seed counter
-  
-  char lotcode[30];			//TEST~~~ batch_mode variables
-  char packcode[30];
-  //char substitution[30];  //yet to be implemeneted//
-  //char seed_count[30];
-//----------------------------------------------------------------------------------------------------------------//
 
-  {
-    //table_p = new table;
-	ifstream barcodes("settings/totalize_backup");
-	if(!barcodes.is_open())
-	{
-	  cout<<"settings/totalize_backup file not open\n";
-	  exit(1);
-	}
-	
-    while(!barcodes.eof())	//TEST~~~
-    {
-      barcodes>>barcode_1;
-      barcodes>>barcode_2;
-      barcodes>>barcode_3;
-      barcodes>>barcode_4;
-      barcodes>>seed_count;
-    }
-    
-    barcodes.close();
-    
-    for(int q=0; q<30; ++q)
-    {
-      if(barcode_1[q] == ',')
-      {
-        barcode_1[q] = 0;
-      }
-      if(barcode_2[q] == ',')
-      {
-        barcode_2[q] = 0;
-      }
-      if(barcode_3[q] == ',')
-      {
-        barcode_3[q] = 0;
-      }
-      if(barcode_4[q] == ',')
-      {
-        barcode_4[q] = 0;
-      }
-    }
-  }
-//----------------------------------------------------------------------------------------------------------------//
-  {  
-	ifstream batchcodes("settings/batch_backup");
-	if(!batchcodes.is_open())
-	{
-	  cout<<"settings/batch_backup file not open\n";
-	  exit(1);
-	}
-	
-	
-    while(!batchcodes.eof())	//TEST~~~
-    {
-	    batchcodes>>lotcode;
-	    batchcodes>>packcode;
-	    batchcodes>>seed_count;
-	    //batchcodes>>substitution;
-    }
-    
-    batchcodes.close();									                //
-    
-    for(int q=0; q<30; ++q)
-	  {
-	    if(lotcode[q] == ',')
-	    {
-	      lotcode[q] = 0;
-	    }
-	    if(packcode[q] == ',')
-	    {
-	      packcode[q] = 0;
-	    }
-	    if(seed_count[q] == ',')
-	    {
-	      seed_count[q] = 0;
-	    }
-	  }
-  }
-//----------------------------------------------------------------------------------------------------------------//
-  {
-    ifstream macros("macro_table");
-	if(!macros.is_open())
-	{
-	  cout<<"macro_table file not open\n";
-	  exit(1);
-	}
-	
-    
-    for(int i=0; i<10; ++i)		//searches all 10 macros available
-    {
-	    macros>>macro_status_bool;
-	    macros>>macro_numb_int;
-	    macros>>macro_name_char;
-	    macros>>macro_mask_char;
-	    macros>>macro_function_char;
-	
-      //if(macros.eof()) break;
-	    if(macro_status_bool == 0)
-      { 
-		
-      }
-      else
-      {
-        QString macro_string;
-	  
-        for(unsigned int j=0; j<strlen(macro_function_char); ++j)
-        {
-          if(macro_function_char[j] == '\\')
-          {
-            if(macro_function_char[j+1] == 'C')
-            {
-              count_string = QString::number(count);
-              macro_string = macro_string + count_string;
-            }
-            else if(macro_function_char[j+1] == '1')		//Barcodes
-            {
-              if(tm_barcode_columns >= 1)
-              {
-                macro_string = macro_string + barcode_1;
-              }
-            }
-            else if(macro_function_char[j+1] == '2')
-            {
-              if(tm_barcode_columns >=2)
-              {
-                macro_string = macro_string + barcode_2;
-              }
-            }
-            else if(macro_function_char[j+1] == '3')
-            {
-              if(tm_barcode_columns >= 3)
-              {
-                macro_string = macro_string + barcode_3;
-              }
-            }
-            else if(macro_function_char[j+1] == '4')
-            {
-              if(tm_barcode_columns >= 4)
-              {
-                macro_string = macro_string + barcode_4;
-              }
-            }
-            else if(macro_function_char[j+1] == 'T')		//Lot code
-            {
-              if(tm_barcode_columns >= 1)
-			      {
-			        macro_string = macro_string + lotcode;
-			      }
-            }
-            else if(macro_function_char[j+1] == 'P')		//Pack code
-            {
-              if(tm_barcode_columns >=2)
-              {
-                macro_string = macro_string + packcode;
-              } 
-            }
-            else
-            {
-              macro_string = macro_string + macro_function_char[j] + macro_function_char[j+1];
-            }
-          }
-        }
-        combined_macro_functions = combined_macro_functions + macro_string;
-      }
-      if(macros.eof()) break;
-    }
-    macros.close();
-  }
-//  tm_macro_updated = true;
-}
-*/
 QString centre::choose_tcp_network(int choice)//choice 1 -> 192.168.100.1.  choice 2 -> 192.168.200.1.  Empty return -> success.  Error string returned for failure
 {
   if(tcp_socket_p) tcp_socket_p->disconnectFromHost();
@@ -1428,21 +1078,13 @@ bool centre::get_macro_selection()
 
 void centre::set_macro_name(QString name)
 {
-  
-  cout<<"centre::set_macro_name 1\n";
-  cout<<"macro_type_for_entry = "<<macro_type_for_entry<<endl;
-  
   QStringList* list_p = 0;
   if(macro_type_for_entry==0) list_p = &totalize_macros;
   if(macro_type_for_entry==1) list_p = &batch_pack_macros;
   if(macro_type_for_entry==2) list_p = &batch_dump_macros;
   if(macro_type_for_entry==3) list_p = &batch_substitution_macros;
-  
-  cout<<"centre::set_macro_name 2\n";
-  
   for(int i=0; i<list_p->size(); ++i)//mark all macros of this type de-selected
   {
-//    if(list_p->at(i).size()>0) (list_p->at(i))[0] = QChar('0');
     if(list_p->at(i).size()>0) 
     {
       QString string = list_p->at(i);
@@ -1450,18 +1092,12 @@ void centre::set_macro_name(QString name)
       list_p->replace(i, string);
     }
   }
-  
-  cout<<"centre::set_macro_name 3\n";
-  
   QString string = list_p->at(macro_row_for_entry);
   int name_end = string.indexOf(QChar(23));
   string = string.right(string.size()-name_end);//remove old name plus selection character at start
   string.prepend(name);//add new name
   string.prepend("1");//select this macro.  add new selection character
   list_p->replace(macro_row_for_entry, string);
-  
-  cout<<"centre::set_macro_name 4\n";
-  
 }
 
 QString centre::get_macro_name()
@@ -1504,10 +1140,7 @@ QString centre::get_macro()
   
   QString string = list_p->at(macro_row_for_entry);
   int name_end = string.indexOf(QChar(23));
-  cout<<"name_end = "<<name_end<<endl;
-  cout<<"string.size = "<<string.size()<<endl;
   string = string.right(string.size()-name_end-1);
-  cout<<"string-"<<string.toStdString()<<"-\n";
   return string;
 }
   
@@ -1516,11 +1149,6 @@ QString centre::get_macro_display_string()
   QString macro_display_string;
   QString macro_string=get_macro();
   bool in_text = false;
-//  if(macro_string.size() == 0)
-//  {
-//    cout<<"centre::get_macro_display_string.  macro_string empty\n";
-//    return "";
-//  }
   for(int j=0; j<macro_string.size(); ++j)
   {
     if(macro_string[j] == QChar(2))//start of text
@@ -1640,12 +1268,12 @@ void centre::load_macros()
     }
     return;
   }
-  cout<<"communication_macros file\n";
+  //  cout<<"communication_macros file\n";
   while(!file.atEnd())
   {
     file.getChar(&ch);
-    if(ch<32) cout<<"character "<<int(ch)<<endl;
-    else cout<<ch<<endl;
+    //    if(ch<32) cout<<"character "<<int(ch)<<endl;
+    //    else cout<<ch<<endl;
     if(ch == 0)//marks end of macro
     {
       if(getting_totalize_macros)
@@ -1692,7 +1320,7 @@ void centre::load_macros()
       string.append(ch);
     }
   }
-  cout<<"end communication_macros file\n";
+  //cout<<"end communication_macros file\n";
 }
 
 void centre::save_macros()

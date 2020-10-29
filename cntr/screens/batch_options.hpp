@@ -6,14 +6,9 @@
 class button;
 class QGridLayout;
 class QGroupBox;
-//class QVBoxLayout;
 class QLabel;
 class QRadioButton;
-//class QSlider;
-//class QTimer;
-//class QFileDialog;
 class batch_mode_driver;
-//class message_box;
 
 class batch_options : public screen
 {
@@ -21,7 +16,6 @@ class batch_options : public screen
   
   public:
   batch_options(centre*set_centre_p, batch_mode_driver* set_batch_mode_driver_p);
-//  ~batch();
   
   private slots:
   void barcode_switch_toggled(bool checked);

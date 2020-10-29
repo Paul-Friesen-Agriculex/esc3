@@ -77,7 +77,6 @@ void totalize_options::back_button_clicked()
 void totalize_options::zero_when_seed_discharged_changed(bool value)
 {
   centre_p->tm_zero_when_seed_discharged = value;
-//  cout<<"centre_p->tm_zero_when_seed_discharged = "<<centre_p->tm_zero_when_seed_discharged<<endl;
 }
 
 void totalize_options::number_of_barcode_columns_changed(int value)
@@ -93,12 +92,10 @@ void totalize_options::autosave_limit_changed(int value)
 void totalize_options::ok_button_clicked()
 {
   centre_p->screen_done = true;
-//  cout<<"ok clicked\n";
 }
 
 void totalize_options::macro_menu_button_clicked()	//TEST~~~
 {
-  //cout<<"macro_menu_button_click"<<endl;	//OMIT~~~
   centre_p->macro_type_for_entry = 0;//totalize macro
   centre_p->add_waiting_screen(5);//totalize
   centre_p->add_waiting_screen(28);//macro_screen

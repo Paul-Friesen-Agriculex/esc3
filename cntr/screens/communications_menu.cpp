@@ -166,7 +166,7 @@ void communications_menu::help_button_clicked()
   
   help_screen_p -> set_text("This screen allows you to set up communications with a computer, PLC, etc.  "
                             "A message can be sent after each sample, containing things like the count, a "
-                            "barcode, or text.  You set up what will be sent later.  Here, you choose the method "
+                            "barcode, or text.  You set up what will be sent in another screen.  Here, you choose the method "
                             "of connection.\n\n"
                             
                             "COMMUNICATE BY KEYBOARD CABLE - This requires the special keyboard cable from Agriculex.  "
