@@ -10,6 +10,7 @@
 #include <QTcpServer>
 #include <QTcpSocket>
 #include <QScreen>
+#include <QDir>
 #include "message_box.hpp"
 #include <time.h>
 #include <fcntl.h>	//library used to use system call command "open()" used to check available serial
@@ -211,7 +212,7 @@ void centre::init()
   tm_autosave_count = 0;//counts how many counts were recorded;
   tm_save_filename = "";
   block_endgate_opening = false;//true prevents endgate from opening.  Used if barcode test fails in batch.
-  communicate_by_keyboard_cable = true;
+  communicate_by_keyboard_cable = false;
   communicate_by_tcp = false;
   tcp_link_established = false;
   network = 0;//0-> not set.  1->use 192.168.100.1.  2->use 192.168.200.1.
@@ -240,6 +241,26 @@ void centre::init()
   enter_batch_substitution_macro = false;
   
   load_macros();
+  
+  QDir dir("");
+  if(dir.exists("settings") == false)
+  {
+    dir.mkdir("settings");
+  }
+  if(dir.exists("programs") == false)
+  {
+    dir.mkdir("programs");
+  }
+  if(dir.exists("user") == false)
+  {
+    dir.mkdir("user");
+  }
+  if(dir.exists("ss_setups") == false)
+  {
+    dir.mkdir("ss_setups");
+  }
+  
+
 }
 
 centre::~centre()
@@ -484,6 +505,11 @@ void centre::run()
 
 bool centre::save_settings(QString file_name)
 {
+  QDir dir("");
+  if(dir.exists("settings") == false)
+  {
+    dir.mkdir("settings");
+  }
   QString f_path = QString("settings/");
   f_path += file_name;
   std::ofstream fset(f_path.toLatin1().data(),std::ofstream::out);

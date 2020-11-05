@@ -31,11 +31,18 @@ communications_menu::communications_menu(centre*set_centre_p)
   message_p = new QLabel("Choose communication method");
   if(centre_p->communicate_by_keyboard_cable)
   {
-    message_p->setText("Set up to communicate by Keyboard Cable");
+    if(QFileInfo::exists("/dev/usb2serial"))
+    {
+      message_p->setText("Set up to communicate by Keyboard Cable.");
+    }
+    else
+    {
+      message_p->setText("Set up to communicate by Keyboard Cable but cable not found.");
+    }
   }
   if(centre_p->tcp_link_established)
   {
-    message_p->setText("Set up to communicate by TCP");
+    message_p->setText("Set up to communicate by TCP.");
   }
 
   main_layout_p=new QGridLayout;
