@@ -22,6 +22,7 @@ class start_screen : public screen
   void batch_clicked();
   void batch_from_spreadsheet_clicked();
   void tools_clicked();
+  void slave_mode_clicked();
   void eject_memory_sticks_clicked();
   void help_button_clicked();
   void shutdown();
@@ -32,6 +33,7 @@ class start_screen : public screen
   button* batch_button_p;
   button* batch_from_spreadsheet_button_p;
   button* tools_button_p;
+  button* slave_mode_button_p;
   button* eject_memory_sticks_button_p;
   button* shutdown_button_p;
   button* help_button_p;

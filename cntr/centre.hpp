@@ -3,6 +3,7 @@
 
 #include <QThread>
 #include <QString>
+#include <QChar>
 #include <QStringList>
 #include <QWidget>
 #include <QImage>
@@ -25,6 +26,7 @@ class brother_envelope_feeder;
 class QTcpServer;
 class QTcpSocket;
 class QApplication;
+class QByteArray;
 
 const int screen_wait_list_size=10;
 
@@ -46,8 +48,10 @@ class centre : public QObject
   void end_of_playback();
   void get_cycle_time(int value);
   void tcp_connection_detected();
+  void read_tcp_socket();
   
   signals:
+  void char_from_tcp(QChar tcp_char);
   void set_camera_processing(bool state);
   void playback_line();
   void get_qimage();
@@ -92,6 +96,7 @@ class centre : public QObject
   4 - Can do anything except change users and permissions.
   5 - Unrestricted.
   */
+  QByteArray* tcp_input_array_p;
   
   public:
   QApplication* application_p;

@@ -22,6 +22,7 @@ struct bm_set //batch mode set of packs
 enum mode_enum
 {
   wait_for_seed_lot_barcode,
+  slave_mode_entry,
   hi_open,
   low_open,
   gate_delay,
@@ -236,6 +237,10 @@ class batch_mode_driver : public QObject
   bool substitute_seed_lot;
   QString substitute_barcode;
   
+  //slave mode
+  bool slave_mode;
+//  bool slave_mode_wait;
+  
   //diagnostics
   void list_program();//in terminal - diagnostics
   int cout_counter;//use to count cycles to print diagnostic messages occasionally
@@ -253,6 +258,7 @@ class batch_mode_driver : public QObject
   
   signals:
   void dumping();
+  void pack_ready();
   void pack_collected(int count);
   void dump_complete(int dump_count);
   void seed_lot_barcode_entered(QString barcode);
@@ -261,7 +267,7 @@ class batch_mode_driver : public QObject
   void refresh_screen();
   void send_extra_pack_message(QString message);
   void extra_pack_finished_signal();
-//  void substitution_barcode_entered(QString barcode);
+  void slave_mode_set_finished();
   
   //testing
   void send_message2(QString);

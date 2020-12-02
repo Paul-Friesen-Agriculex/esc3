@@ -71,6 +71,8 @@ batch_mode_driver::batch_mode_driver(centre* centre_p_s, cutgate* cutgate_p_s)
   extra_pack_finished = false;
   
   substitute_seed_lot = false;
+  slave_mode = false;
+//  slave_mode_wait = false;
   
   //diagnostics
   cout_counter = 0;
@@ -490,6 +492,8 @@ void batch_mode_driver::list_program()
 
 void batch_mode_driver::run()
 {
+//  if(slave_mode_wait) return;
+  
   if(   (slowdown_count_diff_set==false)   &&   (current_count_limit>=0)   )//estimate a starting value for slowdown_count_diff.
     //a negative value for current_count_limit indicates it has not been set and should not be used
   {
@@ -605,6 +609,13 @@ void batch_mode_driver::run()
         restart();
       }
       break;
+    case slave_mode_entry:
+      current_set = 0;
+      current_pack = 0;
+      current_count_limit = program[current_set]->seeds;
+      current_pack_limit = program[current_set]->packs;
+      mode = hi_open;
+      break;
     case hi_open:
       barcode_mode = pack;
       cutgate_p -> open();
@@ -618,6 +629,9 @@ void batch_mode_driver::run()
         
         if(   (current_count_limit-centre_p->count) < slowdown_count_diff   )
         {
+          cout<<"current_count_limit = "<<current_count_limit<<endl;
+          cout<<"centre_p->count = "<<centre_p->count<<endl;
+          cout<<"slowdown_count_diff = "<<slowdown_count_diff<<endl;
           mode = low_open;
           cout<<"mode low_open. count "<<centre_p->count<<"\n";
           low_speed_mode_time.restart();
@@ -665,6 +679,7 @@ void batch_mode_driver::run()
       if(cutoff_gate_close_time.elapsed() >= cutoff_gate_delay_time)
       {
         cutgate_p -> close();
+        emit pack_ready();
         
         actual_count = current_count_limit;//This number will be recorded in actual_count column of spreadsheet, if required.  Actual count may be less if seed is short.
 
@@ -1140,11 +1155,22 @@ void batch_mode_driver::run()
       centre_p->block_endgate_opening = false;
       if(centre_p->get_endgate_state()==ENDGATE_CLOSED)
       {
-        mode = wait_for_seed_lot_barcode;
-        cout<<"mode wait_for_seed_lot_barcode\n";
-        seed_lot_barcode_ok = false;
-        seed_lot_barcode_old = true;
-        reset_program();
+        if(slave_mode) 
+        {
+          emit slave_mode_set_finished();
+          cout<<"slave mode set finished\n";
+          stop();
+          centre_p->set_speed(0);
+          slave_mode = false;
+        }
+        else
+        {
+          mode = wait_for_seed_lot_barcode;
+          cout<<"mode wait_for_seed_lot_barcode\n";
+          seed_lot_barcode_ok = false;
+          seed_lot_barcode_old = true;
+          reset_program();
+        }
       }      
       break;
     case substitution_wait_for_cleanout_open:

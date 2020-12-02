@@ -18,6 +18,7 @@ start_screen::start_screen(centre* set_centre_p)
   batch_button_p = new button("Batch Mode");
   batch_from_spreadsheet_button_p = new button("Batch From Spreadsheet Mode");
   tools_button_p = new button("Tools/Options");
+  slave_mode_button_p = new button("Slave Mode");
   eject_memory_sticks_button_p = new button("Safely remove memory sticks");
   shutdown_button_p = new button("Shut Down");
   help_button_p = new button("Help");
@@ -33,6 +34,7 @@ start_screen::start_screen(centre* set_centre_p)
   modebox_layout_p->addWidget(batch_button_p, 0, 1);
   modebox_layout_p->addWidget(batch_from_spreadsheet_button_p, 0, 2);
   modebox_layout_p->addWidget(tools_button_p, 1, 0);
+  modebox_layout_p->addWidget(slave_mode_button_p, 1, 2);
   shutdownbox_layout_p->addWidget(eject_memory_sticks_button_p, 0, 1);
   shutdownbox_layout_p->addWidget(help_button_p, 1, 0);
   shutdownbox_layout_p->addWidget(shutdown_button_p, 1, 1);
@@ -48,6 +50,7 @@ start_screen::start_screen(centre* set_centre_p)
   connect(batch_button_p, SIGNAL(clicked()), this, SLOT(batch_clicked()));
   connect(batch_from_spreadsheet_button_p, SIGNAL(clicked()), this, SLOT(batch_from_spreadsheet_clicked()));
   connect(tools_button_p, SIGNAL(clicked()), this, SLOT(tools_clicked()));
+  connect(slave_mode_button_p, SIGNAL(clicked()), this, SLOT(slave_mode_clicked()));
   connect(eject_memory_sticks_button_p, SIGNAL(clicked()), this, SLOT(eject_memory_sticks_clicked()));
   connect(help_button_p, SIGNAL(clicked()), this, SLOT(help_button_clicked()));
   connect(shutdown_button_p, SIGNAL(clicked()), this, SLOT(shutdown()));
@@ -80,6 +83,12 @@ void start_screen::batch_from_spreadsheet_clicked()
 void start_screen::tools_clicked()
 {
   centre_p->add_waiting_screen(9);//tool choice
+  centre_p->screen_done=true;
+}
+
+void start_screen::slave_mode_clicked()
+{
+  centre_p->add_waiting_screen(60);//slave mode
   centre_p->screen_done=true;
 }
 

@@ -3,7 +3,9 @@
 #include <stdio.h>
 #include "centre.hpp"
 #include "signal_port.hpp"
+#include <iostream>
 
+using namespace std;
 
 endgate::endgate(centre* centre_p_s)
 {
@@ -29,6 +31,8 @@ endgate::~endgate()
 
 void endgate::open()
 {
+  cout<<"endgate::open\n";
+  
   FILE * fp;
   fp = fopen("/sys/class/gpio/gpio189/value", "w");
   fprintf(fp, "1");
@@ -40,6 +44,8 @@ void endgate::open()
 
 void endgate::close()
 {
+  cout<<"endgate::close\n";
+  
   FILE * fp;
   fp = fopen("/sys/class/gpio/gpio210/value", "w");
   fprintf(fp, "1");

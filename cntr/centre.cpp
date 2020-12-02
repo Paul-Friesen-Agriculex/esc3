@@ -58,6 +58,7 @@
 #include "brother_envelope_feeder.hpp"
 #include "signal_port.hpp"
 #include "batch_macro_type_choice.hpp"
+#include "slave_mode_screen.hpp"
 
 Q_DECLARE_METATYPE(crop)
 
@@ -219,6 +220,7 @@ void centre::init()
   QString tcp_client_server_addr = "";
   tcp_server_p = new QTcpServer;
   tcp_socket_p = new QTcpSocket;
+  tcp_input_array_p = new QByteArray;
 
   load_settings("default");
   
@@ -341,7 +343,15 @@ void centre::get_cycle_time(int value)//value is msec.
 void centre::tcp_connection_detected()
 {
   tcp_socket_p = tcp_server_p->nextPendingConnection();
+  connect(tcp_socket_p, SIGNAL(readyRead()), this, SLOT(read_tcp_socket()));
   emit tcp_connection_detected_signal();
+}
+
+void centre::read_tcp_socket()
+{
+  cout<<"start read_tcp_socket\n";
+  tcp_input_array_p -> clear();
+  *tcp_input_array_p = tcp_socket_p->readAll();
 }
 
 void centre::run()
@@ -351,13 +361,20 @@ void centre::run()
     init();
     init_ran = true;
   }
-    
+  
+  while(tcp_input_array_p->length() > 0)
+  {
+    QChar input_char = tcp_input_array_p->at(0);
+    emit char_from_tcp(input_char);
+    tcp_input_array_p->remove(0, 1);
+  }
+  
   emit set_crop(crops[0]);
   endgate_state = endgate_p->get_state();
   envelope_present = envelope_sensor_p->read();
   brother_envelope_feeder_p -> run();
 
-  if(current_screen==5)//totalize
+  if(  (current_screen==5)  ||  (current_screen==60)  )//totalize or slave mode screen
   {
     if(endgate_state == ENDGATE_CLOSED)
     {
@@ -486,7 +503,7 @@ void centre::run()
       case 41: screen_p=new tcp_server_addr_choice(this); break;
       case 42: screen_p=new tcp_client_server_addr_entry(this); break;
       case 50: screen_p=new batch_macro_type_choice(this, batch_mode_driver_p); break;
-//      case : screen_p=new (this); break;
+      case 60: screen_p=new slave_mode_screen(this, batch_mode_driver_p); break;
 //      case : screen_p=new (this); break;
 //      case : screen_p=new (this); break;
 //      case : screen_p=new (this); break;
