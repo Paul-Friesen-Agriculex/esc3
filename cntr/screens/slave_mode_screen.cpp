@@ -11,6 +11,10 @@
 #include <QTcpSocket>
 #include <QString>
 #include <QStringList>
+#include <QDir>
+#include <fcntl.h>	//library used to use system call command "open()" used to check available serial
+#include <unistd.h>	//library to enable write() function
+#include <termios.h>
 #include "centre.hpp"
 #include "slave_mode_screen.hpp"
 #include "button.hpp"
@@ -33,6 +37,7 @@ slave_mode_screen::slave_mode_screen(centre*set_centre_p, batch_mode_driver* set
   function_as_server_1_button_p = new button("Function as TCP Server Using 192.168.100.1");
   function_as_server_2_button_p = new button("Function as TCP Server Using 192.168.200.1");
   function_as_client_button_p = new button("Function as TCP Client");
+  communicate_by_serial_port_button_p = new button("Communicate by Serial Port");
   help_button_p = new button("Help");
   exit_button_p = new button("Exit Slave Mode");
   connection_message_p = new QLabel("Choose communication method");
@@ -48,6 +53,7 @@ slave_mode_screen::slave_mode_screen(centre*set_centre_p, batch_mode_driver* set
   main_layout_p->addWidget(function_as_server_1_button_p, 1, 0);
   main_layout_p->addWidget(function_as_server_2_button_p, 2, 0);
   main_layout_p->addWidget(function_as_client_button_p, 3, 0);
+  main_layout_p->addWidget(communicate_by_serial_port_button_p, 4, 0);
   main_layout_p->addWidget(help_button_p, 6, 0);
   main_layout_p->addWidget(connection_message_p, 1, 1);
   main_layout_p->addWidget(command_screen_p, 2, 1, 3, 1);
@@ -59,10 +65,19 @@ slave_mode_screen::slave_mode_screen(centre*set_centre_p, batch_mode_driver* set
   connect(function_as_server_1_button_p, SIGNAL(clicked()), this, SLOT(function_as_server_1_clicked()));
   connect(function_as_server_2_button_p, SIGNAL(clicked()), this, SLOT(function_as_server_2_clicked()));
   connect(function_as_client_button_p, SIGNAL(clicked()), this, SLOT(function_as_client_clicked()));
+  connect(communicate_by_serial_port_button_p, SIGNAL(clicked()), this, SLOT(communicate_by_serial_port_clicked()));
   connect(help_button_p, SIGNAL(clicked()), this, SLOT(help_button_clicked()));
   connect(exit_button_p, SIGNAL(clicked()), this, SLOT(exit_button_clicked()));
   connect(centre_p, SIGNAL(tcp_connection_detected_signal()), this, SLOT(connection_detected()));
-  connect(centre_p, SIGNAL(char_from_tcp(QChar)), this, SLOT(command_char(QChar)));
+//  if(centre_p->communicate_by_tcp)
+//  {
+    connect(centre_p, SIGNAL(char_from_tcp(QChar)), this, SLOT(command_char(QChar)));
+//  }
+//  else if(centre_p->communicate_by_serial_port
+//  {
+    connect(centre_p, SIGNAL(char_from_serial_port(QChar)), this, SLOT(command_char(QChar)));
+//  }
+//  else cout<<"no communication method for slave mode\n";
   connect(batch_mode_driver_p, SIGNAL(slave_mode_set_finished()), this, SLOT(command_finished()));
   connect(batch_mode_driver_p, SIGNAL(pack_ready()), this, SLOT(pack_ready()));
   connect(batch_mode_driver_p, SIGNAL(pack_collected(int)), this, SLOT(pack_collected(int)));
@@ -82,11 +97,15 @@ slave_mode_screen::slave_mode_screen(centre*set_centre_p, batch_mode_driver* set
   end_gate_full = false;
   end_gate_opened_full = false;
   end_gate_filling = true;
-  
+
+  if(centre_p->communicate_by_serial_port == true)
+  {
+    connection_message_p->setText("Serial port addapter cable detected.\nReady to communicate");
+  }
   
   timer_p = new QTimer;
   connect(timer_p, SIGNAL(timeout()), this, SLOT(run()));
-  timer_p->start(100);
+  timer_p->start(500);
 }
 
 slave_mode_screen::~slave_mode_screen()
@@ -107,7 +126,15 @@ void slave_mode_screen::pack_ready()
   array.append(QString("Full"));
   array.append(QChar(31));
   array.append(QChar(3));
-  centre_p->tcp_socket_p->write(array);
+  if(centre_p->communicate_by_tcp)
+  {
+    centre_p->tcp_socket_p->write(array);
+  }
+  else if(centre_p->communicate_by_serial_port)
+  {
+    centre_p->serial_port_write(QString(array));
+  }
+  else cout<<"no communication method for slave mode\n";
 }
   
 void slave_mode_screen::pack_collected(int)
@@ -119,7 +146,15 @@ void slave_mode_screen::pack_collected(int)
   array.append(QString("Empty"));
   array.append(QChar(31));
   array.append(QChar(3));
-  centre_p->tcp_socket_p->write(array);
+  if(centre_p->communicate_by_tcp)
+  {
+    centre_p->tcp_socket_p->write(array);
+  }
+  else if(centre_p->communicate_by_serial_port)
+  {
+    centre_p->serial_port_write(QString(array));
+  }
+  else cout<<"no communication method for slave mode\n";
 }
   
 void slave_mode_screen::dump_complete(int)
@@ -131,7 +166,15 @@ void slave_mode_screen::dump_complete(int)
   array.append(QString("BatchF"));
   array.append(QChar(31));
   array.append(QChar(3));
-  centre_p->tcp_socket_p->write(array);
+  if(centre_p->communicate_by_tcp)
+  {
+    centre_p->tcp_socket_p->write(array);
+  }
+  else if(centre_p->communicate_by_serial_port)
+  {
+    centre_p->serial_port_write(QString(array));
+  }
+  else cout<<"no communication method for slave mode\n";
 }
   
 void slave_mode_screen::back_button_clicked()
@@ -145,7 +188,7 @@ void slave_mode_screen::function_as_server_1_clicked()
   QString message_string = centre_p->choose_tcp_network(1);
   if(message_string=="")//success
   {
-    connection_message_p->setText("Listening for connection to address 192.168.100.1");
+    connection_message_p->setText("Listening for connection to\naddress 192.168.100.1");
     return;
   }
   connection_message_p->setText(QString("listen failure.   ") . append(message_string));
@@ -156,7 +199,7 @@ void slave_mode_screen::function_as_server_2_clicked()
   QString message_string = centre_p->choose_tcp_network(2);
   if(message_string=="")//success
   {
-    connection_message_p->setText("Listening for connection to address 192.168.200.1");
+    connection_message_p->setText("Listening for connection to\naddress 192.168.200.1");
     return;
   }
   connection_message_p->setText(QString("listen failure.   ") . append(message_string));
@@ -168,6 +211,24 @@ void slave_mode_screen::function_as_client_clicked()
   centre_p->add_waiting_screen(42);//tcp_client_server_addr_entry
   centre_p->screen_done = true;
 }
+
+void slave_mode_screen::communicate_by_serial_port_clicked()
+{
+  QDir dir("/dev");
+  if(dir.exists("ttyACM0"))
+  {
+    centre_p->communicate_by_keyboard_cable = false;
+    centre_p->communicate_by_tcp = false;
+    centre_p->communicate_by_serial_port = true;
+    centre_p->add_waiting_screen(60);//come back here
+    centre_p->add_waiting_screen(61);//serial_port_setup
+    centre_p->screen_done = true;
+  }
+  else
+  {
+    connection_message_p->setText("No serial port adapter cable.  This is needed for serial port communication.");
+  }
+}  
 
 void slave_mode_screen::help_button_clicked()
 {
@@ -208,6 +269,7 @@ void slave_mode_screen::connection_detected()
   }
   centre_p->communicate_by_tcp = true;
   centre_p->tcp_link_established = true;
+  centre_p->communicate_by_serial_port = false;
 }
   
 void slave_mode_screen::exit_button_clicked() 
@@ -218,6 +280,10 @@ void slave_mode_screen::exit_button_clicked()
 
 void slave_mode_screen::command_char(QChar character)
 {
+  
+//  char c = character.toLatin1();
+//  cout<<"char received "<<c<<"   number "<<int(c)<<endl;
+  
   if(character==2)//start of new command
   {
     command_line_string.clear();
@@ -225,17 +291,21 @@ void slave_mode_screen::command_char(QChar character)
   }
   if(character==3)//end of command.  create slave_mode_command from command_line_string and add it to command_p_list for execution.
   {
+    /*
     cout<<"command_line_string\n";
     for(int i=0; i<command_line_string.size(); ++i)
     {
       cout<<"  command_line_string["<<i<<"] = "<<int(command_line_string[i].toLatin1())<<"  prints "<<command_line_string[i].toLatin1()<<endl;
     }
+    */
     QStringList list = command_line_string.split(QChar(31));
+    /*
     cout<<"command received\n";
     for(int i=0; i<list.size(); ++i)
     {
       cout<<"  list["<<i<<"] = "<<list[i].toStdString()<<endl;
     }
+    */
     new_command_p = new slave_mode_command;
     bool ok=false;
     if(list.size()<2)
@@ -421,11 +491,19 @@ void slave_mode_screen::run()
   }
   array.append(QChar(31));
   array.append(QChar(3));
-  centre_p->tcp_socket_p->write(array);
-  
-//  if(batch_mode)
-//  {
-    
+  if(centre_p->communicate_by_tcp)
+  {
+    if(centre_p->tcp_link_established)
+    {
+      centre_p->tcp_socket_p->write(array);
+    }
+  }
+  else if(centre_p->communicate_by_serial_port)
+  {
+    centre_p->serial_port_write(QString(array));
+//    cout<<"wrote "<<(QString(array)).toStdString()<< "to serial port\n";
+  }
+  else cout<<"no communication method for slave mode\n";
   
   if(executing_command_p == 0)
   {
@@ -566,7 +644,7 @@ void slave_mode_screen::run()
 
 void slave_mode_screen::end_command()
 {
-  cout<<"start slave_mode_screen::end_command()\n";
+//  cout<<"start slave_mode_screen::end_command()\n";
   if(previous_command_p != 0)
   {
     delete previous_command_p;
@@ -574,7 +652,7 @@ void slave_mode_screen::end_command()
   previous_command_p = executing_command_p;
   executing_command_p = 0;
   batch_mode_driver_p->slave_mode = false;
-  cout<<"end slave_mode_screen::end_command()\n";
+//  cout<<"end slave_mode_screen::end_command()\n";
   return;
 }
 

@@ -26,6 +26,7 @@ class communications_menu : public screen
   void function_as_server_1_clicked();
   void function_as_server_2_clicked();
   void function_as_client_clicked();
+  void communicate_by_serial_port_clicked();
   void help_button_clicked();
   void ok_button_clicked();
   void connection_detected();
@@ -36,6 +37,7 @@ class communications_menu : public screen
   button* function_as_server_1_button_p;
   button* function_as_server_2_button_p;
   button* function_as_client_button_p;
+  button* communicate_by_serial_port_button_p;
   button* help_button_p;
   button* ok_button_p;
   QLabel* message_p;

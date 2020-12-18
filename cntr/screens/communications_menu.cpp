@@ -6,6 +6,10 @@
 #include <QRadioButton>
 #include <QSpinBox>
 #include <QFileInfo>
+#include <QDir>
+#include <fcntl.h>	//library used to use system call command "open()" used to check available serial
+#include <unistd.h>	//library to enable write() function
+#include <termios.h>
 #include "centre.hpp"
 #include "communications_menu.hpp"
 #include "button.hpp"
@@ -26,6 +30,7 @@ communications_menu::communications_menu(centre*set_centre_p)
   function_as_server_1_button_p = new button("Function as TCP Server Using 192.168.100.1");
   function_as_server_2_button_p = new button("Function as TCP Server Using 192.168.200.1");
   function_as_client_button_p = new button("Function as TCP Client");
+  communicate_by_serial_port_button_p = new button("Communicate by Serial Port");
   help_button_p = new button("Help");
   ok_button_p = new button("OK");
   message_p = new QLabel("Choose communication method");
@@ -44,6 +49,10 @@ communications_menu::communications_menu(centre*set_centre_p)
   {
     message_p->setText("Set up to communicate by TCP.");
   }
+  if(centre_p->communicate_by_serial_port)
+  {
+    message_p->setText("Set up to communicate by serial port cable.");
+  }
 
   main_layout_p=new QGridLayout;
   
@@ -52,6 +61,7 @@ communications_menu::communications_menu(centre*set_centre_p)
   main_layout_p->addWidget(function_as_server_1_button_p, 2, 0);
   main_layout_p->addWidget(function_as_server_2_button_p, 3, 0);
   main_layout_p->addWidget(function_as_client_button_p, 4, 0);
+  main_layout_p->addWidget(communicate_by_serial_port_button_p, 5, 0);
   main_layout_p->addWidget(help_button_p, 6, 0);
   main_layout_p->addWidget(message_p, 1, 1, 3, 1);
   main_layout_p->addWidget(ok_button_p, 6, 1);
@@ -63,12 +73,13 @@ communications_menu::communications_menu(centre*set_centre_p)
   connect(function_as_server_1_button_p, SIGNAL(clicked()), this, SLOT(function_as_server_1_clicked()));
   connect(function_as_server_2_button_p, SIGNAL(clicked()), this, SLOT(function_as_server_2_clicked()));
   connect(function_as_client_button_p, SIGNAL(clicked()), this, SLOT(function_as_client_clicked()));
+  connect(communicate_by_serial_port_button_p, SIGNAL(clicked()), this, SLOT(communicate_by_serial_port_clicked()));
   connect(help_button_p, SIGNAL(clicked()), this, SLOT(help_button_clicked()));
   connect(ok_button_p, SIGNAL(clicked()), this, SLOT(ok_button_clicked()));
   connect(centre_p, SIGNAL(tcp_connection_detected_signal()), this, SLOT(connection_detected()));
   
   ok_button_p->setEnabled(false);
-  if(   (centre_p->communicate_by_keyboard_cable)   ||   (centre_p->communicate_by_tcp)   )
+  if(   (centre_p->communicate_by_keyboard_cable)   ||   (centre_p->communicate_by_tcp)   ||  (centre_p->communicate_by_serial_port)  )
   {
     ok_button_p->setEnabled(true);
   }
@@ -167,6 +178,60 @@ void communications_menu::function_as_client_clicked()
   centre_p->screen_done = true;
 }
 
+void communications_menu::communicate_by_serial_port_clicked()
+{
+  QDir dir("/dev");
+  if(dir.exists("ttyACM0"))
+  {
+    centre_p->communicate_by_keyboard_cable = false;
+    centre_p->communicate_by_tcp = false;
+    centre_p->communicate_by_serial_port = true;
+    centre_p->add_waiting_screen(40);//come back here
+    centre_p->add_waiting_screen(61);//serial_port_setup
+    centre_p->screen_done = true;
+  }
+  else
+  {
+    message_p->setText("No serial port adapter cable.  This is needed for serial port communication.");
+  }
+}  
+
+
+/*
+{
+  QDir dir("/dev");
+  if(dir.exists("ttyACM0"))
+  {
+    centre_p->communicate_by_keyboard_cable = false;
+    centre_p->communicate_by_tcp = false;
+    centre_p->communicate_by_serial_port = true;
+    message_p->setText("Serial port addapter cable detected.  Ready to communicate");
+
+    int fd = centre_p->serial_port_fd;
+    struct termios tio;
+    memset(&tio,0,sizeof(tio));
+    tio.c_iflag=0;
+    tio.c_oflag=0;
+    tio.c_cflag=CS8|CREAD|CLOCAL;
+    tio.c_lflag=0;
+    tio.c_cc[VMIN]=1;
+    tio.c_cc[VTIME]=5;
+    
+    if(fd<0)fd = open("/dev/ttyACM0", O_RDWR | O_NONBLOCK);
+    if(fd<0) cout<<"serial port opening error\n";
+    
+    cfsetospeed(&tio,B9600);          
+    cfsetispeed(&tio,B9600);          
+    tcsetattr(fd,TCSANOW,&tio);
+    
+    centre_p->serial_port_fd = fd;
+  }
+  else
+  {
+    message_p->setText("No serial port adapter cable.  This is needed for serial port communication.");
+  }
+}  
+*/
 void communications_menu::help_button_clicked()
 {
   help_screen_p = new help_screen;

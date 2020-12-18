@@ -15,6 +15,9 @@
 #include <time.h>
 #include <fcntl.h>	//library used to use system call command "open()" used to check available serial
 #include <unistd.h>	//library to enable write() function
+#include <string.h> //memset, strcpy
+#include <termios.h>
+
 
 #include "centre.hpp"
 #include "processor.hpp"
@@ -59,6 +62,7 @@
 #include "signal_port.hpp"
 #include "batch_macro_type_choice.hpp"
 #include "slave_mode_screen.hpp"
+#include "serial_port_setup.hpp"
 
 Q_DECLARE_METATYPE(crop)
 
@@ -97,8 +101,13 @@ centre::centre():
   init_ran = false;
 
   run_timer_p = new QTimer;
+  serial_port_timer_p = new QTimer;
   connect(run_timer_p, SIGNAL(timeout()), this, SLOT(run()));
+  connect(serial_port_timer_p, SIGNAL(timeout()), this, SLOT(read_serial_port()));
   run_timer_p->start(10);
+  serial_port_timer_p->start(50);
+  serial_port_fd = 0;
+  baud_rate = 9600;
 }
 
 void centre::init()
@@ -212,6 +221,10 @@ void centre::init()
   tm_autosave_count_limit = 0;//after this many counts are recorded, autosaves the file
   tm_autosave_count = 0;//counts how many counts were recorded;
   tm_save_filename = "";
+  
+  communicate_by_serial_port= false;
+  serial_port_fd = -1;//negative number->port not open
+  
   block_endgate_opening = false;//true prevents endgate from opening.  Used if barcode test fails in batch.
   communicate_by_keyboard_cable = false;
   communicate_by_tcp = false;
@@ -313,6 +326,7 @@ centre::~centre()
   f.close();
   save_settings("default");
   save_macros();
+  if(serial_port_fd>0) close(serial_port_fd);
 }
 
 void centre::increase_count(int to_add)
@@ -352,6 +366,33 @@ void centre::read_tcp_socket()
   cout<<"start read_tcp_socket\n";
   tcp_input_array_p -> clear();
   *tcp_input_array_p = tcp_socket_p->readAll();
+}
+/*
+void centre::read_serial_port()
+{
+//  cout<<"centre::read_serial_port() "<<endl;
+  unsigned char c=0;
+  if(read(serial_port_fd, &c, 1) > 0)
+  {
+//    cout<<"centre::read_serial_port().  c = "<<c<<endl;
+    emit char_from_serial_port(QChar(c));
+  }
+}
+*/
+void centre::read_serial_port()
+{
+//  cout<<"centre::read_serial_port() "<<endl;
+  unsigned char str[50];
+  memset(str, 0, sizeof(str));
+  if(read(serial_port_fd, str, 9) > 0)
+  {
+    cout<<"centre::read_serial_port().  str = "<<str<<endl;
+    for(unsigned int i=0; i<sizeof(str); ++i)
+    {
+      if(str[i] == 0) break;
+      emit char_from_serial_port(str[i]);
+    }
+  }
 }
 
 void centre::run()
@@ -504,7 +545,7 @@ void centre::run()
       case 42: screen_p=new tcp_client_server_addr_entry(this); break;
       case 50: screen_p=new batch_macro_type_choice(this, batch_mode_driver_p); break;
       case 60: screen_p=new slave_mode_screen(this, batch_mode_driver_p); break;
-//      case : screen_p=new (this); break;
+      case 61: screen_p=new serial_port_setup(this); break;
 //      case : screen_p=new (this); break;
 //      case : screen_p=new (this); break;
       case 100 : screen_p=new keyboard(this); break;
@@ -906,6 +947,10 @@ void centre::communicate_out(char type)//'t'->totalize.  'p'->batch pack.  'd'->
   {
     tcp_write(out_string);
   }
+  if(communicate_by_serial_port==true)
+  {
+    serial_port_write(out_string);
+  }
 }
 
 screen::screen(centre* set_centre_p)
@@ -1080,6 +1125,76 @@ void centre::tcp_write(QString string)
 {
   QByteArray array = string.toLatin1();
   tcp_socket_p->write(string.toLatin1());
+}
+
+void centre::setup_serial_communications(int baud_rate)//assumes serial port cable is attached
+{
+  communicate_by_keyboard_cable = false;
+  communicate_by_tcp = false;
+  communicate_by_serial_port = true;
+
+  termios_p = new termios;
+  memset(termios_p,0,sizeof(*termios_p));
+  termios_p->c_iflag=0;
+  termios_p->c_oflag=0;
+  termios_p->c_cflag=CS8|CREAD|CLOCAL;
+  termios_p->c_lflag=0;
+  termios_p->c_cc[VMIN]=1;
+  termios_p->c_cc[VTIME]=5;
+  
+  if(serial_port_fd>=0)
+  {
+    close(serial_port_fd);
+  }
+  serial_port_fd = open("/dev/ttyACM0", O_RDWR | O_NONBLOCK);
+  if(serial_port_fd<0) cout<<"serial port opening error\n";
+  
+  if(baud_rate == 9600)
+  {
+    cout<<"set 9600 baud\n";
+    cfsetospeed(termios_p,B9600);          
+    cfsetispeed(termios_p,B9600);          
+  }
+  if(baud_rate == 19200)
+  {
+    cfsetospeed(termios_p,B19200);          
+    cfsetispeed(termios_p,B19200);          
+  }
+  if(baud_rate == 38400)
+  {
+    cfsetospeed(termios_p,B38400);          
+    cfsetispeed(termios_p,B38400);          
+  }
+  if(baud_rate == 57600)
+  {
+    cfsetospeed(termios_p,B57600);          
+    cfsetispeed(termios_p,B57600);          
+  }
+  if(baud_rate == 115200)
+  {
+    cfsetospeed(termios_p,B115200);          
+    cfsetispeed(termios_p,B115200);          
+  }
+  tcsetattr(serial_port_fd,TCSANOW,termios_p);
+}
+
+void centre::serial_port_write(QString str)
+{
+  char cstring[100];
+  memset(cstring, 0, sizeof(cstring));
+  strcpy(cstring, str.toLatin1());
+  /*
+  for(int i=0; i<100; ++i)
+  {
+    cout<<"cstring["<<i<<"] = "<<cstring[i]<<"   number "<<int(cstring[i])<<endl;
+    if(cstring[i] == 0) break;
+  }
+  cout<<"sizeof(str.toLatin1) "<<sizeof(str.toLatin1())<<endl;
+  cout<<"sizeof(cstring) "<<sizeof(cstring)<<endl;
+  */
+//  int res = write(serial_port_fd, str.toLatin1(), sizeof(str.toLatin1()));
+  int res = write(serial_port_fd, cstring, str.size());
+  if(res<0) cout<<"write error\n";
 }
 
 int centre::number_of_macros()
