@@ -339,7 +339,11 @@ void batch::pack_collected(int count_to_record)
   barcode_line_p->setFocus();
   centre_p->pack_count_str = QString::number(count_to_record);
   
-  if(batch_mode_driver_p->substitute_seed_lot==false)
+  if(centre_p->windows_printer_tcp_connection && centre_p->communicate_by_tcp)	//2020_12_17
+  {																				//
+	  centre_p->windows_printer_tcp_write();									//
+  }																				//
+  else if(batch_mode_driver_p->substitute_seed_lot==false)
   {
     centre_p -> communicate_out('p');
   }

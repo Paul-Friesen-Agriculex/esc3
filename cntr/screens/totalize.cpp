@@ -387,7 +387,16 @@ void totalize::run()
     centre_p->seed_type_str = centre_p->crops[0].name;
 
     centre_p -> communicate_out('t');
-
+    /*if(centre_p -> tcp_socket_p)				//2020_12_14		//needs more logic
+    {											//
+		centre_p -> windows_tcp_write();		//
+	}											//*/
+	
+	if(centre_p->windows_printer_tcp_connection && centre_p->communicate_by_tcp)	//2020_12_17	
+	{																				//
+		centre_p->windows_printer_tcp_write(); 										//
+	}																				//
+	
     table_p->save_file(QString("settings/totalize_backup"));
   }
 

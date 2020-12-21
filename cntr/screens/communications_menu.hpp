@@ -26,10 +26,10 @@ class communications_menu : public screen
   void function_as_server_1_clicked();
   void function_as_server_2_clicked();
   void function_as_client_clicked();
-  void communicate_by_serial_port_clicked();
   void help_button_clicked();
   void ok_button_clicked();
   void connection_detected();
+  void windows_tcp_button_clicked();  //2020_12_08
 
   private:
   button* back_button_p;
@@ -37,9 +37,9 @@ class communications_menu : public screen
   button* function_as_server_1_button_p;
   button* function_as_server_2_button_p;
   button* function_as_client_button_p;
-  button* communicate_by_serial_port_button_p;
   button* help_button_p;
   button* ok_button_p;
+  button* windows_tcp_button_p; //2020_12_08
   QLabel* message_p;
   help_screen* help_screen_p;
 

@@ -42,8 +42,7 @@ class start_screen : public screen
   QGridLayout* shutdownbox_layout_p;
   QGroupBox* modebox_p;
   QGroupBox* shutdownbox_p;
-  QGridLayout* main_layout_p;
-  
+  QGridLayout* main_layout_p;  
   help_screen* help_screen_p;
 };
 #endif

@@ -27,7 +27,6 @@ class QTcpServer;
 class QTcpSocket;
 class QApplication;
 class QByteArray;
-struct termios;
 
 const int screen_wait_list_size=10;
 
@@ -50,11 +49,9 @@ class centre : public QObject
   void get_cycle_time(int value);
   void tcp_connection_detected();
   void read_tcp_socket();
-  void read_serial_port();
   
   signals:
   void char_from_tcp(QChar tcp_char);
-  void char_from_serial_port(QChar sp_char);
   void set_camera_processing(bool state);
   void playback_line();
   void get_qimage();
@@ -79,7 +76,6 @@ class centre : public QObject
   feeder* feeder_p;
   brother_envelope_feeder* brother_envelope_feeder_p;
   QTimer* run_timer_p;
-  QTimer* serial_port_timer_p;
   screen* screen_p;
   int previous_screen_list[10];
   int previous_screen_index;
@@ -101,7 +97,6 @@ class centre : public QObject
   5 - Unrestricted.
   */
   QByteArray* tcp_input_array_p;
-  termios* termios_p;
   
   public:
   QApplication* application_p;
@@ -155,6 +150,7 @@ class centre : public QObject
   
   bool communicate_by_keyboard_cable;
   bool communicate_by_tcp;
+  bool windows_printer_tcp_connection; //2020_12_17 - Identifier for Windows Label Printing connection
   bool tcp_link_established;
   int network;
   QString tcp_client_server_addr;
@@ -162,17 +158,11 @@ class centre : public QObject
   QTcpSocket* tcp_socket_p;
   QString choose_tcp_network(int choice);//choice 1 -> 192.168.100.1.  choice 2 -> 192.168.200.1.  Empty return -> success.  Error string returned for failure
   void tcp_write(QString string);
-  
-  bool communicate_by_serial_port;
-  void setup_serial_communications(int baud_rate);
-  void serial_port_write(QString string);
-  QString serial_port_read();
-  int serial_port_fd;
-  int baud_rate;
+  void windows_printer_tcp_write();	//2020_12_14
   
   //batch mode
   bool block_endgate_opening;//true prevents endgate from opening.  Used if barcode test fails in batch.
-  
+	
   //playback
   QImage qimage;
   

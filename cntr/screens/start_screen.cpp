@@ -21,6 +21,7 @@ start_screen::start_screen(centre* set_centre_p)
   slave_mode_button_p = new button("Slave Mode");
   eject_memory_sticks_button_p = new button("Safely remove memory sticks");
   shutdown_button_p = new button("Shut Down");
+  shutdown_button_p -> setStyleSheet("button { background-color: red }");  //2020_12_09
   help_button_p = new button("Help");
 //  exit_button_p = new button("Exit Program");
   
@@ -165,9 +166,12 @@ void start_screen::help_button_clicked()
 
 void start_screen::shutdown()
 {
-  centre_p->~centre();
-  centre_p->application_p->exit(1);
+  //centre_p->~centre();                //2020_12_09
+  //centre_p->application_p->exit(1);   //2020_12_09
+  
+  cout << "Shutdown temporarily disabled." << endl; //2020_12_09
 }
+
 /*
 void start_screen::exit_program()
 {
