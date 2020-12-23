@@ -31,6 +31,9 @@ cutgate::~cutgate()
 void cutgate::open()
 {
   if( (state==CUTGATE_OPEN) || (state==CUTGATE_OPENING) ) return;
+
+  cout<<"new cutgate::open\n";
+  
   if(closing==true)
   {
     cout<<"cutgate opened while closing\n";
@@ -50,6 +53,9 @@ void cutgate::open()
 void cutgate::close()
 {
   if( (state==CUTGATE_CLOSED) || (state==CUTGATE_CLOSING) ) return;
+
+  cout<<"new cutgate::close\n";
+  
   if(opening==true)
   {
     cout<<"cutgate closed while opening\n";

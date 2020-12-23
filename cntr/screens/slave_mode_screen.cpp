@@ -100,7 +100,7 @@ slave_mode_screen::slave_mode_screen(centre*set_centre_p, batch_mode_driver* set
 
   if(centre_p->communicate_by_serial_port == true)
   {
-    connection_message_p->setText("Serial port addapter cable detected.\nReady to communicate");
+    connection_message_p->setText("Serial port adapter cable detected.\nReady to communicate");
   }
   
   timer_p = new QTimer;
@@ -448,11 +448,18 @@ void slave_mode_screen::run()
   {
     if(end_gate_filling == true)
     {
+      cout<<"  *end_gate_filling == true\n";
       end_gate_filling = false;
       end_gate_full = true;
+      if(centre_p->get_endgate_state() == ENDGATE_OPEN)
+      {
+        end_gate_full = false;
+        end_gate_opened_full = true;
+      }
     }
     else if(end_gate_full == true)
     {
+      cout<<"  *end_gate_full == true\n";
       if(centre_p->get_endgate_state() == ENDGATE_OPEN)
       {
         end_gate_full = false;
@@ -461,6 +468,7 @@ void slave_mode_screen::run()
     }
     else if(end_gate_opened_full == true)
     {
+      cout<<"  *end_gate_opened_full == true\n";
       if(centre_p->get_endgate_state() == ENDGATE_CLOSED)
       {
         end_gate_opened_full = false;

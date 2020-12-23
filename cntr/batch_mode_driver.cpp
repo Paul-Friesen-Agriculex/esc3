@@ -766,7 +766,11 @@ void batch_mode_driver::run()
       }
       cutgate_p -> close();
       centre_p->block_endgate_opening = !pack_barcode_ok;
+
+
       if( (old_pack_present==true) && (pack_present==false) && (pack_barcode_ok==true) )
+
+
       {
         emit pack_collected(pack_ready_count_limit);
         pack_barcode_ok = false;
@@ -865,6 +869,7 @@ void batch_mode_driver::run()
       }
       cutgate_p -> close();
       centre_p->block_endgate_opening = !pack_barcode_ok;
+//      cout<<"   **mode wait_for_pack.  pack_complete = "<<pack_complete<<endl;
       if(pack_complete==true) 
       {
         emit pack_collected(pack_ready_count_limit);
