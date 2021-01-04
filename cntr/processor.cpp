@@ -18,6 +18,7 @@
 #include <QtMath>         //Trig., Sqrt., Pow functions
 #include <QtAlgorithms>	  //for list qSort function
 #include <stdio.h>	      //for using eof in filestream
+//#include <unistd.h>       //for sleep
 
 using namespace std;
 
@@ -57,9 +58,12 @@ static const int calibration_seed_number = 50;		//------------------------------
 
 processor::processor()
 {
-//  valid_start = 130;
-//  valid_end = 1920;//ignore pixels outside valid range
   
+//  SK_STOPGRABBING(0);
+//  SK_CLOSECAMERA(0);
+//  SK_UNLOADDLL();
+//  sleep(10);
+
   int result;
   if(SK_LOADDLL() != SK_RESULT_OK)
   {

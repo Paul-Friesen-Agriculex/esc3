@@ -8,7 +8,8 @@ class button;
 class QGridLayout;
 class QGroupBox;
 class QVBoxLayout;
-class QLabel;
+//class QLabel;
+class message_box;
 class QDir;
 class QStringList;
 
@@ -34,7 +35,8 @@ class program_choice : public screen
   void back_clicked();
   
   private:
-  QLabel* message_p;
+//  QLabel* message_p;
+  message_box* message_p;
   button* choice1_p;
   button* choice2_p;
   button* choice3_p;

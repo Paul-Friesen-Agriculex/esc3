@@ -29,6 +29,9 @@ void barcode_line::keyPressEvent(QKeyEvent* event)
 batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
  :screen(set_centre_p)
 {
+  
+  cout<<"batch::batch 0\n";
+  
   batch_mode_driver_p = set_batch_mode_driver_p;
 
   if (centre_p->crops[0].calibrated == false) 
@@ -298,6 +301,9 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
         
   repeat_pack_window_p = 0;
   repeat_pack_window_exists = false;
+  
+  cout<<"batch::batch end\n";
+  
 }
 
 batch::~batch()

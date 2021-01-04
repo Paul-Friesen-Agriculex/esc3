@@ -169,6 +169,8 @@ class centre : public QObject
   QString serial_port_read();
   int serial_port_fd;
   int baud_rate;
+  QString serial_port_name;
+  bool serial_port_opened;
   
   //batch mode
   bool block_endgate_opening;//true prevents endgate from opening.  Used if barcode test fails in batch.

@@ -112,6 +112,7 @@ void enter_program::back_clicked()
 
 void enter_program::number_entered(int value)
 {
+  if(value<=0) return;
   if(enter_flag == 'p')
   {
 //    bm_set_p = new bm_set;

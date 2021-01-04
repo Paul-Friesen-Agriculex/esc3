@@ -73,36 +73,42 @@ crop_choice::crop_choice(centre*set_centre_p)
 
 void crop_choice::choice1_clicked()
 {
+  if(choice1_p->text() == "") return;
   centre_p->select_crop(first_crop_displayed);
   centre_p->screen_done=true;
 }
 
 void crop_choice::choice2_clicked()
 {
+  if(choice2_p->text() == "") return;
   centre_p->select_crop(first_crop_displayed+1);
   centre_p->screen_done=true;
 }
 
 void crop_choice::choice3_clicked()
 {
+  if(choice3_p->text() == "") return;
   centre_p->select_crop(first_crop_displayed+2);
   centre_p->screen_done=true;
 }
 
 void crop_choice::choice4_clicked()
 {
+  if(choice4_p->text() == "") return;
   centre_p->select_crop(first_crop_displayed+3);
   centre_p->screen_done=true;
 }
 
 void crop_choice::choice5_clicked()
 {
+  if(choice5_p->text() == "") return;
   centre_p->select_crop(first_crop_displayed+4);
   centre_p->screen_done=true;
 }
 
 void crop_choice::choice6_clicked()
 {
+  if(choice6_p->text() == "") return;
   centre_p->select_crop(first_crop_displayed+5);
   centre_p->screen_done=true;
 }

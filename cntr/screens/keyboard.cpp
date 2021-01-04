@@ -39,16 +39,16 @@ keyboard::keyboard(centre* set_centre_p)
   top_box_layout_p->addWidget(back_button_p,0,1);
   top_box_p->setLayout(top_box_layout_p);
   
-  n1_key_p=new kb_key("1");
-  n2_key_p=new kb_key("2");
-  n3_key_p=new kb_key("3");
-  n4_key_p=new kb_key("4");
-  n5_key_p=new kb_key("5");
-  n6_key_p=new kb_key("6");
-  n7_key_p=new kb_key("7");
-  n8_key_p=new kb_key("8");
-  n9_key_p=new kb_key("9");
-  n0_key_p=new kb_key("0");
+  n1_key_p=new kb_key(",\n1");
+  n2_key_p=new kb_key(".\n2");
+  n3_key_p=new kb_key("?\n3");
+  n4_key_p=new kb_key("!\n4");
+  n5_key_p=new kb_key(":\n5");
+  n6_key_p=new kb_key(";\n6");
+  n7_key_p=new kb_key("@\n7");
+  n8_key_p=new kb_key("#\n8");
+  n9_key_p=new kb_key("(\n9");
+  n0_key_p=new kb_key(")\n0");
   Q_key_p=new kb_key("Q");
   W_key_p=new kb_key("W");
   E_key_p=new kb_key("E");
@@ -79,48 +79,51 @@ keyboard::keyboard(centre* set_centre_p)
   space_key_p-> setMinimumSize(130,65);
   enter_key_p=new kb_key("OK");
   backspace_key_p=new kb_key("<-X");
+  shift_key_p=new QPushButton("S\nH\nI\nF\nT");
+  shift_key_p-> setMinimumSize(40,200);
   
   key_box_p=new QGroupBox;
   key_box_layout_p=new QGridLayout;
-  key_box_layout_p->addWidget(n1_key_p, 0, 0);
-  key_box_layout_p->addWidget(n2_key_p, 0, 1);
-  key_box_layout_p->addWidget(n3_key_p, 0, 2);
-  key_box_layout_p->addWidget(n4_key_p, 0, 3);
-  key_box_layout_p->addWidget(n5_key_p, 0, 4);
-  key_box_layout_p->addWidget(n6_key_p, 0, 5);
-  key_box_layout_p->addWidget(n7_key_p, 0, 6);
-  key_box_layout_p->addWidget(n8_key_p, 0, 7);
-  key_box_layout_p->addWidget(n9_key_p, 0, 8);
-  key_box_layout_p->addWidget(n0_key_p, 0, 9);
-  key_box_layout_p->addWidget(Q_key_p, 1, 0);
-  key_box_layout_p->addWidget(W_key_p, 1, 1);
-  key_box_layout_p->addWidget(E_key_p, 1, 2);
-  key_box_layout_p->addWidget(R_key_p, 1, 3);
-  key_box_layout_p->addWidget(T_key_p, 1, 4);
-  key_box_layout_p->addWidget(Y_key_p, 1, 5);
-  key_box_layout_p->addWidget(U_key_p, 1, 6);
-  key_box_layout_p->addWidget(I_key_p, 1, 7);
-  key_box_layout_p->addWidget(O_key_p, 1, 8);
-  key_box_layout_p->addWidget(P_key_p, 1, 9);
-  key_box_layout_p->addWidget(A_key_p, 2, 0);
-  key_box_layout_p->addWidget(S_key_p, 2, 1);
-  key_box_layout_p->addWidget(D_key_p, 2, 2);
-  key_box_layout_p->addWidget(F_key_p, 2, 3);
-  key_box_layout_p->addWidget(G_key_p, 2, 4);
-  key_box_layout_p->addWidget(H_key_p, 2, 5);
-  key_box_layout_p->addWidget(J_key_p, 2, 6);
-  key_box_layout_p->addWidget(K_key_p, 2, 7);
-  key_box_layout_p->addWidget(L_key_p, 2, 8);
-  key_box_layout_p->addWidget(backspace_key_p, 2, 9);
-  key_box_layout_p->addWidget(Z_key_p, 3, 0);
-  key_box_layout_p->addWidget(X_key_p, 3, 1);
-  key_box_layout_p->addWidget(C_key_p, 3, 2);
-  key_box_layout_p->addWidget(V_key_p, 3, 3);
-  key_box_layout_p->addWidget(space_key_p, 3, 4, 1, 2);
-  key_box_layout_p->addWidget(B_key_p, 3, 6);
-  key_box_layout_p->addWidget(N_key_p, 3, 7);
-  key_box_layout_p->addWidget(M_key_p, 3, 8);
-  key_box_layout_p->addWidget(enter_key_p, 3, 9);
+  key_box_layout_p->addWidget(n1_key_p, 0, 1);
+  key_box_layout_p->addWidget(n2_key_p, 0, 2);
+  key_box_layout_p->addWidget(n3_key_p, 0, 3);
+  key_box_layout_p->addWidget(n4_key_p, 0, 4);
+  key_box_layout_p->addWidget(n5_key_p, 0, 5);
+  key_box_layout_p->addWidget(n6_key_p, 0, 6);
+  key_box_layout_p->addWidget(n7_key_p, 0, 7);
+  key_box_layout_p->addWidget(n8_key_p, 0, 8);
+  key_box_layout_p->addWidget(n9_key_p, 0, 9);
+  key_box_layout_p->addWidget(n0_key_p, 0, 10);
+  key_box_layout_p->addWidget(Q_key_p, 1, 1);
+  key_box_layout_p->addWidget(W_key_p, 1, 2);
+  key_box_layout_p->addWidget(E_key_p, 1, 3);
+  key_box_layout_p->addWidget(R_key_p, 1, 4);
+  key_box_layout_p->addWidget(T_key_p, 1, 5);
+  key_box_layout_p->addWidget(Y_key_p, 1, 6);
+  key_box_layout_p->addWidget(U_key_p, 1, 7);
+  key_box_layout_p->addWidget(I_key_p, 1, 8);
+  key_box_layout_p->addWidget(O_key_p, 1, 9);
+  key_box_layout_p->addWidget(P_key_p, 1, 10);
+  key_box_layout_p->addWidget(A_key_p, 2, 1);
+  key_box_layout_p->addWidget(S_key_p, 2, 2);
+  key_box_layout_p->addWidget(D_key_p, 2, 3);
+  key_box_layout_p->addWidget(F_key_p, 2, 4);
+  key_box_layout_p->addWidget(G_key_p, 2, 5);
+  key_box_layout_p->addWidget(H_key_p, 2, 6);
+  key_box_layout_p->addWidget(J_key_p, 2, 7);
+  key_box_layout_p->addWidget(K_key_p, 2, 8);
+  key_box_layout_p->addWidget(L_key_p, 2, 9);
+  key_box_layout_p->addWidget(backspace_key_p, 2, 10);
+  key_box_layout_p->addWidget(Z_key_p, 3, 1);
+  key_box_layout_p->addWidget(X_key_p, 3, 2);
+  key_box_layout_p->addWidget(C_key_p, 3, 3);
+  key_box_layout_p->addWidget(V_key_p, 3, 4);
+  key_box_layout_p->addWidget(space_key_p, 3, 5, 1, 2);
+  key_box_layout_p->addWidget(B_key_p, 3, 7);
+  key_box_layout_p->addWidget(N_key_p, 3, 8);
+  key_box_layout_p->addWidget(M_key_p, 3, 9);
+  key_box_layout_p->addWidget(enter_key_p, 3, 10);
+  key_box_layout_p->addWidget(shift_key_p, 0, 0, 4, 1);
 
   key_box_p->setLayout(key_box_layout_p);
   
@@ -171,6 +174,7 @@ keyboard::keyboard(centre* set_centre_p)
   connect(N_key_p, SIGNAL(clicked()), this, SLOT(N_clicked()));
   connect(M_key_p, SIGNAL(clicked()), this, SLOT(M_clicked()));
   connect(enter_key_p, SIGNAL(clicked()), this, SLOT(enter_clicked()));
+  connect(shift_key_p, SIGNAL(clicked()), this, SLOT(shift_clicked()));
   
   connect(this, SIGNAL(external_keyboard_enter()), enter_key_p, SIGNAL(clicked()));
 
@@ -180,6 +184,7 @@ keyboard::keyboard(centre* set_centre_p)
   }
   entry_line_display_p -> setStyleSheet( "font-size: 15pt;");
   
+  shift_active = false;
   setFocus();
 }
 
@@ -191,193 +196,267 @@ void keyboard::back_clicked()
 
 void keyboard::n1_clicked()
 {
-  entry_line_p->append("1");
+  if(shift_active) entry_line_p->append(",");
+  else entry_line_p->append("1");
   entry_line_display_p->setText(*entry_line_p);
+  shift_active = false;
 }
 void keyboard::n2_clicked()
 {
-  entry_line_p->append("2");
+  if(shift_active) entry_line_p->append(".");
+  else entry_line_p->append("2");
   entry_line_display_p->setText(*entry_line_p);
+  shift_active = false;
 }
 void keyboard::n3_clicked()
 {
-  entry_line_p->append("3");
+  if(shift_active) entry_line_p->append("?");
+  else entry_line_p->append("3");
   entry_line_display_p->setText(*entry_line_p);
+  shift_active = false;
 }
 void keyboard::n4_clicked()
 {
-  entry_line_p->append("4");
+  if(shift_active) entry_line_p->append("!");
+  else entry_line_p->append("4");
   entry_line_display_p->setText(*entry_line_p);
+  shift_active = false;
 }
 void keyboard::n5_clicked()
 {
-  entry_line_p->append("5");
+  if(shift_active) entry_line_p->append(":");
+  else entry_line_p->append("5");
   entry_line_display_p->setText(*entry_line_p);
+  shift_active = false;
 }
 void keyboard::n6_clicked()
 {
-  entry_line_p->append("6");
+  if(shift_active) entry_line_p->append(";");
+  else entry_line_p->append("6");
   entry_line_display_p->setText(*entry_line_p);
+  shift_active = false;
 }
 void keyboard::n7_clicked()
 {
-  entry_line_p->append("7");
+  if(shift_active) entry_line_p->append("@");
+  else entry_line_p->append("7");
   entry_line_display_p->setText(*entry_line_p);
+  shift_active = false;
 }
 void keyboard::n8_clicked()
 {
-  entry_line_p->append("8");
+  if(shift_active) entry_line_p->append("#");
+  else entry_line_p->append("8");
   entry_line_display_p->setText(*entry_line_p);
+  shift_active = false;
 }
 void keyboard::n9_clicked()
 {
-  entry_line_p->append("9");
+  if(shift_active) entry_line_p->append("(");
+  else entry_line_p->append("9");
   entry_line_display_p->setText(*entry_line_p);
+  shift_active = false;
 }
 void keyboard::n0_clicked()
 {
-  entry_line_p->append("0");
+  if(shift_active) entry_line_p->append(")");
+  else entry_line_p->append("0");
   entry_line_display_p->setText(*entry_line_p);
+  shift_active = false;
 }
 void keyboard::Q_clicked()
 {
-  entry_line_p->append("Q");
+  if(shift_active) entry_line_p->append("Q");
+  else entry_line_p->append("q");
   entry_line_display_p->setText(*entry_line_p);
+  shift_active = false;
 }
 void keyboard::W_clicked()
 {
-  entry_line_p->append("W");
+  if(shift_active) entry_line_p->append("W");
+  else entry_line_p->append("w");
   entry_line_display_p->setText(*entry_line_p);
+  shift_active = false;
 }
 void keyboard::E_clicked()
 {
-  entry_line_p->append("E");
+  if(shift_active) entry_line_p->append("E");
+  else entry_line_p->append("e");
   entry_line_display_p->setText(*entry_line_p);
+  shift_active = false;
 }
 void keyboard::R_clicked()
 {
-  entry_line_p->append("R");
+  if(shift_active) entry_line_p->append("R");
+  else entry_line_p->append("r");
   entry_line_display_p->setText(*entry_line_p);
+  shift_active = false;
 }
 void keyboard::T_clicked()
 {
-  entry_line_p->append("T");
+  if(shift_active) entry_line_p->append("T");
+  else entry_line_p->append("t");
   entry_line_display_p->setText(*entry_line_p);
+  shift_active = false;
 }
 void keyboard::Y_clicked()
 {
-  entry_line_p->append("Y");
+  if(shift_active) entry_line_p->append("Y");
+  else entry_line_p->append("y");
   entry_line_display_p->setText(*entry_line_p);
+  shift_active = false;
 }
 void keyboard::U_clicked()
 {
-  entry_line_p->append("U");
+  if(shift_active) entry_line_p->append("U");
+  else entry_line_p->append("u");
   entry_line_display_p->setText(*entry_line_p);
+  shift_active = false;
 }
 void keyboard::I_clicked()
 {
-  entry_line_p->append("I");
+  if(shift_active) entry_line_p->append("I");
+  else entry_line_p->append("i");
   entry_line_display_p->setText(*entry_line_p);
+  shift_active = false;
 }
 void keyboard::O_clicked()
 {
-  entry_line_p->append("O");
+  if(shift_active) entry_line_p->append("O");
+  else entry_line_p->append("o");
   entry_line_display_p->setText(*entry_line_p);
+  shift_active = false;
 }
 void keyboard::P_clicked()
 {
-  entry_line_p->append("P");
+  if(shift_active) entry_line_p->append("P");
+  else entry_line_p->append("p");
   entry_line_display_p->setText(*entry_line_p);
+  shift_active = false;
 }
 void keyboard::A_clicked()
 {
-  entry_line_p->append("A");
+  if(shift_active) entry_line_p->append("A");
+  else entry_line_p->append("a");
   entry_line_display_p->setText(*entry_line_p);
+  shift_active = false;
 }
 void keyboard::S_clicked()
 {
-  entry_line_p->append("S");
+  if(shift_active) entry_line_p->append("S");
+  else entry_line_p->append("s");
   entry_line_display_p->setText(*entry_line_p);
+  shift_active = false;
 }
 void keyboard::D_clicked()
 {
-  entry_line_p->append("D");
+  if(shift_active) entry_line_p->append("D");
+  else entry_line_p->append("d");
   entry_line_display_p->setText(*entry_line_p);
+  shift_active = false;
 }
 void keyboard::F_clicked()
 {
-  entry_line_p->append("F");
+  if(shift_active) entry_line_p->append("F");
+  else entry_line_p->append("f");
   entry_line_display_p->setText(*entry_line_p);
+  shift_active = false;
 }
 void keyboard::G_clicked()
 {
-  entry_line_p->append("G");
+  if(shift_active) entry_line_p->append("G");
+  else entry_line_p->append("g");
   entry_line_display_p->setText(*entry_line_p);
+  shift_active = false;
 }
 void keyboard::H_clicked()
 {
-  entry_line_p->append("H");
+  if(shift_active) entry_line_p->append("H");
+  else entry_line_p->append("h");
   entry_line_display_p->setText(*entry_line_p);
+  shift_active = false;
 }
 void keyboard::J_clicked()
 {
-  entry_line_p->append("J");
+  if(shift_active) entry_line_p->append("J");
+  else entry_line_p->append("j");
   entry_line_display_p->setText(*entry_line_p);
+  shift_active = false;
 }
 void keyboard::K_clicked()
 {
-  entry_line_p->append("K");
+  if(shift_active) entry_line_p->append("K");
+  else entry_line_p->append("k");
   entry_line_display_p->setText(*entry_line_p);
+  shift_active = false;
 }
 void keyboard::L_clicked()
 {
-  entry_line_p->append("L");
+  if(shift_active) entry_line_p->append("L");
+  else entry_line_p->append("l");
   entry_line_display_p->setText(*entry_line_p);
+  shift_active = false;
 }
 void keyboard::backspace_clicked()
 {
   entry_line_p->chop(1);
   entry_line_display_p->setText(*entry_line_p);
+  shift_active = false;
 }
 void keyboard::Z_clicked()
 {
-  entry_line_p->append("Z");
+  if(shift_active) entry_line_p->append("Z");
+  else entry_line_p->append("z");
   entry_line_display_p->setText(*entry_line_p);
+  shift_active = false;
 }
 void keyboard::X_clicked()
 {
-  entry_line_p->append("X");
+  if(shift_active) entry_line_p->append("X");
+  else entry_line_p->append("x");
   entry_line_display_p->setText(*entry_line_p);
+  shift_active = false;
 }
 void keyboard::C_clicked()
 {
-  entry_line_p->append("C");
+  if(shift_active) entry_line_p->append("C");
+  else entry_line_p->append("c");
   entry_line_display_p->setText(*entry_line_p);
+  shift_active = false;
 }
 void keyboard::V_clicked()
 {
-  entry_line_p->append("V");
+  if(shift_active) entry_line_p->append("V");
+  else entry_line_p->append("v");
   entry_line_display_p->setText(*entry_line_p);
+  shift_active = false;
 }
 void keyboard::space_clicked()
 {
   entry_line_p->append(" ");
   entry_line_display_p->setText(*entry_line_p);
+  shift_active = false;
 }
 void keyboard::B_clicked()
 {
-  entry_line_p->append("B");
+  if(shift_active) entry_line_p->append("B");
+  else entry_line_p->append("b");
   entry_line_display_p->setText(*entry_line_p);
+  shift_active = false;
 }
 void keyboard::N_clicked()
 {
-  entry_line_p->append("N");
+  if(shift_active) entry_line_p->append("N");
+  else entry_line_p->append("n");
   entry_line_display_p->setText(*entry_line_p);
+  shift_active = false;
 }
 void keyboard::M_clicked()
 {
-  entry_line_p->append("M");
+  if(shift_active) entry_line_p->append("M");
+  else entry_line_p->append("m");
   entry_line_display_p->setText(*entry_line_p);
+  shift_active = false;
 }
 
 void keyboard::enter_clicked()
@@ -389,9 +468,15 @@ void keyboard::enter_clicked()
   centre_p->keyboard_return_string.clear();
   centre_p->keyboard_return_string.append(*entry_line_p);
   centre_p->screen_done = true;//go to waiting screen
+  shift_active = false;
   
   cout<<"end keyboard::enter_clicked.  keyboard_return_string = "<<centre_p->keyboard_return_string.toStdString()<<endl;
   
+}
+
+void keyboard::shift_clicked()
+{
+  shift_active = true;
 }
 
 void keyboard::keyPressEvent(QKeyEvent* event)

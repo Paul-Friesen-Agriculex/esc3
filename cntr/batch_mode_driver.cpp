@@ -31,8 +31,8 @@ batch_mode_driver::batch_mode_driver(centre* centre_p_s, cutgate* cutgate_p_s)
   current_count_limit = -1;//negative value indicates that it has not been set.
   
   //batch options
-  require_seed_lot_barcode = true;
-  require_pack_barcode = true;
+  require_seed_lot_barcode = false;
+  require_pack_barcode = false;
   pack_match_lot = true;
   pack_contain_lot = false;
   lot_contain_pack = false;

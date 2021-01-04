@@ -74,6 +74,7 @@ class keyboard : public screen
   
   void enter_clicked();
   void backspace_clicked();
+  void shift_clicked();
   
   signals:
   void external_keyboard_enter();
@@ -87,7 +88,7 @@ class keyboard : public screen
   button* back_button_p;
   QPushButton* enter_key_p;
   QString* out_string_p;
-  
+  bool shift_active;//shift key was pressed
   
   
   virtual void keyPressEvent(QKeyEvent* event) Q_DECL_OVERRIDE;
@@ -134,6 +135,7 @@ class keyboard : public screen
   kb_key* M_key_p;
   kb_key* backspace_key_p;
   QPushButton* space_key_p;
+  QPushButton* shift_key_p;
   
   
   

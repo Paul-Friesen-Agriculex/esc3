@@ -108,6 +108,7 @@ centre::centre():
   serial_port_timer_p->start(50);
   serial_port_fd = 0;
   baud_rate = 9600;
+  serial_port_opened = false;
 }
 
 void centre::init()
@@ -170,12 +171,13 @@ void centre::init()
   }
 
   ifstream f("crop_file");
-  char name_string[30];
+  char name_string[100];
   
   for(int i=0;i<100;++i)
   {
-    f.getline(name_string,29);
+    f.getline(name_string,99);
     crops[i].name = QString(name_string);
+//    cout<<"loaded crop "<<name_string<<endl;
     f>>crops[i].sensitivity;
     f>>crops[i].gate_setting;
     f>>crops[i].area_mean;
@@ -308,7 +310,10 @@ centre::~centre()
   int i;
   for(i=0;i<100;++i)
   {
-    f<<(crops[i].name).toStdString()<<"\n";
+    QString crop_name = crops[i].name;
+    crop_name.truncate(98);//ensure name is not too long for file loading routine
+    f<<crop_name.toStdString()<<"\n";
+//    cout<<"saved crop "<<(crops[i].name).toStdString()<<endl;
     f<<crops[i].sensitivity<<" ";
     f<<crops[i].gate_setting<<" ";
     f<<crops[i].area_mean<<" ";
@@ -585,6 +590,8 @@ bool centre::save_settings(QString file_name)
   fset<<batch_mode_driver_p->bm_last_table_filename.toStdString()<<endl;
   fset<<communicate_by_keyboard_cable<<endl;
   fset<<communicate_by_tcp<<endl;
+  fset<<baud_rate<<endl;
+  fset<<serial_port_name.toStdString()<<endl;
 
   fset.close();
   return true;
@@ -637,6 +644,12 @@ bool centre::load_settings(QString file_name)
   
   fset.getline(input, 100);
   communicate_by_tcp = atoi(input);
+  
+  fset.getline(input, 100);
+  baud_rate = atoi(input);
+
+  fset.getline(input, 100);
+  serial_port_name = QString(input);
   
   fset.close();
   return true;
@@ -1129,6 +1142,7 @@ void centre::tcp_write(QString string)
 
 void centre::setup_serial_communications(int baud_rate)//assumes serial port cable is attached
 {
+  QString full_port_name = QString("/dev/") + serial_port_name;
   communicate_by_keyboard_cable = false;
   communicate_by_tcp = false;
   communicate_by_serial_port = true;
@@ -1146,8 +1160,17 @@ void centre::setup_serial_communications(int baud_rate)//assumes serial port cab
   {
     close(serial_port_fd);
   }
-  serial_port_fd = open("/dev/ttyACM0", O_RDWR | O_NONBLOCK);
-  if(serial_port_fd<0) cout<<"serial port opening error\n";
+//  serial_port_fd = open("/dev/ttyACM0", O_RDWR | O_NONBLOCK);
+  serial_port_fd = open(full_port_name.toLatin1(), O_RDWR | O_NONBLOCK);
+  if(serial_port_fd<0)
+  {
+    cout<<"serial port opening error\n";
+    serial_port_opened = false;
+  }
+  else
+  {
+    serial_port_opened = true;
+  }
   
   if(baud_rate == 9600)
   {

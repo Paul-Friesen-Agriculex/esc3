@@ -22,6 +22,7 @@ class serial_port_setup : public screen
   private slots:
   void back_button_clicked();
   void done_button_clicked();
+  void serial_port_name_button_clicked();
 
   private:
   button* back_button_p;
@@ -30,6 +31,8 @@ class serial_port_setup : public screen
   QRadioButton* b38400_p;
   QRadioButton* b57600_p;
   QRadioButton* b115200_p;
+  QLabel* serial_port_name_label_p;
+  button* serial_port_name_button_p;
   button* done_button_p;
 
   QLabel* message_p;

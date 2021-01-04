@@ -2,12 +2,13 @@
 #include <QGridLayout>
 #include <QVBoxLayout>
 #include <QGroupBox>
-#include <QLabel>
+//#include <QLabel>
 #include <QDir>
 #include "centre.hpp"
 #include "program_choice.hpp"
 #include "button.hpp"
 #include "batch_mode_driver.hpp"
+#include "message_box.hpp"
 
 using namespace std;
 
@@ -31,7 +32,10 @@ program_choice::program_choice(centre*set_centre_p, batch_mode_driver* batch_mod
   add_program_p=new button("Add a program");
   delete_program_p=new button("Delete a program");
   back_p=new button("Back");
-  message_p=new QLabel("Select program");
+//  message_p=new QLabel("Select program");
+  message_p=new message_box;
+  message_p->set_text("Select program");
+  message_p->setMinimumSize(250, 70);
 
   top_box_p=new QGroupBox;
   middle_box_p=new QGroupBox;
@@ -94,6 +98,16 @@ program_choice::program_choice(centre*set_centre_p, batch_mode_driver* batch_mod
   }
   first_program_displayed = 0;
   display_programs();
+  
+  if(centre_p->crops[0].calibrated == false)
+  {
+    QString msg = "Crop ";
+    msg.append(centre_p->crops[0].name);
+    msg.append(" has not been calibrated.\nYou must calibrate it before using.");
+    message_p->set_text(msg);
+    message_p->set_background(255, 0, 0);
+    message_p->set_text_size(20);
+  }
 }
 
 program_choice::~program_choice()
@@ -190,6 +204,7 @@ void program_choice::more_programs_clicked()
 
 void program_choice::add_program_clicked()
 {
+  if(centre_p->crops[0].calibrated == false) return;
   centre_p->add_waiting_screen(14);//enter_program
   batch_mode_driver_p->clear_program();
   batch_mode_driver_p->program_path = "";

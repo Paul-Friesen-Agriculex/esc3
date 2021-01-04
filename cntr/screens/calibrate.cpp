@@ -169,7 +169,8 @@ void calibrate::gateset_clicked()
 
 void calibrate::back_clicked()
 {
-  centre_p->add_waiting_screen(centre_p->get_previous_screen());
+//  centre_p->add_waiting_screen(centre_p->get_previous_screen());
+  centre_p->add_waiting_screen(0);
   
   centre_p->set_speed(0);
   centre_p->count = 0;

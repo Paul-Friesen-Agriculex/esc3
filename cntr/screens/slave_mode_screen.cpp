@@ -214,20 +214,20 @@ void slave_mode_screen::function_as_client_clicked()
 
 void slave_mode_screen::communicate_by_serial_port_clicked()
 {
-  QDir dir("/dev");
-  if(dir.exists("ttyACM0"))
-  {
+//  QDir dir("/dev");
+//  if(dir.exists("ttyACM0"))
+//  {
     centre_p->communicate_by_keyboard_cable = false;
     centre_p->communicate_by_tcp = false;
     centre_p->communicate_by_serial_port = true;
     centre_p->add_waiting_screen(60);//come back here
     centre_p->add_waiting_screen(61);//serial_port_setup
     centre_p->screen_done = true;
-  }
-  else
-  {
-    connection_message_p->setText("No serial port adapter cable.  This is needed for serial port communication.");
-  }
+//  }
+//  else
+//  {
+//    connection_message_p->setText("No serial port adapter cable.  This is needed for serial port communication.");
+//  }
 }  
 
 void slave_mode_screen::help_button_clicked()
