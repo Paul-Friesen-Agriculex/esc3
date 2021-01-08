@@ -25,6 +25,7 @@ enum mode_enum
   slave_mode_entry,
   hi_open,
   low_open,
+  hi_open_pulse,
   gate_delay,
   hi_closed,
   wait_for_endgate_to_close,
@@ -134,7 +135,7 @@ class batch_mode_driver : public QObject
   void restart();//dump out seed and restart program
 
   QString program_path;
-  float count_rate_multiplier;
+//  float count_rate_multiplier;
   int high_feed_speed;
   int low_feed_speed;
   int dump_speed;
@@ -147,12 +148,27 @@ class batch_mode_driver : public QObject
   int pack_ready_count_limit;
   int pack_ready_pack_limit;
   
-  bool discharge_next_packet;
+//  bool discharge_next_packet;
+/*
   int slowdown_count_diff;//seed feeder slows down when count is this many seeds from limit
   bool slowdown_count_diff_set;//if this is false, run function will estimate a default starting value.  Otherwise, the set value will be used.  The set value will be adjusted continuously.
   QTime low_speed_mode_time;
   int stop_count_diff;//will stop feeder if reaches this in mode hi_closed
+  */
   
+  float slowdown_time;//seconds
+  float pulseup_time;//seconds
+  float hipulse_duration;//seconds
+  QTime hipulse_time;
+  int count_rate_old_count;
+  QTime count_rate_time;
+  float count_rate_interval;//seconds
+  float count_rate;//seeds/sec
+  float hi_rate;//measure of count rate expected on high speed
+  int slowdown_count_diff;//seed feeder slows down when count is this many seeds from limit
+  int pulseup_count_diff;//will produce a high speed pulse if count is farther from limit than this
+  int stop_count_diff;//will stop feeder if reaches this in mode hi_closed
+
   bool force_endgate_open;
   
   //batch option flags

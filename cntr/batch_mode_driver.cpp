@@ -14,9 +14,6 @@ batch_mode_driver::batch_mode_driver(centre* centre_p_s, cutgate* cutgate_p_s)
   centre_p = centre_p_s;
   cutgate_p = cutgate_p_s;
   slowdown_count_diff = 0;
-  slowdown_count_diff_set = false;//will be set to true if a value is loaded from file or is estimated by run function.
-    //a true value prevents the run function from estimating a new value from scratch.  It will, however, adjust the value as appropriate.
-  low_speed_mode_time.start();
   pack_present = old_pack_present = false;
   pack_changed = true;
   timer_p = new QTimer;
@@ -73,6 +70,18 @@ batch_mode_driver::batch_mode_driver(centre* centre_p_s, cutgate* cutgate_p_s)
   substitute_seed_lot = false;
   slave_mode = false;
 //  slave_mode_wait = false;
+  
+  slowdown_time = 0.75;
+  pulseup_time = 10.0;
+  hipulse_duration = 0.3;
+  count_rate_old_count = centre_p->count;
+  count_rate_time.start();
+  count_rate_interval = 0.2;
+  count_rate = 0;//seeds/sec
+  hi_rate = 0;
+  slowdown_count_diff = 0;//seed feeder slows down when count is this many seeds from limit
+  pulseup_count_diff = 0;//will produce a high speed pulse if count is farther from limit than this
+  stop_count_diff = 0;//will stop feeder if reaches this in mode hi_closed
   
   //diagnostics
   cout_counter = 0;
@@ -314,6 +323,9 @@ void batch_mode_driver::program_remove_last()
 void batch_mode_driver::start()
 {
   timer_p->start(1);
+  count_rate_old_count = centre_p->count;
+  hipulse_time.start();
+  count_rate_time.start();
 }
 
 void batch_mode_driver::stop()
@@ -492,18 +504,21 @@ void batch_mode_driver::list_program()
 
 void batch_mode_driver::run()
 {
-//  if(slave_mode_wait) return;
-  
-  if(   (slowdown_count_diff_set==false)   &&   (current_count_limit>=0)   )//estimate a starting value for slowdown_count_diff.
-    //a negative value for current_count_limit indicates it has not been set and should not be used
-  {
-    slowdown_count_diff = current_count_limit/10;
-    stop_count_diff = 3*slowdown_count_diff;
-    slowdown_count_diff_set = true;
-  }
-  
   old_pack_present = pack_present;
   pack_present = centre_p->envelope_present;
+  
+  if(count_rate_time.elapsed() > count_rate_interval*1000.0)
+  {
+    int new_count = centre_p->count;
+    float measured_interval = float(count_rate_time.restart()) / 1000.0;//in seconds
+    float inst_count_rate = float(new_count - count_rate_old_count) / measured_interval;//counts/sec
+    if(inst_count_rate >= 0) count_rate = (inst_count_rate+count_rate) / 2.0;
+    count_rate_old_count = new_count;
+    slowdown_count_diff = hi_rate * slowdown_time;
+    pulseup_count_diff = hi_rate * float(low_feed_speed) / float(high_feed_speed) * pulseup_time;
+    stop_count_diff = slowdown_count_diff;
+    cout<<"count_rate = "<<count_rate<<"  slowdown_count_diff = "<<slowdown_count_diff<<"  pulseup_count_diff = "<<pulseup_count_diff<<"  hi_rate = "<<hi_rate<<endl;
+  }
 
   //barcode checking
   if(require_seed_lot_barcode == false)
@@ -619,6 +634,8 @@ void batch_mode_driver::run()
     case hi_open:
       barcode_mode = pack;
       cutgate_p -> open();
+      if(count_rate > hi_rate) hi_rate = count_rate;
+      else hi_rate *= 0.999;
       if(cutgate_p->get_state() ==  CUTGATE_OPEN) //if still opening, keep feeder stopped
       {
         if(centre_p->feed_speed != high_feed_speed)
@@ -629,12 +646,11 @@ void batch_mode_driver::run()
         
         if(   (current_count_limit-centre_p->count) < slowdown_count_diff   )
         {
-          cout<<"current_count_limit = "<<current_count_limit<<endl;
-          cout<<"centre_p->count = "<<centre_p->count<<endl;
-          cout<<"slowdown_count_diff = "<<slowdown_count_diff<<endl;
+//          cout<<"current_count_limit = "<<current_count_limit<<endl;
+//          cout<<"centre_p->count = "<<centre_p->count<<endl;
+//          cout<<"slowdown_count_diff = "<<slowdown_count_diff<<endl;
           mode = low_open;
           cout<<"mode low_open. count "<<centre_p->count<<"\n";
-          low_speed_mode_time.restart();
         }
       }
       
@@ -649,13 +665,19 @@ void batch_mode_driver::run()
       }
       cutgate_p -> open();
       centre_p->block_endgate_opening = !pack_barcode_ok;
+      if(   (current_count_limit-centre_p->count) > pulseup_count_diff   )
+      {
+        hipulse_time.start();
+        mode = hi_open_pulse;
+        cout<<"mode hi_open_pulse. count "<<centre_p->count<<"\n";
+      }
       if(centre_p->count >= current_count_limit)
       {
         centre_p->count = 0;
         mode = gate_delay;
         cout<<"mode gate_delay. count "<<centre_p->count<<"\n";
         cutoff_gate_close_time.restart();
-        
+        /*
         int low_open_ms = low_speed_mode_time.elapsed();
         float desired_low_open_ms = 1500;
         float k = 0.05;//controls convergence speed
@@ -666,8 +688,30 @@ void batch_mode_driver::run()
         if(slowdown_count_diff>max_slowdown_count_diff) slowdown_count_diff = max_slowdown_count_diff;
         stop_count_diff = 4*slowdown_count_diff;
         if(stop_count_diff>current_count_limit/2) stop_count_diff = current_count_limit/2;
+        */
       }
       break;
+    case hi_open_pulse:
+      barcode_mode = pack;
+      if(centre_p->feed_speed != high_feed_speed)
+      {
+        centre_p->set_speed(high_feed_speed);
+      }
+      cutgate_p -> open();
+      centre_p->block_endgate_opening = !pack_barcode_ok;
+      if(float(hipulse_time.elapsed())/1000.0 >= hipulse_duration)
+      {
+        mode = low_open;
+        cout<<"mode low_open. count "<<centre_p->count<<"\n";
+      }
+      if(centre_p->count >= current_count_limit)
+      {
+        centre_p->count = 0;
+        mode = gate_delay;
+        cout<<"mode gate_delay. count "<<centre_p->count<<"\n";
+        cutoff_gate_close_time.restart();
+      }
+      break;  
     case gate_delay:
       barcode_mode = pack;
       if(centre_p->feed_speed != low_feed_speed)
@@ -766,7 +810,8 @@ void batch_mode_driver::run()
       }
       cutgate_p -> close();
       centre_p->block_endgate_opening = !pack_barcode_ok;
-
+      if(count_rate > hi_rate) hi_rate = count_rate;
+      else hi_rate *= 0.999;
 
       if( (old_pack_present==true) && (pack_present==false) && (pack_barcode_ok==true) )
 
@@ -847,9 +892,9 @@ void batch_mode_driver::run()
       break;
     case wait_for_endgate_to_close:
       barcode_mode = pack;
-      if(centre_p->feed_speed != high_feed_speed)
+      if(centre_p->feed_speed != low_feed_speed)
       {
-        centre_p->set_speed(high_feed_speed);
+        centre_p->set_speed(low_feed_speed);
       }
       cutgate_p -> close();
       centre_p->block_endgate_opening = !pack_barcode_ok;
@@ -857,8 +902,17 @@ void batch_mode_driver::run()
       if(endgate_close_counter>=50)
   
       {
-        mode = hi_open;
-        cout<<"mode hi_open. count "<<centre_p->count<<"\n";
+        cout<<"hi_rate = "<<hi_rate<<endl;
+        if(   (current_count_limit-centre_p->count) < slowdown_count_diff   )
+        {
+          mode = low_open;
+          cout<<"mode low_open. count "<<centre_p->count<<"\n";
+        }
+        else
+        {
+          mode = hi_open;
+          cout<<"mode hi_open. count "<<centre_p->count<<"\n";
+        }
       }
       break;
     case wait_for_pack:
