@@ -229,6 +229,7 @@ class batch_mode_driver : public QObject
   void fill_ss_column_pointers();
   QList<int> display_column_numbers;
   QString envelope_layout_path;
+  bool ss_batch_exit_flag;
 
   //saving spreadsheet setup files
   QString bm_save_ss_setup_filename;//new filename just entered.  Set back to blank when file is saved.

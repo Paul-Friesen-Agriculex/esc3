@@ -66,6 +66,7 @@ batch_mode_driver::batch_mode_driver(centre* centre_p_s, cutgate* cutgate_p_s)
   extra_pack_count_limit = 0;
   extra_pack_stored_count_limit = 0;
   extra_pack_finished = false;
+  ss_batch_exit_flag = false;
   
   substitute_seed_lot = false;
   slave_mode = false;
@@ -566,12 +567,18 @@ void batch_mode_driver::run()
             QMessageBox box;
             box.setText(QString("No unfilled rows for seed lot %1. ").arg(seed_lot_barcode));
             QPushButton* rescan_button_p = box.addButton(QString("Rescan"), QMessageBox::ActionRole);
+            QPushButton* exit_button_p = box.addButton(QString("Exit"), QMessageBox::ActionRole);
             QPushButton* dump_button_p = box.addButton(QString("Dump out seed"), QMessageBox::ActionRole);
             box.exec();
             
             if(box.clickedButton() == rescan_button_p)
             {
               seed_lot_barcode_ok = false;
+            }
+            if(box.clickedButton() == exit_button_p)
+            {
+              restart_flag = true;
+              ss_batch_exit_flag = true;
             }
             else if (box.clickedButton() == dump_button_p)
             {
@@ -770,9 +777,15 @@ void batch_mode_driver::run()
         }
         else//use_spreadsheet true
         {
-          ss_first_column_p->data_list[spreadsheet_line_number] = "Y";
+          
+          cout<<"batch_mode_driver::run 1.  spreadsheet_line_number = "<<spreadsheet_line_number<<endl;
+          
+          if(spreadsheet_line_number>=0) ss_first_column_p->data_list[spreadsheet_line_number] = "Y";
           centre_p->pack_count_str = QString::number(current_count_limit);
           spreadsheet_line_number = get_next_spreadsheet_line_number();//cutgate about to close.  spreadsheet_line_number will be line in cutgate.  end_valve_spreadsheet_line_number will be in endgate
+          
+          cout<<"batch_mode_driver::run 2.  spreadsheet_line_number = "<<spreadsheet_line_number<<endl;
+          
           if(spreadsheet_line_number==-1)//-1 value signals no more lines for this seed_lot_barcode
           {
             mode = dump_into_cut_gate;

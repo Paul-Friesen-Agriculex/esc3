@@ -342,7 +342,7 @@ ss_batch::~ss_batch()
   manual_operation_window_p = 0;
 }
 
-void ss_batch::pack_collected(int count_to_record)
+void ss_batch::pack_collected(int)
 {
   if( (end_valve_mode==ss_closed_bad_lot) || (end_valve_mode==ss_open_emptying_bad_lot) ) return;
   refresh_screen();
@@ -363,7 +363,7 @@ void ss_batch::pack_collected(int count_to_record)
   */
 }  
 
-void ss_batch::dump_complete(int dump_count)
+void ss_batch::dump_complete(int)
 {
   end_valve_mode = ss_dump_open_empty;
   barcode_line_p->setFocus();
@@ -509,6 +509,8 @@ void ss_batch::quit_clicked()
 
 void ss_batch::run()
 {
+  if(batch_mode_driver_p->ss_batch_exit_flag == true) quit_clicked();//exit flag can be set by QMessageBox in batch_mode_driver::run
+  
   QString message=QString("Count: %1").arg(centre_p->count);
   count_message_p->setText(message);
   centre_p->processor_display_blobs(false);
