@@ -24,8 +24,9 @@ enum mode_enum
   wait_for_seed_lot_barcode,
   slave_mode_entry,
   hi_open,
-  low_open,
-  hi_open_pulse,
+//  low_open,
+//  hi_open_pulse,
+  ramp_down,
   gate_delay,
   hi_closed,
   wait_for_endgate_to_close,
@@ -159,15 +160,16 @@ class batch_mode_driver : public QObject
   float slowdown_time;//seconds
   float pulseup_time;//seconds
   float hipulse_duration;//seconds
-  QTime hipulse_time;
+//  QTime hipulse_time;
   int count_rate_old_count;
   QTime count_rate_time;
   float count_rate_interval;//seconds
   float count_rate;//seeds/sec
   float hi_rate;//measure of count rate expected on high speed
   int slowdown_count_diff;//seed feeder slows down when count is this many seeds from limit
-  int pulseup_count_diff;//will produce a high speed pulse if count is farther from limit than this
+//  int pulseup_count_diff;//will produce a high speed pulse if count is farther from limit than this
   int stop_count_diff;//will stop feeder if reaches this in mode hi_closed
+  int ramp_down_counter;//used to time ramp speed changes
 
   bool force_endgate_open;
   

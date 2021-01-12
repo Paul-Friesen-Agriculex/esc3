@@ -81,8 +81,9 @@ batch_mode_driver::batch_mode_driver(centre* centre_p_s, cutgate* cutgate_p_s)
   count_rate = 0;//seeds/sec
   hi_rate = 0;
   slowdown_count_diff = 0;//seed feeder slows down when count is this many seeds from limit
-  pulseup_count_diff = 0;//will produce a high speed pulse if count is farther from limit than this
+//  pulseup_count_diff = 0;//will produce a high speed pulse if count is farther from limit than this
   stop_count_diff = 0;//will stop feeder if reaches this in mode hi_closed
+  ramp_down_counter = 0;
   
   //diagnostics
   cout_counter = 0;
@@ -325,7 +326,7 @@ void batch_mode_driver::start()
 {
   timer_p->start(1);
   count_rate_old_count = centre_p->count;
-  hipulse_time.start();
+//  hipulse_time.start();
   count_rate_time.start();
 }
 
@@ -516,9 +517,9 @@ void batch_mode_driver::run()
     if(inst_count_rate >= 0) count_rate = (inst_count_rate+count_rate) / 2.0;
     count_rate_old_count = new_count;
     slowdown_count_diff = hi_rate * slowdown_time;
-    pulseup_count_diff = hi_rate * float(low_feed_speed) / float(high_feed_speed) * pulseup_time;
+//    pulseup_count_diff = hi_rate * float(low_feed_speed) / float(high_feed_speed) * pulseup_time;
     stop_count_diff = slowdown_count_diff;
-    cout<<"count_rate = "<<count_rate<<"  slowdown_count_diff = "<<slowdown_count_diff<<"  pulseup_count_diff = "<<pulseup_count_diff<<"  hi_rate = "<<hi_rate<<endl;
+//    cout<<"count_rate = "<<count_rate<<"  slowdown_count_diff = "<<slowdown_count_diff<<"  hi_rate = "<<hi_rate<<endl;
   }
 
   //barcode checking
@@ -656,69 +657,36 @@ void batch_mode_driver::run()
 //          cout<<"current_count_limit = "<<current_count_limit<<endl;
 //          cout<<"centre_p->count = "<<centre_p->count<<endl;
 //          cout<<"slowdown_count_diff = "<<slowdown_count_diff<<endl;
-          mode = low_open;
-          cout<<"mode low_open. count "<<centre_p->count<<"\n";
+          mode = ramp_down;
+          cout<<"mode ramp_down. count "<<centre_p->count<<"  high_feed_speed = "<<high_feed_speed<<"  low_feed_speed = "<<low_feed_speed<<"\n";
         }
       }
       
       end_valve_spreadsheet_line_number = spreadsheet_line_number;//in spreadsheet mode, spreadsheet_line_number will change
         //when cutgate closes.  end_valve_spreadsheet_line_number will then be line number of sample in end gate
       break;
-    case low_open:
+    case ramp_down:
       barcode_mode = pack;
-      if(centre_p->feed_speed != low_feed_speed)
+      ++ramp_down_counter;
+      if(ramp_down_counter>50)
       {
-        centre_p->set_speed(low_feed_speed);
+        ramp_down_counter = 0;
+        float ramp_speed = low_feed_speed + (high_feed_speed-low_feed_speed)*(current_count_limit-centre_p->count)/slowdown_count_diff;
+        if(ramp_speed < low_feed_speed) ramp_speed = low_feed_speed;
+        centre_p->set_speed(ramp_speed);
+//        cout<<"set ramp speed "<<ramp_speed<<endl;
       }
       cutgate_p -> open();
       centre_p->block_endgate_opening = !pack_barcode_ok;
-      if(   (current_count_limit-centre_p->count) > pulseup_count_diff   )
-      {
-        hipulse_time.start();
-        mode = hi_open_pulse;
-        cout<<"mode hi_open_pulse. count "<<centre_p->count<<"\n";
-      }
       if(centre_p->count >= current_count_limit)
       {
         centre_p->count = 0;
         mode = gate_delay;
         cout<<"mode gate_delay. count "<<centre_p->count<<"\n";
         cutoff_gate_close_time.restart();
-        /*
-        int low_open_ms = low_speed_mode_time.elapsed();
-        float desired_low_open_ms = 1500;
-        float k = 0.05;//controls convergence speed
-        float min_slowdown_count_diff = 0.8*float(slowdown_count_diff);//do not reduce more than 20% at a time
-        float max_slowdown_count_diff = current_count_limit/2;
-        slowdown_count_diff = slowdown_count_diff + k*current_count_limit*(float(desired_low_open_ms-low_open_ms)/desired_low_open_ms);
-        if(slowdown_count_diff<min_slowdown_count_diff) slowdown_count_diff = min_slowdown_count_diff;
-        if(slowdown_count_diff>max_slowdown_count_diff) slowdown_count_diff = max_slowdown_count_diff;
-        stop_count_diff = 4*slowdown_count_diff;
-        if(stop_count_diff>current_count_limit/2) stop_count_diff = current_count_limit/2;
-        */
       }
       break;
-    case hi_open_pulse:
-      barcode_mode = pack;
-      if(centre_p->feed_speed != high_feed_speed)
-      {
-        centre_p->set_speed(high_feed_speed);
-      }
-      cutgate_p -> open();
-      centre_p->block_endgate_opening = !pack_barcode_ok;
-      if(float(hipulse_time.elapsed())/1000.0 >= hipulse_duration)
-      {
-        mode = low_open;
-        cout<<"mode low_open. count "<<centre_p->count<<"\n";
-      }
-      if(centre_p->count >= current_count_limit)
-      {
-        centre_p->count = 0;
-        mode = gate_delay;
-        cout<<"mode gate_delay. count "<<centre_p->count<<"\n";
-        cutoff_gate_close_time.restart();
-      }
-      break;  
+
     case gate_delay:
       barcode_mode = pack;
       if(centre_p->feed_speed != low_feed_speed)
@@ -905,9 +873,9 @@ void batch_mode_driver::run()
       break;
     case wait_for_endgate_to_close:
       barcode_mode = pack;
-      if(centre_p->feed_speed != low_feed_speed)
+      if(centre_p->feed_speed != high_feed_speed)
       {
-        centre_p->set_speed(low_feed_speed);
+        centre_p->set_speed(high_feed_speed);
       }
       cutgate_p -> close();
       centre_p->block_endgate_opening = !pack_barcode_ok;
@@ -918,8 +886,8 @@ void batch_mode_driver::run()
         cout<<"hi_rate = "<<hi_rate<<endl;
         if(   (current_count_limit-centre_p->count) < slowdown_count_diff   )
         {
-          mode = low_open;
-          cout<<"mode low_open. count "<<centre_p->count<<"\n";
+          mode = ramp_down;
+          cout<<"mode ramp_down. count "<<centre_p->count<<"  high_feed_speed = "<<high_feed_speed<<"  low_feed_speed = "<<low_feed_speed<<"\n";
         }
         else
         {
