@@ -183,6 +183,7 @@ class batch_mode_driver : public QObject
   bool record_only;
   bool next_seed_lot_bad;//used to signal count went over limit
   bool pack_complete;//used by batch screen to signal when it is finished
+  bool use_cutgate;
   
   //batch barcode matching data
   barcode_entry_mode barcode_mode;

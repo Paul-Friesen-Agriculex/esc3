@@ -8,6 +8,7 @@ class QGridLayout;
 class QGroupBox;
 class QLabel;
 class QRadioButton;
+class QSpinBox;
 class batch_mode_driver;
 
 class batch_options : public screen
@@ -32,12 +33,19 @@ class batch_options : public screen
   QRadioButton* lot_contain_pack_p;
   QRadioButton* pack_match_spreadsheet_p;
   QRadioButton* record_only_p;
+  QRadioButton* use_cutgate_p;
+  QSpinBox* seed_feeder_stop_allowance_p;
+  QLabel* seed_feeder_stop_allowance_label_p;
+  
   button* back_button_p;
   button* done_button_p;
   button* macro_menu_button_p;
+  button* help_button_p;
   
   QGroupBox* barcode_matching_group_p;
+  QGroupBox* cutgate_option_group_p;
   QGridLayout* barcode_matching_group_layout_p;
+  QGridLayout* cutgate_option_group_layout_p;
   QGridLayout* main_layout_p;
   
   public slots:

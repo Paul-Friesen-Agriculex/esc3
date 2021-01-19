@@ -28,7 +28,7 @@ batch_mode_driver::batch_mode_driver(centre* centre_p_s, cutgate* cutgate_p_s)
   current_count_limit = -1;//negative value indicates that it has not been set.
   
   //batch options
-  require_seed_lot_barcode = false;
+  require_seed_lot_barcode = true;
   require_pack_barcode = false;
   pack_match_lot = true;
   pack_contain_lot = false;
@@ -49,6 +49,8 @@ batch_mode_driver::batch_mode_driver(centre* centre_p_s, cutgate* cutgate_p_s)
   
   force_dump_out = false;
   next_seed_lot_bad = false;
+  pack_complete = false;
+  use_cutgate = true;
 
   use_spreadsheet = false;
   ss_setup_p = new ss_setup;
@@ -518,7 +520,7 @@ void batch_mode_driver::run()
     count_rate_old_count = new_count;
     slowdown_count_diff = hi_rate * slowdown_time;
 //    pulseup_count_diff = hi_rate * float(low_feed_speed) / float(high_feed_speed) * pulseup_time;
-    stop_count_diff = slowdown_count_diff;
+    stop_count_diff = slowdown_count_diff*1.5;
 //    cout<<"count_rate = "<<count_rate<<"  slowdown_count_diff = "<<slowdown_count_diff<<"  hi_rate = "<<hi_rate<<endl;
   }
 
@@ -556,6 +558,7 @@ void batch_mode_driver::run()
       }
       cutgate_p -> open();
       centre_p->block_endgate_opening =  !pack_barcode_ok;
+//      cout<<"mode wait_for_seed_lot_barcode.  seed_lot_barcode_ok = "<<seed_lot_barcode_ok<<"  release_pack = "<<release_pack<<endl;
       if(   (seed_lot_barcode_ok == true)   ||   (release_pack == true)    )
       {
         if(use_spreadsheet == true)
@@ -685,6 +688,8 @@ void batch_mode_driver::run()
         cout<<"mode gate_delay. count "<<centre_p->count<<"\n";
         cutoff_gate_close_time.restart();
       }
+      end_valve_spreadsheet_line_number = spreadsheet_line_number;//in spreadsheet mode, spreadsheet_line_number will change
+        //when cutgate closes.  end_valve_spreadsheet_line_number will then be line number of sample in end gate
       break;
 
     case gate_delay:
@@ -750,6 +755,16 @@ void batch_mode_driver::run()
           
           if(spreadsheet_line_number>=0) ss_first_column_p->data_list[spreadsheet_line_number] = "Y";
           centre_p->pack_count_str = QString::number(current_count_limit);
+          
+          
+          
+          
+//          end_valve_spreadsheet_line_number = spreadsheet_line_number;
+          
+          
+          
+          
+          
           spreadsheet_line_number = get_next_spreadsheet_line_number();//cutgate about to close.  spreadsheet_line_number will be line in cutgate.  end_valve_spreadsheet_line_number will be in endgate
           
           cout<<"batch_mode_driver::run 2.  spreadsheet_line_number = "<<spreadsheet_line_number<<endl;
@@ -1919,6 +1934,7 @@ int batch_mode_driver::get_next_spreadsheet_line_number()//look for next line nu
       ++lines_left_to_fill;
     }
   }
+  cout<<"get_next_spreadsheet_line_number returning "<<ret_val<<endl;
   return(ret_val);
 }
 

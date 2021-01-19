@@ -4,6 +4,7 @@
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QRadioButton>
+#include <QSpinBox>
 #include "batch_mode_driver.hpp"
 
 #include "batch_options.hpp"
@@ -22,13 +23,18 @@ batch_options::batch_options(centre*set_centre_p, batch_mode_driver* set_batch_m
   pack_contain_lot_p = new QRadioButton("Pack barcode must contain seed lot barcode");
   lot_contain_pack_p = new QRadioButton("Seed lot barcode must contain pack barcode");
   record_only_p = new QRadioButton("Record barcodes only - no matching");
+  use_cutgate_p = new QRadioButton("Use cutgate");
+  seed_feeder_stop_allowance_p = new QSpinBox();
+  seed_feeder_stop_allowance_label_p = new QLabel("Seed feeder stop allowance");
   back_button_p = new button("Back");
+  help_button_p = new button("Help");
   done_button_p = new button("Done");
   macro_menu_button_p = new button("Communications Macro Menu");
-
   
   barcode_matching_group_p = new QGroupBox;
   barcode_matching_group_layout_p = new QGridLayout;
+  cutgate_option_group_p = new QGroupBox;
+  cutgate_option_group_layout_p = new QGridLayout;
   main_layout_p = new QGridLayout;
   
   barcode_matching_group_layout_p -> addWidget(pack_match_lot_p,0,0);
@@ -37,12 +43,19 @@ batch_options::batch_options(centre*set_centre_p, batch_mode_driver* set_batch_m
   barcode_matching_group_layout_p -> addWidget(record_only_p,1,1);
   barcode_matching_group_p -> setLayout(barcode_matching_group_layout_p);
   
+  cutgate_option_group_layout_p -> addWidget(use_cutgate_p, 0, 0);
+  cutgate_option_group_layout_p -> addWidget(seed_feeder_stop_allowance_p, 0, 1);
+  cutgate_option_group_layout_p -> addWidget(seed_feeder_stop_allowance_label_p, 1, 1);
+  cutgate_option_group_p -> setLayout(cutgate_option_group_layout_p);
+  
   main_layout_p -> addWidget(require_seed_lot_barcode_p,0,0);
   main_layout_p -> addWidget(require_pack_barcode_p,0,1);
   main_layout_p -> addWidget(back_button_p,0,2);
   main_layout_p -> addWidget(barcode_matching_group_p,1,0,1,3);
-  main_layout_p -> addWidget(done_button_p,2,1);
-  main_layout_p -> addWidget(macro_menu_button_p, 2, 0);
+  main_layout_p -> addWidget(cutgate_option_group_p,2,0,1,3);
+  main_layout_p -> addWidget(help_button_p, 3, 0);
+  main_layout_p -> addWidget(macro_menu_button_p, 3, 1);
+  main_layout_p -> addWidget(done_button_p,3,2);
   setLayout(main_layout_p);
   
   require_seed_lot_barcode_p -> setAutoExclusive(false);
