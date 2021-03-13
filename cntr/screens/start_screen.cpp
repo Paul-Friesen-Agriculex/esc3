@@ -126,6 +126,9 @@ void start_screen::eject_memory_sticks_clicked()
 void start_screen::help_button_clicked()
 {
   help_screen_p = new help_screen;
+//  QRect rect = geometry();
+//  cout<<"rect width = "<<rect.width()<<endl;
+  help_screen_p -> setGeometry(geometry());
   
   help_screen_p -> set_text("TOTALIZE MODE - This counts the number of seeds in existing samples.  "
                             "Counts are stored in a table, which you can save as a .csv file and "
@@ -158,7 +161,13 @@ void start_screen::help_button_clicked()
                             "You can also exit the ESC-3 program, giving access to other features "
                             "of the Linux-based computer that runs it, like the file system.  "
                             "You can hook up a mouse and keyboard, and, if you like, a larger monitor.  "
-                            "Double-click the ESC-3 icon to re-start the ESC-3 program.");
+                            "Double-click the ESC-3 icon to re-start the ESC-3 program.  "
+                            "You can also set up methods for communicating with another computer here.\n\n"
+                            
+                            "SLAVE MODE - This allows control of the ESC-3 by another computer, PLC, or other device.  "
+                            "The other device can send commands to the ESC-3 over an ethernet cable using TCP, "
+                            "or it can use serial port communications.  The serial port option requires a special cable.  "
+                            "The ESC-3 also sends seed counts and the number of packets back to the other device.  ");
   
   help_screen_p -> show();
 }

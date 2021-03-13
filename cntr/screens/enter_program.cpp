@@ -8,6 +8,7 @@
 #include "enter_program.hpp"
 #include "button.hpp"
 #include "keypad.hpp"
+#include "help_screen.hpp"
 
 using namespace std;
 
@@ -147,6 +148,37 @@ void enter_program::number_entered(int value)
 
 void enter_program::help_clicked()
 {
+  help_screen_p = new help_screen;
+  help_screen_p -> setGeometry(geometry());
+  help_screen_p -> set_text(
+    "This screen allows you to set up programs for batch count.  "  
+    "A simple program would have just one line, for example \"4 packs, 100 seeds each.\"  "
+    "With such a program, you would fill the hopper with one seed lot.  "
+    "It would count out 4 packets with 100 seeds in each.  "
+    "It would then automatically dump out the remaining seed, counting it.  "
+    "\n\n"
+    
+    "To set up such a program, just follow the prompts.  "
+    "You will first be asked for the number of seeds, then the number of packs.  "
+    "If that is all you need, touch \"Done.\"  "
+    "\n\n"
+    
+    "You can also set up multiline programs by continuing the above process.  "
+    "For example, you could count 4 packs of 100 seeds, followed by 2 packs of 150 seeds.  "
+    "This would again be followed by an automatic dump.  "
+    "\n\n"
+    
+    "The \"Options\" button allows you to set up barcode options, and gives access to the communications menu.  "
+    "The latter allows you to set up data that can be sent out by the ESC-3 to a computer or other device.  "
+    "\n\n"
+    
+    "After you touch \"Done\", you will be taken to the main batch counting screen.  "
+    "Try out the program.  "
+    "If it is satisfactory, be sure to save it for use next time.  "
+    "This will save any options you select too.  "
+    );
+    
+  help_screen_p -> show();
 }
 
 void enter_program::done_clicked()

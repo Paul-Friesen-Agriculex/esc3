@@ -10,7 +10,7 @@ help_screen::help_screen()
 //  setMaximumSize(800, 470);
 //  setMinimumSize(800, 470);
   
-  setWindowState(Qt::WindowFullScreen);
+//  setWindowState(Qt::WindowFullScreen);
 
 
 

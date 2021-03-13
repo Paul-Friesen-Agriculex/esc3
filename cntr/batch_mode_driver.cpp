@@ -28,9 +28,9 @@ batch_mode_driver::batch_mode_driver(centre* centre_p_s, cutgate* cutgate_p_s)
   current_count_limit = -1;//negative value indicates that it has not been set.
   
   //batch options
-  require_seed_lot_barcode = true;
+  require_seed_lot_barcode = false;
   require_pack_barcode = false;
-  pack_match_lot = true;
+  pack_match_lot = false;
   pack_contain_lot = false;
   lot_contain_pack = false;
   pack_match_spreadsheet = false;
@@ -72,7 +72,6 @@ batch_mode_driver::batch_mode_driver(centre* centre_p_s, cutgate* cutgate_p_s)
   
   substitute_seed_lot = false;
   slave_mode = false;
-//  slave_mode_wait = false;
   
   slowdown_time = 0.75;
   pulseup_time = 10.0;
@@ -83,7 +82,6 @@ batch_mode_driver::batch_mode_driver(centre* centre_p_s, cutgate* cutgate_p_s)
   count_rate = 0;//seeds/sec
   hi_rate = 0;
   slowdown_count_diff = 0;//seed feeder slows down when count is this many seeds from limit
-//  pulseup_count_diff = 0;//will produce a high speed pulse if count is farther from limit than this
   stop_count_diff = 0;//will stop feeder if reaches this in mode hi_closed
   ramp_down_counter = 0;
   
@@ -328,7 +326,6 @@ void batch_mode_driver::start()
 {
   timer_p->start(1);
   count_rate_old_count = centre_p->count;
-//  hipulse_time.start();
   count_rate_time.start();
 }
 
@@ -418,9 +415,6 @@ void batch_mode_driver::load_spreadsheet(QString filename)
     ss_column_p = ss_first_column_p;
     for(int i=0; i<list.size() && i<spreadsheet_number_of_columns; ++i)
     {
-      
-//      cout<<list[i].toStdString()<<endl;
-      
       ss_column_p->data_list.append(list[i]);
       ss_column_p = ss_column_p->next;
     }
@@ -519,9 +513,7 @@ void batch_mode_driver::run()
     if(inst_count_rate >= 0) count_rate = (inst_count_rate+count_rate) / 2.0;
     count_rate_old_count = new_count;
     slowdown_count_diff = hi_rate * slowdown_time;
-//    pulseup_count_diff = hi_rate * float(low_feed_speed) / float(high_feed_speed) * pulseup_time;
-    stop_count_diff = slowdown_count_diff*1.5;
-//    cout<<"count_rate = "<<count_rate<<"  slowdown_count_diff = "<<slowdown_count_diff<<"  hi_rate = "<<hi_rate<<endl;
+    stop_count_diff = slowdown_count_diff*2.0;
   }
 
   //barcode checking
@@ -558,9 +550,11 @@ void batch_mode_driver::run()
       }
       cutgate_p -> open();
       centre_p->block_endgate_opening =  !pack_barcode_ok;
-//      cout<<"mode wait_for_seed_lot_barcode.  seed_lot_barcode_ok = "<<seed_lot_barcode_ok<<"  release_pack = "<<release_pack<<endl;
       if(   (seed_lot_barcode_ok == true)   ||   (release_pack == true)    )
       {
+        
+        cout<<"seed_lot_barcode_ok = "<<seed_lot_barcode_ok<<"   release_pack = "<<release_pack<<endl;
+        
         if(use_spreadsheet == true)
         {
           spreadsheet_line_number = get_next_spreadsheet_line_number();
@@ -657,9 +651,6 @@ void batch_mode_driver::run()
         
         if(   (current_count_limit-centre_p->count) < slowdown_count_diff   )
         {
-//          cout<<"current_count_limit = "<<current_count_limit<<endl;
-//          cout<<"centre_p->count = "<<centre_p->count<<endl;
-//          cout<<"slowdown_count_diff = "<<slowdown_count_diff<<endl;
           mode = ramp_down;
           cout<<"mode ramp_down. count "<<centre_p->count<<"  high_feed_speed = "<<high_feed_speed<<"  low_feed_speed = "<<low_feed_speed<<"\n";
         }
@@ -677,7 +668,6 @@ void batch_mode_driver::run()
         float ramp_speed = low_feed_speed + (high_feed_speed-low_feed_speed)*(current_count_limit-centre_p->count)/slowdown_count_diff;
         if(ramp_speed < low_feed_speed) ramp_speed = low_feed_speed;
         centre_p->set_speed(ramp_speed);
-//        cout<<"set ramp speed "<<ramp_speed<<endl;
       }
       cutgate_p -> open();
       centre_p->block_endgate_opening = !pack_barcode_ok;
@@ -729,7 +719,7 @@ void batch_mode_driver::run()
             if(current_set >= program_size)
             {
               mode = dump_into_cut_gate;
-              cout<<"mode dump_into_cut_gate. count "<<centre_p->count<<"\n";
+              cout<<"current_set >= program_size.  mode dump_into_cut_gate. count "<<centre_p->count<<"\n";
               dump_into_cut_gate_time.restart();
               old_count = centre_p -> count;
               dump_end_qtime.restart();
@@ -755,16 +745,6 @@ void batch_mode_driver::run()
           
           if(spreadsheet_line_number>=0) ss_first_column_p->data_list[spreadsheet_line_number] = "Y";
           centre_p->pack_count_str = QString::number(current_count_limit);
-          
-          
-          
-          
-//          end_valve_spreadsheet_line_number = spreadsheet_line_number;
-          
-          
-          
-          
-          
           spreadsheet_line_number = get_next_spreadsheet_line_number();//cutgate about to close.  spreadsheet_line_number will be line in cutgate.  end_valve_spreadsheet_line_number will be in endgate
           
           cout<<"batch_mode_driver::run 2.  spreadsheet_line_number = "<<spreadsheet_line_number<<endl;
@@ -919,7 +899,6 @@ void batch_mode_driver::run()
       }
       cutgate_p -> close();
       centre_p->block_endgate_opening = !pack_barcode_ok;
-//      cout<<"   **mode wait_for_pack.  pack_complete = "<<pack_complete<<endl;
       if(pack_complete==true) 
       {
         emit pack_collected(pack_ready_count_limit);
@@ -1187,7 +1166,10 @@ void batch_mode_driver::run()
           {
             if(ss_setup_p->dump_count_column >= 0)// -1 value signals not to record
             {
-              ss_dump_count_p -> data_list[end_valve_spreadsheet_line_number] = QString::number(old_count);
+              if(end_valve_spreadsheet_line_number>=0)//may be -1 if previously filled row is scanned
+              {
+                ss_dump_count_p -> data_list[end_valve_spreadsheet_line_number] = QString::number(old_count);
+              }
               centre_p->dump_count_str = QString::number(old_count);
               centre_p->communicate_out('d');
               emit refresh_screen();

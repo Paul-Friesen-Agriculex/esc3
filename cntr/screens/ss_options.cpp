@@ -16,18 +16,18 @@ ss_options::ss_options(centre*set_centre_p, batch_mode_driver* set_batch_mode_dr
   batch_mode_driver_p = set_batch_mode_driver_p;
   
   title_p = new QLabel;
-  require_pack_barcode_p = new QRadioButton("Require pack barcode");
-  pack_match_lot_p = new QRadioButton("Pack barcode must match seed lot barcode");
-  pack_contain_lot_p = new QRadioButton("Pack barcode must contain seed lot barcode");
-  lot_contain_pack_p = new QRadioButton("Seed lot barcode must contain pack barcode");
-  pack_match_spreadsheet_p = new QRadioButton("Pack barcode must match spreadsheet");
+//  require_pack_barcode_p = new QRadioButton("Require pack barcode");
+//  pack_match_lot_p = new QRadioButton("Pack barcode must match seed lot barcode");
+//  pack_contain_lot_p = new QRadioButton("Pack barcode must contain seed lot barcode");
+//  lot_contain_pack_p = new QRadioButton("Seed lot barcode must contain pack barcode");
+//  pack_match_spreadsheet_p = new QRadioButton("Pack barcode must match spreadsheet");
   
   start_on_pack_collect_p = new QRadioButton("Start printing when pack collected");
   start_on_previous_pack_collect_p = new QRadioButton("Start printing when previous pack collected");
   preprint_batch_p = new QRadioButton("Preprint all envelopes when seed lot scanned");
 
   
-  record_only_p = new QRadioButton("Record barcodes only - no matching");
+//  record_only_p = new QRadioButton("Record barcodes only - no matching");
 
   back_button_p = new button("Back");
   envelope_layout_p = new button("Envelope layout");
@@ -35,15 +35,15 @@ ss_options::ss_options(centre*set_centre_p, batch_mode_driver* set_batch_mode_dr
   macro_menu_button_p = new button("Communications Macro Menu");
   done_button_p = new button("Done");
 
-  barcode_matching_group_p = new QGroupBox;
-  barcode_matching_group_layout_p = new QGridLayout;
+//  barcode_matching_group_p = new QGroupBox;
+//  barcode_matching_group_layout_p = new QGridLayout;
   
-  barcode_matching_group_layout_p -> addWidget(pack_match_lot_p, 0, 0);
-  barcode_matching_group_layout_p -> addWidget(pack_contain_lot_p, 1, 0);
-  barcode_matching_group_layout_p -> addWidget(lot_contain_pack_p, 2, 0);
-  barcode_matching_group_layout_p -> addWidget(pack_match_spreadsheet_p, 0, 1);
-  barcode_matching_group_layout_p -> addWidget(record_only_p, 1, 1);
-  barcode_matching_group_p -> setLayout(barcode_matching_group_layout_p);
+//  barcode_matching_group_layout_p -> addWidget(pack_match_lot_p, 0, 0);
+//  barcode_matching_group_layout_p -> addWidget(pack_contain_lot_p, 1, 0);
+//  barcode_matching_group_layout_p -> addWidget(lot_contain_pack_p, 2, 0);
+//  barcode_matching_group_layout_p -> addWidget(pack_match_spreadsheet_p, 0, 1);
+//  barcode_matching_group_layout_p -> addWidget(record_only_p, 1, 1);
+//  barcode_matching_group_p -> setLayout(barcode_matching_group_layout_p);
   
   print_control_group_p = new QGroupBox;
   print_control_group_layout_p = new QGridLayout;
@@ -55,9 +55,9 @@ ss_options::ss_options(centre*set_centre_p, batch_mode_driver* set_batch_mode_dr
   print_control_group_p -> setTitle("Print control");
   
   main_layout_p = new QGridLayout;
-  main_layout_p -> addWidget(require_pack_barcode_p, 0, 0);
+//  main_layout_p -> addWidget(require_pack_barcode_p, 0, 0);
   main_layout_p -> addWidget(back_button_p, 0, 2);
-  main_layout_p -> addWidget(barcode_matching_group_p, 1, 0, 1, 3);
+//  main_layout_p -> addWidget(barcode_matching_group_p, 1, 0, 1, 3);
   main_layout_p -> addWidget(print_control_group_p, 2, 0, 3, 1);
   main_layout_p -> addWidget(envelope_layout_p, 2, 1);
   main_layout_p -> addWidget(column_display_p, 3, 1);
@@ -65,7 +65,7 @@ ss_options::ss_options(centre*set_centre_p, batch_mode_driver* set_batch_mode_dr
   main_layout_p -> addWidget(done_button_p, 3, 2);
   setLayout(main_layout_p);
   
-  require_pack_barcode_p -> setAutoExclusive(false);
+//  require_pack_barcode_p -> setAutoExclusive(false);
   
   connect(back_button_p, SIGNAL(clicked()), this, SLOT(back_button_clicked()));
   connect(start_on_pack_collect_p, SIGNAL(toggled(bool)), this, SLOT(start_on_pack_collect_clicked(bool)));
@@ -76,12 +76,12 @@ ss_options::ss_options(centre*set_centre_p, batch_mode_driver* set_batch_mode_dr
   connect(column_display_p, SIGNAL(clicked()), this, SLOT(column_display_button_clicked()));
   connect(macro_menu_button_p, SIGNAL(clicked()), this, SLOT(macro_menu_button_clicked()));	
 
-  require_pack_barcode_p -> setChecked(batch_mode_driver_p->require_pack_barcode);
-  pack_match_lot_p -> setChecked(batch_mode_driver_p->pack_match_lot);
-  pack_contain_lot_p -> setChecked(batch_mode_driver_p->pack_contain_lot);
-  lot_contain_pack_p -> setChecked(batch_mode_driver_p->lot_contain_pack);
-  pack_match_spreadsheet_p -> setChecked(batch_mode_driver_p->pack_match_spreadsheet);
-  record_only_p -> setChecked(batch_mode_driver_p->record_only);
+//  require_pack_barcode_p -> setChecked(batch_mode_driver_p->require_pack_barcode);
+//  pack_match_lot_p -> setChecked(batch_mode_driver_p->pack_match_lot);
+//  pack_contain_lot_p -> setChecked(batch_mode_driver_p->pack_contain_lot);
+//  lot_contain_pack_p -> setChecked(batch_mode_driver_p->lot_contain_pack);
+//  pack_match_spreadsheet_p -> setChecked(batch_mode_driver_p->pack_match_spreadsheet);
+//  record_only_p -> setChecked(batch_mode_driver_p->record_only);
   
   if(batch_mode_driver_p->print_control_mode == start_on_pack_collect)
   {
@@ -114,12 +114,12 @@ void ss_options::back_button_clicked()
 
 void ss_options::done_button_clicked()
 {
-  batch_mode_driver_p->require_pack_barcode = require_pack_barcode_p->isChecked();
-  batch_mode_driver_p->pack_match_lot = pack_match_lot_p->isChecked();
-  batch_mode_driver_p->pack_contain_lot = pack_contain_lot_p->isChecked();
-  batch_mode_driver_p->lot_contain_pack = lot_contain_pack_p->isChecked();
-  batch_mode_driver_p->pack_match_spreadsheet = pack_match_spreadsheet_p->isChecked();
-  batch_mode_driver_p->record_only = record_only_p->isChecked();
+//  batch_mode_driver_p->require_pack_barcode = require_pack_barcode_p->isChecked();
+//  batch_mode_driver_p->pack_match_lot = pack_match_lot_p->isChecked();
+//  batch_mode_driver_p->pack_contain_lot = pack_contain_lot_p->isChecked();
+//  batch_mode_driver_p->lot_contain_pack = lot_contain_pack_p->isChecked();
+//  batch_mode_driver_p->pack_match_spreadsheet = pack_match_spreadsheet_p->isChecked();
+//  batch_mode_driver_p->record_only = record_only_p->isChecked();
   
   centre_p->screen_done = true;
 }
@@ -132,12 +132,12 @@ void ss_options::envelope_layout_button_clicked()
 
 void ss_options::column_display_button_clicked()
 {
-  batch_mode_driver_p->require_pack_barcode = require_pack_barcode_p->isChecked();
-  batch_mode_driver_p->pack_match_lot = pack_match_lot_p->isChecked();
-  batch_mode_driver_p->pack_contain_lot = pack_contain_lot_p->isChecked();
-  batch_mode_driver_p->lot_contain_pack = lot_contain_pack_p->isChecked();
-  batch_mode_driver_p->pack_match_spreadsheet = pack_match_spreadsheet_p->isChecked();
-  batch_mode_driver_p->record_only = record_only_p->isChecked();
+//  batch_mode_driver_p->require_pack_barcode = require_pack_barcode_p->isChecked();
+//  batch_mode_driver_p->pack_match_lot = pack_match_lot_p->isChecked();
+//  batch_mode_driver_p->pack_contain_lot = pack_contain_lot_p->isChecked();
+//  batch_mode_driver_p->lot_contain_pack = lot_contain_pack_p->isChecked();
+//  batch_mode_driver_p->pack_match_spreadsheet = pack_match_spreadsheet_p->isChecked();
+//  batch_mode_driver_p->record_only = record_only_p->isChecked();
   centre_p -> add_waiting_screen(32);//ss_column_display_options
   centre_p -> screen_done = true;
 }  

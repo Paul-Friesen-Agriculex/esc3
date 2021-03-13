@@ -10,6 +10,7 @@ class QLabel;
 class QRadioButton;
 class QSpinBox;
 class batch_mode_driver;
+class help_screen;
 
 class batch_options : public screen
 {
@@ -20,7 +21,8 @@ class batch_options : public screen
   
   private slots:
   void barcode_switch_toggled(bool checked);
-  void macro_menu_button_clicked();	//TEST~~~
+  void help_button_clicked();
+  void macro_menu_button_clicked();
 
   
   private:
@@ -47,6 +49,8 @@ class batch_options : public screen
   QGridLayout* barcode_matching_group_layout_p;
   QGridLayout* cutgate_option_group_layout_p;
   QGridLayout* main_layout_p;
+  
+  help_screen* help_screen_p;
   
   public slots:
   void done_button_clicked();

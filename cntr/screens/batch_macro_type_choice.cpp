@@ -88,5 +88,6 @@ void batch_macro_type_choice::setup_button_clicked()
 
 void batch_macro_type_choice::done_button_clicked()
 {
+  centre_p->add_waiting_screen(16);//batch_options
   centre_p->screen_done=true;
 }

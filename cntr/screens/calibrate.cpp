@@ -229,7 +229,7 @@ void calibrate::change_speed(int value)
 void calibrate::help_button_clicked()
 {
   help_screen_p = new help_screen;
-  
+  help_screen_p -> setGeometry(geometry());
   help_screen_p -> set_text("The purpose of callibration is to teach the machine what a single seed should look like.  "
                             "It is important to drop the seeds slowly to minimize the chance that two seeds overlap during the process.  "
                             "The machine uses the seed images from the callibration to detect if two or more seed images "

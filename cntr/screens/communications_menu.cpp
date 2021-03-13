@@ -235,13 +235,22 @@ void communications_menu::communicate_by_serial_port_clicked()
 void communications_menu::help_button_clicked()
 {
   help_screen_p = new help_screen;
-  
-  help_screen_p -> set_text("This screen allows you to set up communications with a computer, PLC, etc.  "
-                            "A message can be sent after each sample, containing things like the count, a "
-                            "barcode, or text.  You set up what will be sent in another screen.  Here, you choose the method "
-                            "of connection.\n\n"
+  help_screen_p -> setGeometry(geometry());
+  help_screen_p -> set_text(
+                            "The ESC-3 has 2 basic types of communication.  "
+                            "The first is 1-way communication that can be used in all totalize and batch modes.  "
+                            "This sends out data at various points, in ways that you can control flexibly.  "
+                            "You can set it up from the totalize and batch screens,using the Options button.  "
+                            "The second type of communication is 2-way communication, which allows another device to control the ESC-3.  "
+                            "You set this up using the Slave Mode screen.  "
+                            "\n\n"
+                            
+                            "This screen allows you to choose the method of connection.  "
+                            "\n\n"
                             
                             "COMMUNICATE BY KEYBOARD CABLE - This requires the special keyboard cable from Agriculex.  "
+                            "While it is very easy to set up, it can only be used for 1-way communication.  "
+                            "It cannot be used for slave mode communication.  "
                             "It connects to USB ports on the ESC-3 and the other device.  The two ends of the "
                             "cable function differently, so be sure to connect them as marked.  \n\n"
                             
@@ -249,11 +258,13 @@ void communications_menu::help_button_clicked()
                             "You can see them just by opening up any program that accepts keyboard input on the computer, "
                             "such as a text editor.  You could enter data into a wide variety of programs.  "
                             "You can program tab or enter characters or arrow keys to move around the program on the other computer "
-                            "and enter values in different fields.\n\n"
+                            "and enter values in different fields.  "
+                            "The machine is shipped with a spreadsheet example macro which can enter count and barcode data in a spreadsheet program.  "
+                            "\n\n"
                             
-                            "The other communication options all involve communicating by TCP (transmission control protocol) "
+                            "The next 3 communication options all involve communicating by TCP (transmission control protocol) "
                             "using a connection by ethernet cable.  This requires a program on the other computer "
-                            "capable of communicationg using this method.  The three options all result in the same thing - "
+                            "capable of communicating using this method.  The three options all result in the same thing - "
                             "a TCP link to the other computer.  The options merely control the method by which the link "
                             "is established.\n\n"
                             
@@ -265,8 +276,16 @@ void communications_menu::help_button_clicked()
                             
                             "With all three TCP methods, the result is the same - a TCP connection to the other computer.\n\n"
                             
-                            "NOTE - Do not try to include arrow keys in a macro for use with a TCP connection.  They do "
-                            "not correspond to anything that can be sent by TCP, and will not work properly.  Use them "
+                            "The final communication option is by serial port.  "
+                            "The easiest way to use it is with the serial port cable from Agriculex.  "
+                            "It might well also be possible to use a different USB-serial converter.  "
+                            "Contact Agriculex if you want to attempt this.  "
+                            "NOTE - YOU DO NEED TO USE A USB-SERIAL CONVERTER.  "
+                            "DO NOT TRY TO USE THE 9-PIN CONNECTORS ON THE BACK OF THE ESC-3.  "
+                            "THEY ARE NOT SERIAL PORTS AND MIGHT DAMAGE SERIAL PORT DEVICES.\n\n"
+                            
+                            "NOTE - Do not try to include arrow keys in a macro for use with a TCP or serial port connection.  They do "
+                            "not correspond to anything that can be sent by TCP or serial port, and will not work properly.  Use them "
                             "for keyboard cable communication only.");
   help_screen_p -> show();
 }

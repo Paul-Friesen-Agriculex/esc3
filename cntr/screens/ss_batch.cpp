@@ -247,6 +247,18 @@ ss_batch::ss_batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_drive
   
   manual_operation_window_p = 0;
   manual_operation_window_created = false;
+
+
+
+  batch_mode_driver_p->require_pack_barcode = true;
+  batch_mode_driver_p->require_seed_lot_barcode = true;
+  batch_mode_driver_p->pack_match_lot = false;
+  batch_mode_driver_p->pack_contain_lot = false;
+  batch_mode_driver_p->lot_contain_pack = false;
+  batch_mode_driver_p->pack_match_spreadsheet = true;
+  batch_mode_driver_p->record_only = false;
+
+
   
   batch_mode_driver_p -> use_spreadsheet = true;
   batch_mode_driver_p -> seed_lot_barcode = "";
@@ -261,6 +273,8 @@ ss_batch::ss_batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_drive
   
   barcode_line_p->setFocus();
   batch_mode_driver_p->mode = wait_for_seed_lot_barcode;
+  batch_mode_driver_p->seed_lot_barcode_ok = false;
+
 //  batch_mode_driver_p -> restart();
 
 //  cout<<"end of ss_batch::ss_batch.  spreadsheet_line_number = "<<batch_mode_driver_p->spreadsheet_line_number<<endl;

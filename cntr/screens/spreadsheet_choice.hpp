@@ -11,6 +11,7 @@ class QVBoxLayout;
 class QLabel;
 class QDir;
 class QStringList;
+class help_screen;
 
 class spreadsheet_choice : public screen
 {
@@ -30,6 +31,7 @@ class spreadsheet_choice : public screen
   
   void more_spreadsheets_clicked();
   void back_clicked();
+  void help_clicked();
   
   private:
   QLabel* message_p;
@@ -44,6 +46,7 @@ class spreadsheet_choice : public screen
   button* add_spreadsheet_p;
   button* delete_spreadsheet_p;
   button* back_p;
+  button* help_p;
   
   void display_spreadsheets();
   
@@ -65,5 +68,7 @@ class spreadsheet_choice : public screen
   QDir* dir_p;
   QStringList* spreadsheet_list_p;
   QString spreadsheet_path;
+  
+  help_screen* help_screen_p;
 };
 #endif

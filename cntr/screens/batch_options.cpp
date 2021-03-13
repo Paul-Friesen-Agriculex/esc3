@@ -6,6 +6,7 @@
 #include <QRadioButton>
 #include <QSpinBox>
 #include "batch_mode_driver.hpp"
+#include "help_screen.hpp"
 
 #include "batch_options.hpp"
 
@@ -52,7 +53,7 @@ batch_options::batch_options(centre*set_centre_p, batch_mode_driver* set_batch_m
   main_layout_p -> addWidget(require_pack_barcode_p,0,1);
   main_layout_p -> addWidget(back_button_p,0,2);
   main_layout_p -> addWidget(barcode_matching_group_p,1,0,1,3);
-  main_layout_p -> addWidget(cutgate_option_group_p,2,0,1,3);
+//  main_layout_p -> addWidget(cutgate_option_group_p,2,0,1,3);
   main_layout_p -> addWidget(help_button_p, 3, 0);
   main_layout_p -> addWidget(macro_menu_button_p, 3, 1);
   main_layout_p -> addWidget(done_button_p,3,2);
@@ -63,6 +64,7 @@ batch_options::batch_options(centre*set_centre_p, batch_mode_driver* set_batch_m
   
   connect(done_button_p, SIGNAL(clicked()), this, SLOT(done_button_clicked()));
   connect(back_button_p, SIGNAL(clicked()), this, SLOT(back_button_clicked()));
+  connect(help_button_p, SIGNAL(clicked()), this, SLOT(help_button_clicked()));
   connect(require_seed_lot_barcode_p, SIGNAL(toggled(bool)), this, SLOT(barcode_switch_toggled(bool)));
   connect(require_pack_barcode_p, SIGNAL(toggled(bool)), this, SLOT(barcode_switch_toggled(bool)));
   connect(macro_menu_button_p, SIGNAL(clicked()), this, SLOT(macro_menu_button_clicked()));
@@ -84,6 +86,7 @@ void batch_options::done_button_clicked()
   batch_mode_driver_p->lot_contain_pack = lot_contain_pack_p->isChecked();
   batch_mode_driver_p->record_only = record_only_p->isChecked();
   
+//  centre_p->add_waiting_screen(15);//batch
   centre_p->screen_done = true;
 }
 
@@ -92,6 +95,23 @@ void batch_options::back_button_clicked()
   centre_p->add_waiting_screen(centre_p->get_previous_screen());
   centre_p->screen_done=true;
 }
+
+void batch_options::help_button_clicked()
+{
+  help_screen_p = new help_screen;
+  help_screen_p -> setGeometry(geometry());
+  help_screen_p -> set_text(
+    "This screen allows you to set up barcode checking, to guard against errors in packet filling.  "
+    "If both \"Require seed lot barcode\" and \"Require pack barcode\" are checked, barcode checking is possible.  "
+    "If, for example, you then choose \"Pack barcode must match seed lot barcode\", the user will be prompted to scan a "
+    "barcode for each seed lot.  "
+    "The feeder will not start until a barcode is scanned.  "
+    "For each pack, the user will again be prompted for a barcode.  "
+    "If no barcode is scanned, or if the barcodes do not match, the end gate will not open to discharge the seed until the "
+    "problem is fixed.  ");
+  help_screen_p->show();
+}    
+    
 
 void batch_options::barcode_switch_toggled(bool checked)
 {
@@ -108,7 +128,15 @@ void batch_options::barcode_switch_toggled(bool checked)
 void batch_options::macro_menu_button_clicked()
 {
   cout<<"macro_menu_button_click"<<endl;	//OMIT~~~
-  centre_p->add_waiting_screen(28);//macro_screen
+//  centre_p->add_waiting_screen(28);//macro_screen
+
+  batch_mode_driver_p->require_seed_lot_barcode = require_seed_lot_barcode_p->isChecked();
+  batch_mode_driver_p->require_pack_barcode = require_pack_barcode_p->isChecked();
+  batch_mode_driver_p->pack_match_lot = pack_match_lot_p->isChecked();
+  batch_mode_driver_p->pack_contain_lot = pack_contain_lot_p->isChecked();
+  batch_mode_driver_p->lot_contain_pack = lot_contain_pack_p->isChecked();
+  batch_mode_driver_p->record_only = record_only_p->isChecked();
+
   centre_p->add_waiting_screen(50);//batch_macro_type_choice
   centre_p->screen_done=true;
 }

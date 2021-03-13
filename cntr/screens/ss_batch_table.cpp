@@ -92,13 +92,13 @@ void ss_batch_table::refresh()
   for(int i=0; i<batch_mode_driver_p->spreadsheet_number_of_lines; ++i)
   {
     QColor row_colour(255,255,255);
-    if(batch_mode_driver_p->ss_first_column_p->data_list[i] == "Y")//packet for this row is filled.  colour dark green
+    if(   (batch_mode_driver_p->ss_first_column_p->data_list[i] == "Y")  ||  (batch_mode_driver_p->ss_first_column_p->data_list[i] == "R"))//packet for this row is filled.  colour dark green
     {
       row_colour = QColor(100,230,100);
     }
     if(i==current_row)//colour light green
     {
-      row_colour = QColor(100,255,100);//light green
+      row_colour = QColor(180,255,180);//light green
     }
     for(int j=0; j<number_of_columns; ++j)
     {

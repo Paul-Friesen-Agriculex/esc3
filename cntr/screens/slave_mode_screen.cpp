@@ -28,8 +28,6 @@ using namespace std;
 slave_mode_screen::slave_mode_screen(centre*set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
 :screen(set_centre_p)
 {
-//  cout<<"slave_mode_screen::slave_mode_screen 1\n";
-  
   batch_mode_driver_p = set_batch_mode_driver_p;
   help_screen_p = 0;
   
@@ -69,24 +67,13 @@ slave_mode_screen::slave_mode_screen(centre*set_centre_p, batch_mode_driver* set
   connect(help_button_p, SIGNAL(clicked()), this, SLOT(help_button_clicked()));
   connect(exit_button_p, SIGNAL(clicked()), this, SLOT(exit_button_clicked()));
   connect(centre_p, SIGNAL(tcp_connection_detected_signal()), this, SLOT(connection_detected()));
-//  if(centre_p->communicate_by_tcp)
-//  {
-    connect(centre_p, SIGNAL(char_from_tcp(QChar)), this, SLOT(command_char(QChar)));
-//  }
-//  else if(centre_p->communicate_by_serial_port
-//  {
-    connect(centre_p, SIGNAL(char_from_serial_port(QChar)), this, SLOT(command_char(QChar)));
-//  }
-//  else cout<<"no communication method for slave mode\n";
+  connect(centre_p, SIGNAL(char_from_tcp(QChar)), this, SLOT(command_char(QChar)));
+  connect(centre_p, SIGNAL(char_from_serial_port(QChar)), this, SLOT(command_char(QChar)));
   connect(batch_mode_driver_p, SIGNAL(slave_mode_set_finished()), this, SLOT(command_finished()));
   connect(batch_mode_driver_p, SIGNAL(pack_ready()), this, SLOT(pack_ready()));
   connect(batch_mode_driver_p, SIGNAL(pack_collected(int)), this, SLOT(pack_collected(int)));
   connect(batch_mode_driver_p, SIGNAL(dump_complete(int)), this, SLOT(dump_complete(int)));
   
-//  command_input_mode = wait_start;
-//  command_type_flag = 'X';//invalid
-//  waiting_for_delimiter = false;
-//  int_to_build = 0;
   executing_command_p = 0;
   previous_command_p = 0;
   pack_count = 0;
@@ -214,34 +201,37 @@ void slave_mode_screen::function_as_client_clicked()
 
 void slave_mode_screen::communicate_by_serial_port_clicked()
 {
-//  QDir dir("/dev");
-//  if(dir.exists("ttyACM0"))
-//  {
-    centre_p->communicate_by_keyboard_cable = false;
-    centre_p->communicate_by_tcp = false;
-    centre_p->communicate_by_serial_port = true;
-    centre_p->add_waiting_screen(60);//come back here
-    centre_p->add_waiting_screen(61);//serial_port_setup
-    centre_p->screen_done = true;
-//  }
-//  else
-//  {
-//    connection_message_p->setText("No serial port adapter cable.  This is needed for serial port communication.");
-//  }
+  centre_p->communicate_by_keyboard_cable = false;
+  centre_p->communicate_by_tcp = false;
+  centre_p->communicate_by_serial_port = true;
+  centre_p->add_waiting_screen(60);//come back here
+  centre_p->add_waiting_screen(61);//serial_port_setup
+  centre_p->screen_done = true;
 }  
 
 void slave_mode_screen::help_button_clicked()
 {
   help_screen_p = new help_screen;
-  
-  help_screen_p -> set_text("This screen allows you to set up communications with a computer, PLC, etc.  "
-                            "A message can be sent after each sample, containing things like the count, a "
-                            "barcode, or text.  You set up what will be sent in another screen.  Here, you choose the method "
-                            "of connection.\n\n"
+  help_screen_p -> setGeometry(geometry());
+  help_screen_p -> set_text(
+                            "The ESC-3 has 2 basic types of communication.  "
+                            "The first is 1-way communication that can be used in all totalize and batch modes.  "
+                            "This sends out data at various points, in ways that you can control flexibly.  "
+                            "You can set it up from the totalize and batch screens.  "
+                            "\n\n"
                             
-                            "The other communication options all involve communicating by TCP (transmission control protocol) "
+                            "This screen allows you to set up 2-way communication between the ESC-3 and a computer, PLC, etc.  "
+                            "Commands can be sent from the other device to control the ESC-3.  "
+                            "You can send a command to make the machine count out a series of packets with a "
+                            "different number of seeds in each, for example.  "
+                            "The ESC-3 also sends out data that can be read by the other device.  "
+                            "See the manual for details on the commands to be used and the data sent out. "
+                            "On this screen, you can choose the communication method.  "
+                            "\n\n"
+                            
+                            "The first 3 communication options all involve communicating by TCP (transmission control protocol) "
                             "using a connection by ethernet cable.  This requires a program on the other computer "
-                            "capable of communicationg using this method.  The three options all result in the same thing - "
+                            "capable of communicating using this method.  The three options all result in the same thing - "
                             "a TCP link to the other computer.  The options merely control the method by which the link "
                             "is established.\n\n"
                             
@@ -251,14 +241,20 @@ void slave_mode_screen::help_button_clicked()
                             "FUNCTION AS TCP CLIENT - With this option, the other device must function as a server, and 'listen' "
                             "for a connection from the ESC-3.  You will enter the IP address it will connect to later. \n\n"
                             
-                            "With all three TCP methods, the result is the same - a TCP connection to the other computer.\n\n");
+                            "With all three TCP methods, the result is the same - a TCP connection to the other computer.\n\n"
+                            
+                            "The final communication option is by serial port.  "
+                            "The easiest way to use it is with the serial port cable from Agriculex.  "
+                            "It might well also be possible to use a different USB-serial converter.  "
+                            "Contact Agriculex if you want to attempt this.  "
+                            "NOTE - YOU DO NEED TO USE A USB-SERIAL CONVERTER.  "
+                            "DO NOT TRY TO USE THE 9-PIN CONNECTORS ON THE BACK OF THE ESC-3.  "
+                            "THEY ARE NOT SERIAL PORTS AND MIGHT DAMAGE SERIAL PORT DEVICES.\n\n");
   help_screen_p -> show();
 }
 
 void slave_mode_screen::connection_detected()
 {
-//  cout<<"connection_detected\n";
-
   if(centre_p->network == 1)
   {
     connection_message_p->setText("Connected using address 192.168.100.1");
@@ -280,10 +276,6 @@ void slave_mode_screen::exit_button_clicked()
 
 void slave_mode_screen::command_char(QChar character)
 {
-  
-//  char c = character.toLatin1();
-//  cout<<"char received "<<c<<"   number "<<int(c)<<endl;
-  
   if(character==2)//start of new command
   {
     command_line_string.clear();
@@ -291,21 +283,7 @@ void slave_mode_screen::command_char(QChar character)
   }
   if(character==3)//end of command.  create slave_mode_command from command_line_string and add it to command_p_list for execution.
   {
-    /*
-    cout<<"command_line_string\n";
-    for(int i=0; i<command_line_string.size(); ++i)
-    {
-      cout<<"  command_line_string["<<i<<"] = "<<int(command_line_string[i].toLatin1())<<"  prints "<<command_line_string[i].toLatin1()<<endl;
-    }
-    */
     QStringList list = command_line_string.split(QChar(31));
-    /*
-    cout<<"command received\n";
-    for(int i=0; i<list.size(); ++i)
-    {
-      cout<<"  list["<<i<<"] = "<<list[i].toStdString()<<endl;
-    }
-    */
     new_command_p = new slave_mode_command;
     bool ok=false;
     if(list.size()<2)
@@ -396,7 +374,7 @@ void slave_mode_screen::command_char(QChar character)
       centre_p->set_speed(0);
       batch_mode_driver_p -> high_feed_speed = 0;
       batch_mode_driver_p -> low_feed_speed = 0;
-      batch_mode_driver_p -> dump_speed = 0;
+      batch_mode_driver_p -> dump_speed = 1000;
       batch_mode_driver_p -> current_set = 0;
       batch_mode_driver_p -> current_pack = 0;
       batch_mode_driver_p -> current_count_limit = 0;
@@ -509,7 +487,6 @@ void slave_mode_screen::run()
   else if(centre_p->communicate_by_serial_port)
   {
     centre_p->serial_port_write(QString(array));
-//    cout<<"wrote "<<(QString(array)).toStdString()<< "to serial port\n";
   }
   else cout<<"no communication method for slave mode\n";
   
@@ -652,7 +629,6 @@ void slave_mode_screen::run()
 
 void slave_mode_screen::end_command()
 {
-//  cout<<"start slave_mode_screen::end_command()\n";
   if(previous_command_p != 0)
   {
     delete previous_command_p;
@@ -660,7 +636,6 @@ void slave_mode_screen::end_command()
   previous_command_p = executing_command_p;
   executing_command_p = 0;
   batch_mode_driver_p->slave_mode = false;
-//  cout<<"end slave_mode_screen::end_command()\n";
   return;
 }
 

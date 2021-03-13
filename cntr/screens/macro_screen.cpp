@@ -135,7 +135,7 @@ void macro_screen::ok_button_clicked()
 void macro_screen::help_button_clicked()
 { 
   help_screen_p = new help_screen();
-  			   
+  help_screen_p -> setGeometry(geometry());			   
   if(centre_p->macro_type_for_entry == 0)
   {
     help_screen_p->set_text("The ESC-3 is able to send data to a computer through the USB Communications Cable provided, "

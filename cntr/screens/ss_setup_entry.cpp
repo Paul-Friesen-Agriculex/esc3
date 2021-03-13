@@ -141,11 +141,16 @@ void ss_setup_entry::enter_choice(int column)
   {
     batch_mode_driver_p -> ss_setup_p -> envelope_id_column = column;
     batch_mode_driver_p -> display_column_numbers.append(column);
+    
+    /*
     mode = 'a';
   }
   else if(mode=='a')
   {
     batch_mode_driver_p -> ss_setup_p -> actual_count_column = column;
+    */
+    
+    
     mode = 'p';
   }
   else if(mode=='p')
@@ -211,7 +216,8 @@ void ss_setup_entry::back_clicked()
   }
   if(mode=='p')
   {
-    mode='a';
+    //mode='a';
+    mode = 'e';
   }
   if(mode=='f')
   {

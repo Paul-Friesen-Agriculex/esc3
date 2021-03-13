@@ -14,6 +14,7 @@ class QString;
 class QTextEdit;
 class QTimer;
 class keypad;
+class help_screen;
 
 class enter_program : public screen
 {
@@ -48,5 +49,6 @@ class enter_program : public screen
   char enter_flag;//'p' -> number of packs.  's' -> number of seeds per pack
   int current_packs;
   int current_seeds;
+  help_screen* help_screen_p;
 };
 #endif

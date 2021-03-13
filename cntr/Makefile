@@ -1432,7 +1432,8 @@ program_choice.o: screens/program_choice.cpp centre.hpp \
 		screens/program_choice.hpp \
 		button.hpp \
 		batch_mode_driver.hpp \
-		envelope.hpp
+		envelope.hpp \
+		screens/message_box.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o program_choice.o screens/program_choice.cpp
 
 program_delete.o: screens/program_delete.cpp centre.hpp \

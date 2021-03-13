@@ -8,6 +8,7 @@
 #include "spreadsheet_choice.hpp"
 #include "button.hpp"
 #include "batch_mode_driver.hpp"
+#include "help_screen.hpp"
 
 using namespace std;
 
@@ -25,6 +26,7 @@ spreadsheet_choice::spreadsheet_choice(centre*set_centre_p, batch_mode_driver* b
   choice6_p=new button("");
   more_spreadsheets_p=new button("More spreadsheets");
   back_p=new button("Back");
+  help_p = new button("Help");
   message_p=new QLabel(" \
 Select spreadsheet.\n \
 Spreadsheets must be in CSV format and\n \
@@ -53,7 +55,8 @@ attached to the machine.");
   middle_layout_p->addWidget(choice6_p,2,1);
   middle_box_p->setLayout(middle_layout_p);
   
-  bottom_layout_p->addWidget(more_spreadsheets_p,0,0);
+  bottom_layout_p->addWidget(help_p,0,0);
+  bottom_layout_p->addWidget(more_spreadsheets_p,0,1);
   bottom_box_p->setLayout(bottom_layout_p);
   
   main_layout_p->addWidget(top_box_p);
@@ -70,6 +73,7 @@ attached to the machine.");
   connect(choice6_p, SIGNAL(clicked()), this, SLOT(choice6_clicked()));
   connect(more_spreadsheets_p, SIGNAL(clicked()), this, SLOT(more_spreadsheets_clicked()));
   connect(back_p, SIGNAL(clicked()), this, SLOT(back_clicked()));
+  connect(help_p, SIGNAL(clicked()), this, SLOT(help_clicked()));
   
   first_spreadsheet_displayed = 0;
   spreadsheet_path = "/media/odroid/";
@@ -217,6 +221,62 @@ void spreadsheet_choice::back_clicked()
     centre_p->add_waiting_screen(centre_p->get_previous_screen());
     centre_p->screen_done=true;
   }
+}
+
+void spreadsheet_choice::help_clicked()
+{
+  help_screen_p = new help_screen;
+  help_screen_p -> setGeometry(geometry());
+  help_screen_p -> set_text(
+    "Spreadsheets must be in CSV format and in the root directory of a USB stick attached to the machine."
+    "\n\n"
+    "The top row of the spreadsheet should be column headings.  "
+    "These will be read by the ESC-3 and treated as labels for the data under them.  "
+    "The remaining rows of the spreadsheet each represent one pack to be filled.  "
+    "\n\n"
+    
+    "There must be columns to fill the following roles: "
+    "\n\n"
+    
+    "1 - A column of material identification codes, identifying the seed lot to be used for that packet.  "
+    "This should correspond to barcodes that you will scan to identify the material.  "
+    "Normally, multiple rows will have the same material identification code.  "
+    "They do not need to be together; the program will look for all rows with the same code and fill them from the same source, "
+    "wherever they are located in the spreadsheet.  "
+    "\n\n"
+    
+    "2 - A column of numbers which are the required number of seeds for each packet. "
+    "\n\n"
+    
+    "3 - A column of unique identifiers for each packet.  "
+    "These identifiers should correspond to barcodes on each packet, which you will scan to identify the packet.  "
+    "\n\n"
+    
+    "You can choose columns to fill these roles, so order is not important.  "
+    "You can also choose columns for other optional roles as follows:"
+    "\n\n"
+    
+    "4 - Print time column.  "
+    "If you are printing envelopes or labels with an attached printer, the time of printing will be recorded here.  "
+    "\n\n"
+    
+    "5 - Fill time column.  "
+    "If chosen, the time the envelope was filled will be recorded here.  "
+    "\n\n"
+    
+    "6 - Dump count column.  "
+    "If chosen, the number of seeds dumped after all packets are filled is recorded here.  "
+    "You can use this for inventory purposes.  "
+    "(If you want an accurate count, make sure the dump speed is not set too high.)"
+    "\n\n"
+    
+    "In operation, you scan a material identification code from your seed lot.  "
+    "The program picks all rows from your spreadsheet with that code for filling.  "
+    "After all packets are filled, remaining seed dumps automatically.  "
+    "\n\n"
+    
+    );
+  help_screen_p -> show();
 }
 
 void spreadsheet_choice::display_spreadsheets()
