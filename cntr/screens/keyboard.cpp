@@ -649,6 +649,9 @@ void batch_save_program::enter_clicked()
   cout<<"outfile_name "<<outfile_name.toLatin1().data()<<endl;
   
   batch_mode_driver_p->bm_save_program_filename = outfile_name;
+  
+  batch_mode_driver_p->program_path = outfile_name;//added 2021-03-14 to cause default name to appear if editing a newly entered program
+  
   centre_p->add_waiting_screen(15);//batch
   centre_p->screen_done=true;
   //returning to batch with bm_save_program filename not blank will trigger save.  see batch constructor.

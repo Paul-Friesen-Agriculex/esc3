@@ -108,7 +108,7 @@ class batch_mode_driver : public QObject
   QTime dump_into_end_time;
   static const int dump_into_end_time_limit = 4000;//millisecs. Max time for dumping into end gate
   QTime dump_end_qtime;
-  static const int dump_end_qtime_limit = 2000;//millisecs.  If no change in count for this time, consider dump complete
+  static const int dump_end_qtime_limit = 1000;//millisecs.  If no change in count for this time, consider dump complete
   int old_count;
   int endgate_close_counter;
   QList<bm_set*> program;

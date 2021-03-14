@@ -420,7 +420,7 @@ void centre::run()
   envelope_present = envelope_sensor_p->read();
   brother_envelope_feeder_p -> run();
 
-  if(  (current_screen==5)  ||  (current_screen==60)  )//totalize or slave mode screen
+  if(  (current_screen==5)  ||  (current_screen==15)  ||  (current_screen==60)  )//totalize or batch or slave mode screen
   {
     if(endgate_state == ENDGATE_CLOSED)
     {

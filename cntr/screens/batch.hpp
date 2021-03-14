@@ -21,6 +21,7 @@ class QTimer;
 class QFileDialog;
 class message_box;
 class repeat_pack_window;
+class help_screen;
 
 class barcode_line : public QLineEdit  
 {
@@ -73,6 +74,7 @@ class batch : public screen
   void bad_lot_slot();
   
   private slots:
+  void endgate_clicked();
   void options_clicked();
   void back_clicked();
   void repeat_pack_clicked();
@@ -80,6 +82,7 @@ class batch : public screen
   void substitution_button_clicked();
   void cancel_substitution_button_clicked();
 //  void substitution_barcode_entered(QString);
+  void help_button_clicked();
   void save_program_clicked();
   void save_table_clicked();
   void clear_table_clicked();
@@ -88,6 +91,7 @@ class batch : public screen
   
   private:
   QLabel* count_message_p;
+  button* endgate_button_p;
   button* options_button_p;
   button* back_button_p;
   barcode_line* barcode_line_p;
@@ -103,6 +107,7 @@ class batch : public screen
   QSlider* dump_speed_set_p;
   batch_table* table_p;
   message_box* status_box_p;
+  button* help_button_p;
   button* save_program_button_p;
   button* save_table_button_p;
   button* clear_table_button_p;
@@ -119,6 +124,8 @@ class batch : public screen
   QGridLayout* speed_layout_p;
   QGridLayout* bottom_layout_p;
   QGridLayout* main_layout_p;
+  
+  help_screen* help_screen_p;
   
   bool feeder_is_running;
   ENDGATE_STATE screen_endgate;//state of endgate according to screen control.

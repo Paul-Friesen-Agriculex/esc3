@@ -34,7 +34,7 @@ batch_mode_driver::batch_mode_driver(centre* centre_p_s, cutgate* cutgate_p_s)
   pack_contain_lot = false;
   lot_contain_pack = false;
   pack_match_spreadsheet = false;
-  record_only = false;
+  record_only = true;
   
   barcode_mode = seed_lot;
   seed_lot_barcode_old = true;//need a new scan
@@ -231,7 +231,16 @@ void batch_mode_driver::load_program()//load the program indicated by program_pa
         return;
       }
     }
-
+    else if(line == "totalize_force_endgate_open")
+    {
+      stream.readLineInto(&subline);
+      centre_p->totalize_force_endgate_open = subline.toInt(&conversion_ok_flag);
+      if(conversion_ok_flag==false)
+      {
+        cout<<"failed to convert   "<<subline.toStdString()<<"   to int\n";
+        return;
+      }
+    }
     else
     {
       cout<<"batch_mode_driver::load_program.  data type identifier not found.\n";
@@ -379,6 +388,8 @@ void batch_mode_driver::save_program(QString filename)
   stream<<pack_match_spreadsheet<<endl;
   stream<<"record_only\n";
   stream<<record_only<<endl;
+  stream<<"totalize_force_endgate_open\n";
+  stream<<centre_p->totalize_force_endgate_open<<endl;
 }
 
 void batch_mode_driver::load_spreadsheet(QString filename)
@@ -1190,7 +1201,7 @@ void batch_mode_driver::run()
       }
       cutgate_p -> open();
       centre_p->block_endgate_opening = false;
-      if(centre_p->get_endgate_state()==ENDGATE_CLOSED)
+      if(centre_p->envelope_present==false)//  (centre_p->get_endgate_state()==ENDGATE_CLOSED)
       {
         if(slave_mode) 
         {
@@ -1218,7 +1229,7 @@ void batch_mode_driver::run()
       }
       cutgate_p -> open();
       centre_p->block_endgate_opening = false;
-      if(centre_p->get_endgate_state()==ENDGATE_OPEN)
+      if(centre_p->envelope_present==true)//if(centre_p->get_endgate_state()==ENDGATE_OPEN)
       {
         centre_p->count = 0;
         mode = substitution_wait_for_cleanout_close;
@@ -1233,7 +1244,7 @@ void batch_mode_driver::run()
       }
       cutgate_p -> open();
       centre_p->block_endgate_opening = false;
-      if(centre_p->get_endgate_state()==ENDGATE_CLOSED)
+      if(centre_p->envelope_present==false)//if(centre_p->get_endgate_state()==ENDGATE_CLOSED)
       {
         seed_lot_barcode_ok = false;
         seed_lot_barcode_old = true;
@@ -1263,7 +1274,7 @@ void batch_mode_driver::run()
       }
       cutgate_p -> open();
       centre_p->block_endgate_opening = false;
-      if(centre_p->get_endgate_state()==ENDGATE_OPEN)
+      if(centre_p->envelope_present==true)//if(centre_p->get_endgate_state()==ENDGATE_OPEN)
       {
         centre_p->count = 0;
         mode = cancel_substitution_wait_for_cleanout_close;
@@ -1278,7 +1289,7 @@ void batch_mode_driver::run()
       }
       cutgate_p -> open();
       centre_p->block_endgate_opening = false;
-      if(centre_p->get_endgate_state()==ENDGATE_CLOSED)
+      if(centre_p->envelope_present==false)//if(centre_p->get_endgate_state()==ENDGATE_CLOSED)
       {
         seed_lot_barcode_ok = false;
         seed_lot_barcode_old = true;

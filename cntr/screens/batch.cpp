@@ -11,7 +11,7 @@
 #include "batch.hpp"
 #include "button.hpp"
 #include "message_box.hpp"
-
+#include "help_screen.hpp"
 
 using namespace std;
 
@@ -41,7 +41,11 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
     centre_p->screen_done = true;
     return;
   }
+  
+  cout<<"batch::batch 1\n";
+  
   count_message_p = new QLabel;
+  endgate_button_p = new button("");
   options_button_p = new button("Options");
   back_button_p = new button("Back");
   barcode_line_p = new barcode_line;
@@ -71,6 +75,9 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
   
   //calculate speed slider positions from speed values.  This is needed because the speed values are piecewise linear functions of the slider positions.
   
+  
+  cout<<"batch::batch 2\n";
+  
   int high_speed_value = batch_mode_driver_p->high_feed_speed;
   int high_speed_position;
   if(high_speed_value<=250) high_speed_position = 2*high_speed_value;
@@ -93,11 +100,15 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
   table_p = new batch_table(centre_p, batch_mode_driver_p);
   status_box_p = new message_box;
   status_box_p -> setMinimumSize(250,100);
+  help_button_p = new button("Help");
   save_program_button_p = new button("Save Program");
   save_table_button_p = new button("Save Table");
   clear_table_button_p = new button("Clear Table");
   quit_button_p = new button("Quit");
   barcode_status_p = new message_box;
+  
+  
+  cout<<"batch::batch 3\n";
   
   top_box_p = new QGroupBox;
   control_box_p = new QGroupBox;
@@ -106,39 +117,65 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
   speed_box_p -> setMinimumWidth(300);
   bottom_box_p = new QGroupBox;
     
+  
+  cout<<"batch::batch 3a\n";
+  
   top_layout_p = new QGridLayout;
   control_layout_p = new QGridLayout;
   speed_layout_p = new QGridLayout;
   bottom_layout_p = new QGridLayout;  
   main_layout_p = new QGridLayout;
 
+  
+  cout<<"batch::batch 3b\n";
+  
   top_layout_p -> addWidget(count_message_p, 0, 0);
-  top_layout_p -> addWidget(options_button_p, 0, 1);
-  top_layout_p -> addWidget(back_button_p, 0, 2);
+  top_layout_p -> addWidget(endgate_button_p, 0, 1);
+  top_layout_p -> addWidget(options_button_p, 0, 2);
+  top_layout_p -> addWidget(back_button_p, 0, 3);
+  
+  cout<<"batch::batch 3c\n";
+  
   bottom_layout_p -> addWidget(barcode_line_p, 1, 4); 
   barcode_line_p -> setText("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");  
   barcode_line_p -> clear();  
+  
+  cout<<"batch::batch 3d\n";
+  
   control_layout_p -> addWidget(repeat_pack_button_p, 0, 0);
   control_layout_p -> addWidget(restart_button_p, 0, 1);
   control_layout_p -> addWidget(substitution_button_p, 1, 0);
   control_layout_p -> addWidget(cancel_substitution_button_p, 1, 1);
   control_layout_p -> addWidget(speed_box_p, 2, 0, 1, 2);     
+  
+  cout<<"batch::batch 3e\n";
+  
   speed_layout_p -> addWidget(high_speed_label_p, 0, 0);
   speed_layout_p -> addWidget(high_speed_set_p, 0, 1);
   speed_layout_p -> addWidget(low_speed_label_p, 1, 0);
   speed_layout_p -> addWidget(low_speed_set_p, 1, 1);
   speed_layout_p -> addWidget(dump_speed_label_p, 2, 0);
   speed_layout_p -> addWidget(dump_speed_set_p, 2, 1);
+  
+  cout<<"batch::batch 3f\n";
+  
   bottom_layout_p -> addWidget(status_box_p, 0, 0, 2, 1);
-  bottom_layout_p -> addWidget(save_program_button_p, 0, 2);
-  bottom_layout_p -> addWidget(save_table_button_p, 0, 3);
-  bottom_layout_p -> addWidget(clear_table_button_p, 0, 4);
-  bottom_layout_p -> addWidget(quit_button_p, 0, 5);
+  bottom_layout_p -> addWidget(help_button_p, 0, 2);
+  bottom_layout_p -> addWidget(save_program_button_p, 0, 3);
+  bottom_layout_p -> addWidget(save_table_button_p, 0, 4);
+  bottom_layout_p -> addWidget(clear_table_button_p, 0, 5);
+  bottom_layout_p -> addWidget(quit_button_p, 1, 5);
   bottom_layout_p -> addWidget(barcode_status_p, 1, 2, 1, 3);
+  
+  cout<<"batch::batch 3g\n";
+  
   main_layout_p -> addWidget(top_box_p, 0, 0, 1, 2);
   main_layout_p -> addWidget(control_box_p, 1, 0);
   main_layout_p -> addWidget(table_p, 1, 1);
   main_layout_p -> addWidget(bottom_box_p, 2, 0, 1, 2);
+  
+  
+  cout<<"batch::batch 4\n";
   
   top_box_p -> setLayout(top_layout_p);
   control_box_p -> setLayout(control_layout_p);
@@ -146,6 +183,7 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
   bottom_box_p -> setLayout(bottom_layout_p);
   setLayout(main_layout_p);
   
+  connect(endgate_button_p, SIGNAL(clicked()), this, SLOT(endgate_clicked()));
   connect(options_button_p, SIGNAL(clicked()), this, SLOT(options_clicked()));
   connect(back_button_p, SIGNAL(clicked()), this, SLOT(back_clicked()));
   connect(repeat_pack_button_p, SIGNAL(clicked()), this, SLOT(repeat_pack_clicked()));
@@ -155,6 +193,7 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
   connect(high_speed_set_p, SIGNAL(valueChanged(int)), batch_mode_driver_p, SLOT(set_high_feed_speed(int)));
   connect(low_speed_set_p, SIGNAL(valueChanged(int)), batch_mode_driver_p, SLOT(set_low_feed_speed(int)));
   connect(dump_speed_set_p, SIGNAL(valueChanged(int)), batch_mode_driver_p, SLOT(set_dump_feed_speed(int)));
+  connect(help_button_p, SIGNAL(clicked()), this, SLOT(help_button_clicked()));
   connect(save_program_button_p, SIGNAL(clicked()), this, SLOT(save_program_clicked()));
   connect(save_table_button_p, SIGNAL(clicked()), this, SLOT(save_table_clicked()));
   connect(clear_table_button_p, SIGNAL(clicked()), this, SLOT(clear_table_clicked()));
@@ -164,15 +203,21 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
   connect(batch_mode_driver_p, SIGNAL(pack_barcode_entered(QString)), table_p, SLOT(enter_pack_barcode(QString)));
   connect(low_speed_set_p, SIGNAL(sliderReleased()), this, SLOT(focus_on_barcode()));
 
-  centre_p->set_endgate_state(ENDGATE_CLOSED);
+  
+  cout<<"batch::batch 5\n";
+  
+//  centre_p->set_endgate_state(ENDGATE_CLOSED);
   if(centre_p->totalize_force_endgate_open == true)
   {
     screen_endgate=ENDGATE_OPEN;
+    centre_p->set_endgate_state(ENDGATE_OPEN);
   }
   else
   {
     screen_endgate=ENDGATE_CLOSED;
+    centre_p->set_endgate_state(ENDGATE_CLOSED);
   }
+  endgate_button_p->setText("Hold Endgate\nOpen");
   
   feeder_is_running = true;
   
@@ -182,6 +227,9 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
   
   centre_p->count = 0;
   batch_mode_driver_p->start();
+  
+  
+  cout<<"batch::batch 6\n";
   
   mode = old_mode = wait_for_seed_lot_barcode;
   end_valve_mode = old_end_valve_mode = closed_empty;
@@ -206,6 +254,9 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
   connect(batch_mode_driver_p, SIGNAL(bad_lot_signal()), this, SLOT(bad_lot_slot()));
     
   table_p->load_file("settings/batch_backup");
+  
+  
+  cout<<"batch::batch 7\n";
   
   if(batch_mode_driver_p->bm_save_program_filename != "")//returning from batch_save_program screen with name of file to save
   {
@@ -279,6 +330,9 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
 
     batch_mode_driver_p->bm_save_table_filename = "";
   }
+  
+  cout<<"batch::batch 8\n";
+  
   barcode_line_p->setFocus();
 
   top_layout_p->setContentsMargins(0,0,0,0);        //set layout margins to shrink to designated container dimensions//
@@ -299,6 +353,9 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
         "border: 3px solid black;"          
         "font-size: 20pt;}"); 
         
+  
+  cout<<"batch::batch 9\n";
+  
   repeat_pack_window_p = 0;
   repeat_pack_window_exists = false;
   
@@ -380,6 +437,19 @@ void batch::bad_lot_slot()
   end_valve_mode = closed_bad_lot;
 }
 
+void batch::endgate_clicked()
+{
+  if(centre_p->get_endgate_state()==ENDGATE_OPEN)
+  {
+    screen_endgate = ENDGATE_CLOSED;
+  }
+  else
+  {
+    screen_endgate = ENDGATE_OPEN;
+  }
+  focus_on_barcode();
+}
+
 void batch::options_clicked()
 {
   batch_mode_driver_p -> stop();
@@ -413,7 +483,7 @@ void batch::restart_clicked()
 
 void batch::substitution_button_clicked()
 {
-  if(centre_p->get_endgate_state() == ENDGATE_CLOSED)
+  if(centre_p->envelope_present == false)//if(centre_p->get_endgate_state() == ENDGATE_CLOSED)
   {
     batch_mode_driver_p -> mode = substitution_wait_for_cleanout_open;
     end_valve_mode = substitution_wait_for_cleanout;
@@ -434,7 +504,7 @@ void batch::substitution_button_clicked()
 void batch::cancel_substitution_button_clicked()
 {
   batch_mode_driver_p->current_pack --;
-  if(centre_p->get_endgate_state() == ENDGATE_CLOSED)
+  if(centre_p->envelope_present == false)//if(centre_p->get_endgate_state() == ENDGATE_CLOSED)
   {
     batch_mode_driver_p -> mode = cancel_substitution_wait_for_cleanout_open;
   }
@@ -451,6 +521,45 @@ void batch::cancel_substitution_button_clicked()
   focus_on_barcode();
 }
 
+void batch::help_button_clicked()
+{
+  help_screen_p = new help_screen;
+  help_screen_p -> setGeometry(geometry());
+  help_screen_p -> set_text(
+    "This is the main batch count screen.  "
+    "Batch count programs you defined or chose in other screens run here.  "
+    "\n\n"
+    "The Endgate button controls the operation of the gate that holds seed just above the discharge spout.  "
+    "Under normal operation, this will only open when the envelope sensor is lifted.  "
+    "However, large batches may over-fill the seed holding chamber above the endgate.  "
+    "This is not a problem if you hold a package under the spout for the chamber to discharge into, raising the envelope sensor.  "
+    "However, it may be convenient to keep the endgate open and leave a container under the spout.  "
+    "When the package is finished, change the container.  "
+    "Lift and release the envelope sensor after the container is changed.  "
+    "\n\n"
+    "The \"Options\" button allows you to set up barcode checking and communications.  "
+    "\n\n"
+    "The \"Substitute seed lot\" button is for use if you run out of seed of a particular lot, and need to substitute a different lot.  "
+    "The substitution will be recorded, and you can also control how this is communicated to another computer.  "
+    "\n\n"
+    "You can control the speed of counting.  "
+    "High speed is the speed the turntable will run at when a pack starts.  "
+    "As the pack nears the end, the turntable slows down, with the low speed being the minimum.  "
+    "This is to increase the accuracy of the end point where the cut gate closes.  "
+    "In general, the lower the speed, the more accurate the count.  "
+    "\n\n"
+    "Excessive speed may cause problems.  "
+    "The cut valve may not have time to open fully, resulting in a \"cut gate timing error\".  "
+    "Or the seed may come down so fast that the turntable cannot stop before there is already too much seed in the cut gate chamber.  "
+    "The machine will detect both of these problems and advise you to reduce the speed.  "
+    "\n\n"
+    "Dump speed is the speed the turntable will use while dumping.  "
+    "While the machine can count at very high speeds, you may wish to reduce the dump speed if you need an accurate dump count.  "
+    "You can check how accurate the dump count is by re-counting the dumped seed in totalize mode, using a low speed setting.  "
+    "");
+  help_screen_p->show();
+}    
+    
 void batch::save_program_clicked()
 {
   batch_mode_driver_p -> stop();
@@ -501,6 +610,23 @@ void batch::run()
     .arg(1.0*low_speed_slider_position/10)
     .arg(1.0*dump_speed_slider_position/10));
   speed_box_p -> setTitle(speed_label_string);  
+
+
+
+
+  if(screen_endgate==ENDGATE_OPEN)
+  {
+    centre_p -> totalize_force_endgate_open = true;
+    endgate_button_p->setText("Normal Endgate\nOperation");
+  }
+  else //endgate is closed
+  {      
+    centre_p -> totalize_force_endgate_open = false;
+    endgate_button_p->setText("Hold Endgate\nOpen");
+  }
+
+
+
   
   count = centre_p->count;
 
@@ -517,7 +643,8 @@ void batch::run()
       {
         end_valve_mode = closed_filling;
       }
-      if(centre_p->get_endgate_state() == ENDGATE_OPEN)
+      if(centre_p->envelope_present == true)
+//      if(centre_p->get_endgate_state() == ENDGATE_OPEN)
       {
         end_valve_mode = opened_while_empty;
       }
@@ -527,7 +654,7 @@ void batch::run()
       {
         end_valve_mode = open_pass_through;
       }
-      if(centre_p->get_endgate_state() == ENDGATE_CLOSED)
+      if(centre_p->envelope_present == false)//if(centre_p->get_endgate_state() == ENDGATE_CLOSED)
       {
         end_valve_mode = pack_removed_too_soon;
       }
@@ -537,7 +664,7 @@ void batch::run()
       {
         end_valve_mode = closed_full;
       }
-      if(centre_p->get_endgate_state() == ENDGATE_OPEN)
+      if(centre_p->envelope_present == true)//if(centre_p->get_endgate_state() == ENDGATE_OPEN)
       {
         end_valve_mode = open_pass_through;
       }
@@ -547,18 +674,18 @@ void batch::run()
       {
         cout<<"cutgate opened in end_valve_mode closed_full\n";
       }
-      if(centre_p->get_endgate_state() == ENDGATE_OPEN)
+      if(centre_p->envelope_present == true)//if(centre_p->get_endgate_state() == ENDGATE_OPEN)
       {
         end_valve_mode = open_emptying;
         end_valve_empty_counter = 0;
       }
       break;
     case open_emptying:
-      if(end_valve_empty_counter >= 5)//0.5 sec.
+      if(end_valve_empty_counter >= 2)//0.2 sec.
       {
         end_valve_mode = open_empty;
       }
-      if(centre_p->get_endgate_state() == ENDGATE_CLOSED)
+      if(centre_p->envelope_present == false)//if(centre_p->get_endgate_state() == ENDGATE_CLOSED)
       {
         end_valve_mode = pack_removed_too_soon;
       }
@@ -569,7 +696,7 @@ void batch::run()
         end_valve_mode = open_emptying;
         end_valve_empty_counter = 0;
       }
-      if(centre_p->get_endgate_state() == ENDGATE_CLOSED)
+      if(centre_p->envelope_present == false)//if(centre_p->get_endgate_state() == ENDGATE_CLOSED)
       {
         end_valve_mode = pack_removed_too_soon;
       }
@@ -579,14 +706,30 @@ void batch::run()
       {
         cout<<"cutgate opened in end_valve_mode open_empty\n";
       }
+      /*
       if(centre_p->get_endgate_state() == ENDGATE_CLOSED)
       {
         end_valve_mode = closed_empty;
         batch_mode_driver_p->pack_complete = true;
       }
       break;
+      */
+    
+    
+      if(centre_p->envelope_present == false)
+      {
+        end_valve_mode = closed_empty;
+        batch_mode_driver_p->pack_complete = true;
+      }
+      break;
+    
+    
+    
+    
+    
     case pack_removed_too_soon:
-      if(centre_p->get_endgate_state() == ENDGATE_OPEN)
+      if(centre_p->envelope_present == true)
+//      if(centre_p->get_endgate_state() == ENDGATE_OPEN)
       {
         if(centre_p->cutgate_p->get_state() == CUTGATE_OPEN)
         {
@@ -604,7 +747,7 @@ void batch::run()
       {
         cout<<"cutgate opened in end_valve_mode closed_bad_lot\n";
       }
-      if(centre_p->get_endgate_state() == ENDGATE_OPEN)
+      if(centre_p->envelope_present == true)//if(centre_p->get_endgate_state() == ENDGATE_OPEN)
       {
         end_valve_mode = open_emptying_bad_lot;
       }
@@ -614,7 +757,7 @@ void batch::run()
       {
         cout<<"cutgate opened in end_valve_mode open_emptying_bad_lot\n";
       }
-      if(centre_p->get_endgate_state() == ENDGATE_CLOSED)
+      if(centre_p->envelope_present == false)//if(centre_p->get_endgate_state() == ENDGATE_CLOSED)
       {
         end_valve_mode = closed_empty;
       }
@@ -624,7 +767,7 @@ void batch::run()
       {
         end_valve_mode = dump_closed_filling;
       }
-      if(centre_p->get_endgate_state() == ENDGATE_OPEN)
+      if(centre_p->envelope_present == true)//if(centre_p->get_endgate_state() == ENDGATE_OPEN)
       {
         end_valve_mode = dump_opened_while_empty;
       }
@@ -634,7 +777,7 @@ void batch::run()
       {
         end_valve_mode = dump_pass_through;
       }
-      if(centre_p->get_endgate_state() == ENDGATE_CLOSED)
+      if(centre_p->envelope_present == false)//if(centre_p->get_endgate_state() == ENDGATE_CLOSED)
       {
         end_valve_mode = dump_container_removed_too_soon;
       }
@@ -644,7 +787,7 @@ void batch::run()
       {
         cout<<"cutgate closed in end_valve_mode dump_closed_filling\n";
       }
-      if(centre_p->get_endgate_state() == ENDGATE_OPEN)
+      if(centre_p->envelope_present == true)//if(centre_p->get_endgate_state() == ENDGATE_OPEN)
       {
         end_valve_mode = dump_pass_through;
       }
@@ -654,7 +797,7 @@ void batch::run()
       {
         cout<<"cutgate closed in end_valve_mode dump_pass_through\n";
       }
-      if(centre_p->get_endgate_state() == ENDGATE_CLOSED)
+      if(centre_p->envelope_present == false)//if(centre_p->get_endgate_state() == ENDGATE_CLOSED)
       {
         end_valve_mode = dump_container_removed_too_soon;
       }
@@ -664,17 +807,17 @@ void batch::run()
       {
         cout<<"cutgate closed in end_valve_mode dump_open_empty\n";
       }
-      if(centre_p->get_endgate_state() == ENDGATE_CLOSED)
+      if(centre_p->envelope_present == false)//if(centre_p->get_endgate_state() == ENDGATE_CLOSED)
       {
         end_valve_mode = closed_filling;
       }
       break;
     case dump_container_removed_too_soon:
-      if( (centre_p->cutgate_p->get_state()==CUTGATE_CLOSED) && (centre_p->get_endgate_state()==ENDGATE_OPEN) )
+      if( (centre_p->cutgate_p->get_state()==CUTGATE_CLOSED) && (centre_p->envelope_present == true)  )  //centre_p->get_endgate_state()==ENDGATE_OPEN) )
       {
         end_valve_mode = dump_opened_while_empty;
       }
-      if( (centre_p->cutgate_p->get_state()==CUTGATE_OPEN) && (centre_p->get_endgate_state()==ENDGATE_OPEN) )
+      if( (centre_p->cutgate_p->get_state()==CUTGATE_OPEN) && (centre_p->envelope_present == true)  )  //centre_p->get_endgate_state()==ENDGATE_OPEN) )
       {
         end_valve_mode = dump_pass_through;
       }
