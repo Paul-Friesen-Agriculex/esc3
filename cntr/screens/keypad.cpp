@@ -44,6 +44,8 @@ keypad::keypad()
   enter_button_p = new QPushButton("Enter");
   //enter_button_p -> setMaximumWidth(50);
   enter_button_p -> setMinimumSize(50,50);
+  backspace_button_p = new QPushButton("<-");
+  backspace_button_p -> setMinimumSize(50,50);
   
   layout_p = new QGridLayout;
   layout_p -> addWidget(display_p, 0, 0, 1, 3);
@@ -56,6 +58,7 @@ keypad::keypad()
   layout_p -> addWidget(n1_button_p, 3, 0);
   layout_p -> addWidget(n2_button_p, 3, 1);
   layout_p -> addWidget(n3_button_p, 3, 2);
+  layout_p -> addWidget(backspace_button_p, 4, 0);
   layout_p -> addWidget(n0_button_p, 4, 1);
   layout_p -> addWidget(enter_button_p, 4, 2);
   setLayout(layout_p);
@@ -71,6 +74,7 @@ keypad::keypad()
   connect(n8_button_p, SIGNAL(clicked()), this, SLOT(n8_clicked()));
   connect(n9_button_p, SIGNAL(clicked()), this, SLOT(n9_clicked()));
   connect(enter_button_p, SIGNAL(clicked()), this, SLOT(enter_clicked()));
+  connect(backspace_button_p, SIGNAL(clicked()), this, SLOT(backspace_clicked()));
   
   display_p -> setStyleSheet( "font-size: 15pt;");
 }
@@ -172,4 +176,8 @@ void keypad::enter_clicked()
   display_p->setText(*entry_line_p);
 }
   
-
+void keypad::backspace_clicked()
+{
+  if(!entry_line_p->isEmpty()) entry_line_p->chop(1);
+  display_p->setText(*entry_line_p);
+}

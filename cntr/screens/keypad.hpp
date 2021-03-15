@@ -32,6 +32,7 @@ class keypad:public QWidget
   void n8_clicked();
   void n9_clicked();
   void enter_clicked();
+  void backspace_clicked();
   
   signals:
   void number_entered(int value);
@@ -49,6 +50,7 @@ class keypad:public QWidget
   QPushButton* n8_button_p;
   QPushButton* n9_button_p;
   QPushButton* enter_button_p;
+  QPushButton* backspace_button_p;
   
   QGridLayout* layout_p;
   
