@@ -24,6 +24,7 @@ class tcp_client_server_addr_entry : public screen
   void ok_button_clicked();
   void help_button_clicked();
   void connection_detected();
+  void retrieve_connection_ip();
 
   private:
   button* back_button_p;
@@ -37,7 +38,8 @@ class tcp_client_server_addr_entry : public screen
   button* help_button_p;
 
   QGridLayout* main_layout_p;
-
+  QString default_ip_addr;
+  
 //  centre* centre_p;
 };
 #endif
