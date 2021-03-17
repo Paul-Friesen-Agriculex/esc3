@@ -37,7 +37,7 @@ batch_macro_type_choice::batch_macro_type_choice(centre*set_centre_p, batch_mode
   main_layout_p->addWidget(substitution_macro_button_p, 3, 0);
   main_layout_p->addWidget(substitution_label_p, 3, 1);
   main_layout_p->addWidget(setup_button_p, 4, 1);
-  main_layout_p->addWidget(done_button_p, 5, 2);
+  main_layout_p->addWidget(done_button_p, 5, 1);
   setLayout(main_layout_p);
   
   connect(back_button_p, SIGNAL(clicked()), this, SLOT(back_button_clicked()));

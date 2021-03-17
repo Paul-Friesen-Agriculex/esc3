@@ -614,12 +614,12 @@ void batch::run()
 
 
 
-  if(screen_endgate==ENDGATE_OPEN)
+  if(screen_endgate==ENDGATE_OPEN)//keep endgate open
   {
     centre_p -> totalize_force_endgate_open = true;
     endgate_button_p->setText("Normal Endgate\nOperation");
   }
-  else //endgate is closed
+  else //normal operation
   {      
     centre_p -> totalize_force_endgate_open = false;
     endgate_button_p->setText("Hold Endgate\nOpen");
@@ -635,7 +635,8 @@ void batch::run()
   old_end_valve_mode = end_valve_mode;
   ++end_valve_empty_counter;
   
-  
+  bool valid_pack_present = centre_p->envelope_present;
+  if(centre_p->block_endgate_opening) valid_pack_present = false;
   switch(end_valve_mode)
   {
     case closed_empty:
@@ -643,7 +644,7 @@ void batch::run()
       {
         end_valve_mode = closed_filling;
       }
-      if(centre_p->envelope_present == true)
+      if(valid_pack_present == true)
 //      if(centre_p->get_endgate_state() == ENDGATE_OPEN)
       {
         end_valve_mode = opened_while_empty;
@@ -654,7 +655,7 @@ void batch::run()
       {
         end_valve_mode = open_pass_through;
       }
-      if(centre_p->envelope_present == false)//if(centre_p->get_endgate_state() == ENDGATE_CLOSED)
+      if(valid_pack_present == false)//if(centre_p->get_endgate_state() == ENDGATE_CLOSED)
       {
         end_valve_mode = pack_removed_too_soon;
       }
@@ -664,7 +665,7 @@ void batch::run()
       {
         end_valve_mode = closed_full;
       }
-      if(centre_p->envelope_present == true)//if(centre_p->get_endgate_state() == ENDGATE_OPEN)
+      if(valid_pack_present == true)//if(centre_p->get_endgate_state() == ENDGATE_OPEN)
       {
         end_valve_mode = open_pass_through;
       }
@@ -674,7 +675,7 @@ void batch::run()
       {
         cout<<"cutgate opened in end_valve_mode closed_full\n";
       }
-      if(centre_p->envelope_present == true)//if(centre_p->get_endgate_state() == ENDGATE_OPEN)
+      if(valid_pack_present == true)//if(centre_p->get_endgate_state() == ENDGATE_OPEN)
       {
         end_valve_mode = open_emptying;
         end_valve_empty_counter = 0;
@@ -685,7 +686,7 @@ void batch::run()
       {
         end_valve_mode = open_empty;
       }
-      if(centre_p->envelope_present == false)//if(centre_p->get_endgate_state() == ENDGATE_CLOSED)
+      if(valid_pack_present == false)//if(centre_p->get_endgate_state() == ENDGATE_CLOSED)
       {
         end_valve_mode = pack_removed_too_soon;
       }
@@ -696,7 +697,7 @@ void batch::run()
         end_valve_mode = open_emptying;
         end_valve_empty_counter = 0;
       }
-      if(centre_p->envelope_present == false)//if(centre_p->get_endgate_state() == ENDGATE_CLOSED)
+      if(valid_pack_present == false)//if(centre_p->get_endgate_state() == ENDGATE_CLOSED)
       {
         end_valve_mode = pack_removed_too_soon;
       }
@@ -716,7 +717,7 @@ void batch::run()
       */
     
     
-      if(centre_p->envelope_present == false)
+      if(valid_pack_present == false)
       {
         end_valve_mode = closed_empty;
         batch_mode_driver_p->pack_complete = true;
@@ -728,7 +729,7 @@ void batch::run()
     
     
     case pack_removed_too_soon:
-      if(centre_p->envelope_present == true)
+      if(valid_pack_present == true)
 //      if(centre_p->get_endgate_state() == ENDGATE_OPEN)
       {
         if(centre_p->cutgate_p->get_state() == CUTGATE_OPEN)
@@ -747,7 +748,7 @@ void batch::run()
       {
         cout<<"cutgate opened in end_valve_mode closed_bad_lot\n";
       }
-      if(centre_p->envelope_present == true)//if(centre_p->get_endgate_state() == ENDGATE_OPEN)
+      if(valid_pack_present == true)//if(centre_p->get_endgate_state() == ENDGATE_OPEN)
       {
         end_valve_mode = open_emptying_bad_lot;
       }
@@ -757,7 +758,7 @@ void batch::run()
       {
         cout<<"cutgate opened in end_valve_mode open_emptying_bad_lot\n";
       }
-      if(centre_p->envelope_present == false)//if(centre_p->get_endgate_state() == ENDGATE_CLOSED)
+      if(valid_pack_present == false)//if(centre_p->get_endgate_state() == ENDGATE_CLOSED)
       {
         end_valve_mode = closed_empty;
       }
@@ -767,7 +768,7 @@ void batch::run()
       {
         end_valve_mode = dump_closed_filling;
       }
-      if(centre_p->envelope_present == true)//if(centre_p->get_endgate_state() == ENDGATE_OPEN)
+      if(valid_pack_present == true)//if(centre_p->get_endgate_state() == ENDGATE_OPEN)
       {
         end_valve_mode = dump_opened_while_empty;
       }
@@ -777,7 +778,7 @@ void batch::run()
       {
         end_valve_mode = dump_pass_through;
       }
-      if(centre_p->envelope_present == false)//if(centre_p->get_endgate_state() == ENDGATE_CLOSED)
+      if(valid_pack_present == false)//if(centre_p->get_endgate_state() == ENDGATE_CLOSED)
       {
         end_valve_mode = dump_container_removed_too_soon;
       }
@@ -787,7 +788,7 @@ void batch::run()
       {
         cout<<"cutgate closed in end_valve_mode dump_closed_filling\n";
       }
-      if(centre_p->envelope_present == true)//if(centre_p->get_endgate_state() == ENDGATE_OPEN)
+      if(valid_pack_present == true)//if(centre_p->get_endgate_state() == ENDGATE_OPEN)
       {
         end_valve_mode = dump_pass_through;
       }
@@ -797,7 +798,7 @@ void batch::run()
       {
         cout<<"cutgate closed in end_valve_mode dump_pass_through\n";
       }
-      if(centre_p->envelope_present == false)//if(centre_p->get_endgate_state() == ENDGATE_CLOSED)
+      if(valid_pack_present == false)//if(centre_p->get_endgate_state() == ENDGATE_CLOSED)
       {
         end_valve_mode = dump_container_removed_too_soon;
       }
@@ -807,7 +808,7 @@ void batch::run()
       {
         cout<<"cutgate closed in end_valve_mode dump_open_empty\n";
       }
-      if(centre_p->envelope_present == false)//if(centre_p->get_endgate_state() == ENDGATE_CLOSED)
+      if(valid_pack_present == false)//if(centre_p->get_endgate_state() == ENDGATE_CLOSED)
       {
         end_valve_mode = closed_filling;
       }
