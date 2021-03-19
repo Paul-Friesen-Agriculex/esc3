@@ -6,6 +6,7 @@
 #include <QMessageBox>
 #include <QDateTime>
 #include <QPushButton>
+#include <QtMath> //2021_03_19
 
 using namespace std;
 
@@ -250,6 +251,8 @@ void batch_mode_driver::load_program()//load the program indicated by program_pa
   current_pack = 0;
   current_count_limit = program[current_set]->seeds;
   current_pack_limit = program[current_set]->packs;
+  
+  chamber_count_limit_calculation();  //2021_03_19 TEST~~~//  
 }
 
 void batch_mode_driver::reset_program()
@@ -523,8 +526,20 @@ void batch_mode_driver::run()
     float inst_count_rate = float(new_count - count_rate_old_count) / measured_interval;//counts/sec
     if(inst_count_rate >= 0) count_rate = (inst_count_rate+count_rate) / 2.0;
     count_rate_old_count = new_count;
-    slowdown_count_diff = hi_rate * slowdown_time;
-    stop_count_diff = slowdown_count_diff*2.0;
+    
+    //slowdown_count_diff = hi_rate * slowdown_time;  //2021_03_19~~~//
+    //stop_count_diff = slowdown_count_diff*2.0;      //2021_03_19~~~//
+    
+    if((program[current_set]->seeds) > upper_chamber_count_limit) //2021_03_19
+    {
+      slowdown_count_diff = upper_chamber_count_limit/10; 
+      stop_count_diff = slowdown_count_diff*2;
+    }
+    else
+    {
+      slowdown_count_diff = hi_rate * slowdown_time;
+      stop_count_diff = slowdown_count_diff*2;
+    }
   }
 
   //barcode checking
@@ -1942,4 +1957,36 @@ int batch_mode_driver::get_spreadsheet_line_number_after(int val)//look for line
     }
   }
   return(-1);
+}
+
+void batch_mode_driver::chamber_count_limit_calculation() //2021_03_19
+{
+  //Chamber Volumes
+  double lower_chamber_volume = 787*0.8;  //endgate to cutgate - approximated using CAD model (units are cm^3) 
+  double upper_chamber_volume = 1053;     //cutgate to camera opening
+  
+  //Reference Variables (corn)
+  double measured_seed_volume = 0.79650 * 0.49395 * 1.23505;        //(measured corn in centimetres)
+  double virtual_seed_volume = qPow(1353, 1.5);                     //area_mean (pixel^3)
+  double pixel_to_cm3 = measured_seed_volume / virtual_seed_volume; //conversion ratio
+  double cm3_to_pixel = virtual_seed_volume/measured_seed_volume;   //
+  
+  //Selected Seed Volume
+  double selected_average_seed_volume = qPow(centre_p->crops[0].area_mean, 1.5);  //selection dependent
+  
+  //Calculated From Selected Seed
+  double lower_chamber_seed_limit = (lower_chamber_volume * cm3_to_pixel) / selected_average_seed_volume;
+  double upper_chamber_seed_limit = (upper_chamber_volume * cm3_to_pixel) / selected_average_seed_volume;
+  
+  upper_chamber_count_limit = upper_chamber_seed_limit; //class variable
+  lower_chamber_count_limit = upper_chamber_seed_limit; //
+  
+//------------------------------------------------------------------------------------------------------//  
+  cout<<"\t\t measured_seed_volume: "<<measured_seed_volume<<endl;
+  cout<<"\t\t virtuial_seed_volume: "<<virtual_seed_volume<<endl;
+  cout<<"\t\t pixel_to_cm3: "<<pixel_to_cm3<<endl;
+  cout<<"\t\t selected_average_seed_volume: "<<selected_average_seed_volume<<endl;
+  cout<<"\t\t lower_chamber_seed_limit: "<<lower_chamber_seed_limit<<endl;
+  cout<<"\t\t upper_chamber_seed_limit: "<<upper_chamber_seed_limit<<endl;
+//------------------------------------------------------------------------------------------------------//
 }

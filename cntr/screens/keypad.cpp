@@ -93,6 +93,7 @@ keypad::~keypad()
   delete n8_button_p;
   delete n9_button_p;
   delete enter_button_p;
+  delete backspace_button_p;
   delete layout_p;
 }
 
