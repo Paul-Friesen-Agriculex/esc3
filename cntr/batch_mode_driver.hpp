@@ -273,11 +273,11 @@ class batch_mode_driver : public QObject
   void set_high_feed_speed(int speed_s);
   void set_low_feed_speed(int speed_s);
   void set_dump_feed_speed(int speed_s);
-  void chamber_count_limit_calculation(); //calculates count limit for seed chambers for currently selected seed size //2021_03_19
   
   public slots:
   void barcode_entered(QString value);
   void cutgate_timing_error();
+  void chamber_count_limit_calculation(); //calculates count limit for seed chambers for currently selected seed size //2021_03_19
   
   signals:
   void dumping();

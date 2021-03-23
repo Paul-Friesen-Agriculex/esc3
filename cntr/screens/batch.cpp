@@ -33,6 +33,7 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
   cout<<"batch::batch 0\n";
   
   batch_mode_driver_p = set_batch_mode_driver_p;
+  batch_mode_driver_p->chamber_count_limit_calculation(); //2021_03_22//
 
   if (centre_p->crops[0].calibrated == false) 
   {

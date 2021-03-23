@@ -250,9 +250,7 @@ void batch_mode_driver::load_program()//load the program indicated by program_pa
   current_set = 0;
   current_pack = 0;
   current_count_limit = program[current_set]->seeds;
-  current_pack_limit = program[current_set]->packs;
-  
-  chamber_count_limit_calculation();  //2021_03_19 TEST~~~//  
+  current_pack_limit = program[current_set]->packs;  
 }
 
 void batch_mode_driver::reset_program()
@@ -527,19 +525,16 @@ void batch_mode_driver::run()
     if(inst_count_rate >= 0) count_rate = (inst_count_rate+count_rate) / 2.0;
     count_rate_old_count = new_count;
     
-    //slowdown_count_diff = hi_rate * slowdown_time;  //2021_03_19~~~//
-    //stop_count_diff = slowdown_count_diff*2.0;      //2021_03_19~~~//
+    slowdown_count_diff = hi_rate * slowdown_time;
+    stop_count_diff = slowdown_count_diff*2.0;
     
-    if((program[current_set]->seeds) > upper_chamber_count_limit) //2021_03_19
+    if(program[current_set]->seeds > upper_chamber_count_limit)     //2021_03_22//
     {
-      slowdown_count_diff = upper_chamber_count_limit/10; 
-      stop_count_diff = slowdown_count_diff*2;
+      stop_count_diff = upper_chamber_count_limit/5;
     }
-    else
-    {
-      slowdown_count_diff = hi_rate * slowdown_time;
-      stop_count_diff = slowdown_count_diff*2;
-    }
+
+    cout<<"\t\t slowdown_count_diff: "<<slowdown_count_diff<<endl;    //OMIT~~~//
+    cout<<"\t\t stop_count_diff: "<<stop_count_diff<<endl;            //OMIT~~~//
   }
 
   //barcode checking
