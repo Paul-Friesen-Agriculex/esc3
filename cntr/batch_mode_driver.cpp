@@ -527,14 +527,6 @@ void batch_mode_driver::run()
     
     slowdown_count_diff = hi_rate * slowdown_time;
     stop_count_diff = slowdown_count_diff*2.0;
-    
-    if(program[current_set]->seeds > upper_chamber_count_limit)     //2021_03_22//
-    {
-      stop_count_diff = upper_chamber_count_limit/5;
-    }
-
-    cout<<"\t\t slowdown_count_diff: "<<slowdown_count_diff<<endl;    //OMIT~~~//
-    cout<<"\t\t stop_count_diff: "<<stop_count_diff<<endl;            //OMIT~~~//
   }
 
   //barcode checking
@@ -885,7 +877,11 @@ void batch_mode_driver::run()
         }
         pack_complete = false;
         cout<<"mode wait_for_pack. count "<<centre_p->count<<"\n";
-      }      
+      }
+      if((program[current_set]->seeds) > (0.80*upper_chamber_count_limit))
+      {
+        stop_count_diff = (program[current_set]->seeds) - 0.80*upper_chamber_count_limit; //2021_03_24//
+      }
       break;
     case wait_for_endgate_to_close:
       barcode_mode = pack;
@@ -1983,5 +1979,9 @@ void batch_mode_driver::chamber_count_limit_calculation() //2021_03_19
   cout<<"\t\t selected_average_seed_volume: "<<selected_average_seed_volume<<endl;
   cout<<"\t\t lower_chamber_seed_limit: "<<lower_chamber_seed_limit<<endl;
   cout<<"\t\t upper_chamber_seed_limit: "<<upper_chamber_seed_limit<<endl;
+  
+  cout<<"\t\t program[current_set]->seeds: "<<program[current_set]->seeds<<endl;
+  cout<<"\t\t 0.8*upperchamber_count_limit: "<<0.8*upper_chamber_count_limit<<endl;
+  cout<<"\t\t difference: "<<(program[current_set]->seeds - 0.8*upper_chamber_count_limit)<<endl;
 //------------------------------------------------------------------------------------------------------//
 }
