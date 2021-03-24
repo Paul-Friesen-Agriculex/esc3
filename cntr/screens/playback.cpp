@@ -30,10 +30,11 @@ playback::playback(centre*set_centre_p)
   autoadvance_slider_p->setMinimum(0);
   autoadvance_slider_p->setMaximum(100);
   autoadvance_slider_p->setValue(0);
-  autoadvance_box_p = new QGroupBox("Auto Advance");
+  autoadvance_box_p = new QGroupBox;
   autoadvance_layout_p = new QGridLayout;
   autoadvance_timer_p = new QTimer;
   autoadvance_timer_p->setInterval(100);
+  autoadvance_box_p->setStyleSheet("QGroupBox {border: 0px}");
 
   back_button_p=new button("Back");
   count_message_p=new QLabel;
@@ -48,6 +49,8 @@ playback::playback(centre*set_centre_p)
 //  save_image_button_p = new button("Save image");
   file_name_p = new QLineEdit("image");
 
+  back_button_p->setStyleSheet("button { width: 100px}");
+  quit_button_p->setStyleSheet("button { width: 100px}");
   main_layout_p=new QGridLayout;
   
   main_layout_p->addWidget(title_p, 0, 0);
@@ -61,7 +64,7 @@ playback::playback(centre*set_centre_p)
   main_layout_p->addWidget(advance10_button_p, 4, 0);
   main_layout_p->addWidget(advance100_button_p, 5, 0);
   main_layout_p->addWidget(back_button_p, 0, 5);
-  main_layout_p->addWidget(display_p, 1, 1, 3, 5);
+  main_layout_p->addWidget(display_p, 1, 1, 5, 5);
   main_layout_p->addWidget(file_button_p, 6, 1);
   main_layout_p->addWidget(load_file_button_p, 6, 2);
   main_layout_p -> addWidget(file_name_p, 6, 3);

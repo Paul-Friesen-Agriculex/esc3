@@ -108,7 +108,7 @@ class batch_mode_driver : public QObject
   QTime dump_into_end_time;
   static const int dump_into_end_time_limit = 4000;//millisecs. Max time for dumping into end gate
   QTime dump_end_qtime;
-  static const int dump_end_qtime_limit = 2000;//millisecs.  If no change in count for this time, consider dump complete
+  static const int dump_end_qtime_limit = 1000;//millisecs.  If no change in count for this time, consider dump complete
   int old_count;
   int endgate_close_counter;
   QList<bm_set*> program;
@@ -148,6 +148,8 @@ class batch_mode_driver : public QObject
   int pack_ready_pack;//number of the pack that has been completed in its set
   int pack_ready_count_limit;
   int pack_ready_pack_limit;
+  int upper_chamber_count_limit;  //2021_03_19
+  int lower_chamber_count_limit;  //2021_03_19
   
 //  bool discharge_next_packet;
 /*
@@ -275,6 +277,7 @@ class batch_mode_driver : public QObject
   public slots:
   void barcode_entered(QString value);
   void cutgate_timing_error();
+  void chamber_count_limit_calculation(); //calculates count limit for seed chambers for currently selected seed size //2021_03_19
   
   signals:
   void dumping();

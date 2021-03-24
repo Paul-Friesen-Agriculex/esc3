@@ -34,6 +34,7 @@ communications_menu::communications_menu(centre*set_centre_p)
   help_button_p = new button("Help");
   ok_button_p = new button("OK");
   message_p = new QLabel("Choose communication method");
+  message_p -> setWordWrap(true);
   if(centre_p->communicate_by_keyboard_cable)
   {
     if(QFileInfo::exists("/dev/usb2serial"))
@@ -113,7 +114,7 @@ void communications_menu::communicate_by_keyboard_cable_button_clicked()
   }
   else
   {
-    message_p->setText("No USB communications cable detected.\nThis requires a special cable from Agriculex.\nIf it is attached, be sure you are using the right end.");
+    message_p->setText("No USB communications cable detected. This requires a special cable from Agriculex. If it is attached, be sure you are using the right end.");
   }
   
   /*

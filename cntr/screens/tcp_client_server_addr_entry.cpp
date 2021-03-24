@@ -9,6 +9,8 @@
 #include "centre.hpp"
 #include "tcp_client_server_addr_entry.hpp"
 #include "button.hpp"
+#include <QHostAddress>
+#include <QNetworkInterface>
 
 using namespace std;
 
@@ -39,6 +41,11 @@ tcp_client_server_addr_entry::tcp_client_server_addr_entry(centre*set_centre_p)
 //  main_layout_p->addWidget(help_button_p, 4, 0);
   main_layout_p->addWidget(ok_button_p, 4, 3);
   
+  addr1_p->setStyleSheet("QSpinBox { width: 50px}" );
+  addr2_p->setStyleSheet("QSpinBox { width: 50px}" );
+  addr3_p->setStyleSheet("QSpinBox { width: 50px}" );
+  addr4_p->setStyleSheet("QSpinBox { width: 50px}" );
+  
   addr1_p->setRange(0,255);
   addr2_p->setRange(0,255);
   addr3_p->setRange(0,255);
@@ -61,6 +68,9 @@ tcp_client_server_addr_entry::tcp_client_server_addr_entry(centre*set_centre_p)
   
   message_p->setText("Enter the IP address of the host and touch \"connect\".");
   ok_button_p->setEnabled(false);
+  
+  default_ip_addr = "192.168.1.2";
+  retrieve_connection_ip();
 }
 
 void tcp_client_server_addr_entry::back_button_clicked()
@@ -96,5 +106,41 @@ void tcp_client_server_addr_entry::connection_detected()
   ok_button_p->setEnabled(true);
 }
 
-
+void tcp_client_server_addr_entry::retrieve_connection_ip()
+{
+  QString full_ipv4;
+  QStringList ipv4_segments;
+  
+  int addr1, addr2, addr3, addr4;
+  
+  QList<QHostAddress> list = QNetworkInterface::allAddresses();
+  
+  for(int i=0; i<list.count(); ++i)
+  {
+    if(!list[i].isLoopback())
+    {
+      if(list[i].protocol() == QAbstractSocket:: IPv4Protocol)
+      {
+        full_ipv4 = list[i].toString();
+      }
+    }
+  }
+  
+  if(full_ipv4.isEmpty())
+  {
+    full_ipv4 = default_ip_addr;
+  }
+  
+  ipv4_segments = full_ipv4.split(".");
+  
+  addr1 = ipv4_segments[0].toInt();
+  addr2 = ipv4_segments[1].toInt();
+  addr3 = ipv4_segments[2].toInt();
+  addr4 = ipv4_segments[3].toInt();
+  
+  addr1_p->setValue(addr1);
+  addr2_p->setValue(addr2);
+  addr3_p->setValue(addr3);
+  addr4_p->setValue(addr4);  
+}
 

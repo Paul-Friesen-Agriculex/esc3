@@ -6,6 +6,7 @@
 #include <QMessageBox>
 #include <QDateTime>
 #include <QPushButton>
+#include <QtMath> //2021_03_19
 
 using namespace std;
 
@@ -34,7 +35,7 @@ batch_mode_driver::batch_mode_driver(centre* centre_p_s, cutgate* cutgate_p_s)
   pack_contain_lot = false;
   lot_contain_pack = false;
   pack_match_spreadsheet = false;
-  record_only = false;
+  record_only = true;
   
   barcode_mode = seed_lot;
   seed_lot_barcode_old = true;//need a new scan
@@ -231,7 +232,16 @@ void batch_mode_driver::load_program()//load the program indicated by program_pa
         return;
       }
     }
-
+    else if(line == "totalize_force_endgate_open")
+    {
+      stream.readLineInto(&subline);
+      centre_p->totalize_force_endgate_open = subline.toInt(&conversion_ok_flag);
+      if(conversion_ok_flag==false)
+      {
+        cout<<"failed to convert   "<<subline.toStdString()<<"   to int\n";
+        return;
+      }
+    }
     else
     {
       cout<<"batch_mode_driver::load_program.  data type identifier not found.\n";
@@ -240,7 +250,7 @@ void batch_mode_driver::load_program()//load the program indicated by program_pa
   current_set = 0;
   current_pack = 0;
   current_count_limit = program[current_set]->seeds;
-  current_pack_limit = program[current_set]->packs;
+  current_pack_limit = program[current_set]->packs;  
 }
 
 void batch_mode_driver::reset_program()
@@ -379,6 +389,8 @@ void batch_mode_driver::save_program(QString filename)
   stream<<pack_match_spreadsheet<<endl;
   stream<<"record_only\n";
   stream<<record_only<<endl;
+  stream<<"totalize_force_endgate_open\n";
+  stream<<centre_p->totalize_force_endgate_open<<endl;
 }
 
 void batch_mode_driver::load_spreadsheet(QString filename)
@@ -512,6 +524,7 @@ void batch_mode_driver::run()
     float inst_count_rate = float(new_count - count_rate_old_count) / measured_interval;//counts/sec
     if(inst_count_rate >= 0) count_rate = (inst_count_rate+count_rate) / 2.0;
     count_rate_old_count = new_count;
+    
     slowdown_count_diff = hi_rate * slowdown_time;
     stop_count_diff = slowdown_count_diff*2.0;
   }
@@ -864,7 +877,11 @@ void batch_mode_driver::run()
         }
         pack_complete = false;
         cout<<"mode wait_for_pack. count "<<centre_p->count<<"\n";
-      }      
+      }
+      if((program[current_set]->seeds) > (0.80*upper_chamber_count_limit))
+      {
+        stop_count_diff = (program[current_set]->seeds) - 0.80*upper_chamber_count_limit; //2021_03_24//
+      }
       break;
     case wait_for_endgate_to_close:
       barcode_mode = pack;
@@ -1190,7 +1207,7 @@ void batch_mode_driver::run()
       }
       cutgate_p -> open();
       centre_p->block_endgate_opening = false;
-      if(centre_p->get_endgate_state()==ENDGATE_CLOSED)
+      if(centre_p->envelope_present==false)//  (centre_p->get_endgate_state()==ENDGATE_CLOSED)
       {
         if(slave_mode) 
         {
@@ -1218,7 +1235,7 @@ void batch_mode_driver::run()
       }
       cutgate_p -> open();
       centre_p->block_endgate_opening = false;
-      if(centre_p->get_endgate_state()==ENDGATE_OPEN)
+      if(centre_p->envelope_present==true)//if(centre_p->get_endgate_state()==ENDGATE_OPEN)
       {
         centre_p->count = 0;
         mode = substitution_wait_for_cleanout_close;
@@ -1233,7 +1250,7 @@ void batch_mode_driver::run()
       }
       cutgate_p -> open();
       centre_p->block_endgate_opening = false;
-      if(centre_p->get_endgate_state()==ENDGATE_CLOSED)
+      if(centre_p->envelope_present==false)//if(centre_p->get_endgate_state()==ENDGATE_CLOSED)
       {
         seed_lot_barcode_ok = false;
         seed_lot_barcode_old = true;
@@ -1263,7 +1280,7 @@ void batch_mode_driver::run()
       }
       cutgate_p -> open();
       centre_p->block_endgate_opening = false;
-      if(centre_p->get_endgate_state()==ENDGATE_OPEN)
+      if(centre_p->envelope_present==true)//if(centre_p->get_endgate_state()==ENDGATE_OPEN)
       {
         centre_p->count = 0;
         mode = cancel_substitution_wait_for_cleanout_close;
@@ -1278,7 +1295,7 @@ void batch_mode_driver::run()
       }
       cutgate_p -> open();
       centre_p->block_endgate_opening = false;
-      if(centre_p->get_endgate_state()==ENDGATE_CLOSED)
+      if(centre_p->envelope_present==false)//if(centre_p->get_endgate_state()==ENDGATE_CLOSED)
       {
         seed_lot_barcode_ok = false;
         seed_lot_barcode_old = true;
@@ -1931,4 +1948,40 @@ int batch_mode_driver::get_spreadsheet_line_number_after(int val)//look for line
     }
   }
   return(-1);
+}
+
+void batch_mode_driver::chamber_count_limit_calculation() //2021_03_19
+{
+  //Chamber Volumes
+  double lower_chamber_volume = 787*0.8;  //endgate to cutgate - approximated using CAD model (units are cm^3) 
+  double upper_chamber_volume = 1053;     //cutgate to camera opening
+  
+  //Reference Variables (corn)
+  double measured_seed_volume = 0.79650 * 0.49395 * 1.23505;        //(measured corn in centimetres)
+  double virtual_seed_volume = qPow(1353, 1.5);                     //area_mean (pixel^3)
+  double pixel_to_cm3 = measured_seed_volume / virtual_seed_volume; //conversion ratio
+  double cm3_to_pixel = virtual_seed_volume/measured_seed_volume;   //
+  
+  //Selected Seed Volume
+  double selected_average_seed_volume = qPow(centre_p->crops[0].area_mean, 1.5);  //selection dependent
+  
+  //Calculated From Selected Seed
+  double lower_chamber_seed_limit = (lower_chamber_volume * cm3_to_pixel) / selected_average_seed_volume;
+  double upper_chamber_seed_limit = (upper_chamber_volume * cm3_to_pixel) / selected_average_seed_volume;
+  
+  upper_chamber_count_limit = upper_chamber_seed_limit; //class variable
+  lower_chamber_count_limit = upper_chamber_seed_limit; //
+  
+//------------------------------------------------------------------------------------------------------//  
+  cout<<"\t\t measured_seed_volume: "<<measured_seed_volume<<endl;
+  cout<<"\t\t virtuial_seed_volume: "<<virtual_seed_volume<<endl;
+  cout<<"\t\t pixel_to_cm3: "<<pixel_to_cm3<<endl;
+  cout<<"\t\t selected_average_seed_volume: "<<selected_average_seed_volume<<endl;
+  cout<<"\t\t lower_chamber_seed_limit: "<<lower_chamber_seed_limit<<endl;
+  cout<<"\t\t upper_chamber_seed_limit: "<<upper_chamber_seed_limit<<endl;
+  
+  cout<<"\t\t program[current_set]->seeds: "<<program[current_set]->seeds<<endl;
+  cout<<"\t\t 0.8*upperchamber_count_limit: "<<0.8*upper_chamber_count_limit<<endl;
+  cout<<"\t\t difference: "<<(program[current_set]->seeds - 0.8*upper_chamber_count_limit)<<endl;
+//------------------------------------------------------------------------------------------------------//
 }

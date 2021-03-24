@@ -92,9 +92,16 @@ centre::centre():
   diagnostics_console_p -> show();
 
   base_widget_p = new QWidget;
-    
-//  base_widget_p->setWindowState(Qt::WindowFullScreen);
-  base_widget_p->setGeometry(0, 0, 800, 480);
+
+
+
+  //********************  
+  //comment out one of these 2 lines:
+  base_widget_p->setWindowState(Qt::WindowFullScreen);
+//  base_widget_p->setGeometry(0, 0, 800, 480);
+  //********************
+
+
     
   base_widget_p->show();
   
@@ -420,6 +427,7 @@ void centre::run()
   envelope_present = envelope_sensor_p->read();
   brother_envelope_feeder_p -> run();
 
+//  if(  (current_screen==5)  ||  (current_screen==15)  ||  (current_screen==60)  )//totalize or batch or slave mode screen
   if(  (current_screen==5)  ||  (current_screen==60)  )//totalize or slave mode screen
   {
     if(endgate_state == ENDGATE_CLOSED)
@@ -439,10 +447,50 @@ void centre::run()
   }
   else if( (current_screen==15) || (current_screen==33) )//batch or ss_batch
   {
+
+    if(endgate_state == ENDGATE_CLOSED)
+    {
+      bool should_open = false;
+      if(envelope_present==true &&   (block_endgate_opening==false || batch_mode_driver_p->release_pack==true)    )
+      {
+        batch_mode_driver_p->release_pack = false;
+        should_open = true;
+      }
+      if(totalize_force_endgate_open)
+      {
+        should_open = true;
+      }
+      if(should_open)
+      {
+        set_endgate_state(ENDGATE_OPEN);
+      }
+    }
+    else //endgate is open
+    {
+      bool should_stay_open=true;
+      if(envelope_present==false)
+      {
+        should_stay_open = false;
+      }
+      if(totalize_force_endgate_open)
+      {
+        should_stay_open=true;
+      }
+      if(should_stay_open == false)
+      {
+        set_endgate_state(ENDGATE_CLOSED);
+      }
+    }
+
+
+    /*
     if(endgate_state == ENDGATE_CLOSED)
     {
       if(envelope_present==true &&   (block_endgate_opening==false || batch_mode_driver_p->release_pack==true)    )
       {
+        
+        cout<<"envelope_present = "<<envelope_present<<"  block_endgate_opening = "<<block_endgate_opening<<"  batch_mode_driver_p->release_pack = "<<batch_mode_driver_p->release_pack<<endl;
+        
         batch_mode_driver_p->release_pack = false;
         set_endgate_state(ENDGATE_OPEN);
       }
@@ -454,6 +502,7 @@ void centre::run()
         set_endgate_state(ENDGATE_CLOSED);
       }
     }
+    */
   }
   else //current screen is not totalize or batch
   {
