@@ -52,6 +52,8 @@ class batch_options : public screen
   
   help_screen* help_screen_p;
   
+  bool original_require_seed_lot_barcode;
+  
   public slots:
   void done_button_clicked();
   void back_button_clicked();

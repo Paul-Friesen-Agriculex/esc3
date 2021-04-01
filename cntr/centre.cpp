@@ -97,8 +97,8 @@ centre::centre():
 
   //********************  
   //comment out one of these 2 lines:
-  base_widget_p->setWindowState(Qt::WindowFullScreen);
-//  base_widget_p->setGeometry(0, 0, 800, 480);
+//  base_widget_p->setWindowState(Qt::WindowFullScreen);
+  base_widget_p->setGeometry(0, 0, 800, 480);
   //********************
 
 

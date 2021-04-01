@@ -506,6 +506,12 @@ crop_name_entry::crop_name_entry(centre* centre_p)
 
 void crop_name_entry::enter_clicked()
 {
+  if((*entry_line_p).trimmed() == "")
+  {
+    centre_p->add_waiting_screen(0);//start
+    centre_p->screen_done = true;
+    return;
+  }
   if(centre_p->changing_existing_crop == true)//overwrite name.  Do not create new crop.
   {
     centre_p->crops[0].name=*entry_line_p;
