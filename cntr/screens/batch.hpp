@@ -10,6 +10,7 @@
 #include <QLabel>
 #include <QTextEdit>  //ORIGINAL~~~
 #include <QLineEdit>  //TEST~~~
+#include <QColor>
 
 
 class button;
@@ -33,7 +34,7 @@ class barcode_line : public QLineEdit
   signals:
   void barcode_entered(QString barcode);
 };
-
+/*
 enum end_valve_mode_enum
 {
   closed_empty,
@@ -56,7 +57,7 @@ enum end_valve_mode_enum
   substitution_enter_barcode,
   cancel_substitution
 };
-
+*/
 class batch : public screen
 {
   Q_OBJECT
@@ -67,14 +68,16 @@ class batch : public screen
   batch_mode_driver* batch_mode_driver_p;
   
   public slots:
+  void get_status_message(QString message, QColor foreground, QColor background, int text_size);
+  void get_barcode_status_message(QString message, QColor foreground, QColor background, int text_size);
   void pack_collected(int count);
   void dump_complete(int dump_count);
-  void dumping();
+//  void dumping();
   void focus_on_barcode();
-  void bad_lot_slot();
+//  void bad_lot_slot();
   
   private slots:
-  void endgate_clicked();
+//  void endgate_clicked();
   void options_clicked();
   void back_clicked();
   void repeat_pack_clicked();
@@ -91,7 +94,7 @@ class batch : public screen
   
   private:
   QLabel* count_message_p;
-  button* endgate_button_p;
+//  button* endgate_button_p;
   button* options_button_p;
   button* back_button_p;
   barcode_line* barcode_line_p;
@@ -133,15 +136,15 @@ class batch : public screen
     //If this is closed, it will be over-ridden by presence of an envelope
   
   int count;
-  
+  /*
   mode_enum mode;
   mode_enum old_mode;
   end_valve_mode_enum end_valve_mode;
   end_valve_mode_enum old_end_valve_mode;
   int end_valve_empty_counter;//use to time valve emptying
+  */
   
-  
-  
+  /*
   QString pack_ready_message;
   QString pack_removed_too_soon_message;
   QString dump_container_needed_message;
@@ -151,8 +154,8 @@ class batch : public screen
   QString substitution_cleanout_message;
   QString substitution_barcode_message;
   QString cancel_substitution_message;
-  
-  barcode_entry_mode old_barcode_mode;
+  */
+//  barcode_entry_mode old_barcode_mode;
   
   QString count_string;				//seed count access from gpio_keyboard
   QTimer* run_timer_p;

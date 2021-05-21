@@ -5,6 +5,9 @@
 #include <QList>
 #include <QWidget>
 #include <QTime>
+#include <QColor>
+#include <iostream>
+#include <string>
 
 #include "centre.hpp"
 #include "cutgate.hpp"
@@ -12,6 +15,8 @@
 
 class QTimer;
 class envelope;
+
+using namespace std;
 
 struct bm_set //batch mode set of packs
 {
@@ -21,11 +26,79 @@ struct bm_set //batch mode set of packs
 
 enum mode_enum
 {
+  entry,
+  hi_o_c,
+  lower_chamber_full_o_c,
+  ramp_down_o_c,
+  gate_delay_o_c,
+  hi_o_o,
+  ramp_down_o_o,
+  gate_delay_o_o,
+  hi_c_o,
+  hi_c_c,
+  wait_for_endgate_to_close,
+  hi_o_c_old_pack,
+  wait_old_pack,
+  wait_for_pack,
+  wait_for_endgate_to_clear,
+  dump_into_cut_gate_c_o,
+  dump_into_cut_gate_c_c,
+  dump_into_cut_gate_wait_for_endgate_to_close,
+  dump_into_cut_gate_wait_for_pack,
+  dump_into_cut_gate_wait_for_pack_removal,
+  dump_into_cut_gate_wait_for_endgate_to_clear,
+  dump_into_end_gate,
+  dump_into_end_gate_wait_for_container,
+  dump_into_container,
+  wait_for_dump_container_removal
+};
+
+
+
+/*
+{
+  entry,
+  wait_for_seed_lot_barcode_start,
+  wait_for_seed_lot_barcode,
+  hi_o_c_start,
+  hi_o_c,
+  hi_o_o_start,
+  hi_o_o,
+  ramp_down_o_c_start,
+  ramp_down_o_c,
+  ramp_down_o_o_start,
+  ramp_down_o_o,
+  gate_delay_o_c_start,
+  gate_delay_o_c,
+  gate_delay_o_o_start,
+  gate_delay_o_o,
+  hi_c_c_start,
+  hi_c_c,
+  hi_c_o_start,
+  hi_c_o,
+  wait_for_endgate_to_close,
+  wait_for_pack,
+  wait_for_bad_lot_cleanout,
+  dump_into_cut_gate,
+  dump_wait_for_endgate_to_close,
+  wait_for_final_pack,
+  dump_into_end,
+  wait_for_dump_container,
+  dump_into_container,
+  wait_for_dump_container_removal,
+  substitution_wait_for_cleanout_open,
+  substitution_wait_for_cleanout_close,
+  substitution_wait_for_barcode, 
+  cancel_substitution_wait_for_cleanout_open,
+  cancel_substitution_wait_for_cleanout_close,
+};
+*/
+/*
+enum mode_enum
+{
   wait_for_seed_lot_barcode,
   slave_mode_entry,
   hi_open,
-//  low_open,
-//  hi_open_pulse,
   ramp_down,
   gate_delay,
   hi_closed,
@@ -44,16 +117,9 @@ enum mode_enum
   substitution_wait_for_barcode, 
   cancel_substitution_wait_for_cleanout_open,
   cancel_substitution_wait_for_cleanout_close,
-/*
-  substitution_hi_open,
-  substitution_low_open,
-  substitution_gate_delay,
-  substitution_hi_closed,
-  substitution_wait_for_endgate_to_close,
-  substitution_wait_for_pack,
-  substitution_wait_for_bad_lot_cleanout
-  */
 };
+*/
+
 
 enum barcode_entry_mode
 {
@@ -96,32 +162,45 @@ class batch_mode_driver : public QObject
   QTimer* timer_p;
   centre* centre_p;
   cutgate* cutgate_p;
-  QTime cutoff_gate_close_time;
-  static const int cutoff_gate_delay_time = 0;//milliseconds 
-  static const int cutoff_gate_to_pack_removal_time = 2000;//milliseconds.  
+  endgate* endgate_p;
+//  static const int cutoff_gate_to_pack_removal_time = 2000;//milliseconds.  
   //After cutoff gate closes, user must wait this long before removing pack for seed to fall.
   bool pack_present;
   bool old_pack_present;
+  int pack_present_counter;
   bool pack_changed;
-  QTime dump_into_cut_gate_time;
-  static const int dump_into_cut_gate_time_limit = 2000;//millisecs.  Max time for dumping into cut gate
-  QTime dump_into_end_time;
-  static const int dump_into_end_time_limit = 4000;//millisecs. Max time for dumping into end gate
-  QTime dump_end_qtime;
-  static const int dump_end_qtime_limit = 1000;//millisecs.  If no change in count for this time, consider dump complete
+//  static const int dump_into_cut_gate_time_limit = 2000;//millisecs.  Max time for dumping into cut gate
+//  static const int dump_into_end_time_limit = 4000;//millisecs. Max time for dumping into end gate
+//  static const int dump_end_qtime_limit = 1000;//millisecs.  If no change in count for this time, consider dump complete
   int old_count;
-  int endgate_close_counter;
   QList<bm_set*> program;
   bm_set* set_p;
   int program_size;
   bool force_dump_out;
   envelope_feeder_brother* e_f_brother_p;
+  bool mode_changed;
+  bool mode_new;
+
+  QTime cutoff_gate_close_time;
+  static const int cutoff_gate_delay_time = 0;//milliseconds 
+  QTime end_chute_clear_time;
+  static const int end_chute_clear_time_limit = 1000;
+  QTime endgate_close_time;
+  static const int endgate_close_time_limit = 1000;
+//  QTime dump_into_cut_gate_time;
+//  static const int dump_into_cut_gate_time_limit;
+//  QTime dump_into_end_time;
+//  static const int dump_into_end_time_limit;
+  QTime dump_end_qtime;
+  static const int dump_end_qtime_limit = 1000;
   
   public:
-  batch_mode_driver(centre* centre_p_s, cutgate* cutgate_p_s);
+  batch_mode_driver(centre* centre_p_s, cutgate* cutgate_p_s, endgate* endgate_p_s);
   ~batch_mode_driver();
 
+  void set_normal_status_message();
   mode_enum mode;
+  void switch_mode(mode_enum new_mode, string str);
   void load_program();//load the program indicated by program_path
   void reset_program();//start at beginning of current program
   void clear_program();
@@ -135,45 +214,52 @@ class batch_mode_driver : public QObject
   void stop();
   void restart();//dump out seed and restart program
 
+  QString program_name;
   QString program_path;
 //  float count_rate_multiplier;
   int high_feed_speed;
   int low_feed_speed;
   int dump_speed;
-  int current_set;
-  int current_pack;
-  int current_count_limit;
-  int current_pack_limit;
+  int cutgate_set;
+  int cutgate_pack;
+  int endgate_set;
+  int endgate_pack;
+  int out_set;
+  int out_pack;
+  int cutgate_count_limit;
+  int cutgate_pack_limit;
+  int endgate_count_limit;
+  int endgate_pack_limit;
   //following numbers are for the last pack completed.  They are needed for display when current numbers have already been changed
-  int pack_ready_pack;//number of the pack that has been completed in its set
-  int pack_ready_count_limit;
-  int pack_ready_pack_limit;
+//  int pack_ready_pack;//number of the pack that has been completed in its set
+//  int pack_ready_count_limit;
+//  int pack_ready_pack_limit;
   int upper_chamber_count_limit;  //2021_03_19
   int lower_chamber_count_limit;  //2021_03_19
   
 //  bool discharge_next_packet;
-/*
+
   int slowdown_count_diff;//seed feeder slows down when count is this many seeds from limit
   bool slowdown_count_diff_set;//if this is false, run function will estimate a default starting value.  Otherwise, the set value will be used.  The set value will be adjusted continuously.
   QTime low_speed_mode_time;
   int stop_count_diff;//will stop feeder if reaches this in mode hi_closed
-  */
+
   
   float slowdown_time;//seconds
-  float pulseup_time;//seconds
-  float hipulse_duration;//seconds
+//  float pulseup_time;//seconds
+//  float hipulse_duration;//seconds
 //  QTime hipulse_time;
   int count_rate_old_count;
   QTime count_rate_time;
   float count_rate_interval;//seconds
   float count_rate;//seeds/sec
   float hi_rate;//measure of count rate expected on high speed
-  int slowdown_count_diff;//seed feeder slows down when count is this many seeds from limit
+//  int slowdown_count_diff;//seed feeder slows down when count is this many seeds from limit
 //  int pulseup_count_diff;//will produce a high speed pulse if count is farther from limit than this
-  int stop_count_diff;//will stop feeder if reaches this in mode hi_closed
+//  int stop_count_diff;//will stop feeder if reaches this in mode hi_closed
   int ramp_down_counter;//used to time ramp speed changes
 
-  bool force_endgate_open;
+//  bool force_endgate_open;
   
   //batch option flags
   bool require_seed_lot_barcode;
@@ -183,12 +269,15 @@ class batch_mode_driver : public QObject
   bool lot_contain_pack;
   bool pack_match_spreadsheet;
   bool record_only;
-  bool next_seed_lot_bad;//used to signal count went over limit
-  bool pack_complete;//used by batch screen to signal when it is finished
-  bool use_cutgate;
+//  bool pack_barcode_ok();
+//  bool next_seed_lot_bad;//used to signal count went over limit
+//  bool pack_complete;//used by batch screen to signal when it is finished
+//  bool use_cutgate;
   
   //batch barcode matching data
   barcode_entry_mode barcode_mode;
+  QString barcode;
+  bool barcode_is_new;
   QString seed_lot_barcode;
   QString pack_barcode;
   bool seed_lot_barcode_old;//seed lot it codes is finished
@@ -204,6 +293,7 @@ class batch_mode_driver : public QObject
   void save_program(QString filename);
   
   //spreadsheet handling
+  /*
   bool use_spreadsheet;
   QString spreadsheet_filename;
   void load_spreadsheet(QString filename);
@@ -254,7 +344,7 @@ class batch_mode_driver : public QObject
   int extra_pack_count_limit;
   int extra_pack_stored_count_limit;//store current_count_limit so it can be restored after extra pack
   bool extra_pack_finished;
-  
+  */
   //substitute seed lot
   bool substitute_seed_lot;
   QString substitute_barcode;
@@ -276,7 +366,7 @@ class batch_mode_driver : public QObject
   
   public slots:
   void barcode_entered(QString value);
-  void cutgate_timing_error();
+//  void cutgate_timing_error();
   void chamber_count_limit_calculation(); //calculates count limit for seed chambers for currently selected seed size //2021_03_19
   
   signals:
@@ -291,6 +381,8 @@ class batch_mode_driver : public QObject
   void send_extra_pack_message(QString message);
   void extra_pack_finished_signal();
   void slave_mode_set_finished();
+  void send_status_message(QString message, QColor foreground, QColor background, int text_size);
+  void send_barcode_status_message(QString message, QColor foreground, QColor background, int text_size);
   
   //testing
   void send_message2(QString);

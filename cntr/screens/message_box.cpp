@@ -24,9 +24,21 @@ void message_box::set_background(int r, int g, int b)
   update();
 }
 
+void message_box::set_background(QColor background_s)
+{
+  background = background_s;
+  update();
+}
+
 void message_box::set_foreground(int r, int g, int b)
 {
   foreground = QColor(r, g, b);
+  update();
+}
+
+void message_box::set_foreground(QColor foreground_s)
+{
+  foreground = foreground_s;
   update();
 }
 

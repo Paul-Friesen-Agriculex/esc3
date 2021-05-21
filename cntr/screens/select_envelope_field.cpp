@@ -130,8 +130,8 @@ void select_envelope_field::choice6_clicked()
 
 void select_envelope_field::enter_choice(int column)
 {
-  if(batch_mode_driver_p->field_data_source_flag == 'd') batch_mode_driver_p->envelope_p->enter_ss_data_field(batch_mode_driver_p->get_spreadsheet_column_pointer(column));
-  if(batch_mode_driver_p->field_data_source_flag == 'h') batch_mode_driver_p->envelope_p->enter_ss_heading_field(batch_mode_driver_p->get_spreadsheet_column_pointer(column));
+//  if(batch_mode_driver_p->field_data_source_flag == 'd') batch_mode_driver_p->envelope_p->enter_ss_data_field(batch_mode_driver_p->get_spreadsheet_column_pointer(column));
+//  if(batch_mode_driver_p->field_data_source_flag == 'h') batch_mode_driver_p->envelope_p->enter_ss_heading_field(batch_mode_driver_p->get_spreadsheet_column_pointer(column));
   centre_p->add_waiting_screen(35);//position_envelope_field
   centre_p->screen_done = true;
 }
@@ -170,27 +170,27 @@ void select_envelope_field::display_headings()
   QString message_text("Pick field name");
   message_p->setText(message_text);
   
-  column_p = batch_mode_driver_p->get_spreadsheet_column_pointer(first_heading_displayed);
+//  column_p = batch_mode_driver_p->get_spreadsheet_column_pointer(first_heading_displayed);
   if(column_p==0) choice1_p->setText("");
   else choice1_p->setText(column_p->heading);
 
-  column_p = batch_mode_driver_p->get_spreadsheet_column_pointer(first_heading_displayed+1);
+//  column_p = batch_mode_driver_p->get_spreadsheet_column_pointer(first_heading_displayed+1);
   if(column_p==0) choice2_p->setText("");
   else choice2_p->setText(column_p->heading);
 
-  column_p = batch_mode_driver_p->get_spreadsheet_column_pointer(first_heading_displayed+2);
+//  column_p = batch_mode_driver_p->get_spreadsheet_column_pointer(first_heading_displayed+2);
   if(column_p==0) choice3_p->setText("");
   else choice3_p->setText(column_p->heading);
 
-  column_p = batch_mode_driver_p->get_spreadsheet_column_pointer(first_heading_displayed+3);
+//  column_p = batch_mode_driver_p->get_spreadsheet_column_pointer(first_heading_displayed+3);
   if(column_p==0) choice4_p->setText("");
   else choice4_p->setText(column_p->heading);
 
-  column_p = batch_mode_driver_p->get_spreadsheet_column_pointer(first_heading_displayed+4);
+//  column_p = batch_mode_driver_p->get_spreadsheet_column_pointer(first_heading_displayed+4);
   if(column_p==0) choice5_p->setText("");
   else choice5_p->setText(column_p->heading);
 
-  column_p = batch_mode_driver_p->get_spreadsheet_column_pointer(first_heading_displayed+5);
+//  column_p = batch_mode_driver_p->get_spreadsheet_column_pointer(first_heading_displayed+5);
   if(column_p==0) choice6_p->setText("");
   else choice6_p->setText(column_p->heading);
 

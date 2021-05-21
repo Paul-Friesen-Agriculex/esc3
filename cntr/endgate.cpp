@@ -33,6 +33,7 @@ void endgate::open()
 {
   cout<<"endgate::open\n";
   
+  if(state == ENDGATE_OPEN) return;
   FILE * fp;
   fp = fopen("/sys/class/gpio/gpio189/value", "w");
   fprintf(fp, "1");
@@ -46,6 +47,7 @@ void endgate::close()
 {
   cout<<"endgate::close\n";
   
+  if(state == ENDGATE_CLOSED) return;
   FILE * fp;
   fp = fopen("/sys/class/gpio/gpio210/value", "w");
   fprintf(fp, "1");

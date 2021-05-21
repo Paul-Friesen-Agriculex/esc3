@@ -90,9 +90,9 @@ void batch_options::done_button_clicked()
   
   if(  (batch_mode_driver_p->require_seed_lot_barcode==true)  &&  (original_require_seed_lot_barcode==false)  )
   {
-    batch_mode_driver_p->mode = wait_for_seed_lot_barcode;
-    batch_mode_driver_p->seed_lot_barcode_ok = false;
-    batch_mode_driver_p->seed_lot_barcode_old = true;
+//    batch_mode_driver_p->mode = wait_for_seed_lot_barcode;
+//    batch_mode_driver_p->seed_lot_barcode_ok = false;
+//    batch_mode_driver_p->seed_lot_barcode_old = true;
   }
   
 //  centre_p->add_waiting_screen(15);//batch

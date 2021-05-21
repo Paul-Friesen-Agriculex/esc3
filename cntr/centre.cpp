@@ -41,7 +41,8 @@
 #include "program_delete.hpp"
 #include "crop_name_exists.hpp"
 #include "diagnostics_console.hpp"
-#include "spreadsheet_choice.hpp"
+//#include "spreadsheet_choice.hpp"
+/*
 #include "ss_setup_choice.hpp"
 #include "ss_setup_entry.hpp"
 #include "set_envelope_size.hpp"
@@ -53,6 +54,7 @@
 #include "select_envelope_field.hpp"
 #include "position_envelope_field.hpp"
 #include "select_field_data_source.hpp"
+*/
 #include "macro_screen.hpp"	
 #include "macro_builder.hpp"
 #include "communications_menu.hpp"
@@ -223,7 +225,7 @@ void centre::init()
   end_of_playback_flag = false;
   measured_line_frequency = 4700;
   
-  batch_mode_driver_p = new batch_mode_driver(this, cutgate_p);
+  batch_mode_driver_p = new batch_mode_driver(this, cutgate_p, endgate_p);
   
   //totalize mode
   tm_barcode_columns = 0;
@@ -250,8 +252,8 @@ void centre::init()
   connect(batch_mode_driver_p, SIGNAL(send_message2(QString)), diagnostics_console_p, SLOT(receive_message2(QString)));
   connect(batch_mode_driver_p, SIGNAL(send_message_time_to_end(QString)), diagnostics_console_p, SLOT(receive_message3(QString)));
   connect(diagnostics_console_p, SIGNAL(reset_time_tests_signal()), processor_p, SLOT(reset_time_tests()));
-  connect(cutgate_p, SIGNAL(closed_while_opening()), batch_mode_driver_p, SLOT(cutgate_timing_error()));
-  connect(cutgate_p, SIGNAL(opened_while_closing()), batch_mode_driver_p, SLOT(cutgate_timing_error()));
+//  connect(cutgate_p, SIGNAL(closed_while_opening()), batch_mode_driver_p, SLOT(cutgate_timing_error()));
+//  connect(cutgate_p, SIGNAL(opened_while_closing()), batch_mode_driver_p, SLOT(cutgate_timing_error()));
   connect(tcp_server_p, SIGNAL(newConnection()), this, SLOT(tcp_connection_detected())); 
   connect(tcp_socket_p, SIGNAL(connected()), this, SIGNAL(tcp_connection_detected_signal())); 
   
@@ -447,7 +449,7 @@ void centre::run()
   }
   else if( (current_screen==15) || (current_screen==33) )//batch or ss_batch
   {
-
+    /*
     if(endgate_state == ENDGATE_CLOSED)
     {
       bool should_open = false;
@@ -481,7 +483,7 @@ void centre::run()
         set_endgate_state(ENDGATE_CLOSED);
       }
     }
-
+    */
 
     /*
     if(endgate_state == ENDGATE_CLOSED)
@@ -571,26 +573,24 @@ void centre::run()
       case 18: screen_p=new program_delete(this, batch_mode_driver_p); break;
       case 19: screen_p=new crop_name_exists(this); break;
       case 20: screen_p=new batch_save_table(this, batch_mode_driver_p); break;
-      case 21: screen_p=new spreadsheet_choice(this, batch_mode_driver_p); break;
-      case 22: screen_p=new ss_setup_choice(this, batch_mode_driver_p); break;
-      case 23: screen_p=new ss_setup_entry(this, batch_mode_driver_p); break;
-//      case 24: screen_p=new envelope_layout_choice(this, batch_mode_driver_p); break;
-      case 25: screen_p=new set_envelope_size(this, batch_mode_driver_p); break;
+//      case 21: screen_p=new spreadsheet_choice(this, batch_mode_driver_p); break;
+//      case 22: screen_p=new ss_setup_choice(this, batch_mode_driver_p); break;
+//      case 23: screen_p=new ss_setup_entry(this, batch_mode_driver_p); break;
+//      case 25: screen_p=new set_envelope_size(this, batch_mode_driver_p); break;
 //      case : screen_p=new (this); break;
 //      case : screen_p=new (this); break;
 //      case : screen_p=new (this); break;
 //      case : screen_p=new (this); break;
 //      case : screen_p=new (this); break;
-//      case 27: screen_p=new macro_name_entry(this);  break;    //TEST~~~ 11_13_2018//
       case 28: screen_p=new macro_screen(this); break;	    //TEST~~~ macro_menu
-      case 29: screen_p=new batch_save_ss_setup(this, batch_mode_driver_p); break;
-      case 30: screen_p=new ss_setup_delete(this, batch_mode_driver_p); break;
-      case 31: screen_p=new ss_options(this, batch_mode_driver_p); break;
-      case 32: screen_p=new ss_column_display_options(this, batch_mode_driver_p); break;
-      case 33: screen_p=new ss_batch(this, batch_mode_driver_p); break;
-      case 34: screen_p=new select_envelope_field(this, batch_mode_driver_p); break;
-      case 35: screen_p=new position_envelope_field(this, batch_mode_driver_p); break;
-      case 36: screen_p=new select_field_data_source(this, batch_mode_driver_p); break;
+//      case 29: screen_p=new batch_save_ss_setup(this, batch_mode_driver_p); break;
+//      case 30: screen_p=new ss_setup_delete(this, batch_mode_driver_p); break;
+//      case 31: screen_p=new ss_options(this, batch_mode_driver_p); break;
+//      case 32: screen_p=new ss_column_display_options(this, batch_mode_driver_p); break;
+//      case 33: screen_p=new ss_batch(this, batch_mode_driver_p); break;
+//      case 34: screen_p=new select_envelope_field(this, batch_mode_driver_p); break;
+//      case 35: screen_p=new position_envelope_field(this, batch_mode_driver_p); break;
+//      case 36: screen_p=new select_field_data_source(this, batch_mode_driver_p); break;
       case 37: screen_p=new enter_field_text(this, batch_mode_driver_p); break;
       case 38: screen_p=new macro_builder(this); break;
 //      case : screen_p=new (this); break;

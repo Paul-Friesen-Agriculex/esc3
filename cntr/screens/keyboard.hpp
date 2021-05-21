@@ -208,7 +208,7 @@ class batch_save_table : public keyboard
   public slots:
   void enter_clicked();
 };
-
+/*
 class batch_save_ss_setup : public keyboard
 {
   Q_OBJECT
@@ -221,7 +221,7 @@ class batch_save_ss_setup : public keyboard
   public slots:
   void enter_clicked();
 };
-
+*/
 class enter_field_text : public keyboard
 {
   Q_OBJECT
