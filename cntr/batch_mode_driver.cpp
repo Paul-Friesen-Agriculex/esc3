@@ -45,6 +45,9 @@ batch_mode_driver::batch_mode_driver(centre* centre_p_s, cutgate* cutgate_p_s, e
   pack_barcode_old = true;//need a new scan
   seed_lot_barcode_ok = false;
   pack_barcode_ok = false;
+  pack_barcode_ok_message_posted = false;
+  pack_barcode_wrong = false;
+  pack_barcode_wrong_message_posted = false;
 //  release_pack = false;//true signals to release counted seed, even if barcode matching not satisfied.  For use in case of lost packet.
   
 //  dump_into_cut_gate_time.start();
@@ -329,7 +332,9 @@ void batch_mode_driver::reset_program()
   pack_barcode_old = true;//need a new scan
   seed_lot_barcode_ok = false;
   pack_barcode_ok = false;
-
+  pack_barcode_ok_message_posted = false;
+  pack_barcode_wrong = false;
+  pack_barcode_wrong_message_posted = false;
 
   dump_end_qtime.restart();
 }  
@@ -624,7 +629,30 @@ void batch_mode_driver::run()
   switch(mode)
   {
     case entry:
-      switch_mode(hi_o_c, "hi_o_c");
+      if(require_seed_lot_barcode)
+      {
+        seed_lot_barcode_ok = false;
+        switch_mode(wait_for_seed_lot_barcode, "wait_for_seed_lot_barcode");
+      }
+      else
+      {
+        send_barcode_status_message("Barcode Not Required", QColor(0,0,0), QColor(0,255,0), 25);
+        switch_mode(hi_o_c, "hi_o_c");
+      }
+      break;
+    case wait_for_seed_lot_barcode:
+      if(mode_new)
+      {
+        set_normal_status_message();
+        send_barcode_status_message("Scan Seed Lot Barcode", QColor(0,0,0), QColor(255,255,0), 25);
+        barcode_mode = seed_lot;
+        centre_p->set_speed(0);
+      }
+      if(seed_lot_barcode_ok)
+      {
+        barcode_mode = pack;
+        switch_mode(hi_o_c, "hi_o_c");
+      }
       break;
     case hi_o_c:
       if(mode_new)
@@ -639,6 +667,14 @@ void batch_mode_driver::run()
         
         set_normal_status_message();
         barcode_mode = pack;
+        if(require_pack_barcode)
+        {
+          send_barcode_status_message("Scan Pack Barcode", QColor(0,0,0), QColor(255,255,0), 25);
+          pack_barcode_ok = false;
+          pack_barcode_ok_message_posted = false;
+          pack_barcode_wrong = false;
+          pack_barcode_wrong_message_posted = false;
+        }
       }
       if(centre_p->feed_speed != high_feed_speed)
       {
@@ -652,9 +688,19 @@ void batch_mode_driver::run()
       {
         switch_mode(lower_chamber_full_o_c, "lower_chamber_full_o_c");
       }
-      if(pack_present)
+      if(pack_present && pack_barcode_ok)
       {
         switch_mode(hi_o_o, "hi_o_o");
+      }
+      if(pack_barcode_ok && pack_barcode_ok_message_posted==false)
+      {
+        send_barcode_status_message("Barcode OK", QColor(0,0,0), QColor(0,255,0), 25);
+        pack_barcode_ok_message_posted = true;
+      }
+      if(pack_barcode_wrong && pack_barcode_wrong_message_posted==false)
+      {
+        send_barcode_status_message("Incorrect Barcode", QColor(0,0,0), QColor(255,0,0), 25);
+        pack_barcode_wrong_message_posted = true;
       }
       break;
     case lower_chamber_full_o_c:
@@ -663,9 +709,19 @@ void batch_mode_driver::run()
         centre_p->set_speed(0);
         send_status_message("Waiting for\nPack", QColor(0,0,0), QColor(255,255,0), 16);
       }
-      if(pack_present)
+      if(pack_present && pack_barcode_ok)
       {
         switch_mode(hi_o_o, "hi_o_o");
+      }
+      if(pack_barcode_ok && pack_barcode_ok_message_posted==false)
+      {
+        send_barcode_status_message("Barcode OK", QColor(0,0,0), QColor(0,255,0), 25);
+        pack_barcode_ok_message_posted = true;
+      }
+      if(pack_barcode_wrong && pack_barcode_wrong_message_posted==false)
+      {
+        send_barcode_status_message("Incorrect Barcode", QColor(0,0,0), QColor(255,0,0), 25);
+        pack_barcode_wrong_message_posted = true;
       }
       break;
     case ramp_down_o_c:
@@ -682,9 +738,19 @@ void batch_mode_driver::run()
         centre_p->count = 0;
         switch_mode(gate_delay_o_c, "gate_delay_o_c");
       }
-      if(pack_present)
+      if(pack_present && pack_barcode_ok)
       {
         switch_mode(ramp_down_o_o, "ramp_down_o_o");
+      }
+      if(pack_barcode_ok && pack_barcode_ok_message_posted==false)
+      {
+        send_barcode_status_message("Barcode OK", QColor(0,0,0), QColor(0,255,0), 25);
+        pack_barcode_ok_message_posted = true;
+      }
+      if(pack_barcode_wrong && pack_barcode_wrong_message_posted==false)
+      {
+        send_barcode_status_message("Incorrect Barcode", QColor(0,0,0), QColor(255,0,0), 25);
+        pack_barcode_wrong_message_posted = true;
       }
       break;
     case gate_delay_o_c:
@@ -833,9 +899,19 @@ void batch_mode_driver::run()
       {
         switch_mode(wait_for_pack, "wait_for_pack");
       }
-      if(pack_present)
+      if(pack_present && pack_barcode_ok)
       {
         switch_mode(hi_c_o, "hi_c_o");
+      }
+      if(pack_barcode_ok && pack_barcode_ok_message_posted==false)
+      {
+        send_barcode_status_message("Barcode OK", QColor(0,0,0), QColor(0,255,0), 25);
+        pack_barcode_ok_message_posted = true;
+      }
+      if(pack_barcode_wrong && pack_barcode_wrong_message_posted==false)
+      {
+        send_barcode_status_message("Incorrect Barcode", QColor(0,0,0), QColor(255,0,0), 25);
+        pack_barcode_wrong_message_posted = true;
       }
       break;
     case wait_for_endgate_to_close:
@@ -900,9 +976,19 @@ void batch_mode_driver::run()
         cutgate_p->close();
         endgate_p->close();
       }
-      if(pack_present)
+      if(pack_present && pack_barcode_ok)
       {
         switch_mode(wait_for_endgate_to_clear, "wait_for_endgate_to_clear");
+      }
+      if(pack_barcode_ok && pack_barcode_ok_message_posted==false)
+      {
+        send_barcode_status_message("Barcode OK", QColor(0,0,0), QColor(0,255,0), 25);
+        pack_barcode_ok_message_posted = true;
+      }
+      if(pack_barcode_wrong && pack_barcode_wrong_message_posted==false)
+      {
+        send_barcode_status_message("Incorrect Barcode", QColor(0,0,0), QColor(255,0,0), 25);
+        pack_barcode_wrong_message_posted = true;
       }
       break;
     case wait_for_endgate_to_clear:
@@ -964,9 +1050,19 @@ void batch_mode_driver::run()
       {
         centre_p->set_speed(dump_speed);
       }
-      if(pack_present==true)
+      if(pack_present && pack_barcode_ok)
       {
         switch_mode(dump_into_cut_gate_wait_for_endgate_to_clear, "dump_into_cut_gate_wait_for_endgate_to_clear");
+      }
+      if(pack_barcode_ok && pack_barcode_ok_message_posted==false)
+      {
+        send_barcode_status_message("Barcode OK", QColor(0,0,0), QColor(0,255,0), 25);
+        pack_barcode_ok_message_posted = true;
+      }
+      if(pack_barcode_wrong && pack_barcode_wrong_message_posted==false)
+      {
+        send_barcode_status_message("Incorrect Barcode", QColor(0,0,0), QColor(255,0,0), 25);
+        pack_barcode_wrong_message_posted = true;
       }
       if(centre_p->count > upper_chamber_count_limit)
       {
@@ -999,9 +1095,14 @@ void batch_mode_driver::run()
         cutgate_p->close();
         endgate_p->close();
       }
-      if(pack_present==true)
+      if(pack_present==true && pack_barcode_ok)
       {
         switch_mode(dump_into_cut_gate_wait_for_endgate_to_clear, "dump_into_cut_gate_wait_for_endgate_to_clear");
+      }
+      if(pack_barcode_ok && pack_barcode_ok_message_posted==false)
+      {
+        send_barcode_status_message("Barcode OK", QColor(0,0,0), QColor(0,255,0), 25);
+        pack_barcode_ok_message_posted = true;
       }
       break;
     case dump_into_cut_gate_wait_for_pack_removal:
@@ -2016,6 +2117,7 @@ void batch_mode_driver::barcode_entered(QString value)
   {
     pack_barcode = value_trimmed;
     pack_barcode_old = false;
+    pack_barcode_ok_message_posted = false;
     if(require_pack_barcode == false)
     {
       pack_barcode_ok = true;
@@ -2028,6 +2130,10 @@ void batch_mode_driver::barcode_entered(QString value)
         {
           pack_barcode_ok = true;
         }
+        else
+        {
+          pack_barcode_wrong = true;
+        }
       }
       if(pack_contain_lot == true)
       {
@@ -2035,12 +2141,20 @@ void batch_mode_driver::barcode_entered(QString value)
         {
           pack_barcode_ok = true;
         }
+        else
+        {
+          pack_barcode_wrong = true;
+        }
       }
       if(lot_contain_pack == true)
       {
         if(seed_lot_barcode.contains(pack_barcode)==true) 
         {
           pack_barcode_ok = true;
+        }
+        else
+        {
+          pack_barcode_wrong = true;
         }
       }
       /*

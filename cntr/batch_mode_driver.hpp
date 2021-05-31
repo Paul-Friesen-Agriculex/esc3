@@ -27,6 +27,7 @@ struct bm_set //batch mode set of packs
 enum mode_enum
 {
   entry,
+  wait_for_seed_lot_barcode,
   hi_o_c,
   lower_chamber_full_o_c,
   ramp_down_o_c,
@@ -284,6 +285,9 @@ class batch_mode_driver : public QObject
   bool pack_barcode_old;//pack that was scanned is finished
   bool seed_lot_barcode_ok;
   bool pack_barcode_ok;
+  bool pack_barcode_ok_message_posted;
+  bool pack_barcode_wrong;
+  bool pack_barcode_wrong_message_posted;
   bool release_pack;//true signals to release counted seed, even if barcode matching not satisfied.  For use in case of lost packet.
   
   //saving files
