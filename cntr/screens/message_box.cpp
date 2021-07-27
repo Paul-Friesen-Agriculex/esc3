@@ -1,5 +1,8 @@
 #include "message_box.hpp"
 #include <QPainter>
+#include <iostream>
+
+using namespace std;
 
 
 message_box::message_box(QWidget* parent)
@@ -14,38 +17,43 @@ message_box::message_box(QWidget* parent)
 
 void message_box::set_text(QString text_s)
 {
+  if(text==text_s) return;
   text = text_s;
+  cout<<"message_box::set_text.  text_size = "<<text_size<<endl;
+  cout<<"  text = "<<text.toStdString()<<endl;
   update();
 }
 
 void message_box::set_background(int r, int g, int b)
 {
   background = QColor(r, g, b);
-  update();
+//  update();
 }
 
 void message_box::set_background(QColor background_s)
 {
   background = background_s;
-  update();
+//  update();
 }
 
 void message_box::set_foreground(int r, int g, int b)
 {
   foreground = QColor(r, g, b);
-  update();
+//  update();
 }
 
 void message_box::set_foreground(QColor foreground_s)
 {
   foreground = foreground_s;
-  update();
+//  update();
 }
 
 void message_box::set_text_size(int size_s)
 {
   text_size = size_s;
-  update();
+//  cout<<"message_box::set_text_size.  text_size = "<<text_size<<endl;
+//  cout<<"  text = "<<text.toStdString()<<endl;
+//  update();
 }
 
 void message_box::paintEvent(QPaintEvent*) Q_DECL_OVERRIDE

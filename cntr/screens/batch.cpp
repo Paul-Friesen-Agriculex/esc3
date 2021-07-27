@@ -367,6 +367,7 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
   
   repeat_pack_window_p = 0;
   repeat_pack_window_exists = false;
+  batch_mode_driver_p -> use_spreadsheet = false;
   
 //  cout<<"batch::batch end\n";
   
@@ -447,7 +448,8 @@ void batch::dump_complete(int dump_count)
 //  end_valve_mode = dump_open_empty;
   barcode_line_p->setFocus();
   centre_p->dump_count_str = QString::number(dump_count);
-  centre_p->communicate_out('d');
+//  centre_p->communicate_out('d');
+  cout<<" end batch::dump_complete\n";
 }
 
 /*
@@ -1070,6 +1072,8 @@ void batch::run()
   old_barcode_mode = batch_mode_driver_p->barcode_mode;
 }
 */
+
+
 repeat_pack_window::repeat_pack_window(batch_mode_driver* batch_mode_driver_p_s, batch* batch_p_s)
 :QWidget()
 {
@@ -1125,9 +1129,9 @@ void repeat_pack_window::cancel_button_clicked()
 
 void repeat_pack_window::number_entered(int val)
 {
-  /*
+  
   batch_mode_driver_p -> extra_pack_count_limit = val;
   batch_mode_driver_p -> fill_extra_pack = true;
   barcode_line_p -> setFocus();
-  */
+  
 }

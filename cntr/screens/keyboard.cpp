@@ -715,7 +715,7 @@ void batch_save_table::enter_clicked()
   centre_p->screen_done=true;
   //returning to batch with bm_save_table_filename not blank will trigger save.  see batch constructor.
 }
-/*  
+  
 batch_save_ss_setup::batch_save_ss_setup(centre* centre_p, batch_mode_driver* batch_mode_driver_p_s)
 :keyboard(centre_p)
 {
@@ -749,8 +749,8 @@ batch_save_ss_setup::batch_save_ss_setup(centre* centre_p, batch_mode_driver* ba
 
   connect(enter_key_p, SIGNAL(clicked()), this, SLOT(enter_clicked()));
 }
-*/
-/*
+
+
 void batch_save_ss_setup::enter_clicked()
 {
   QDir qdir("ss_setups");
@@ -782,7 +782,7 @@ void batch_save_ss_setup::enter_clicked()
   centre_p->screen_done=true;
   //returning to ss_batch with bm_save_ss_setup filename not blank will trigger save.  see ss_batch constructor.
 }
-*/
+
 enter_field_text::enter_field_text(centre* centre_p, batch_mode_driver* batch_mode_driver_p_s)
 :keyboard(centre_p)
 {

@@ -59,23 +59,23 @@ batch_mode_driver::batch_mode_driver(centre* centre_p_s, cutgate* cutgate_p_s, e
 //  pack_complete = false;
 //  use_cutgate = true;
 
-//  use_spreadsheet = false;
-//  ss_setup_p = new ss_setup;
-//  clear_ss_setup();
-//  ss_setup_path = "";
-//  envelope_layout_path = "";
-//  envelope_p = new envelope;
-//  sample_row = 0;
-//  print_envelope = false;
-//  print_control_mode = start_on_pack_collect;
-//  field_data_source_flag = 'd'; //use spreadsheet data in print field (not heading).
+  use_spreadsheet = false;
+  ss_setup_p = new ss_setup;
+  clear_ss_setup();
+  ss_setup_path = "";
+  envelope_layout_path = "";
+  envelope_p = new envelope;
+  sample_row = 0;
+  print_envelope = false;
+  print_control_mode = start_on_pack_collect;
+  field_data_source_flag = 'd'; //use spreadsheet data in print field (not heading).
   
-//  fill_extra_pack = false;
-//  extra_pack_filling = false;
-//  extra_pack_count_limit = 0;
-//  extra_pack_stored_count_limit = 0;
- // extra_pack_finished = false;
- // ss_batch_exit_flag = false;
+  fill_extra_pack = false;
+  extra_pack_filling = false;
+  extra_pack_count_limit = 0;
+  extra_pack_stored_count_limit = 0;
+  extra_pack_finished = false;
+//  ss_batch_exit_flag = false;
   
   substitute_seed_lot = false;
   slave_mode = false;
@@ -131,16 +131,43 @@ batch_mode_driver::~batch_mode_driver()
 
 void batch_mode_driver::set_normal_status_message()
 {
-  QString message=QString("Crop: %1.  Sensitivity: %2.\nGate should be set at %3.\nProgram %4.\nPack %5 of %6.\n%7 seeds/pack.") 
-    .arg(centre_p->crops[0].name) 
-    .arg(centre_p->crops[0].sensitivity) 
-    .arg(centre_p->crops[0].gate_setting)
-    .arg(program_name)
-    .arg(endgate_pack+1)
-    .arg(cutgate_pack_limit)
-    .arg(cutgate_count_limit);
-//    .arg(program_path);
-  send_status_message(message, QColor(0,0,0), QColor(30, 200, 255), 16);
+  QString message;
+  if(use_spreadsheet)
+  {
+//    cout<<"batch_mode_driver::set_normal_status_message().  ss_envelope_id_p->data_list.size = "<<ss_envelope_id_p->data_list.size()<<".  spreadsheet_line_number = "<<spreadsheet_line_number<<endl;
+    if(seed_lot_barcode_ok)
+    {
+      message=QString("Crop: %1.  Sensitivity: %2.\nGate should be set at %3.\nMaterial %4.\nPack %5.\n%6 Seeds\n%7 packs left for this material.")
+        .arg(centre_p->crops[0].name) 
+        .arg(centre_p->crops[0].sensitivity) 
+        .arg(centre_p->crops[0].gate_setting)
+        .arg(seed_lot_barcode)
+        .arg(ss_envelope_id_p->data_list[end_valve_spreadsheet_line_number])
+        .arg(cutgate_count_limit)
+        .arg(lines_left_to_fill);
+    }
+    else
+    {
+      message=QString("Crop: %1.  Sensitivity: %2.\nGate should be set at %3.")
+        .arg(centre_p->crops[0].name) 
+        .arg(centre_p->crops[0].sensitivity) 
+        .arg(centre_p->crops[0].gate_setting);
+    }    
+    send_status_message(message, QColor(0,0,0), QColor(30, 200, 255), 14);
+  }
+  else
+  {
+    message=QString("Crop: %1.  Sensitivity: %2.\nGate should be set at %3.\nProgram %4.\nPack %5 of %6.\n%7 seeds/pack.") 
+      .arg(centre_p->crops[0].name) 
+      .arg(centre_p->crops[0].sensitivity) 
+      .arg(centre_p->crops[0].gate_setting)
+      .arg(program_name)
+      .arg(endgate_pack+1)
+      .arg(cutgate_pack_limit)
+      .arg(cutgate_count_limit);
+    send_status_message(message, QColor(0,0,0), QColor(30, 200, 255), 16);
+  }
+  
 }
 
 void batch_mode_driver::switch_mode(mode_enum new_mode, string str)
@@ -325,7 +352,7 @@ void batch_mode_driver::reset_program()
 //  current_pack = 0;
 //  current_count_limit = program[current_set]->seeds;
 //  current_pack_limit = program[current_set]->packs;
-//  mode = wait_for_seed_lot_barcode;
+  mode = entry;
   barcode_mode = seed_lot;
   barcode_is_new = false;
   seed_lot_barcode_old = true;//need a new scan
@@ -413,12 +440,12 @@ void batch_mode_driver::stop()
 
 void batch_mode_driver::restart()
 {
-//  dump_into_end_time.restart();
-//  mode = dump_into_end;
-//  cout<<"mode dump_into_end\n";
+  switch_mode(dump_into_end_gate, "dump_into_end_gate");
 //  emit dumping();
-//  pack_barcode_ok = false;
-//  pack_barcode_old = true;
+  pack_barcode_ok = false;
+  pack_barcode_old = true;
+  cutgate_pack = 0;
+  cutgate_set = 0;
 }
 /*
 bool batch_mode_driver::pack_barcode_ok()
@@ -476,7 +503,7 @@ void batch_mode_driver::save_program(QString filename)
 //  stream<<"totalize_force_endgate_open\n";
 //  stream<<centre_p->totalize_force_endgate_open<<endl;
 }
-/*
+
 void batch_mode_driver::load_spreadsheet(QString filename)
 {
   spreadsheet_filename = filename;
@@ -533,7 +560,7 @@ void batch_mode_driver::load_spreadsheet(QString filename)
       ss_first_column_p->data_list.append("N");
     }
   }
-  mode = wait_for_seed_lot_barcode;
+  mode = entry;
   ss_column_p = ss_first_column_p;
 
   //look for first unfilled row, initialize spreadsheet_line_number
@@ -586,7 +613,7 @@ void batch_mode_driver::print_seed_lot_envelopes(QString mat_id)
     }
   }
 }
-*/
+
 void batch_mode_driver::list_program()
 {
   for (int i=0; i<program_size; ++i)
@@ -610,6 +637,8 @@ void batch_mode_driver::run()
     pack_present_counter = 0;
   }
   
+  if(record_only) pack_barcode_ok = true;
+  
   if(count_rate_time.elapsed() > count_rate_interval*1000.0)
   {
     int new_count = centre_p->count;
@@ -629,6 +658,9 @@ void batch_mode_driver::run()
   switch(mode)
   {
     case entry:
+      cout<<"mode = entry\n";
+      cutgate_p->open();
+      endgate_p->close();
       if(require_seed_lot_barcode)
       {
         seed_lot_barcode_ok = false;
@@ -641,15 +673,92 @@ void batch_mode_driver::run()
       }
       break;
     case wait_for_seed_lot_barcode:
+//      cout<<"mode = wait_for_seed_lot_barcode\n";
       if(mode_new)
       {
+        cout<<"mode wait_for_seed_lot_barcode 1\n";
         set_normal_status_message();
+        cout<<"mode wait_for_seed_lot_barcode 1a\n";
         send_barcode_status_message("Scan Seed Lot Barcode", QColor(0,0,0), QColor(255,255,0), 25);
+        cout<<"mode wait_for_seed_lot_barcode 1b\n";
         barcode_mode = seed_lot;
+        cout<<"mode wait_for_seed_lot_barcode 1c\n";
         centre_p->set_speed(0);
+        cout<<"mode wait_for_seed_lot_barcode 2\n";
       }
       if(seed_lot_barcode_ok)
       {
+        if(use_spreadsheet == true)
+        {
+          cout<<"mode wait_for_seed_lot_barcode 3\n";
+          spreadsheet_line_number = get_next_spreadsheet_line_number();
+          cout<<"mode wait_for_seed_lot_barcode 4\n";
+          emit refresh_screen();
+          end_valve_spreadsheet_line_number = spreadsheet_line_number;
+          if(print_envelope)
+          {
+            if(print_control_mode==start_on_pack_collect)
+            {
+              cout<<"mode wait_for_seed_lot_barcode.  print_control_mode==start_on_pack_collect\n";
+              envelope_p -> print(spreadsheet_line_number);
+            }
+            else if(print_control_mode==start_on_previous_pack_collect)
+            {
+              cout<<"mode wait_for_seed_lot_barcode.  print_control_mode==start_on_previous_pack_collect\n";
+              envelope_p -> print(spreadsheet_line_number);
+              envelope_p -> print(get_spreadsheet_line_number_after(spreadsheet_line_number));
+            }
+          }
+          cout<<"mode wait_for_seed_lot_barcode 5\n";
+          if(spreadsheet_line_number==-1)//-1 value signals no more lines for this seed_lot_barcode
+          {
+            QMessageBox box;
+            box.setText(QString("No unfilled rows for seed lot %1. ").arg(seed_lot_barcode));
+            QPushButton* rescan_button_p = box.addButton(QString("Rescan"), QMessageBox::ActionRole);
+            QPushButton* exit_button_p = box.addButton(QString("Exit"), QMessageBox::ActionRole);
+            QPushButton* dump_button_p = box.addButton(QString("Dump out seed"), QMessageBox::ActionRole);
+            box.exec();
+            
+            if(box.clickedButton() == rescan_button_p)
+            {
+              seed_lot_barcode_ok = false;
+            }
+            if(box.clickedButton() == exit_button_p)
+            {
+              stop();
+              centre_p->add_waiting_screen(0);
+              centre_p->screen_done = true;
+              
+  //            restart_flag = true;
+  //            ss_batch_exit_flag = true;
+            }
+            else if (box.clickedButton() == dump_button_p)
+            {
+              seed_lot_barcode_ok = false;
+              switch_mode(dump_into_end_gate, "dump_into_end_gate");
+//              restart_flag = true;
+            }
+          }
+          else //have valid line number to fill
+          {
+            
+            bool conversion_ok_flag;
+            cutgate_count_limit = ss_required_count_p->data_list[spreadsheet_line_number].toInt(&conversion_ok_flag);
+            if(conversion_ok_flag==false)
+            {
+              QString string("Problem with entry in required count column.  Unable to convert *");
+              string.append(ss_required_count_p->data_list[spreadsheet_line_number]);
+              string.append("* to integer.  Stopping processing.");
+              QMessageBox box;
+              box.setText(string);
+              box.exec();
+              stop();
+              centre_p->add_waiting_screen(0);
+              centre_p->screen_done = true;
+            }           
+          }
+        }
+        send_barcode_status_message("Seed Lot Barcode Scanned", QColor(0,0,0), QColor(0,255,0), 25);
         barcode_mode = pack;
         switch_mode(hi_o_c, "hi_o_c");
       }
@@ -665,16 +774,27 @@ void batch_mode_driver::run()
       
         cout<<"cutgate_count_limit = "<<cutgate_count_limit<<"  centre_p->count = "<<centre_p->count<<"  slowdown_count_diff = "<<slowdown_count_diff<<endl;
         
-        set_normal_status_message();
+//        set_normal_status_message();
         barcode_mode = pack;
         if(require_pack_barcode)
         {
-          send_barcode_status_message("Scan Pack Barcode", QColor(0,0,0), QColor(255,255,0), 25);
+          if(use_spreadsheet)
+          {
+            QString bsm = "Scan Pack Barcode\n";
+            bsm.append(ss_envelope_id_p->data_list[spreadsheet_line_number]);//end_valve_spreadsheet_line_number]);
+            send_barcode_status_message(bsm, QColor(0,0,0), QColor(255,255,0), 14);
+          }
+          else
+          {
+            send_barcode_status_message("Scan Pack Barcode", QColor(0,0,0), QColor(255,255,0), 25);
+          }
           pack_barcode_ok = false;
           pack_barcode_ok_message_posted = false;
           pack_barcode_wrong = false;
           pack_barcode_wrong_message_posted = false;
         }
+        end_valve_spreadsheet_line_number = spreadsheet_line_number;
+        set_normal_status_message();
       }
       if(centre_p->feed_speed != high_feed_speed)
       {
@@ -691,6 +811,12 @@ void batch_mode_driver::run()
       if(pack_present && pack_barcode_ok)
       {
         switch_mode(hi_o_o, "hi_o_o");
+      }
+      if(require_pack_barcode == false)
+      {
+        send_barcode_status_message("Barcode Not Required", QColor(0,0,0), QColor(0,255,0), 25);
+        pack_barcode_ok_message_posted = true;
+        break;
       }
       if(pack_barcode_ok && pack_barcode_ok_message_posted==false)
       {
@@ -712,6 +838,12 @@ void batch_mode_driver::run()
       if(pack_present && pack_barcode_ok)
       {
         switch_mode(hi_o_o, "hi_o_o");
+      }
+      if(require_pack_barcode == false)
+      {
+        send_barcode_status_message("Barcode Not Required", QColor(0,0,0), QColor(0,255,0), 25);
+        pack_barcode_ok_message_posted = true;
+        break;
       }
       if(pack_barcode_ok && pack_barcode_ok_message_posted==false)
       {
@@ -742,6 +874,12 @@ void batch_mode_driver::run()
       {
         switch_mode(ramp_down_o_o, "ramp_down_o_o");
       }
+      if(require_pack_barcode == false)
+      {
+        send_barcode_status_message("Barcode Not Required", QColor(0,0,0), QColor(0,255,0), 25);
+        pack_barcode_ok_message_posted = true;
+        break;
+      }
       if(pack_barcode_ok && pack_barcode_ok_message_posted==false)
       {
         send_barcode_status_message("Barcode OK", QColor(0,0,0), QColor(0,255,0), 25);
@@ -760,23 +898,72 @@ void batch_mode_driver::run()
       }
       if(cutoff_gate_close_time.elapsed() >= cutoff_gate_delay_time)
       {
+        cutgate_p->close();
         switch_mode(hi_c_c, "hi_c_c");
-
-        ++cutgate_pack;
-//        cout<<"mode gate_delay_o_c.  cutgate_pack = "<<cutgate_pack<<endl;
-        if(cutgate_pack>=cutgate_pack_limit)
+        
+        if(use_spreadsheet)
         {
-          cutgate_pack = 0;
-          ++cutgate_set;
-//          cout<<"mode gate_delay_o_c.  cutgate_pack zeroed.  cutgate_set = "<<cutgate_set<<endl;
-          if(cutgate_set>=program_size)
+
+          if(spreadsheet_line_number>=0) ss_first_column_p->data_list[spreadsheet_line_number] = "Y";
+          centre_p->pack_count_str = QString::number(cutgate_count_limit);
+          centre_p->communicate_out('p');
+
+          spreadsheet_line_number = get_next_spreadsheet_line_number();
+          /*
+          if(print_envelope)
           {
-            cutgate_set = 0;
+            if(print_control_mode==start_on_pack_collect)
+            {
+              cout<<"mode gate_delay_o_c printing line "<<spreadsheet_line_number<<endl;
+              envelope_p -> print(spreadsheet_line_number);
+            }
+            else if(print_control_mode==start_on_previous_pack_collect)
+            {
+              envelope_p -> print(get_spreadsheet_line_number_after(spreadsheet_line_number));
+            }
+          }
+          */
+          emit refresh_screen();
+//          end_valve_spreadsheet_line_number = spreadsheet_line_number;
+          if(spreadsheet_line_number == -1)
+          {
             switch_mode(dump_into_cut_gate_c_c, "dump_into_cut_gate_c_c");
           }
+          else
+          {
+            bool conversion_ok_flag = false;
+            cutgate_count_limit = ss_required_count_p->data_list[spreadsheet_line_number].toInt(&conversion_ok_flag);
+            if(conversion_ok_flag==false)
+            {
+              QString string("Problem with entry in required count column.  Unable to convert *");
+              string.append(ss_required_count_p->data_list[spreadsheet_line_number]);
+              string.append("* to integer.  Stopping processing.");
+              QMessageBox box;
+              box.setText(string);
+              box.exec();
+              centre_p->add_waiting_screen(0);
+              centre_p->screen_done = true;
+            }
+          }
         }
-        cutgate_count_limit = program[cutgate_set]->seeds;
-        cutgate_pack_limit = program[cutgate_set]->packs;
+        else//not using spreadsheet
+        {
+          ++cutgate_pack;
+//        cout<<"mode gate_delay_o_c.  cutgate_pack = "<<cutgate_pack<<endl;
+          if(cutgate_pack>=cutgate_pack_limit)
+          {
+            cutgate_pack = 0;
+            ++cutgate_set;
+//          cout<<"mode gate_delay_o_c.  cutgate_pack zeroed.  cutgate_set = "<<cutgate_set<<endl;
+            if(cutgate_set>=program_size)
+            {
+              cutgate_set = 0;
+              switch_mode(dump_into_cut_gate_c_c, "dump_into_cut_gate_c_c");
+            }
+          }
+          cutgate_count_limit = program[cutgate_set]->seeds;
+          cutgate_pack_limit = program[cutgate_set]->packs;
+        }
       }
       break;
     case hi_o_o:
@@ -836,20 +1023,51 @@ void batch_mode_driver::run()
       if(cutoff_gate_close_time.elapsed() >= cutoff_gate_delay_time)
       {
         switch_mode(hi_c_o, "hi_c_o");
-
-        ++cutgate_pack;
-        cout<<"cutgate_pack = "<<cutgate_pack<<endl;
-        if(cutgate_pack>=cutgate_pack_limit)
+        if(use_spreadsheet)
         {
-          cutgate_pack = 0;
-          ++cutgate_set;
-          if(cutgate_set>=program_size)
+          if(spreadsheet_line_number>=0) ss_first_column_p->data_list[spreadsheet_line_number] = "Y";
+          centre_p->pack_count_str = QString::number(cutgate_count_limit);
+          centre_p->communicate_out('p');
+          spreadsheet_line_number = get_next_spreadsheet_line_number();
+          emit refresh_screen();
+//          end_valve_spreadsheet_line_number = spreadsheet_line_number;
+          if(spreadsheet_line_number == -1)
           {
-            cutgate_set = 0;
-            switch_mode(dump_into_cut_gate_c_o, "dump_into_cut_gate_c_o");
+            switch_mode(dump_into_cut_gate_c_c, "dump_into_cut_gate_c_c");
           }
-          cutgate_count_limit = program[cutgate_set]->seeds;
-          cutgate_pack_limit = program[cutgate_set]->packs;
+          else
+          {
+            bool conversion_ok_flag = false;
+            cutgate_count_limit = ss_required_count_p->data_list[spreadsheet_line_number].toInt(&conversion_ok_flag);
+            if(conversion_ok_flag==false)
+            {
+              QString string("Problem with entry in required count column.  Unable to convert *");
+              string.append(ss_required_count_p->data_list[spreadsheet_line_number]);
+              string.append("* to integer.  Stopping processing.");
+              QMessageBox box;
+              box.setText(string);
+              box.exec();
+              centre_p->add_waiting_screen(0);
+              centre_p->screen_done = true;
+            }
+          }
+        }
+        else//use_spreadsheet false
+        {
+          ++cutgate_pack;
+          cout<<"cutgate_pack = "<<cutgate_pack<<endl;
+          if(cutgate_pack>=cutgate_pack_limit)
+          {
+            cutgate_pack = 0;
+            ++cutgate_set;
+            if(cutgate_set>=program_size)
+            {
+              cutgate_set = 0;
+              switch_mode(dump_into_cut_gate_c_o, "dump_into_cut_gate_c_o");
+            }
+            cutgate_count_limit = program[cutgate_set]->seeds;
+            cutgate_pack_limit = program[cutgate_set]->packs;
+          }
         }
       }
       break;      
@@ -861,8 +1079,22 @@ void batch_mode_driver::run()
         endgate_p->open();
         out_pack = endgate_pack;
         out_set = endgate_set;
-        QString status_message = QString("Pack Ready\nPack %1 of %2.\n%3 seeds.").arg(endgate_pack+1).arg(endgate_pack_limit).arg(endgate_count_limit);
-        send_status_message(status_message, QColor(0,0,0), QColor(0,255,0), 25);
+        QString status_message;
+        
+        if(use_spreadsheet)
+        {
+          status_message = QString("Pack Ready.  Seed Lot:\n%1\nPack ID:\n%2.\n%3 seeds.\n%4 packs left for this lot.")
+            .arg(seed_lot_barcode)
+            .arg(ss_envelope_id_p->data_list[end_valve_spreadsheet_line_number])
+            .arg(ss_required_count_p->data_list[end_valve_spreadsheet_line_number])
+            .arg(lines_left_to_fill);
+          send_status_message(status_message, QColor(0,0,0), QColor(0,255,0), 14);
+        }
+        else
+        {
+          status_message = QString("Pack Ready\nPack %1 of %2.\n%3 seeds.").arg(endgate_pack+1).arg(endgate_pack_limit).arg(endgate_count_limit);
+          send_status_message(status_message, QColor(0,0,0), QColor(0,255,0), 25);
+        }
 //        cout<<"mode hi_c_o emitting pack_collected("<<endgate_count_limit<<")\n";
 //        emit pack_collected(endgate_count_limit);
         end_chute_clear_time.restart();
@@ -882,8 +1114,23 @@ void batch_mode_driver::run()
         centre_p->set_speed(high_feed_speed);
         cutgate_p->close();
         endgate_p->close();
-        QString status_message = QString("Pack Ready\nPack %1 of %2.\n%3 seeds.").arg(endgate_pack+1).arg(endgate_pack_limit).arg(endgate_count_limit);
-        send_status_message(status_message, QColor(0,0,0), QColor(0,255,0), 25);
+        QString status_message;
+        if(use_spreadsheet)
+        {
+          status_message = QString("Pack Ready.  Seed Lot:\n%1\nPack ID:\n%2.\n%3 seeds.\n%4 packs left for this lot.")
+            .arg(seed_lot_barcode)
+            .arg(ss_envelope_id_p->data_list[end_valve_spreadsheet_line_number])
+            .arg(ss_required_count_p->data_list[end_valve_spreadsheet_line_number])
+            .arg(lines_left_to_fill);
+          send_status_message(status_message, QColor(0,0,0), QColor(0,255,0), 14);
+        }
+        else
+        {
+          status_message = QString("Pack Ready\nPack %1 of %2.\n%3 seeds.").arg(endgate_pack+1).arg(endgate_pack_limit).arg(endgate_count_limit);
+          send_status_message(status_message, QColor(0,0,0), QColor(0,255,0), 25);
+        }
+//        QString status_message = QString("Pack Ready\nPack %1 of %2.\n%3 seeds.").arg(endgate_pack+1).arg(endgate_pack_limit).arg(endgate_count_limit);
+//        send_status_message(status_message, QColor(0,0,0), QColor(0,255,0), 25);
 //        cout<<"mode hi_c_c emitting pack_collected("<<endgate_count_limit<<")\n";
 //        emit pack_collected(endgate_count_limit);
       }
@@ -902,6 +1149,12 @@ void batch_mode_driver::run()
       if(pack_present && pack_barcode_ok)
       {
         switch_mode(hi_c_o, "hi_c_o");
+      }
+      if(require_pack_barcode == false)
+      {
+        send_barcode_status_message("Barcode Not Required", QColor(0,0,0), QColor(0,255,0), 25);
+        pack_barcode_ok_message_posted = true;
+        break;
       }
       if(pack_barcode_ok && pack_barcode_ok_message_posted==false)
       {
@@ -979,6 +1232,12 @@ void batch_mode_driver::run()
       if(pack_present && pack_barcode_ok)
       {
         switch_mode(wait_for_endgate_to_clear, "wait_for_endgate_to_clear");
+      }
+      if(require_pack_barcode == false)
+      {
+        send_barcode_status_message("Barcode Not Required", QColor(0,0,0), QColor(0,255,0), 25);
+        pack_barcode_ok_message_posted = true;
+        break;
       }
       if(pack_barcode_ok && pack_barcode_ok_message_posted==false)
       {
@@ -1120,18 +1379,18 @@ void batch_mode_driver::run()
     case dump_into_cut_gate_wait_for_endgate_to_clear:
       if(mode_new)
       {
-        centre_p->set_speed(dump_speed);
+        centre_p->set_speed(0);
         cutgate_p->close();
         endgate_p->open();
         end_chute_clear_time.restart();
       }
-      if(centre_p->feed_speed != dump_speed)
+      if(centre_p->feed_speed != 0)
       {
-        centre_p->set_speed(dump_speed);
+        centre_p->set_speed(0);
       }
       if(end_chute_clear_time.elapsed() >= end_chute_clear_time_limit)
       {
-        switch_mode(dump_into_cut_gate_wait_for_endgate_to_close, "dump_into_cut_gate_wait_for_endgate_to_close");
+        switch_mode(dump_into_cut_gate_wait_for_pack_removal, "dump_into_cut_gate_wait_for_pack_removal");
       }
       break;
     case dump_into_end_gate:
@@ -1141,13 +1400,15 @@ void batch_mode_driver::run()
         cutgate_p->open();
         endgate_p->close();
         send_status_message("Place Dump\nContainer", QColor(0,0,0), QColor(255,255,0), 25);
+        send_barcode_status_message("", QColor(0,0,0), QColor(0,255,0), 25);
       }
       if(centre_p->feed_speed != dump_speed)
       {
         centre_p->set_speed(dump_speed);
       }
-      if(centre_p->count > endgate_count_limit)
+      if(centre_p->count > lower_chamber_count_limit)
       {
+        cout<<"centre_p->count = "<<centre_p->count<<".  lower_chamber_count_limit = "<<lower_chamber_count_limit<<endl;
         switch_mode(dump_into_end_gate_wait_for_container, "dump_into_end_gate_wait_for_container");
       }
       if(pack_present)
@@ -1194,25 +1455,45 @@ void batch_mode_driver::run()
     case wait_for_dump_container_removal:
       if(mode_new)
       {
+//        cout<<"batch_mode_driver::run a\n";
         centre_p->set_speed(dump_speed);
         cutgate_p->open();
         endgate_p->open();
         dump_end_qtime.restart();
+//        cout<<"batch_mode_driver::run b\n";
       }
+//      cout<<"batch_mode_driver::run c\n";
       if(centre_p->feed_speed != dump_speed)
       {
         centre_p->set_speed(dump_speed);
       }
-      if(pack_present == false)
+//      cout<<"batch_mode_driver::run d\n";
+      if(pack_present == false) 
       {
+        if(use_spreadsheet)
+        {
+          if(ss_dump_count_p != 0)
+          {
+            ss_dump_count_p -> data_list[end_valve_spreadsheet_line_number] = QString::number(centre_p->count);
+          }
+        }
+        refresh_screen();
+//        cout<<"batch_mode_driver::run 1\n";
         emit dump_complete(centre_p->count);
+//        cout<<"batch_mode_driver::run 2\n";
+        centre_p->dump_count_str = QString::number(centre_p->count);
+//        cout<<"batch_mode_driver::run 3\n";
+        centre_p->communicate_out('d');
+//        cout<<"batch_mode_driver::run 4\n";
         centre_p->count = 0;
         count_rate = 0;//we do not want the rate established during dumping.  Will be re-set quickly on hi speed.
         hi_rate = 0;
         slowdown_count_diff = 0;
         stop_count_diff = 0;
         switch_mode(entry, "entry");
+//        cout<<"batch_mode_driver::run 5\n";
       }
+//      cout<<"batch_mode_driver::run e\n";
       break;
     default: cout<<"batch_mode_driver::run.  mode not found\n";
   }
@@ -2157,7 +2438,7 @@ void batch_mode_driver::barcode_entered(QString value)
           pack_barcode_wrong = true;
         }
       }
-      /*
+      
       if(pack_match_spreadsheet == true)
       {
         QString spreadsheet_pack_barcode  = ss_envelope_id_p->data_list[end_valve_spreadsheet_line_number];
@@ -2174,7 +2455,7 @@ void batch_mode_driver::barcode_entered(QString value)
           
         }
       }
-      */
+      
       if(record_only == true)
       {
         if(pack_barcode_old == false)
@@ -2207,7 +2488,7 @@ void batch_mode_driver::cutgate_timing_error()
   msg_box.exec();
   force_dump_out = true;
 }
-
+*/
 spreadsheet_column* batch_mode_driver::get_spreadsheet_column_pointer(int column_number)
 {
   if(column_number<0)//-1 used to indicate invalid data.
@@ -2727,7 +3008,7 @@ int batch_mode_driver::get_spreadsheet_line_number_after(int val)//look for line
   }
   return(-1);
 }
-*/
+
 void batch_mode_driver::chamber_count_limit_calculation() //2021_03_19
 {
   //Chamber Volumes
@@ -2747,8 +3028,9 @@ void batch_mode_driver::chamber_count_limit_calculation() //2021_03_19
   double lower_chamber_seed_limit = (lower_chamber_volume * cm3_to_pixel) / selected_average_seed_volume;
   double upper_chamber_seed_limit = (upper_chamber_volume * cm3_to_pixel) / selected_average_seed_volume;
   
-  upper_chamber_count_limit = upper_chamber_seed_limit*.7; //class variable
-  lower_chamber_count_limit = lower_chamber_seed_limit*.7; //
+//  upper_chamber_count_limit = upper_chamber_seed_limit*.7; //class variable
+  lower_chamber_count_limit = lower_chamber_seed_limit*.5; //
+  upper_chamber_count_limit = lower_chamber_count_limit;
   
 //------------------------------------------------------------------------------------------------------//  
   cout<<"\t\t measured_seed_volume: "<<measured_seed_volume<<endl;
@@ -2758,7 +3040,7 @@ void batch_mode_driver::chamber_count_limit_calculation() //2021_03_19
   cout<<"\t\t lower_chamber_count_limit: "<<lower_chamber_count_limit<<endl;
   cout<<"\t\t upper_chamber_count_limit: "<<upper_chamber_count_limit<<endl;
   
-  cout<<"\t\t program[current_set]->seeds: "<<program[cutgate_set]->seeds<<endl;
+//  cout<<"\t\t program[current_set]->seeds: "<<program[cutgate_set]->seeds<<endl;
 //  cout<<"\t\t 0.8*upperchamber_count_limit: "<<0.8*upper_chamber_count_limit<<endl;
 //  cout<<"\t\t difference: "<<(program[cutgate_set]->seeds - 0.8*upper_chamber_count_limit)<<endl;
 //------------------------------------------------------------------------------------------------------//

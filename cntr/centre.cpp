@@ -41,8 +41,8 @@
 #include "program_delete.hpp"
 #include "crop_name_exists.hpp"
 #include "diagnostics_console.hpp"
-//#include "spreadsheet_choice.hpp"
-/*
+#include "spreadsheet_choice.hpp"
+
 #include "ss_setup_choice.hpp"
 #include "ss_setup_entry.hpp"
 #include "set_envelope_size.hpp"
@@ -54,7 +54,7 @@
 #include "select_envelope_field.hpp"
 #include "position_envelope_field.hpp"
 #include "select_field_data_source.hpp"
-*/
+
 #include "macro_screen.hpp"	
 #include "macro_builder.hpp"
 #include "communications_menu.hpp"
@@ -573,24 +573,24 @@ void centre::run()
       case 18: screen_p=new program_delete(this, batch_mode_driver_p); break;
       case 19: screen_p=new crop_name_exists(this); break;
       case 20: screen_p=new batch_save_table(this, batch_mode_driver_p); break;
-//      case 21: screen_p=new spreadsheet_choice(this, batch_mode_driver_p); break;
-//      case 22: screen_p=new ss_setup_choice(this, batch_mode_driver_p); break;
-//      case 23: screen_p=new ss_setup_entry(this, batch_mode_driver_p); break;
-//      case 25: screen_p=new set_envelope_size(this, batch_mode_driver_p); break;
+      case 21: screen_p=new spreadsheet_choice(this, batch_mode_driver_p); break;
+      case 22: screen_p=new ss_setup_choice(this, batch_mode_driver_p); break;
+      case 23: screen_p=new ss_setup_entry(this, batch_mode_driver_p); break;
+      case 25: screen_p=new set_envelope_size(this, batch_mode_driver_p); break;
 //      case : screen_p=new (this); break;
 //      case : screen_p=new (this); break;
 //      case : screen_p=new (this); break;
 //      case : screen_p=new (this); break;
 //      case : screen_p=new (this); break;
       case 28: screen_p=new macro_screen(this); break;	    //TEST~~~ macro_menu
-//      case 29: screen_p=new batch_save_ss_setup(this, batch_mode_driver_p); break;
-//      case 30: screen_p=new ss_setup_delete(this, batch_mode_driver_p); break;
-//      case 31: screen_p=new ss_options(this, batch_mode_driver_p); break;
-//      case 32: screen_p=new ss_column_display_options(this, batch_mode_driver_p); break;
-//      case 33: screen_p=new ss_batch(this, batch_mode_driver_p); break;
-//      case 34: screen_p=new select_envelope_field(this, batch_mode_driver_p); break;
-//      case 35: screen_p=new position_envelope_field(this, batch_mode_driver_p); break;
-//      case 36: screen_p=new select_field_data_source(this, batch_mode_driver_p); break;
+      case 29: screen_p=new batch_save_ss_setup(this, batch_mode_driver_p); break;
+      case 30: screen_p=new ss_setup_delete(this, batch_mode_driver_p); break;
+      case 31: screen_p=new ss_options(this, batch_mode_driver_p); break;
+      case 32: screen_p=new ss_column_display_options(this, batch_mode_driver_p); break;
+      case 33: screen_p=new ss_batch(this, batch_mode_driver_p); break;
+      case 34: screen_p=new select_envelope_field(this, batch_mode_driver_p); break;
+      case 35: screen_p=new position_envelope_field(this, batch_mode_driver_p); break;
+      case 36: screen_p=new select_field_data_source(this, batch_mode_driver_p); break;
       case 37: screen_p=new enter_field_text(this, batch_mode_driver_p); break;
       case 38: screen_p=new macro_builder(this); break;
 //      case : screen_p=new (this); break;

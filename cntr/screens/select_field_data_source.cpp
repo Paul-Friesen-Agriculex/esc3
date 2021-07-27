@@ -39,21 +39,21 @@ void select_field_data_source::back_clicked()
 
 void select_field_data_source::ss_data_button_clicked()
 {
-//  batch_mode_driver_p->field_data_source_flag = 'd';
+  batch_mode_driver_p->field_data_source_flag = 'd';
   centre_p->add_waiting_screen(34);//select_envelope_field
   centre_p->screen_done = true;
 }
 
 void select_field_data_source::ss_heading_button_clicked()
 {
-//  batch_mode_driver_p->field_data_source_flag = 'h';
+  batch_mode_driver_p->field_data_source_flag = 'h';
   centre_p->add_waiting_screen(34);//select_envelope_field
   centre_p->screen_done = true;
 }
 
 void select_field_data_source::text_entry_button_clicked()
 {
-//  batch_mode_driver_p->field_data_source_flag = 't';
+  batch_mode_driver_p->field_data_source_flag = 't';
   centre_p->add_waiting_screen(37);//enter_field_text
   centre_p->screen_done = true;
 }

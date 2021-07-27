@@ -193,7 +193,7 @@ class batch_mode_driver : public QObject
 //  QTime dump_into_end_time;
 //  static const int dump_into_end_time_limit;
   QTime dump_end_qtime;
-  static const int dump_end_qtime_limit = 1000;
+  static const int dump_end_qtime_limit = 2000;
   
   public:
   batch_mode_driver(centre* centre_p_s, cutgate* cutgate_p_s, endgate* endgate_p_s);
@@ -297,7 +297,7 @@ class batch_mode_driver : public QObject
   void save_program(QString filename);
   
   //spreadsheet handling
-  /*
+  
   bool use_spreadsheet;
   QString spreadsheet_filename;
   void load_spreadsheet(QString filename);
@@ -328,7 +328,7 @@ class batch_mode_driver : public QObject
   void fill_ss_column_pointers();
   QList<int> display_column_numbers;
   QString envelope_layout_path;
-  bool ss_batch_exit_flag;
+//  bool ss_batch_exit_flag;
 
   //saving spreadsheet setup files
   QString bm_save_ss_setup_filename;//new filename just entered.  Set back to blank when file is saved.
@@ -348,7 +348,7 @@ class batch_mode_driver : public QObject
   int extra_pack_count_limit;
   int extra_pack_stored_count_limit;//store current_count_limit so it can be restored after extra pack
   bool extra_pack_finished;
-  */
+  
   //substitute seed lot
   bool substitute_seed_lot;
   QString substitute_barcode;
