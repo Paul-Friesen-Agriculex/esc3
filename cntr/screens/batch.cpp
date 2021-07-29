@@ -51,7 +51,8 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
   back_button_p = new button("Back");
   barcode_line_p = new barcode_line;
   barcode_line_p->setMaximumSize(120,40);  //ORIGINAL~~~
-  repeat_pack_button_p = new button("Repeat a pack");
+  repeat_pack_button_p = new button("Repeat previous\npack");
+  repeat_pack_button_p->setEnabled(false);
   restart_button_p = new button("Dump out and\nrestart seed lot");
   substitution_button_p = new button("Substitute seed lot");
   cancel_substitution_button_p = new button("Cancel substitute\nseed lot");
@@ -205,6 +206,7 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
   connect(batch_mode_driver_p, SIGNAL(send_status_message(QString, QColor, QColor, int)), this, SLOT(get_status_message(QString, QColor, QColor, int)));
   connect(batch_mode_driver_p, SIGNAL(send_barcode_status_message(QString, QColor, QColor, int)), this, SLOT(get_barcode_status_message(QString, QColor, QColor, int)));
   connect(low_speed_set_p, SIGNAL(sliderReleased()), this, SLOT(focus_on_barcode()));
+  connect(batch_mode_driver_p, SIGNAL(enable_repeat_pack_button(bool)), this, SLOT(enable_repeat_pack_button(bool)));
 
   
 //  cout<<"batch::batch 5\n";
@@ -365,8 +367,8 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
   
 //  cout<<"batch::batch 9\n";
   
-  repeat_pack_window_p = 0;
-  repeat_pack_window_exists = false;
+//  repeat_pack_window_p = 0;
+//  repeat_pack_window_exists = false;
   batch_mode_driver_p -> use_spreadsheet = false;
   
 //  cout<<"batch::batch end\n";
@@ -402,7 +404,7 @@ batch::~batch()
   delete main_layout_p;
   cout<<"~batch end\n";
   */
-  if(repeat_pack_window_exists) delete repeat_pack_window_p;
+//  if(repeat_pack_window_exists) delete repeat_pack_window_p;
 }
 
 void batch::get_status_message(QString message, QColor foreground, QColor background, int text_size)
@@ -462,6 +464,11 @@ void batch::focus_on_barcode()
 {
   barcode_line_p -> setFocus();
 }
+
+void batch::enable_repeat_pack_button(bool on)
+{
+  repeat_pack_button_p->setEnabled(on);
+}
 /*
 void batch::bad_lot_slot()
 {
@@ -501,11 +508,15 @@ void batch::back_clicked()
 
 void batch::repeat_pack_clicked()
 {
+  batch_mode_driver_p->repeat_pack();
+  /*
   repeat_pack_window_p = new repeat_pack_window(batch_mode_driver_p, this);
   connect(repeat_pack_window_p, SIGNAL(destroyed(QObject*)), this, SLOT(focus_on_barcode()));
   connect(batch_mode_driver_p, SIGNAL(send_extra_pack_message(QString)), repeat_pack_window_p, SLOT(set_message(QString)));
   connect(batch_mode_driver_p, SIGNAL(extra_pack_finished_signal()), repeat_pack_window_p, SLOT(cancel_button_clicked()));
+  */
   focus_on_barcode();
+  
 }
 
 void batch::restart_clicked()
@@ -1073,7 +1084,7 @@ void batch::run()
 }
 */
 
-
+/*
 repeat_pack_window::repeat_pack_window(batch_mode_driver* batch_mode_driver_p_s, batch* batch_p_s)
 :QWidget()
 {
@@ -1135,3 +1146,4 @@ void repeat_pack_window::number_entered(int val)
   barcode_line_p -> setFocus();
   
 }
+*/

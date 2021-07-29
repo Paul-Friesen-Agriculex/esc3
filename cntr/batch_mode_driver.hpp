@@ -51,7 +51,9 @@ enum mode_enum
   dump_into_end_gate,
   dump_into_end_gate_wait_for_container,
   dump_into_container,
-  wait_for_dump_container_removal
+  wait_for_dump_container_removal,
+  repeat_wait_for_container,
+  repeat_wait_for_container_removal
 };
 
 
@@ -227,6 +229,7 @@ class batch_mode_driver : public QObject
   int endgate_pack;
   int out_set;
   int out_pack;
+  bool first_repeat_pack;//the first time "repeat previous pack" is pressed, back program up 2 positions.  Subsequent presses back up 1 position.
   int cutgate_count_limit;
   int cutgate_pack_limit;
   int endgate_count_limit;
@@ -372,6 +375,7 @@ class batch_mode_driver : public QObject
   void barcode_entered(QString value);
 //  void cutgate_timing_error();
   void chamber_count_limit_calculation(); //calculates count limit for seed chambers for currently selected seed size //2021_03_19
+  void repeat_pack();
   
   signals:
   void dumping();
@@ -387,6 +391,7 @@ class batch_mode_driver : public QObject
   void slave_mode_set_finished();
   void send_status_message(QString message, QColor foreground, QColor background, int text_size);
   void send_barcode_status_message(QString message, QColor foreground, QColor background, int text_size);
+  void enable_repeat_pack_button(bool on);
   
   //testing
   void send_message2(QString);

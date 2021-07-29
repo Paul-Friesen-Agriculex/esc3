@@ -98,6 +98,7 @@ batch_mode_driver::batch_mode_driver(centre* centre_p_s, cutgate* cutgate_p_s, e
   endgate_pack = 0;
   out_set = 0;
   out_pack = 0;
+  first_repeat_pack = true;
   cutgate_count_limit = 0;
   cutgate_pack_limit = 0;
   endgate_count_limit = 0;
@@ -324,6 +325,7 @@ void batch_mode_driver::load_program()//load the program indicated by program_pa
   endgate_pack = 0;
   out_set = 0;
   out_pack = 0;
+  first_repeat_pack = true;
   cutgate_count_limit = program[cutgate_set]->seeds;
   cutgate_pack_limit = program[cutgate_set]->packs;
   
@@ -345,6 +347,7 @@ void batch_mode_driver::reset_program()
   endgate_pack = 0;
   out_set = 0;
   out_pack = 0;
+  first_repeat_pack = true;
   cutgate_count_limit = program[cutgate_set]->seeds;
   cutgate_pack_limit = program[cutgate_set]->packs;
 
@@ -770,6 +773,7 @@ void batch_mode_driver::run()
         endgate_p->close();
         endgate_count_limit = cutgate_count_limit;
         endgate_pack_limit = cutgate_pack_limit;
+        endgate_set = cutgate_set;
         endgate_pack = cutgate_pack;
       
         cout<<"cutgate_count_limit = "<<cutgate_count_limit<<"  centre_p->count = "<<centre_p->count<<"  slowdown_count_diff = "<<slowdown_count_diff<<endl;
@@ -1196,6 +1200,8 @@ void batch_mode_driver::run()
         centre_p->set_speed(high_feed_speed);
         cutgate_p->open();
         endgate_p->close();
+        endgate_set = cutgate_set;
+        endgate_pack = cutgate_pack;
       }
       if(centre_p->feed_speed != high_feed_speed)
       {
@@ -1228,9 +1234,11 @@ void batch_mode_driver::run()
         centre_p->set_speed(0);
         cutgate_p->close();
         endgate_p->close();
+        emit enable_repeat_pack_button(true);
       }
       if(pack_present && pack_barcode_ok)
       {
+        emit enable_repeat_pack_button(false);
         switch_mode(wait_for_endgate_to_clear, "wait_for_endgate_to_clear");
       }
       if(require_pack_barcode == false)
@@ -1353,9 +1361,11 @@ void batch_mode_driver::run()
         centre_p->set_speed(0);
         cutgate_p->close();
         endgate_p->close();
+        emit enable_repeat_pack_button(true);
       }
       if(pack_present==true && pack_barcode_ok)
       {
+        emit enable_repeat_pack_button(false);
         switch_mode(dump_into_cut_gate_wait_for_endgate_to_clear, "dump_into_cut_gate_wait_for_endgate_to_clear");
       }
       if(pack_barcode_ok && pack_barcode_ok_message_posted==false)
@@ -1494,6 +1504,38 @@ void batch_mode_driver::run()
 //        cout<<"batch_mode_driver::run 5\n";
       }
 //      cout<<"batch_mode_driver::run e\n";
+      break;
+    case repeat_wait_for_container:
+      if(mode_new)
+      {
+        centre_p->set_speed(0);
+        cutgate_p->open();
+        endgate_p->close();
+        first_repeat_pack = false;
+      }
+      if(pack_present == true) 
+      {
+        emit enable_repeat_pack_button(false);
+        first_repeat_pack = true;//reset for future use
+        switch_mode(repeat_wait_for_container_removal, "repeat_wait_for_container_removal");
+      }
+      break;
+    case repeat_wait_for_container_removal:
+      if(mode_new)
+      {
+        centre_p->set_speed(0);
+        cutgate_p->open();
+        endgate_p->open();
+      }
+      if(pack_present == false) 
+      {
+        centre_p->count = 0;
+        count_rate = 0;//we do not want the rate established during dumping.  Will be re-set quickly on hi speed.
+        hi_rate = 0;
+        slowdown_count_diff = 0;
+        stop_count_diff = 0;
+        switch_mode(hi_o_c, "hi_o_c");
+      }
       break;
     default: cout<<"batch_mode_driver::run.  mode not found\n";
   }
@@ -3044,4 +3086,58 @@ void batch_mode_driver::chamber_count_limit_calculation() //2021_03_19
 //  cout<<"\t\t 0.8*upperchamber_count_limit: "<<0.8*upper_chamber_count_limit<<endl;
 //  cout<<"\t\t difference: "<<(program[cutgate_set]->seeds - 0.8*upper_chamber_count_limit)<<endl;
 //------------------------------------------------------------------------------------------------------//
+}
+
+void batch_mode_driver::repeat_pack()
+{
+  if(first_repeat_pack)
+  {
+    if(  (cutgate_set==0)  &&  (cutgate_pack==0)  )//program was reset.  go back to pack before end
+    {
+      cutgate_set = program_size-1;
+      cutgate_pack = program[cutgate_set]->packs - 2;
+    }
+    else
+    {
+      cutgate_pack -= 2;
+    }
+  }
+  else
+  {
+    cutgate_pack -= 1;
+  }
+  if(cutgate_pack<0)
+  {
+    cutgate_set--;
+    if(cutgate_set<0)
+    {
+      cutgate_set = 0;
+      cutgate_pack = 0;
+    }
+    else
+    {
+      cutgate_pack = (program[cutgate_set]->packs) - 1;
+    }
+  }
+  
+//  cutgate_set = out_set;
+//  cutgate_pack = out_pack;
+  cutgate_count_limit = program[cutgate_set]->seeds;
+  cutgate_pack_limit = program[cutgate_set]->packs;
+  
+//  QString message=QString("Program has been stepped back.\nSample in endgate is:\n  Pack %1 of %2, %3 seeds.\nNext pack will repeat:\n  Pack %4 of %5, %6 seeds.") 
+//    .arg(endgate_pack+1)
+//    .arg(endgate_pack_limit)
+//    .arg(endgate_count_limit)
+//    .arg(cutgate_pack+1)
+//    .arg(cutgate_pack_limit)
+//    .arg(cutgate_count_limit);
+  QString message=QString("Program has been stepped back.\nClean out material in endgate.\nNext pack will repeat:\n  Pack %1 of %2:  %3 seeds.\nTo go back farther click again.") 
+    .arg(cutgate_pack+1)
+    .arg(cutgate_pack_limit)
+    .arg(cutgate_count_limit);
+  send_status_message(message, QColor(0,0,0), QColor(255, 255, 0), 16);
+  send_barcode_status_message("", QColor(0,0,0), QColor(0,255,0), 16); 
+  switch_mode(repeat_wait_for_container, "repeat_wait_for_container"); 
+//  emit enable_repeat_pack_button(false);
 }

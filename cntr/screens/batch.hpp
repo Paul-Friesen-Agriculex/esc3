@@ -21,7 +21,7 @@ class QSlider;
 class QTimer;
 class QFileDialog;
 class message_box;
-class repeat_pack_window;
+//class repeat_pack_window;
 class help_screen;
 
 class barcode_line : public QLineEdit  
@@ -74,6 +74,7 @@ class batch : public screen
   void dump_complete(int dump_count);
 //  void dumping();
   void focus_on_barcode();
+  void enable_repeat_pack_button(bool on);
 //  void bad_lot_slot();
   
   private slots:
@@ -160,11 +161,11 @@ class batch : public screen
   QString count_string;				//seed count access from gpio_keyboard
   QTimer* run_timer_p;
   
-  repeat_pack_window* repeat_pack_window_p;
+//  repeat_pack_window* repeat_pack_window_p;
   public:
-  bool repeat_pack_window_exists;
+//  bool repeat_pack_window_exists;
 };
-
+/*
 class repeat_pack_window:public QWidget
 {
   Q_OBJECT
@@ -191,6 +192,6 @@ class repeat_pack_window:public QWidget
   void entry_button_clicked();
   void number_entered(int val);
 };
-
+*/
 #endif
 
