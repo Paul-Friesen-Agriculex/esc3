@@ -55,7 +55,11 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
   repeat_pack_button_p->setEnabled(false);
   restart_button_p = new button("Dump out and\nrestart seed lot");
   substitution_button_p = new button("Substitute seed lot");
+  substitution_button_p->setEnabled(false);
   cancel_substitution_button_p = new button("Cancel substitute\nseed lot");
+  
+  cancel_substitution_button_p->hide();
+  
   high_speed_label_p = new QLabel("High");
   high_speed_set_p = new QSlider;
   high_speed_set_p->setMinimum(0);
@@ -202,12 +206,13 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
   connect(quit_button_p, SIGNAL(clicked()), this, SLOT(quit_clicked()));
   connect(barcode_line_p, SIGNAL(barcode_entered(QString)), batch_mode_driver_p, SLOT(barcode_entered(QString)));
   connect(batch_mode_driver_p, SIGNAL(seed_lot_barcode_entered(QString)), table_p, SLOT(enter_seed_lot_barcode(QString)));
+  connect(batch_mode_driver_p, SIGNAL(substitution_barcode_entered(QString)), table_p, SLOT(enter_substitution_barcode(QString)));
   connect(batch_mode_driver_p, SIGNAL(pack_barcode_entered(QString)), table_p, SLOT(enter_pack_barcode(QString)));
   connect(batch_mode_driver_p, SIGNAL(send_status_message(QString, QColor, QColor, int)), this, SLOT(get_status_message(QString, QColor, QColor, int)));
   connect(batch_mode_driver_p, SIGNAL(send_barcode_status_message(QString, QColor, QColor, int)), this, SLOT(get_barcode_status_message(QString, QColor, QColor, int)));
   connect(low_speed_set_p, SIGNAL(sliderReleased()), this, SLOT(focus_on_barcode()));
   connect(batch_mode_driver_p, SIGNAL(enable_repeat_pack_button(bool)), this, SLOT(enable_repeat_pack_button(bool)));
-
+  connect(batch_mode_driver_p, SIGNAL(enable_substitute_button(bool)), this, SLOT(enable_substitute_button(bool)));
   
 //  cout<<"batch::batch 5\n";
   /*
@@ -469,6 +474,11 @@ void batch::enable_repeat_pack_button(bool on)
 {
   repeat_pack_button_p->setEnabled(on);
 }
+
+void batch::enable_substitute_button(bool on)
+{
+  substitution_button_p->setEnabled(on);
+}
 /*
 void batch::bad_lot_slot()
 {
@@ -509,14 +519,7 @@ void batch::back_clicked()
 void batch::repeat_pack_clicked()
 {
   batch_mode_driver_p->repeat_pack();
-  /*
-  repeat_pack_window_p = new repeat_pack_window(batch_mode_driver_p, this);
-  connect(repeat_pack_window_p, SIGNAL(destroyed(QObject*)), this, SLOT(focus_on_barcode()));
-  connect(batch_mode_driver_p, SIGNAL(send_extra_pack_message(QString)), repeat_pack_window_p, SLOT(set_message(QString)));
-  connect(batch_mode_driver_p, SIGNAL(extra_pack_finished_signal()), repeat_pack_window_p, SLOT(cancel_button_clicked()));
-  */
   focus_on_barcode();
-  
 }
 
 void batch::restart_clicked()
@@ -526,6 +529,7 @@ void batch::restart_clicked()
 
 void batch::substitution_button_clicked()
 {
+  batch_mode_driver_p -> seed_lot_substitution();
   /*
   if(centre_p->envelope_present == false)//if(centre_p->get_endgate_state() == ENDGATE_CLOSED)
   {

@@ -94,6 +94,8 @@ ss_setup_choice::ss_setup_choice(centre*set_centre_p, batch_mode_driver* batch_m
   }
   first_ss_setup_displayed = 0;
   display_ss_setups();
+  
+  (batch_mode_driver_p->display_column_numbers).clear();
 }
 
 ss_setup_choice::~ss_setup_choice()

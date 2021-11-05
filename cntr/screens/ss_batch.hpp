@@ -73,20 +73,21 @@ class ss_batch : public screen
 //  void dump_complete(int dump_count);
 //  void dumping();
   void focus_on_barcode();
+  void enable_substitute_button(bool on);
 //  void bad_lot_slot();
   void refresh_screen();
   
   private slots:
   void options_clicked();
-  void remove_drive_clicked();
+//  void remove_drive_clicked();
   void back_clicked();
   void release_pack_clicked();
   void restart_clicked();
   void substitution_button_clicked();
-  void cancel_substitution_button_clicked();
+//  void cancel_substitution_button_clicked();
   void save_program_clicked();
-  void reprint_button_1_clicked();
-  void reprint_button_2_clicked();
+//  void reprint_button_1_clicked();
+//  void reprint_button_2_clicked();
   void manual_print_button_clicked();
   void quit_clicked();
   void run();
@@ -94,13 +95,13 @@ class ss_batch : public screen
   private:
   QLabel* count_message_p;
   button* options_button_p;
-  button* remove_drive_button_p;
+//  button* remove_drive_button_p;
   button* back_button_p;
   ss_barcode_line* barcode_line_p;
   button* release_pack_button_p;
   button* restart_button_p;
   button* substitution_button_p;
-  button* cancel_substitution_button_p;
+//  button* cancel_substitution_button_p;
   QLabel* high_speed_label_p;
   QLabel* low_speed_label_p;
   QLabel* dump_speed_label_p;
@@ -110,8 +111,8 @@ class ss_batch : public screen
   ss_batch_table* ss_table_p;
   message_box* status_box_p;
   button* save_program_button_p;
-  button* reprint_button_1_p;
-  button* reprint_button_2_p;
+//  button* reprint_button_1_p;
+//  button* reprint_button_2_p;
   button* manual_print_button_p;
   button* quit_button_p;
   message_box* barcode_status_p;
@@ -154,10 +155,10 @@ class ss_batch : public screen
 */  
 //  barcode_entry_mode old_barcode_mode;
   
-  int reprint_line_1;//line number that will be reprinted on envelope if reprint button 1 is clicked
-  int reprint_line_2;//line number that will be reprinted on envelope if reprint button 2 is clicked
+//  int reprint_line_1;//line number that will be reprinted on envelope if reprint button 1 is clicked
+//  int reprint_line_2;//line number that will be reprinted on envelope if reprint button 2 is clicked
   int reprint_line_manual;//line number that will be reprinted on envelope if manual reprint button is clicked
-  void update_reprint_buttons();
+//  void update_reprint_buttons();
   
 //  macro_screen* macro_screen_p;
   QString count_string;				//seed count access from gpio_keyboard

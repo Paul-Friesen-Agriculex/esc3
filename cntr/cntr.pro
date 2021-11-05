@@ -57,6 +57,7 @@ HEADERS += batch_mode_driver.hpp \
            screens/ss_batch_table.hpp \
            screens/ss_column_display_options.hpp \
            screens/ss_options.hpp \
+           screens/ss_other_options.hpp \
            screens/ss_setup_choice.hpp \
            screens/ss_setup_delete.hpp \
            screens/ss_setup_entry.hpp \
@@ -117,6 +118,7 @@ SOURCES += batch_mode_driver.cpp \
            screens/ss_batch_table.cpp \
            screens/ss_column_display_options.cpp \
            screens/ss_options.cpp \
+           screens/ss_other_options.cpp \
            screens/ss_setup_choice.cpp \
            screens/ss_setup_delete.cpp \
            screens/ss_setup_entry.cpp \

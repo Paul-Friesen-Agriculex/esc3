@@ -7,7 +7,8 @@
 
 class QSignalMapper;
 class QLabel;
-class QLineEdit;
+//class QLineEdit;
+class QTextEdit;
 class QHBoxLayout;
 class QVBoxLayout;
 class QPushButton;
@@ -20,7 +21,8 @@ class macro_builder:public screen
   
   QSignalMapper* signalMapper;
   QLabel* instruction_label_p;
-  QLineEdit* lineEdit;
+//  QLineEdit* lineEdit;
+  QTextEdit* lineEdit;
   QHBoxLayout *top_line_p;
   QHBoxLayout *input_line_modify;
   QVBoxLayout* form_p;

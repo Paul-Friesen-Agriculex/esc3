@@ -49,6 +49,7 @@
 
 #include "ss_setup_delete.hpp"
 #include "ss_options.hpp"
+#include "ss_other_options.hpp"
 #include "ss_column_display_options.hpp"
 #include "ss_batch.hpp"
 #include "select_envelope_field.hpp"
@@ -99,8 +100,8 @@ centre::centre():
 
   //********************  
   //comment out one of these 2 lines:
-//  base_widget_p->setWindowState(Qt::WindowFullScreen);
-  base_widget_p->setGeometry(0, 0, 800, 480);
+//  base_widget_p->setWindowState(Qt::WindowFullScreen);//use for final versions to run on touch screen
+  base_widget_p->setGeometry(0, 0, 800, 480);//use for development on full size terminal
   //********************
 
 
@@ -576,6 +577,7 @@ void centre::run()
       case 21: screen_p=new spreadsheet_choice(this, batch_mode_driver_p); break;
       case 22: screen_p=new ss_setup_choice(this, batch_mode_driver_p); break;
       case 23: screen_p=new ss_setup_entry(this, batch_mode_driver_p); break;
+      case 24: screen_p=new ss_other_options(this); break;
       case 25: screen_p=new set_envelope_size(this, batch_mode_driver_p); break;
 //      case : screen_p=new (this); break;
 //      case : screen_p=new (this); break;
@@ -639,6 +641,7 @@ bool centre::save_settings(QString file_name)
   fset<<batch_mode_driver_p->bm_last_table_filename.toStdString()<<endl;
   fset<<communicate_by_keyboard_cable<<endl;
   fset<<communicate_by_tcp<<endl;
+  fset<<communicate_by_serial_port<<endl;
   fset<<baud_rate<<endl;
   fset<<serial_port_name.toStdString()<<endl;
 
@@ -693,6 +696,9 @@ bool centre::load_settings(QString file_name)
   
   fset.getline(input, 100);
   communicate_by_tcp = atoi(input);
+  
+  fset.getline(input, 100);
+  communicate_by_serial_port = atoi(input);
   
   fset.getline(input, 100);
   baud_rate = atoi(input);

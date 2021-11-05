@@ -75,6 +75,7 @@ class batch : public screen
 //  void dumping();
   void focus_on_barcode();
   void enable_repeat_pack_button(bool on);
+  void enable_substitute_button(bool on);
 //  void bad_lot_slot();
   
   private slots:
