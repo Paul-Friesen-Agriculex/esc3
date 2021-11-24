@@ -73,8 +73,8 @@ Q_DECLARE_METATYPE(crop)
 using namespace std;
 
 //extern const int image_lines = 32;
-extern const int image_lines = 64;
-//extern const int image_lines = 128;
+//extern const int image_lines = 64;
+extern const int image_lines = 128;
 //extern const int image_lines = 256;
 //extern const int image_lines = 512;
 //extern const int image_lines = 1024;
@@ -82,8 +82,8 @@ extern const int image_lines = 64;
 
 extern const int line_length = 2048;
 
-//extern const int images_to_record = 128;
-extern const int images_to_record = 512;
+extern const int images_to_record = 128;
+//extern const int images_to_record = 512;
 //extern const int images_to_record = 1500;
 
 centre::centre():
@@ -248,6 +248,7 @@ void centre::init()
   tcp_input_array_p = new QByteArray;
 
   load_settings("default");
+  setup_serial_communications(baud_rate);
   
   connect(processor_p, SIGNAL(send_message(QString)), diagnostics_console_p, SLOT(receive_message1(QString)));
   connect(batch_mode_driver_p, SIGNAL(send_message2(QString)), diagnostics_console_p, SLOT(receive_message2(QString)));
@@ -429,6 +430,8 @@ void centre::run()
   endgate_state = endgate_p->get_state();
   envelope_present = envelope_sensor_p->read();
   brother_envelope_feeder_p -> run();
+  
+  read_serial_port();
 
 //  if(  (current_screen==5)  ||  (current_screen==15)  ||  (current_screen==60)  )//totalize or batch or slave mode screen
   if(  (current_screen==5)  ||  (current_screen==60)  )//totalize or slave mode screen
@@ -1258,6 +1261,7 @@ void centre::setup_serial_communications(int baud_rate)//assumes serial port cab
 
 void centre::serial_port_write(QString str)
 {
+  cout<<"centre::serial_port_write:    "<<str.toStdString()<<endl;
   char cstring[100];
   memset(cstring, 0, sizeof(cstring));
   strcpy(cstring, str.toLatin1());

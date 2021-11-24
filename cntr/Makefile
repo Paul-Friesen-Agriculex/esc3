@@ -1751,7 +1751,8 @@ tool_choice.o: screens/tool_choice.cpp centre.hpp \
 		feeder.hpp \
 		crop.hpp \
 		screens/tool_choice.hpp \
-		button.hpp
+		button.hpp \
+		screens/help_screen.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o tool_choice.o screens/tool_choice.cpp
 
 totalize.o: screens/totalize.cpp centre.hpp \
