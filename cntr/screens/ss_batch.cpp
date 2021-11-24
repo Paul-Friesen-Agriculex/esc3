@@ -30,7 +30,8 @@ ss_batch::ss_batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_drive
  :screen(set_centre_p)
 {
   batch_mode_driver_p = set_batch_mode_driver_p;
-
+  batch_mode_driver_p->chamber_count_limit_calculation(); //2021_03_22//
+  
   if (centre_p->crops[0].calibrated == false) 
   {
     centre_p->add_waiting_screen(33);//back here to ss_batch
@@ -182,15 +183,17 @@ ss_batch::ss_batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_drive
   connect(quit_button_p, SIGNAL(clicked()), this, SLOT(quit_clicked()));
   connect(barcode_line_p, SIGNAL(barcode_entered(QString)), batch_mode_driver_p, SLOT(barcode_entered(QString)));
   connect(low_speed_set_p, SIGNAL(sliderReleased()), this, SLOT(focus_on_barcode()));
+  connect(batch_mode_driver_p, SIGNAL(send_status_message(QString, QColor, QColor, int)), this, SLOT(get_status_message(QString, QColor, QColor, int)));
+  connect(batch_mode_driver_p, SIGNAL(send_barcode_status_message(QString, QColor, QColor, int)), this, SLOT(get_barcode_status_message(QString, QColor, QColor, int)));
 
   centre_p->set_endgate_state(ENDGATE_CLOSED);
   if(centre_p->totalize_force_endgate_open == true)
   {
-    screen_endgate=ENDGATE_OPEN;
+//    screen_endgate=ENDGATE_OPEN;
   }
   else
   {
-    screen_endgate=ENDGATE_CLOSED;
+//    screen_endgate=ENDGATE_CLOSED;
   }
   
   feeder_is_running = true;
@@ -202,9 +205,9 @@ ss_batch::ss_batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_drive
   centre_p->count = 0;
   batch_mode_driver_p->start();
   
-  mode = old_mode = wait_for_seed_lot_barcode;
-  end_valve_mode = old_end_valve_mode = ss_closed_empty;
-  
+//  mode = old_mode = wait_for_seed_lot_barcode;
+//  end_valve_mode = old_end_valve_mode = ss_closed_empty;
+  /*
   pack_ready_message = "Pack Ready";
   pack_removed_too_soon_message = "Pack Not Ready\nPut Back";
   dump_container_needed_message = "Place Dump\nContainer";
@@ -217,12 +220,15 @@ ss_batch::ss_batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_drive
   old_barcode_mode = pack;
   
   end_valve_empty_counter = 0;
-  connect(batch_mode_driver_p, SIGNAL(pack_collected(int)), this, SLOT(pack_collected(int)));
-  connect(batch_mode_driver_p, SIGNAL(dump_complete(int)), this, SLOT(dump_complete(int)));
-  connect(batch_mode_driver_p, SIGNAL(dumping()), this, SLOT(dumping()));
+  */
+//  connect(batch_mode_driver_p, SIGNAL(pack_collected(int)), this, SLOT(pack_collected(int)));
+//  connect(batch_mode_driver_p, SIGNAL(dump_complete(int)), this, SLOT(dump_complete(int)));
+//  connect(batch_mode_driver_p, SIGNAL(dumping()), this, SLOT(dumping()));
   connect(ss_table_p, SIGNAL(focus_on_barcode()), this, SLOT(focus_on_barcode()));
   
+  cout<<"ss_batch::ss_batch bad lot slot connect\n";
   connect(batch_mode_driver_p, SIGNAL(bad_lot_signal()), this, SLOT(bad_lot_slot()));
+  cout<<"ss_batch::ss_batch after bad lot slot connect\n";
   connect(batch_mode_driver_p, SIGNAL(refresh_screen()), this, SLOT(refresh_screen()));
     
   if(batch_mode_driver_p->bm_save_ss_setup_filename != "")//returning from batch_save_ss_setup screen with name of file to save
@@ -264,6 +270,18 @@ ss_batch::ss_batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_drive
   batch_mode_driver_p -> seed_lot_barcode = "";
   batch_mode_driver_p -> pack_barcode = "";
 
+  if(batch_mode_driver_p->print_envelope)
+  {
+    batch_mode_driver_p->require_pack_barcode = false;
+    batch_mode_driver_p->pack_match_lot = false;
+    batch_mode_driver_p->pack_contain_lot = false;
+    batch_mode_driver_p->lot_contain_pack = false;
+    batch_mode_driver_p->pack_match_spreadsheet = false;
+    batch_mode_driver_p->record_only = true;
+    batch_mode_driver_p->pack_barcode_ok = true;
+  }
+
+
   count_message_p->setStyleSheet("QLabel {" 
         "background-color: white;"          
         "border: 3px solid black;"          
@@ -272,7 +290,7 @@ ss_batch::ss_batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_drive
   eject_memory_sticks = false;
   
   barcode_line_p->setFocus();
-  batch_mode_driver_p->mode = wait_for_seed_lot_barcode;
+  batch_mode_driver_p->mode = entry;//wait_for_seed_lot_barcode;
   batch_mode_driver_p->seed_lot_barcode_ok = false;
 
 //  batch_mode_driver_p -> restart();
@@ -356,12 +374,30 @@ ss_batch::~ss_batch()
   manual_operation_window_p = 0;
 }
 
-void ss_batch::pack_collected(int)
+void ss_batch::get_status_message(QString message, QColor foreground, QColor background, int text_size)
 {
-  if( (end_valve_mode==ss_closed_bad_lot) || (end_valve_mode==ss_open_emptying_bad_lot) ) return;
-  refresh_screen();
+  status_box_p->set_text_size(text_size);
+//  cout<<"ss_batch::get_status_message.  set text size to "<<text_size<<endl;
+  status_box_p->set_foreground(foreground);
+  status_box_p->set_background(background);
+  status_box_p->set_text(message);
+}
+
+void ss_batch::get_barcode_status_message(QString message, QColor foreground, QColor background, int text_size)
+{
+  barcode_status_p->set_text_size(text_size);
+  barcode_status_p->set_foreground(foreground);
+  barcode_status_p->set_background(background);
+  barcode_status_p->set_text(message);
+}
+
+
+//void ss_batch::pack_collected(int)
+//{
+//  if( (end_valve_mode==ss_closed_bad_lot) || (end_valve_mode==ss_open_emptying_bad_lot) ) return;
+//  refresh_screen();
   
-  barcode_line_p->setFocus();
+//  barcode_line_p->setFocus();
   /*
   //QString Alternative  to Integers//  //11_02_2018~~~//
   int row;
@@ -375,35 +411,35 @@ void ss_batch::pack_collected(int)
   
   macro_screen_p -> usb_serial_out(lotcode_str, packcode_str, batch_count_str, substitution_str, dump_count_str);
   */
-}  
+//}  
 
-void ss_batch::dump_complete(int)
-{
-  end_valve_mode = ss_dump_open_empty;
-  barcode_line_p->setFocus();
+//void ss_batch::dump_complete(int)
+//{
+//  end_valve_mode = ss_dump_open_empty;
+//  barcode_line_p->setFocus();
   /*
   //QString variant to integers//	11_02_2018//
   QString lotcode_str, packcode_str, batch_count_str, substitution_str, dump_count_str;
   dump_count_str = QString::number(dump_count);
   macro_screen_p -> usb_serial_out(lotcode_str, packcode_str, batch_count_str, substitution_str, dump_count_str);
   */
-}
-
+//}
+/*
 void ss_batch::dumping()
 {
   end_valve_mode = ss_dump_closed_empty;
 }
-
+*/
 void ss_batch::focus_on_barcode()
 {
   barcode_line_p -> setFocus();
 }
-
+/*
 void ss_batch::bad_lot_slot()
 {
   end_valve_mode = ss_closed_bad_lot;
 }
-
+*/
 void ss_batch::refresh_screen()
 {
   int temp_line_number = batch_mode_driver_p->spreadsheet_line_number;
@@ -467,6 +503,7 @@ void ss_batch::restart_clicked()
 
 void ss_batch::substitution_button_clicked()
 {
+  /*
   if(centre_p->get_endgate_state() == ENDGATE_CLOSED)
   {
     batch_mode_driver_p -> mode = substitution_wait_for_cleanout_open;
@@ -481,12 +518,13 @@ void ss_batch::substitution_button_clicked()
   batch_mode_driver_p->pack_barcode_old = true;
   batch_mode_driver_p->substitute_seed_lot = true;
   batch_mode_driver_p->barcode_mode = substitution;
-  
+  */
   focus_on_barcode();
 }
 
 void ss_batch::cancel_substitution_button_clicked()
 {
+  /*
   batch_mode_driver_p->current_pack --;
   if(centre_p->get_endgate_state() == ENDGATE_CLOSED)
   {
@@ -501,7 +539,7 @@ void ss_batch::cancel_substitution_button_clicked()
   batch_mode_driver_p->pack_barcode_old = true;
   batch_mode_driver_p->substitute_seed_lot = false;
   batch_mode_driver_p->barcode_mode = seed_lot;
-  
+  */
   focus_on_barcode();
 }
 
@@ -523,7 +561,7 @@ void ss_batch::quit_clicked()
 
 void ss_batch::run()
 {
-  if(batch_mode_driver_p->ss_batch_exit_flag == true) quit_clicked();//exit flag can be set by QMessageBox in batch_mode_driver::run
+//  if(batch_mode_driver_p->ss_batch_exit_flag == true) quit_clicked();//exit flag can be set by QMessageBox in batch_mode_driver::run
   
   QString message=QString("Count: %1").arg(centre_p->count);
   count_message_p->setText(message);
@@ -545,7 +583,9 @@ void ss_batch::run()
   speed_box_p -> setTitle(speed_label_string);  
   
   count = centre_p->count;
+}
 
+/*
   old_mode = mode;
   mode = batch_mode_driver_p->mode;
   old_end_valve_mode = end_valve_mode;
@@ -998,6 +1038,7 @@ void ss_batch::run()
   update_reprint_buttons();
       
 }
+*/
 
 void ss_batch::update_reprint_buttons()
 {

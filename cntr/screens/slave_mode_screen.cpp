@@ -375,11 +375,11 @@ void slave_mode_screen::command_char(QChar character)
       batch_mode_driver_p -> high_feed_speed = 0;
       batch_mode_driver_p -> low_feed_speed = 0;
       batch_mode_driver_p -> dump_speed = 1000;
-      batch_mode_driver_p -> current_set = 0;
-      batch_mode_driver_p -> current_pack = 0;
-      batch_mode_driver_p -> current_count_limit = 0;
-      batch_mode_driver_p -> current_pack_limit = 0;
-      batch_mode_driver_p->mode = slave_mode_entry;
+      batch_mode_driver_p -> cutgate_set = 0;
+      batch_mode_driver_p -> cutgate_pack = 0;
+      batch_mode_driver_p -> cutgate_count_limit = 0;
+      batch_mode_driver_p -> cutgate_pack_limit = 0;
+//      batch_mode_driver_p->mode = slave_mode_entry;
       batch_mode_driver_p->slave_mode = false;
   
       batch_mode_driver_p->stop();
@@ -451,7 +451,7 @@ void slave_mode_screen::run()
       {
         end_gate_opened_full = false;
         end_gate_closed_empty = true;
-        batch_mode_driver_p->pack_complete = true;
+//        batch_mode_driver_p->pack_complete = true;
       }
     }
     else if(end_gate_closed_empty == true)
@@ -469,7 +469,7 @@ void slave_mode_screen::run()
   array.append(QChar(31));
   if(batch_mode)
   {
-    array.append(QString::number(batch_mode_driver_p->current_pack));
+    array.append(QString::number(batch_mode_driver_p->cutgate_pack));
   }
   else
   {
@@ -603,7 +603,7 @@ void slave_mode_screen::run()
       if(executing_command_p->number_of_sets > 0)//batch mode
       {
         batch_mode_driver_p->clear_program();
-        batch_mode_driver_p->use_spreadsheet = false;
+//        batch_mode_driver_p->use_spreadsheet = false;
         for(int i=0; i<executing_command_p->number_of_sets; ++i)
         {
           int packs = executing_command_p->number_of_packs[i];
@@ -617,7 +617,7 @@ void slave_mode_screen::run()
         batch_mode_driver_p->lot_contain_pack = false;
         batch_mode_driver_p->pack_match_spreadsheet = false;
         batch_mode_driver_p->record_only = true;
-        batch_mode_driver_p->mode = slave_mode_entry;
+//        batch_mode_driver_p->mode = slave_mode_entry;
         batch_mode_driver_p->slave_mode = true;
     
         batch_mode_driver_p->start();

@@ -75,6 +75,8 @@ batch_options::batch_options(centre*set_centre_p, batch_mode_driver* set_batch_m
   pack_contain_lot_p -> setChecked(batch_mode_driver_p->pack_contain_lot);
   lot_contain_pack_p -> setChecked(batch_mode_driver_p->lot_contain_pack);
   record_only_p -> setChecked(batch_mode_driver_p->record_only);
+  
+  original_require_seed_lot_barcode = batch_mode_driver_p->require_seed_lot_barcode;
 }
 
 void batch_options::done_button_clicked()
@@ -85,6 +87,13 @@ void batch_options::done_button_clicked()
   batch_mode_driver_p->pack_contain_lot = pack_contain_lot_p->isChecked();
   batch_mode_driver_p->lot_contain_pack = lot_contain_pack_p->isChecked();
   batch_mode_driver_p->record_only = record_only_p->isChecked();
+  
+  if(  (batch_mode_driver_p->require_seed_lot_barcode==true)  &&  (original_require_seed_lot_barcode==false)  )
+  {
+//    batch_mode_driver_p->mode = wait_for_seed_lot_barcode;
+//    batch_mode_driver_p->seed_lot_barcode_ok = false;
+//    batch_mode_driver_p->seed_lot_barcode_old = true;
+  }
   
 //  centre_p->add_waiting_screen(15);//batch
   centre_p->screen_done = true;

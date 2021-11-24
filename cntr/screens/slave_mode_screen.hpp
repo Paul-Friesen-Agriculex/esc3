@@ -12,23 +12,8 @@ class QTimer;
 class QLabel;
 class QTextEdit;
 class help_screen;
-/*
-enum command_input_mode_enum
-{
-  wait_start,
-  wait_type_flag,
-  wait_crop,
-  wait_number_of_sets,
-  wait_seeds_per_pack,
-  wait_number_of_packs,
-  wait_r1,
-  wait_r2,
-  wait_r3,
-  wait_speed,
-  wait_command,
-  wait_single_speed
-};
-*/
+
+
 struct slave_mode_command
 {
   QChar type_flag;
@@ -38,8 +23,6 @@ struct slave_mode_command
   QList<int> number_of_packs;
   int speed;
   QString command;
-//  bool complete;//true indicates command ready to be executed
-//  bool finished;//true indicates command has finished executing
 };
 
 class slave_mode_screen : public screen
@@ -84,22 +67,15 @@ class slave_mode_screen : public screen
   QGridLayout* main_layout_p;
   QTimer* timer_p;
   
-//  command_input_mode_enum command_input_mode;
   char command_type_flag;
-//  bool waiting_for_delimiter;
   QString command_line_string;//to hold entire command line between character 2 (marks start) and character 3 (marks end).  Does not include start and end markers, but does include delimiters (character 31)
-//  QString command_string;//to hold only command itself eg "Start", "Dump".
   int number_of_sets_expected;
   int number_of_sets_received;
-//  int int_to_build;//for use in calculating hex integers sent 1 byte at a time
   
   slave_mode_command* new_command_p;
   QQueue<slave_mode_command*> command_p_list;
   slave_mode_command* executing_command_p;
   slave_mode_command* previous_command_p;
-//  QList<int> count_limits;
-//  QList<int> pack_limits;
-//  bool execute;
   
   bool batch_mode;
   int pack_count;

@@ -194,9 +194,11 @@ void ss_setup_choice::more_ss_setups_clicked()
 void ss_setup_choice::add_ss_setup_clicked()
 {
   centre_p->add_waiting_screen(23);//enter_ss_setup
+  cout<<"ss_setup_choice::add_ss_setup_clicked 1\n";
   batch_mode_driver_p->clear_ss_setup();
-  batch_mode_driver_p->ss_setup_path = "";
+  cout<<"ss_setup_choice::add_ss_setup_clicked 2\n";batch_mode_driver_p->ss_setup_path = "";
   centre_p->screen_done=true;
+  cout<<"ss_setup_choice::add_ss_setup_clicked 3\n";
 }
 
 void ss_setup_choice::delete_ss_setup_clicked()

@@ -125,6 +125,7 @@ void program_choice::choice1_clicked()
     program_path.append(program_list_p->at(first_program_displayed));
     program_path.append(".ESC3");
     batch_mode_driver_p->program_path = program_path;
+    batch_mode_driver_p->program_name = program_list_p->at(first_program_displayed);
     batch_mode_driver_p->load_program();
     centre_p->add_waiting_screen(15);
     centre_p->screen_done=true;
@@ -138,6 +139,7 @@ void program_choice::choice2_clicked()
     program_path.append(program_list_p->at(first_program_displayed+1));
     program_path.append(".ESC3");
     batch_mode_driver_p->program_path = program_path;
+    batch_mode_driver_p->program_name = program_list_p->at(first_program_displayed+1);
     batch_mode_driver_p->load_program();
     centre_p->add_waiting_screen(15);
     centre_p->screen_done=true;
@@ -151,6 +153,7 @@ void program_choice::choice3_clicked()
     program_path.append(program_list_p->at(first_program_displayed+2));
     program_path.append(".ESC3");
     batch_mode_driver_p->program_path = program_path;
+    batch_mode_driver_p->program_name = program_list_p->at(first_program_displayed+2);
     batch_mode_driver_p->load_program();
     centre_p->add_waiting_screen(15);
     centre_p->screen_done=true;
@@ -164,6 +167,7 @@ void program_choice::choice4_clicked()
     program_path.append(program_list_p->at(first_program_displayed+3));
     program_path.append(".ESC3");
     batch_mode_driver_p->program_path = program_path;
+    batch_mode_driver_p->program_name = program_list_p->at(first_program_displayed+3);
     batch_mode_driver_p->load_program();
     centre_p->add_waiting_screen(15);
     centre_p->screen_done=true;
@@ -177,6 +181,7 @@ void program_choice::choice5_clicked()
     program_path.append(program_list_p->at(first_program_displayed+4));
     program_path.append(".ESC3");
     batch_mode_driver_p->program_path = program_path;
+    batch_mode_driver_p->program_name = program_list_p->at(first_program_displayed+4);
     batch_mode_driver_p->load_program();
     centre_p->add_waiting_screen(15);
     centre_p->screen_done=true;
@@ -190,6 +195,7 @@ void program_choice::choice6_clicked()
     program_path.append(program_list_p->at(first_program_displayed+5));
     program_path.append(".ESC3");
     batch_mode_driver_p->program_path = program_path;
+    batch_mode_driver_p->program_name = program_list_p->at(first_program_displayed+5);
     batch_mode_driver_p->load_program();
     centre_p->add_waiting_screen(15);
     centre_p->screen_done=true;

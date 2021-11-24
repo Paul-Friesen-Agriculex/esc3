@@ -272,6 +272,7 @@ void envelope::print()
 
 void envelope::print(int line_number)
 {
+  cout<<"start envelop::print("<<line_number<<")\n";
   if(line_number<0) return;//-1 is used to signal no more rows
   sample_row = line_number;
   refresh_image();

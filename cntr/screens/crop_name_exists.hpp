@@ -17,10 +17,12 @@ class crop_name_exists : public screen
   
   private slots:
 	  void ok_button_clicked();
+    void start_screen_clicked();
   
   private:
 	  QLabel* message_p;
 	  button* ok_button_p;
+    button* start_screen_p;
 	  QVBoxLayout* layout_p;
 };
 #endif

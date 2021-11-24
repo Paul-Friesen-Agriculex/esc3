@@ -506,6 +506,12 @@ crop_name_entry::crop_name_entry(centre* centre_p)
 
 void crop_name_entry::enter_clicked()
 {
+  if((*entry_line_p).trimmed() == "")
+  {
+    centre_p->add_waiting_screen(0);//start
+    centre_p->screen_done = true;
+    return;
+  }
   if(centre_p->changing_existing_crop == true)//overwrite name.  Do not create new crop.
   {
     centre_p->crops[0].name=*entry_line_p;
@@ -649,6 +655,7 @@ void batch_save_program::enter_clicked()
   cout<<"outfile_name "<<outfile_name.toLatin1().data()<<endl;
   
   batch_mode_driver_p->bm_save_program_filename = outfile_name;
+  batch_mode_driver_p->program_name = *entry_line_p;
   
   batch_mode_driver_p->program_path = outfile_name;//added 2021-03-14 to cause default name to appear if editing a newly entered program
   
@@ -790,7 +797,7 @@ enter_field_text::enter_field_text(centre* centre_p, batch_mode_driver* batch_mo
 
 void enter_field_text::enter_clicked()
 {
-  batch_mode_driver_p->envelope_p->enter_text_field(*entry_line_p);
+//  batch_mode_driver_p->envelope_p->enter_text_field(*entry_line_p);
   centre_p->add_waiting_screen(35);//position_envelope_field
   centre_p->screen_done=true;
 }

@@ -126,7 +126,7 @@ void ss_options::done_button_clicked()
 
 void ss_options::envelope_layout_button_clicked()
 {
-  centre_p->add_waiting_screen(25);
+  centre_p->add_waiting_screen(25);//set_envelope_size
   centre_p->screen_done = true;
 }
 

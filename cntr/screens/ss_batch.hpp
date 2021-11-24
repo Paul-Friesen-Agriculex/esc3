@@ -30,7 +30,7 @@ class ss_barcode_line : public QLineEdit
   signals:
   void barcode_entered(QString barcode);
 };
-
+/*
 enum ss_end_valve_mode_enum
 {
   ss_closed_empty,
@@ -53,7 +53,7 @@ enum ss_end_valve_mode_enum
   ss_substitution_enter_barcode,
   ss_cancel_substitution
 };
-
+*/
 class manual_operation_window;
 
 class ss_batch : public screen
@@ -67,11 +67,13 @@ class ss_batch : public screen
   bool manual_operation_window_created;
   
   public slots:
-  void pack_collected(int count);
-  void dump_complete(int dump_count);
-  void dumping();
+  void get_status_message(QString message, QColor foreground, QColor background, int text_size);
+  void get_barcode_status_message(QString message, QColor foreground, QColor background, int text_size);
+//  void pack_collected(int count);
+//  void dump_complete(int dump_count);
+//  void dumping();
   void focus_on_barcode();
-  void bad_lot_slot();
+//  void bad_lot_slot();
   void refresh_screen();
   
   private slots:
@@ -126,20 +128,20 @@ class ss_batch : public screen
   QGridLayout* main_layout_p;
   
   bool feeder_is_running;
-  ENDGATE_STATE screen_endgate;//state of endgate according to screen control.
+//  ENDGATE_STATE screen_endgate;//state of endgate according to screen control.
     //If this is open, endgate will be open regardless of envelope sensor.
     //If this is closed, it will be over-ridden by presence of an envelope
   
   int count;
   
-  mode_enum mode;
-  mode_enum old_mode;
-  ss_end_valve_mode_enum end_valve_mode;
-  ss_end_valve_mode_enum old_end_valve_mode;
-  int end_valve_empty_counter;//use to time valve emptying
+//  mode_enum mode;
+//  mode_enum old_mode;
+//  ss_end_valve_mode_enum end_valve_mode;
+//  ss_end_valve_mode_enum old_end_valve_mode;
+//  int end_valve_empty_counter;//use to time valve emptying
   
   
-  
+/*  
   QString pack_ready_message;
   QString pack_removed_too_soon_message;
   QString dump_container_needed_message;
@@ -149,8 +151,8 @@ class ss_batch : public screen
   QString substitution_cleanout_message;
   QString substitution_barcode_message;
   QString cancel_substitution_message;
-  
-  barcode_entry_mode old_barcode_mode;
+*/  
+//  barcode_entry_mode old_barcode_mode;
   
   int reprint_line_1;//line number that will be reprinted on envelope if reprint button 1 is clicked
   int reprint_line_2;//line number that will be reprinted on envelope if reprint button 2 is clicked

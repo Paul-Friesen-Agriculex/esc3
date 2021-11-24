@@ -66,16 +66,21 @@ SOURCES       = batch_mode_driver.cpp \
 		processor.cpp \
 		signal_port.cpp \
 		screens/batch.cpp \
+		screens/batch_macro_type_choice.cpp \
 		screens/batch_options.cpp \
 		screens/batch_table.cpp \
 		screens/calibrate.cpp \
+		screens/communications_menu.cpp \
 		screens/crop_choice.cpp \
 		screens/crop_delete.cpp \
 		screens/crop_edit.cpp \
 		screens/crop_name_exists.cpp \
 		screens/enter_program.cpp \
+		screens/gateset.cpp \
+		screens/help_screen.cpp \
 		screens/keyboard.cpp \
 		screens/keypad.cpp \
+		screens/macro_builder.cpp \
 		screens/macro_screen.cpp \
 		screens/message_box.cpp \
 		screens/playback.cpp \
@@ -84,7 +89,9 @@ SOURCES       = batch_mode_driver.cpp \
 		screens/program_delete.cpp \
 		screens/select_envelope_field.cpp \
 		screens/select_field_data_source.cpp \
+		screens/serial_port_setup.cpp \
 		screens/set_envelope_size.cpp \
+		screens/slave_mode_screen.cpp \
 		screens/spreadsheet_choice.cpp \
 		screens/ss_batch.cpp \
 		screens/ss_batch_table.cpp \
@@ -95,19 +102,12 @@ SOURCES       = batch_mode_driver.cpp \
 		screens/ss_setup_entry.cpp \
 		screens/start_screen.cpp \
 		screens/table.cpp \
-		screens/tool_choice.cpp \
-		screens/totalize.cpp \
-		screens/totalize_options.cpp \
-		screens/help_screen.cpp \
-		screens/gateset.cpp \
 		screens/tcp_client_server_addr_entry.cpp \
 		screens/tcp_mode_choice.cpp \
 		screens/tcp_server_addr_choice.cpp \
-		screens/communications_menu.cpp \
-		screens/macro_builder.cpp \
-		screens/batch_macro_type_choice.cpp \
-		screens/slave_mode_screen.cpp \
-		screens/serial_port_setup.cpp moc_batch_mode_driver.cpp \
+		screens/tool_choice.cpp \
+		screens/totalize.cpp \
+		screens/totalize_options.cpp moc_batch_mode_driver.cpp \
 		moc_brother_envelope_feeder.cpp \
 		moc_button.cpp \
 		moc_centre.cpp \
@@ -122,16 +122,21 @@ SOURCES       = batch_mode_driver.cpp \
 		moc_processor.cpp \
 		moc_signal_port.cpp \
 		moc_batch.cpp \
+		moc_batch_macro_type_choice.cpp \
 		moc_batch_options.cpp \
 		moc_batch_table.cpp \
 		moc_calibrate.cpp \
+		moc_communications_menu.cpp \
 		moc_crop_choice.cpp \
 		moc_crop_delete.cpp \
 		moc_crop_edit.cpp \
 		moc_crop_name_exists.cpp \
 		moc_enter_program.cpp \
+		moc_gateset.cpp \
+		moc_help_screen.cpp \
 		moc_keyboard.cpp \
 		moc_keypad.cpp \
+		moc_macro_builder.cpp \
 		moc_macro_screen.cpp \
 		moc_message_box.cpp \
 		moc_playback.cpp \
@@ -140,7 +145,9 @@ SOURCES       = batch_mode_driver.cpp \
 		moc_program_delete.cpp \
 		moc_select_envelope_field.cpp \
 		moc_select_field_data_source.cpp \
+		moc_serial_port_setup.cpp \
 		moc_set_envelope_size.cpp \
+		moc_slave_mode_screen.cpp \
 		moc_spreadsheet_choice.cpp \
 		moc_ss_batch.cpp \
 		moc_ss_batch_table.cpp \
@@ -151,19 +158,12 @@ SOURCES       = batch_mode_driver.cpp \
 		moc_ss_setup_entry.cpp \
 		moc_start_screen.cpp \
 		moc_table.cpp \
-		moc_tool_choice.cpp \
-		moc_totalize.cpp \
-		moc_totalize_options.cpp \
-		moc_help_screen.cpp \
-		moc_gateset.cpp \
 		moc_tcp_client_server_addr_entry.cpp \
 		moc_tcp_mode_choice.cpp \
 		moc_tcp_server_addr_choice.cpp \
-		moc_communications_menu.cpp \
-		moc_macro_builder.cpp \
-		moc_batch_macro_type_choice.cpp \
-		moc_slave_mode_screen.cpp \
-		moc_serial_port_setup.cpp
+		moc_tool_choice.cpp \
+		moc_totalize.cpp \
+		moc_totalize_options.cpp
 OBJECTS       = batch_mode_driver.o \
 		brother_envelope_feeder.o \
 		button.o \
@@ -182,16 +182,21 @@ OBJECTS       = batch_mode_driver.o \
 		processor.o \
 		signal_port.o \
 		batch.o \
+		batch_macro_type_choice.o \
 		batch_options.o \
 		batch_table.o \
 		calibrate.o \
+		communications_menu.o \
 		crop_choice.o \
 		crop_delete.o \
 		crop_edit.o \
 		crop_name_exists.o \
 		enter_program.o \
+		gateset.o \
+		help_screen.o \
 		keyboard.o \
 		keypad.o \
+		macro_builder.o \
 		macro_screen.o \
 		message_box.o \
 		playback.o \
@@ -200,7 +205,9 @@ OBJECTS       = batch_mode_driver.o \
 		program_delete.o \
 		select_envelope_field.o \
 		select_field_data_source.o \
+		serial_port_setup.o \
 		set_envelope_size.o \
+		slave_mode_screen.o \
 		spreadsheet_choice.o \
 		ss_batch.o \
 		ss_batch_table.o \
@@ -211,19 +218,12 @@ OBJECTS       = batch_mode_driver.o \
 		ss_setup_entry.o \
 		start_screen.o \
 		table.o \
-		tool_choice.o \
-		totalize.o \
-		totalize_options.o \
-		help_screen.o \
-		gateset.o \
 		tcp_client_server_addr_entry.o \
 		tcp_mode_choice.o \
 		tcp_server_addr_choice.o \
-		communications_menu.o \
-		macro_builder.o \
-		batch_macro_type_choice.o \
-		slave_mode_screen.o \
-		serial_port_setup.o \
+		tool_choice.o \
+		totalize.o \
+		totalize_options.o \
 		moc_batch_mode_driver.o \
 		moc_brother_envelope_feeder.o \
 		moc_button.o \
@@ -239,16 +239,21 @@ OBJECTS       = batch_mode_driver.o \
 		moc_processor.o \
 		moc_signal_port.o \
 		moc_batch.o \
+		moc_batch_macro_type_choice.o \
 		moc_batch_options.o \
 		moc_batch_table.o \
 		moc_calibrate.o \
+		moc_communications_menu.o \
 		moc_crop_choice.o \
 		moc_crop_delete.o \
 		moc_crop_edit.o \
 		moc_crop_name_exists.o \
 		moc_enter_program.o \
+		moc_gateset.o \
+		moc_help_screen.o \
 		moc_keyboard.o \
 		moc_keypad.o \
+		moc_macro_builder.o \
 		moc_macro_screen.o \
 		moc_message_box.o \
 		moc_playback.o \
@@ -257,7 +262,9 @@ OBJECTS       = batch_mode_driver.o \
 		moc_program_delete.o \
 		moc_select_envelope_field.o \
 		moc_select_field_data_source.o \
+		moc_serial_port_setup.o \
 		moc_set_envelope_size.o \
+		moc_slave_mode_screen.o \
 		moc_spreadsheet_choice.o \
 		moc_ss_batch.o \
 		moc_ss_batch_table.o \
@@ -268,19 +275,12 @@ OBJECTS       = batch_mode_driver.o \
 		moc_ss_setup_entry.o \
 		moc_start_screen.o \
 		moc_table.o \
-		moc_tool_choice.o \
-		moc_totalize.o \
-		moc_totalize_options.o \
-		moc_help_screen.o \
-		moc_gateset.o \
 		moc_tcp_client_server_addr_entry.o \
 		moc_tcp_mode_choice.o \
 		moc_tcp_server_addr_choice.o \
-		moc_communications_menu.o \
-		moc_macro_builder.o \
-		moc_batch_macro_type_choice.o \
-		moc_slave_mode_screen.o \
-		moc_serial_port_setup.o
+		moc_tool_choice.o \
+		moc_totalize.o \
+		moc_totalize_options.o
 DIST          = /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/common/unix.conf \
 		/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/common/linux.conf \
@@ -360,16 +360,21 @@ DIST          = /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/spec_pre.prf \
 		processor_calcs.hpp \
 		signal_port.hpp \
 		screens/batch.hpp \
+		screens/batch_macro_type_choice.hpp \
 		screens/batch_options.hpp \
 		screens/batch_table.hpp \
 		screens/calibrate.hpp \
+		screens/communications_menu.hpp \
 		screens/crop_choice.hpp \
 		screens/crop_delete.hpp \
 		screens/crop_edit.hpp \
 		screens/crop_name_exists.hpp \
 		screens/enter_program.hpp \
+		screens/gateset.hpp \
+		screens/help_screen.hpp \
 		screens/keyboard.hpp \
 		screens/keypad.hpp \
+		screens/macro_builder.hpp \
 		screens/macro_screen.hpp \
 		screens/message_box.hpp \
 		screens/playback.hpp \
@@ -378,7 +383,9 @@ DIST          = /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/spec_pre.prf \
 		screens/program_delete.hpp \
 		screens/select_envelope_field.hpp \
 		screens/select_field_data_source.hpp \
+		screens/serial_port_setup.hpp \
 		screens/set_envelope_size.hpp \
+		screens/slave_mode_screen.hpp \
 		screens/spreadsheet_choice.hpp \
 		screens/ss_batch.hpp \
 		screens/ss_batch_table.hpp \
@@ -389,19 +396,12 @@ DIST          = /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/spec_pre.prf \
 		screens/ss_setup_entry.hpp \
 		screens/start_screen.hpp \
 		screens/table.hpp \
-		screens/tool_choice.hpp \
-		screens/totalize.hpp \
-		screens/totalize_options.hpp \
-		screens/help_screen.hpp \
-		screens/gateset.hpp \
 		screens/tcp_client_server_addr_entry.hpp \
 		screens/tcp_mode_choice.hpp \
 		screens/tcp_server_addr_choice.hpp \
-		screens/communications_menu.hpp \
-		screens/macro_builder.hpp \
-		screens/batch_macro_type_choice.hpp \
-		screens/slave_mode_screen.hpp \
-		screens/serial_port_setup.hpp batch_mode_driver.cpp \
+		screens/tool_choice.hpp \
+		screens/totalize.hpp \
+		screens/totalize_options.hpp batch_mode_driver.cpp \
 		brother_envelope_feeder.cpp \
 		button.cpp \
 		centre.cpp \
@@ -419,16 +419,21 @@ DIST          = /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/spec_pre.prf \
 		processor.cpp \
 		signal_port.cpp \
 		screens/batch.cpp \
+		screens/batch_macro_type_choice.cpp \
 		screens/batch_options.cpp \
 		screens/batch_table.cpp \
 		screens/calibrate.cpp \
+		screens/communications_menu.cpp \
 		screens/crop_choice.cpp \
 		screens/crop_delete.cpp \
 		screens/crop_edit.cpp \
 		screens/crop_name_exists.cpp \
 		screens/enter_program.cpp \
+		screens/gateset.cpp \
+		screens/help_screen.cpp \
 		screens/keyboard.cpp \
 		screens/keypad.cpp \
+		screens/macro_builder.cpp \
 		screens/macro_screen.cpp \
 		screens/message_box.cpp \
 		screens/playback.cpp \
@@ -437,7 +442,9 @@ DIST          = /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/spec_pre.prf \
 		screens/program_delete.cpp \
 		screens/select_envelope_field.cpp \
 		screens/select_field_data_source.cpp \
+		screens/serial_port_setup.cpp \
 		screens/set_envelope_size.cpp \
+		screens/slave_mode_screen.cpp \
 		screens/spreadsheet_choice.cpp \
 		screens/ss_batch.cpp \
 		screens/ss_batch_table.cpp \
@@ -448,19 +455,12 @@ DIST          = /usr/lib/arm-linux-gnueabihf/qt5/mkspecs/features/spec_pre.prf \
 		screens/ss_setup_entry.cpp \
 		screens/start_screen.cpp \
 		screens/table.cpp \
-		screens/tool_choice.cpp \
-		screens/totalize.cpp \
-		screens/totalize_options.cpp \
-		screens/help_screen.cpp \
-		screens/gateset.cpp \
 		screens/tcp_client_server_addr_entry.cpp \
 		screens/tcp_mode_choice.cpp \
 		screens/tcp_server_addr_choice.cpp \
-		screens/communications_menu.cpp \
-		screens/macro_builder.cpp \
-		screens/batch_macro_type_choice.cpp \
-		screens/slave_mode_screen.cpp \
-		screens/serial_port_setup.cpp
+		screens/tool_choice.cpp \
+		screens/totalize.cpp \
+		screens/totalize_options.cpp
 QMAKE_TARGET  = cntr
 DESTDIR       = #avoid trailing-slash linebreak
 TARGET        = cntr
@@ -638,8 +638,8 @@ dist: distdir FORCE
 distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
-	$(COPY_FILE) --parents batch_mode_driver.hpp brother_envelope_feeder.hpp button.hpp centre.hpp code_39_writer.hpp crop.hpp cutgate.hpp diagnostics_console.hpp display.hpp dust_streak.hpp endgate.hpp envelope.hpp envelope_feeder_brother.hpp envelope_sensor.hpp feeder.hpp processor.hpp processor_calcs.hpp signal_port.hpp screens/batch.hpp screens/batch_options.hpp screens/batch_table.hpp screens/calibrate.hpp screens/crop_choice.hpp screens/crop_delete.hpp screens/crop_edit.hpp screens/crop_name_exists.hpp screens/enter_program.hpp screens/keyboard.hpp screens/keypad.hpp screens/macro_screen.hpp screens/message_box.hpp screens/playback.hpp screens/position_envelope_field.hpp screens/program_choice.hpp screens/program_delete.hpp screens/select_envelope_field.hpp screens/select_field_data_source.hpp screens/set_envelope_size.hpp screens/spreadsheet_choice.hpp screens/ss_batch.hpp screens/ss_batch_table.hpp screens/ss_column_display_options.hpp screens/ss_options.hpp screens/ss_setup_choice.hpp screens/ss_setup_delete.hpp screens/ss_setup_entry.hpp screens/start_screen.hpp screens/table.hpp screens/tool_choice.hpp screens/totalize.hpp screens/totalize_options.hpp screens/help_screen.hpp screens/gateset.hpp screens/tcp_client_server_addr_entry.hpp screens/tcp_mode_choice.hpp screens/tcp_server_addr_choice.hpp screens/communications_menu.hpp screens/macro_builder.hpp screens/batch_macro_type_choice.hpp screens/slave_mode_screen.hpp screens/serial_port_setup.hpp $(DISTDIR)/
-	$(COPY_FILE) --parents batch_mode_driver.cpp brother_envelope_feeder.cpp button.cpp centre.cpp code_39_writer.cpp cutgate.cpp diagnostics_console.cpp display.cpp dust_streak.cpp endgate.cpp envelope.cpp envelope_feeder_brother.cpp envelope_sensor.cpp feeder.cpp main.cpp processor.cpp signal_port.cpp screens/batch.cpp screens/batch_options.cpp screens/batch_table.cpp screens/calibrate.cpp screens/crop_choice.cpp screens/crop_delete.cpp screens/crop_edit.cpp screens/crop_name_exists.cpp screens/enter_program.cpp screens/keyboard.cpp screens/keypad.cpp screens/macro_screen.cpp screens/message_box.cpp screens/playback.cpp screens/position_envelope_field.cpp screens/program_choice.cpp screens/program_delete.cpp screens/select_envelope_field.cpp screens/select_field_data_source.cpp screens/set_envelope_size.cpp screens/spreadsheet_choice.cpp screens/ss_batch.cpp screens/ss_batch_table.cpp screens/ss_column_display_options.cpp screens/ss_options.cpp screens/ss_setup_choice.cpp screens/ss_setup_delete.cpp screens/ss_setup_entry.cpp screens/start_screen.cpp screens/table.cpp screens/tool_choice.cpp screens/totalize.cpp screens/totalize_options.cpp screens/help_screen.cpp screens/gateset.cpp screens/tcp_client_server_addr_entry.cpp screens/tcp_mode_choice.cpp screens/tcp_server_addr_choice.cpp screens/communications_menu.cpp screens/macro_builder.cpp screens/batch_macro_type_choice.cpp screens/slave_mode_screen.cpp screens/serial_port_setup.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents batch_mode_driver.hpp brother_envelope_feeder.hpp button.hpp centre.hpp code_39_writer.hpp crop.hpp cutgate.hpp diagnostics_console.hpp display.hpp dust_streak.hpp endgate.hpp envelope.hpp envelope_feeder_brother.hpp envelope_sensor.hpp feeder.hpp processor.hpp processor_calcs.hpp signal_port.hpp screens/batch.hpp screens/batch_macro_type_choice.hpp screens/batch_options.hpp screens/batch_table.hpp screens/calibrate.hpp screens/communications_menu.hpp screens/crop_choice.hpp screens/crop_delete.hpp screens/crop_edit.hpp screens/crop_name_exists.hpp screens/enter_program.hpp screens/gateset.hpp screens/help_screen.hpp screens/keyboard.hpp screens/keypad.hpp screens/macro_builder.hpp screens/macro_screen.hpp screens/message_box.hpp screens/playback.hpp screens/position_envelope_field.hpp screens/program_choice.hpp screens/program_delete.hpp screens/select_envelope_field.hpp screens/select_field_data_source.hpp screens/serial_port_setup.hpp screens/set_envelope_size.hpp screens/slave_mode_screen.hpp screens/spreadsheet_choice.hpp screens/ss_batch.hpp screens/ss_batch_table.hpp screens/ss_column_display_options.hpp screens/ss_options.hpp screens/ss_setup_choice.hpp screens/ss_setup_delete.hpp screens/ss_setup_entry.hpp screens/start_screen.hpp screens/table.hpp screens/tcp_client_server_addr_entry.hpp screens/tcp_mode_choice.hpp screens/tcp_server_addr_choice.hpp screens/tool_choice.hpp screens/totalize.hpp screens/totalize_options.hpp $(DISTDIR)/
+	$(COPY_FILE) --parents batch_mode_driver.cpp brother_envelope_feeder.cpp button.cpp centre.cpp code_39_writer.cpp cutgate.cpp diagnostics_console.cpp display.cpp dust_streak.cpp endgate.cpp envelope.cpp envelope_feeder_brother.cpp envelope_sensor.cpp feeder.cpp main.cpp processor.cpp signal_port.cpp screens/batch.cpp screens/batch_macro_type_choice.cpp screens/batch_options.cpp screens/batch_table.cpp screens/calibrate.cpp screens/communications_menu.cpp screens/crop_choice.cpp screens/crop_delete.cpp screens/crop_edit.cpp screens/crop_name_exists.cpp screens/enter_program.cpp screens/gateset.cpp screens/help_screen.cpp screens/keyboard.cpp screens/keypad.cpp screens/macro_builder.cpp screens/macro_screen.cpp screens/message_box.cpp screens/playback.cpp screens/position_envelope_field.cpp screens/program_choice.cpp screens/program_delete.cpp screens/select_envelope_field.cpp screens/select_field_data_source.cpp screens/serial_port_setup.cpp screens/set_envelope_size.cpp screens/slave_mode_screen.cpp screens/spreadsheet_choice.cpp screens/ss_batch.cpp screens/ss_batch_table.cpp screens/ss_column_display_options.cpp screens/ss_options.cpp screens/ss_setup_choice.cpp screens/ss_setup_delete.cpp screens/ss_setup_entry.cpp screens/start_screen.cpp screens/table.cpp screens/tcp_client_server_addr_entry.cpp screens/tcp_mode_choice.cpp screens/tcp_server_addr_choice.cpp screens/tool_choice.cpp screens/totalize.cpp screens/totalize_options.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -662,9 +662,9 @@ check: first
 
 compiler_rcc_make_all:
 compiler_rcc_clean:
-compiler_moc_header_make_all: moc_batch_mode_driver.cpp moc_brother_envelope_feeder.cpp moc_button.cpp moc_centre.cpp moc_cutgate.cpp moc_diagnostics_console.cpp moc_display.cpp moc_endgate.cpp moc_envelope.cpp moc_envelope_feeder_brother.cpp moc_envelope_sensor.cpp moc_feeder.cpp moc_processor.cpp moc_signal_port.cpp moc_batch.cpp moc_batch_options.cpp moc_batch_table.cpp moc_calibrate.cpp moc_crop_choice.cpp moc_crop_delete.cpp moc_crop_edit.cpp moc_crop_name_exists.cpp moc_enter_program.cpp moc_keyboard.cpp moc_keypad.cpp moc_macro_screen.cpp moc_message_box.cpp moc_playback.cpp moc_position_envelope_field.cpp moc_program_choice.cpp moc_program_delete.cpp moc_select_envelope_field.cpp moc_select_field_data_source.cpp moc_set_envelope_size.cpp moc_spreadsheet_choice.cpp moc_ss_batch.cpp moc_ss_batch_table.cpp moc_ss_column_display_options.cpp moc_ss_options.cpp moc_ss_setup_choice.cpp moc_ss_setup_delete.cpp moc_ss_setup_entry.cpp moc_start_screen.cpp moc_table.cpp moc_tool_choice.cpp moc_totalize.cpp moc_totalize_options.cpp moc_help_screen.cpp moc_gateset.cpp moc_tcp_client_server_addr_entry.cpp moc_tcp_mode_choice.cpp moc_tcp_server_addr_choice.cpp moc_communications_menu.cpp moc_macro_builder.cpp moc_batch_macro_type_choice.cpp moc_slave_mode_screen.cpp moc_serial_port_setup.cpp
+compiler_moc_header_make_all: moc_batch_mode_driver.cpp moc_brother_envelope_feeder.cpp moc_button.cpp moc_centre.cpp moc_cutgate.cpp moc_diagnostics_console.cpp moc_display.cpp moc_endgate.cpp moc_envelope.cpp moc_envelope_feeder_brother.cpp moc_envelope_sensor.cpp moc_feeder.cpp moc_processor.cpp moc_signal_port.cpp moc_batch.cpp moc_batch_macro_type_choice.cpp moc_batch_options.cpp moc_batch_table.cpp moc_calibrate.cpp moc_communications_menu.cpp moc_crop_choice.cpp moc_crop_delete.cpp moc_crop_edit.cpp moc_crop_name_exists.cpp moc_enter_program.cpp moc_gateset.cpp moc_help_screen.cpp moc_keyboard.cpp moc_keypad.cpp moc_macro_builder.cpp moc_macro_screen.cpp moc_message_box.cpp moc_playback.cpp moc_position_envelope_field.cpp moc_program_choice.cpp moc_program_delete.cpp moc_select_envelope_field.cpp moc_select_field_data_source.cpp moc_serial_port_setup.cpp moc_set_envelope_size.cpp moc_slave_mode_screen.cpp moc_spreadsheet_choice.cpp moc_ss_batch.cpp moc_ss_batch_table.cpp moc_ss_column_display_options.cpp moc_ss_options.cpp moc_ss_setup_choice.cpp moc_ss_setup_delete.cpp moc_ss_setup_entry.cpp moc_start_screen.cpp moc_table.cpp moc_tcp_client_server_addr_entry.cpp moc_tcp_mode_choice.cpp moc_tcp_server_addr_choice.cpp moc_tool_choice.cpp moc_totalize.cpp moc_totalize_options.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) moc_batch_mode_driver.cpp moc_brother_envelope_feeder.cpp moc_button.cpp moc_centre.cpp moc_cutgate.cpp moc_diagnostics_console.cpp moc_display.cpp moc_endgate.cpp moc_envelope.cpp moc_envelope_feeder_brother.cpp moc_envelope_sensor.cpp moc_feeder.cpp moc_processor.cpp moc_signal_port.cpp moc_batch.cpp moc_batch_options.cpp moc_batch_table.cpp moc_calibrate.cpp moc_crop_choice.cpp moc_crop_delete.cpp moc_crop_edit.cpp moc_crop_name_exists.cpp moc_enter_program.cpp moc_keyboard.cpp moc_keypad.cpp moc_macro_screen.cpp moc_message_box.cpp moc_playback.cpp moc_position_envelope_field.cpp moc_program_choice.cpp moc_program_delete.cpp moc_select_envelope_field.cpp moc_select_field_data_source.cpp moc_set_envelope_size.cpp moc_spreadsheet_choice.cpp moc_ss_batch.cpp moc_ss_batch_table.cpp moc_ss_column_display_options.cpp moc_ss_options.cpp moc_ss_setup_choice.cpp moc_ss_setup_delete.cpp moc_ss_setup_entry.cpp moc_start_screen.cpp moc_table.cpp moc_tool_choice.cpp moc_totalize.cpp moc_totalize_options.cpp moc_help_screen.cpp moc_gateset.cpp moc_tcp_client_server_addr_entry.cpp moc_tcp_mode_choice.cpp moc_tcp_server_addr_choice.cpp moc_communications_menu.cpp moc_macro_builder.cpp moc_batch_macro_type_choice.cpp moc_slave_mode_screen.cpp moc_serial_port_setup.cpp
+	-$(DEL_FILE) moc_batch_mode_driver.cpp moc_brother_envelope_feeder.cpp moc_button.cpp moc_centre.cpp moc_cutgate.cpp moc_diagnostics_console.cpp moc_display.cpp moc_endgate.cpp moc_envelope.cpp moc_envelope_feeder_brother.cpp moc_envelope_sensor.cpp moc_feeder.cpp moc_processor.cpp moc_signal_port.cpp moc_batch.cpp moc_batch_macro_type_choice.cpp moc_batch_options.cpp moc_batch_table.cpp moc_calibrate.cpp moc_communications_menu.cpp moc_crop_choice.cpp moc_crop_delete.cpp moc_crop_edit.cpp moc_crop_name_exists.cpp moc_enter_program.cpp moc_gateset.cpp moc_help_screen.cpp moc_keyboard.cpp moc_keypad.cpp moc_macro_builder.cpp moc_macro_screen.cpp moc_message_box.cpp moc_playback.cpp moc_position_envelope_field.cpp moc_program_choice.cpp moc_program_delete.cpp moc_select_envelope_field.cpp moc_select_field_data_source.cpp moc_serial_port_setup.cpp moc_set_envelope_size.cpp moc_slave_mode_screen.cpp moc_spreadsheet_choice.cpp moc_ss_batch.cpp moc_ss_batch_table.cpp moc_ss_column_display_options.cpp moc_ss_options.cpp moc_ss_setup_choice.cpp moc_ss_setup_delete.cpp moc_ss_setup_entry.cpp moc_start_screen.cpp moc_table.cpp moc_tcp_client_server_addr_entry.cpp moc_tcp_mode_choice.cpp moc_tcp_server_addr_choice.cpp moc_tool_choice.cpp moc_totalize.cpp moc_totalize_options.cpp
 moc_batch_mode_driver.cpp: centre.hpp \
 		cutgate.hpp \
 		endgate.hpp \
@@ -736,6 +736,15 @@ moc_batch.cpp: screens/batch_table.hpp \
 		screens/batch.hpp
 	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/git_repo/esc3/cntr -I/home/odroid/Documents/git_repo/esc3/cntr -I/home/odroid/Documents/git_repo/esc3/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtNetwork -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/batch.hpp -o moc_batch.cpp
 
+moc_batch_macro_type_choice.cpp: centre.hpp \
+		cutgate.hpp \
+		endgate.hpp \
+		envelope_sensor.hpp \
+		feeder.hpp \
+		crop.hpp \
+		screens/batch_macro_type_choice.hpp
+	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/git_repo/esc3/cntr -I/home/odroid/Documents/git_repo/esc3/cntr -I/home/odroid/Documents/git_repo/esc3/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtNetwork -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/batch_macro_type_choice.hpp -o moc_batch_macro_type_choice.cpp
+
 moc_batch_options.cpp: centre.hpp \
 		cutgate.hpp \
 		endgate.hpp \
@@ -756,6 +765,15 @@ moc_calibrate.cpp: centre.hpp \
 		crop.hpp \
 		screens/calibrate.hpp
 	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/git_repo/esc3/cntr -I/home/odroid/Documents/git_repo/esc3/cntr -I/home/odroid/Documents/git_repo/esc3/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtNetwork -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/calibrate.hpp -o moc_calibrate.cpp
+
+moc_communications_menu.cpp: centre.hpp \
+		cutgate.hpp \
+		endgate.hpp \
+		envelope_sensor.hpp \
+		feeder.hpp \
+		crop.hpp \
+		screens/communications_menu.hpp
+	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/git_repo/esc3/cntr -I/home/odroid/Documents/git_repo/esc3/cntr -I/home/odroid/Documents/git_repo/esc3/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtNetwork -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/communications_menu.hpp -o moc_communications_menu.cpp
 
 moc_crop_choice.cpp: centre.hpp \
 		cutgate.hpp \
@@ -804,6 +822,24 @@ moc_enter_program.cpp: centre.hpp \
 		screens/enter_program.hpp
 	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/git_repo/esc3/cntr -I/home/odroid/Documents/git_repo/esc3/cntr -I/home/odroid/Documents/git_repo/esc3/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtNetwork -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/enter_program.hpp -o moc_enter_program.cpp
 
+moc_gateset.cpp: centre.hpp \
+		cutgate.hpp \
+		endgate.hpp \
+		envelope_sensor.hpp \
+		feeder.hpp \
+		crop.hpp \
+		screens/gateset.hpp
+	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/git_repo/esc3/cntr -I/home/odroid/Documents/git_repo/esc3/cntr -I/home/odroid/Documents/git_repo/esc3/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtNetwork -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/gateset.hpp -o moc_gateset.cpp
+
+moc_help_screen.cpp: centre.hpp \
+		cutgate.hpp \
+		endgate.hpp \
+		envelope_sensor.hpp \
+		feeder.hpp \
+		crop.hpp \
+		screens/help_screen.hpp
+	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/git_repo/esc3/cntr -I/home/odroid/Documents/git_repo/esc3/cntr -I/home/odroid/Documents/git_repo/esc3/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtNetwork -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/help_screen.hpp -o moc_help_screen.cpp
+
 moc_keyboard.cpp: centre.hpp \
 		cutgate.hpp \
 		endgate.hpp \
@@ -817,6 +853,15 @@ moc_keyboard.cpp: centre.hpp \
 
 moc_keypad.cpp: screens/keypad.hpp
 	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/git_repo/esc3/cntr -I/home/odroid/Documents/git_repo/esc3/cntr -I/home/odroid/Documents/git_repo/esc3/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtNetwork -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/keypad.hpp -o moc_keypad.cpp
+
+moc_macro_builder.cpp: centre.hpp \
+		cutgate.hpp \
+		endgate.hpp \
+		envelope_sensor.hpp \
+		feeder.hpp \
+		crop.hpp \
+		screens/macro_builder.hpp
+	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/git_repo/esc3/cntr -I/home/odroid/Documents/git_repo/esc3/cntr -I/home/odroid/Documents/git_repo/esc3/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtNetwork -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/macro_builder.hpp -o moc_macro_builder.cpp
 
 moc_macro_screen.cpp: screens/table.hpp \
 		centre.hpp \
@@ -887,6 +932,15 @@ moc_select_field_data_source.cpp: centre.hpp \
 		screens/select_field_data_source.hpp
 	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/git_repo/esc3/cntr -I/home/odroid/Documents/git_repo/esc3/cntr -I/home/odroid/Documents/git_repo/esc3/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtNetwork -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/select_field_data_source.hpp -o moc_select_field_data_source.cpp
 
+moc_serial_port_setup.cpp: centre.hpp \
+		cutgate.hpp \
+		endgate.hpp \
+		envelope_sensor.hpp \
+		feeder.hpp \
+		crop.hpp \
+		screens/serial_port_setup.hpp
+	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/git_repo/esc3/cntr -I/home/odroid/Documents/git_repo/esc3/cntr -I/home/odroid/Documents/git_repo/esc3/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtNetwork -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/serial_port_setup.hpp -o moc_serial_port_setup.cpp
+
 moc_set_envelope_size.cpp: centre.hpp \
 		cutgate.hpp \
 		endgate.hpp \
@@ -895,6 +949,17 @@ moc_set_envelope_size.cpp: centre.hpp \
 		crop.hpp \
 		screens/set_envelope_size.hpp
 	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/git_repo/esc3/cntr -I/home/odroid/Documents/git_repo/esc3/cntr -I/home/odroid/Documents/git_repo/esc3/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtNetwork -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/set_envelope_size.hpp -o moc_set_envelope_size.cpp
+
+moc_slave_mode_screen.cpp: centre.hpp \
+		cutgate.hpp \
+		endgate.hpp \
+		envelope_sensor.hpp \
+		feeder.hpp \
+		crop.hpp \
+		batch_mode_driver.hpp \
+		envelope.hpp \
+		screens/slave_mode_screen.hpp
+	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/git_repo/esc3/cntr -I/home/odroid/Documents/git_repo/esc3/cntr -I/home/odroid/Documents/git_repo/esc3/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtNetwork -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/slave_mode_screen.hpp -o moc_slave_mode_screen.cpp
 
 moc_spreadsheet_choice.cpp: centre.hpp \
 		cutgate.hpp \
@@ -983,6 +1048,33 @@ moc_start_screen.cpp: centre.hpp \
 moc_table.cpp: screens/table.hpp
 	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/git_repo/esc3/cntr -I/home/odroid/Documents/git_repo/esc3/cntr -I/home/odroid/Documents/git_repo/esc3/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtNetwork -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/table.hpp -o moc_table.cpp
 
+moc_tcp_client_server_addr_entry.cpp: centre.hpp \
+		cutgate.hpp \
+		endgate.hpp \
+		envelope_sensor.hpp \
+		feeder.hpp \
+		crop.hpp \
+		screens/tcp_client_server_addr_entry.hpp
+	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/git_repo/esc3/cntr -I/home/odroid/Documents/git_repo/esc3/cntr -I/home/odroid/Documents/git_repo/esc3/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtNetwork -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/tcp_client_server_addr_entry.hpp -o moc_tcp_client_server_addr_entry.cpp
+
+moc_tcp_mode_choice.cpp: centre.hpp \
+		cutgate.hpp \
+		endgate.hpp \
+		envelope_sensor.hpp \
+		feeder.hpp \
+		crop.hpp \
+		screens/tcp_mode_choice.hpp
+	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/git_repo/esc3/cntr -I/home/odroid/Documents/git_repo/esc3/cntr -I/home/odroid/Documents/git_repo/esc3/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtNetwork -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/tcp_mode_choice.hpp -o moc_tcp_mode_choice.cpp
+
+moc_tcp_server_addr_choice.cpp: centre.hpp \
+		cutgate.hpp \
+		endgate.hpp \
+		envelope_sensor.hpp \
+		feeder.hpp \
+		crop.hpp \
+		screens/tcp_server_addr_choice.hpp
+	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/git_repo/esc3/cntr -I/home/odroid/Documents/git_repo/esc3/cntr -I/home/odroid/Documents/git_repo/esc3/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtNetwork -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/tcp_server_addr_choice.hpp -o moc_tcp_server_addr_choice.cpp
+
 moc_tool_choice.cpp: centre.hpp \
 		cutgate.hpp \
 		endgate.hpp \
@@ -1011,98 +1103,6 @@ moc_totalize_options.cpp: centre.hpp \
 		crop.hpp \
 		screens/totalize_options.hpp
 	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/git_repo/esc3/cntr -I/home/odroid/Documents/git_repo/esc3/cntr -I/home/odroid/Documents/git_repo/esc3/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtNetwork -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/totalize_options.hpp -o moc_totalize_options.cpp
-
-moc_help_screen.cpp: centre.hpp \
-		cutgate.hpp \
-		endgate.hpp \
-		envelope_sensor.hpp \
-		feeder.hpp \
-		crop.hpp \
-		screens/help_screen.hpp
-	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/git_repo/esc3/cntr -I/home/odroid/Documents/git_repo/esc3/cntr -I/home/odroid/Documents/git_repo/esc3/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtNetwork -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/help_screen.hpp -o moc_help_screen.cpp
-
-moc_gateset.cpp: centre.hpp \
-		cutgate.hpp \
-		endgate.hpp \
-		envelope_sensor.hpp \
-		feeder.hpp \
-		crop.hpp \
-		screens/gateset.hpp
-	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/git_repo/esc3/cntr -I/home/odroid/Documents/git_repo/esc3/cntr -I/home/odroid/Documents/git_repo/esc3/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtNetwork -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/gateset.hpp -o moc_gateset.cpp
-
-moc_tcp_client_server_addr_entry.cpp: centre.hpp \
-		cutgate.hpp \
-		endgate.hpp \
-		envelope_sensor.hpp \
-		feeder.hpp \
-		crop.hpp \
-		screens/tcp_client_server_addr_entry.hpp
-	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/git_repo/esc3/cntr -I/home/odroid/Documents/git_repo/esc3/cntr -I/home/odroid/Documents/git_repo/esc3/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtNetwork -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/tcp_client_server_addr_entry.hpp -o moc_tcp_client_server_addr_entry.cpp
-
-moc_tcp_mode_choice.cpp: centre.hpp \
-		cutgate.hpp \
-		endgate.hpp \
-		envelope_sensor.hpp \
-		feeder.hpp \
-		crop.hpp \
-		screens/tcp_mode_choice.hpp
-	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/git_repo/esc3/cntr -I/home/odroid/Documents/git_repo/esc3/cntr -I/home/odroid/Documents/git_repo/esc3/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtNetwork -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/tcp_mode_choice.hpp -o moc_tcp_mode_choice.cpp
-
-moc_tcp_server_addr_choice.cpp: centre.hpp \
-		cutgate.hpp \
-		endgate.hpp \
-		envelope_sensor.hpp \
-		feeder.hpp \
-		crop.hpp \
-		screens/tcp_server_addr_choice.hpp
-	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/git_repo/esc3/cntr -I/home/odroid/Documents/git_repo/esc3/cntr -I/home/odroid/Documents/git_repo/esc3/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtNetwork -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/tcp_server_addr_choice.hpp -o moc_tcp_server_addr_choice.cpp
-
-moc_communications_menu.cpp: centre.hpp \
-		cutgate.hpp \
-		endgate.hpp \
-		envelope_sensor.hpp \
-		feeder.hpp \
-		crop.hpp \
-		screens/communications_menu.hpp
-	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/git_repo/esc3/cntr -I/home/odroid/Documents/git_repo/esc3/cntr -I/home/odroid/Documents/git_repo/esc3/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtNetwork -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/communications_menu.hpp -o moc_communications_menu.cpp
-
-moc_macro_builder.cpp: centre.hpp \
-		cutgate.hpp \
-		endgate.hpp \
-		envelope_sensor.hpp \
-		feeder.hpp \
-		crop.hpp \
-		screens/macro_builder.hpp
-	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/git_repo/esc3/cntr -I/home/odroid/Documents/git_repo/esc3/cntr -I/home/odroid/Documents/git_repo/esc3/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtNetwork -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/macro_builder.hpp -o moc_macro_builder.cpp
-
-moc_batch_macro_type_choice.cpp: centre.hpp \
-		cutgate.hpp \
-		endgate.hpp \
-		envelope_sensor.hpp \
-		feeder.hpp \
-		crop.hpp \
-		screens/batch_macro_type_choice.hpp
-	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/git_repo/esc3/cntr -I/home/odroid/Documents/git_repo/esc3/cntr -I/home/odroid/Documents/git_repo/esc3/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtNetwork -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/batch_macro_type_choice.hpp -o moc_batch_macro_type_choice.cpp
-
-moc_slave_mode_screen.cpp: centre.hpp \
-		cutgate.hpp \
-		endgate.hpp \
-		envelope_sensor.hpp \
-		feeder.hpp \
-		crop.hpp \
-		batch_mode_driver.hpp \
-		envelope.hpp \
-		screens/slave_mode_screen.hpp
-	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/git_repo/esc3/cntr -I/home/odroid/Documents/git_repo/esc3/cntr -I/home/odroid/Documents/git_repo/esc3/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtNetwork -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/slave_mode_screen.hpp -o moc_slave_mode_screen.cpp
-
-moc_serial_port_setup.cpp: centre.hpp \
-		cutgate.hpp \
-		endgate.hpp \
-		envelope_sensor.hpp \
-		feeder.hpp \
-		crop.hpp \
-		screens/serial_port_setup.hpp
-	/usr/lib/arm-linux-gnueabihf/qt5/bin/moc $(DEFINES) -I/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/linux-g++ -I/home/odroid/Documents/git_repo/esc3/cntr -I/home/odroid/Documents/git_repo/esc3/cntr -I/home/odroid/Documents/git_repo/esc3/cntr/screens -I/usr/include/arm-linux-gnueabihf/qt5 -I/usr/include/arm-linux-gnueabihf/qt5/QtPrintSupport -I/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -I/usr/include/arm-linux-gnueabihf/qt5/QtGui -I/usr/include/arm-linux-gnueabihf/qt5/QtNetwork -I/usr/include/arm-linux-gnueabihf/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/arm-linux-gnueabihf/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/arm-linux-gnueabihf/5/include -I/usr/local/include -I/usr/lib/gcc/arm-linux-gnueabihf/5/include-fixed -I/usr/include/arm-linux-gnueabihf -I/usr/include screens/serial_port_setup.hpp -o moc_serial_port_setup.cpp
 
 compiler_moc_source_make_all:
 compiler_moc_source_clean:
@@ -1167,18 +1167,6 @@ centre.o: centre.cpp screens/message_box.hpp \
 		screens/program_delete.hpp \
 		screens/crop_name_exists.hpp \
 		diagnostics_console.hpp \
-		screens/spreadsheet_choice.hpp \
-		screens/ss_setup_choice.hpp \
-		screens/ss_setup_entry.hpp \
-		screens/set_envelope_size.hpp \
-		screens/ss_setup_delete.hpp \
-		screens/ss_options.hpp \
-		screens/ss_column_display_options.hpp \
-		screens/ss_batch.hpp \
-		screens/ss_batch_table.hpp \
-		screens/select_envelope_field.hpp \
-		screens/position_envelope_field.hpp \
-		screens/select_field_data_source.hpp \
 		screens/macro_builder.hpp \
 		screens/communications_menu.hpp \
 		screens/tcp_server_addr_choice.hpp \
@@ -1277,8 +1265,21 @@ batch.o: screens/batch.cpp centre.hpp \
 		screens/table.hpp \
 		screens/keypad.hpp \
 		button.hpp \
-		screens/message_box.hpp
+		screens/message_box.hpp \
+		screens/help_screen.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o batch.o screens/batch.cpp
+
+batch_macro_type_choice.o: screens/batch_macro_type_choice.cpp button.hpp \
+		batch_mode_driver.hpp \
+		centre.hpp \
+		cutgate.hpp \
+		endgate.hpp \
+		envelope_sensor.hpp \
+		feeder.hpp \
+		crop.hpp \
+		envelope.hpp \
+		screens/batch_macro_type_choice.hpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o batch_macro_type_choice.o screens/batch_macro_type_choice.cpp
 
 batch_options.o: screens/batch_options.cpp button.hpp \
 		batch_mode_driver.hpp \
@@ -1289,6 +1290,7 @@ batch_options.o: screens/batch_options.cpp button.hpp \
 		feeder.hpp \
 		crop.hpp \
 		envelope.hpp \
+		screens/help_screen.hpp \
 		screens/batch_options.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o batch_options.o screens/batch_options.cpp
 
@@ -1313,6 +1315,17 @@ calibrate.o: screens/calibrate.cpp centre.hpp \
 		button.hpp \
 		screens/help_screen.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o calibrate.o screens/calibrate.cpp
+
+communications_menu.o: screens/communications_menu.cpp centre.hpp \
+		cutgate.hpp \
+		endgate.hpp \
+		envelope_sensor.hpp \
+		feeder.hpp \
+		crop.hpp \
+		screens/communications_menu.hpp \
+		button.hpp \
+		screens/help_screen.hpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o communications_menu.o screens/communications_menu.cpp
 
 crop_choice.o: screens/crop_choice.cpp centre.hpp \
 		cutgate.hpp \
@@ -1364,8 +1377,29 @@ enter_program.o: screens/enter_program.cpp centre.hpp \
 		batch_mode_driver.hpp \
 		envelope.hpp \
 		button.hpp \
-		screens/keypad.hpp
+		screens/keypad.hpp \
+		screens/help_screen.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o enter_program.o screens/enter_program.cpp
+
+gateset.o: screens/gateset.cpp centre.hpp \
+		cutgate.hpp \
+		endgate.hpp \
+		envelope_sensor.hpp \
+		feeder.hpp \
+		crop.hpp \
+		screens/gateset.hpp \
+		button.hpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o gateset.o screens/gateset.cpp
+
+help_screen.o: screens/help_screen.cpp screens/help_screen.hpp \
+		centre.hpp \
+		cutgate.hpp \
+		endgate.hpp \
+		envelope_sensor.hpp \
+		feeder.hpp \
+		crop.hpp \
+		button.hpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o help_screen.o screens/help_screen.cpp
 
 keyboard.o: screens/keyboard.cpp centre.hpp \
 		cutgate.hpp \
@@ -1382,6 +1416,19 @@ keyboard.o: screens/keyboard.cpp centre.hpp \
 
 keypad.o: screens/keypad.cpp screens/keypad.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o keypad.o screens/keypad.cpp
+
+macro_builder.o: screens/macro_builder.cpp centre.hpp \
+		cutgate.hpp \
+		endgate.hpp \
+		envelope_sensor.hpp \
+		feeder.hpp \
+		crop.hpp \
+		screens/macro_screen.hpp \
+		screens/table.hpp \
+		button.hpp \
+		screens/help_screen.hpp \
+		screens/macro_builder.hpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o macro_builder.o screens/macro_builder.cpp
 
 macro_screen.o: screens/macro_screen.cpp centre.hpp \
 		cutgate.hpp \
@@ -1472,6 +1519,17 @@ select_field_data_source.o: screens/select_field_data_source.cpp centre.hpp \
 		button.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o select_field_data_source.o screens/select_field_data_source.cpp
 
+serial_port_setup.o: screens/serial_port_setup.cpp centre.hpp \
+		cutgate.hpp \
+		endgate.hpp \
+		envelope_sensor.hpp \
+		feeder.hpp \
+		crop.hpp \
+		screens/serial_port_setup.hpp \
+		button.hpp \
+		screens/help_screen.hpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o serial_port_setup.o screens/serial_port_setup.cpp
+
 set_envelope_size.o: screens/set_envelope_size.cpp centre.hpp \
 		cutgate.hpp \
 		endgate.hpp \
@@ -1484,6 +1542,19 @@ set_envelope_size.o: screens/set_envelope_size.cpp centre.hpp \
 		envelope.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o set_envelope_size.o screens/set_envelope_size.cpp
 
+slave_mode_screen.o: screens/slave_mode_screen.cpp centre.hpp \
+		cutgate.hpp \
+		endgate.hpp \
+		envelope_sensor.hpp \
+		feeder.hpp \
+		crop.hpp \
+		screens/slave_mode_screen.hpp \
+		batch_mode_driver.hpp \
+		envelope.hpp \
+		button.hpp \
+		screens/help_screen.hpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o slave_mode_screen.o screens/slave_mode_screen.cpp
+
 spreadsheet_choice.o: screens/spreadsheet_choice.cpp centre.hpp \
 		cutgate.hpp \
 		endgate.hpp \
@@ -1493,7 +1564,8 @@ spreadsheet_choice.o: screens/spreadsheet_choice.cpp centre.hpp \
 		screens/spreadsheet_choice.hpp \
 		button.hpp \
 		batch_mode_driver.hpp \
-		envelope.hpp
+		envelope.hpp \
+		screens/help_screen.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o spreadsheet_choice.o screens/spreadsheet_choice.cpp
 
 ss_batch.o: screens/ss_batch.cpp centre.hpp \
@@ -1603,6 +1675,36 @@ table.o: screens/table.cpp screens/table.hpp \
 		crop.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o table.o screens/table.cpp
 
+tcp_client_server_addr_entry.o: screens/tcp_client_server_addr_entry.cpp centre.hpp \
+		cutgate.hpp \
+		endgate.hpp \
+		envelope_sensor.hpp \
+		feeder.hpp \
+		crop.hpp \
+		screens/tcp_client_server_addr_entry.hpp \
+		button.hpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o tcp_client_server_addr_entry.o screens/tcp_client_server_addr_entry.cpp
+
+tcp_mode_choice.o: screens/tcp_mode_choice.cpp centre.hpp \
+		cutgate.hpp \
+		endgate.hpp \
+		envelope_sensor.hpp \
+		feeder.hpp \
+		crop.hpp \
+		screens/tcp_mode_choice.hpp \
+		button.hpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o tcp_mode_choice.o screens/tcp_mode_choice.cpp
+
+tcp_server_addr_choice.o: screens/tcp_server_addr_choice.cpp centre.hpp \
+		cutgate.hpp \
+		endgate.hpp \
+		envelope_sensor.hpp \
+		feeder.hpp \
+		crop.hpp \
+		screens/tcp_server_addr_choice.hpp \
+		button.hpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o tcp_server_addr_choice.o screens/tcp_server_addr_choice.cpp
+
 tool_choice.o: screens/tool_choice.cpp centre.hpp \
 		cutgate.hpp \
 		endgate.hpp \
@@ -1634,116 +1736,6 @@ totalize_options.o: screens/totalize_options.cpp centre.hpp \
 		screens/totalize_options.hpp \
 		button.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o totalize_options.o screens/totalize_options.cpp
-
-help_screen.o: screens/help_screen.cpp screens/help_screen.hpp \
-		centre.hpp \
-		cutgate.hpp \
-		endgate.hpp \
-		envelope_sensor.hpp \
-		feeder.hpp \
-		crop.hpp \
-		button.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o help_screen.o screens/help_screen.cpp
-
-gateset.o: screens/gateset.cpp centre.hpp \
-		cutgate.hpp \
-		endgate.hpp \
-		envelope_sensor.hpp \
-		feeder.hpp \
-		crop.hpp \
-		screens/gateset.hpp \
-		button.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o gateset.o screens/gateset.cpp
-
-tcp_client_server_addr_entry.o: screens/tcp_client_server_addr_entry.cpp centre.hpp \
-		cutgate.hpp \
-		endgate.hpp \
-		envelope_sensor.hpp \
-		feeder.hpp \
-		crop.hpp \
-		screens/tcp_client_server_addr_entry.hpp \
-		button.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o tcp_client_server_addr_entry.o screens/tcp_client_server_addr_entry.cpp
-
-tcp_mode_choice.o: screens/tcp_mode_choice.cpp centre.hpp \
-		cutgate.hpp \
-		endgate.hpp \
-		envelope_sensor.hpp \
-		feeder.hpp \
-		crop.hpp \
-		screens/tcp_mode_choice.hpp \
-		button.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o tcp_mode_choice.o screens/tcp_mode_choice.cpp
-
-tcp_server_addr_choice.o: screens/tcp_server_addr_choice.cpp centre.hpp \
-		cutgate.hpp \
-		endgate.hpp \
-		envelope_sensor.hpp \
-		feeder.hpp \
-		crop.hpp \
-		screens/tcp_server_addr_choice.hpp \
-		button.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o tcp_server_addr_choice.o screens/tcp_server_addr_choice.cpp
-
-communications_menu.o: screens/communications_menu.cpp centre.hpp \
-		cutgate.hpp \
-		endgate.hpp \
-		envelope_sensor.hpp \
-		feeder.hpp \
-		crop.hpp \
-		screens/communications_menu.hpp \
-		button.hpp \
-		screens/help_screen.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o communications_menu.o screens/communications_menu.cpp
-
-macro_builder.o: screens/macro_builder.cpp centre.hpp \
-		cutgate.hpp \
-		endgate.hpp \
-		envelope_sensor.hpp \
-		feeder.hpp \
-		crop.hpp \
-		screens/macro_screen.hpp \
-		screens/table.hpp \
-		button.hpp \
-		screens/help_screen.hpp \
-		screens/macro_builder.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o macro_builder.o screens/macro_builder.cpp
-
-batch_macro_type_choice.o: screens/batch_macro_type_choice.cpp button.hpp \
-		batch_mode_driver.hpp \
-		centre.hpp \
-		cutgate.hpp \
-		endgate.hpp \
-		envelope_sensor.hpp \
-		feeder.hpp \
-		crop.hpp \
-		envelope.hpp \
-		screens/batch_macro_type_choice.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o batch_macro_type_choice.o screens/batch_macro_type_choice.cpp
-
-slave_mode_screen.o: screens/slave_mode_screen.cpp centre.hpp \
-		cutgate.hpp \
-		endgate.hpp \
-		envelope_sensor.hpp \
-		feeder.hpp \
-		crop.hpp \
-		screens/slave_mode_screen.hpp \
-		batch_mode_driver.hpp \
-		envelope.hpp \
-		button.hpp \
-		screens/help_screen.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o slave_mode_screen.o screens/slave_mode_screen.cpp
-
-serial_port_setup.o: screens/serial_port_setup.cpp centre.hpp \
-		cutgate.hpp \
-		endgate.hpp \
-		envelope_sensor.hpp \
-		feeder.hpp \
-		crop.hpp \
-		screens/serial_port_setup.hpp \
-		button.hpp \
-		screens/help_screen.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o serial_port_setup.o screens/serial_port_setup.cpp
 
 moc_batch_mode_driver.o: moc_batch_mode_driver.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_batch_mode_driver.o moc_batch_mode_driver.cpp
@@ -1790,6 +1782,9 @@ moc_signal_port.o: moc_signal_port.cpp
 moc_batch.o: moc_batch.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_batch.o moc_batch.cpp
 
+moc_batch_macro_type_choice.o: moc_batch_macro_type_choice.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_batch_macro_type_choice.o moc_batch_macro_type_choice.cpp
+
 moc_batch_options.o: moc_batch_options.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_batch_options.o moc_batch_options.cpp
 
@@ -1798,6 +1793,9 @@ moc_batch_table.o: moc_batch_table.cpp
 
 moc_calibrate.o: moc_calibrate.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_calibrate.o moc_calibrate.cpp
+
+moc_communications_menu.o: moc_communications_menu.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_communications_menu.o moc_communications_menu.cpp
 
 moc_crop_choice.o: moc_crop_choice.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_crop_choice.o moc_crop_choice.cpp
@@ -1814,11 +1812,20 @@ moc_crop_name_exists.o: moc_crop_name_exists.cpp
 moc_enter_program.o: moc_enter_program.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_enter_program.o moc_enter_program.cpp
 
+moc_gateset.o: moc_gateset.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_gateset.o moc_gateset.cpp
+
+moc_help_screen.o: moc_help_screen.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_help_screen.o moc_help_screen.cpp
+
 moc_keyboard.o: moc_keyboard.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_keyboard.o moc_keyboard.cpp
 
 moc_keypad.o: moc_keypad.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_keypad.o moc_keypad.cpp
+
+moc_macro_builder.o: moc_macro_builder.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_macro_builder.o moc_macro_builder.cpp
 
 moc_macro_screen.o: moc_macro_screen.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_macro_screen.o moc_macro_screen.cpp
@@ -1844,8 +1851,14 @@ moc_select_envelope_field.o: moc_select_envelope_field.cpp
 moc_select_field_data_source.o: moc_select_field_data_source.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_select_field_data_source.o moc_select_field_data_source.cpp
 
+moc_serial_port_setup.o: moc_serial_port_setup.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_serial_port_setup.o moc_serial_port_setup.cpp
+
 moc_set_envelope_size.o: moc_set_envelope_size.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_set_envelope_size.o moc_set_envelope_size.cpp
+
+moc_slave_mode_screen.o: moc_slave_mode_screen.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_slave_mode_screen.o moc_slave_mode_screen.cpp
 
 moc_spreadsheet_choice.o: moc_spreadsheet_choice.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_spreadsheet_choice.o moc_spreadsheet_choice.cpp
@@ -1877,21 +1890,6 @@ moc_start_screen.o: moc_start_screen.cpp
 moc_table.o: moc_table.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_table.o moc_table.cpp
 
-moc_tool_choice.o: moc_tool_choice.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_tool_choice.o moc_tool_choice.cpp
-
-moc_totalize.o: moc_totalize.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_totalize.o moc_totalize.cpp
-
-moc_totalize_options.o: moc_totalize_options.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_totalize_options.o moc_totalize_options.cpp
-
-moc_help_screen.o: moc_help_screen.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_help_screen.o moc_help_screen.cpp
-
-moc_gateset.o: moc_gateset.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_gateset.o moc_gateset.cpp
-
 moc_tcp_client_server_addr_entry.o: moc_tcp_client_server_addr_entry.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_tcp_client_server_addr_entry.o moc_tcp_client_server_addr_entry.cpp
 
@@ -1901,20 +1899,14 @@ moc_tcp_mode_choice.o: moc_tcp_mode_choice.cpp
 moc_tcp_server_addr_choice.o: moc_tcp_server_addr_choice.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_tcp_server_addr_choice.o moc_tcp_server_addr_choice.cpp
 
-moc_communications_menu.o: moc_communications_menu.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_communications_menu.o moc_communications_menu.cpp
+moc_tool_choice.o: moc_tool_choice.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_tool_choice.o moc_tool_choice.cpp
 
-moc_macro_builder.o: moc_macro_builder.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_macro_builder.o moc_macro_builder.cpp
+moc_totalize.o: moc_totalize.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_totalize.o moc_totalize.cpp
 
-moc_batch_macro_type_choice.o: moc_batch_macro_type_choice.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_batch_macro_type_choice.o moc_batch_macro_type_choice.cpp
-
-moc_slave_mode_screen.o: moc_slave_mode_screen.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_slave_mode_screen.o moc_slave_mode_screen.cpp
-
-moc_serial_port_setup.o: moc_serial_port_setup.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_serial_port_setup.o moc_serial_port_setup.cpp
+moc_totalize_options.o: moc_totalize_options.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_totalize_options.o moc_totalize_options.cpp
 
 ####### Install
 

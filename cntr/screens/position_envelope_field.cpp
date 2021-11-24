@@ -68,17 +68,17 @@ position_envelope_field::position_envelope_field(centre* set_centre_p, batch_mod
   x_label_p = new QLabel("X ");
   x_slider_p = new QSlider(Qt::Horizontal);
   x_slider_p -> setMinimum(0);
-  x_slider_p -> setMaximum(batch_mode_driver_p->envelope_p->get_width());
+//  x_slider_p -> setMaximum(batch_mode_driver_p->envelope_p->get_width());
   y_label_p = new QLabel("Y ");
   y_slider_p = new QSlider(Qt::Horizontal);
   y_slider_p -> setMinimum(15);
-  cout<<"y_slider_p setMaximum "<<batch_mode_driver_p->envelope_p->get_height()<<endl;
-  y_slider_p -> setMaximum(batch_mode_driver_p->envelope_p->get_height());
+//  cout<<"y_slider_p setMaximum "<<batch_mode_driver_p->envelope_p->get_height()<<endl;
+//  y_slider_p -> setMaximum(batch_mode_driver_p->envelope_p->get_height());
   h_label_p = new QLabel("Height ");
   h_slider_p = new QSlider(Qt::Horizontal);
   h_slider_p -> setMinimum(0);
-  cout<<"h_slider_p setMaximum "<<batch_mode_driver_p->envelope_p->get_height()/5<<endl;
-  h_slider_p -> setMaximum(batch_mode_driver_p->envelope_p->get_height()/5);
+//  cout<<"h_slider_p setMaximum "<<batch_mode_driver_p->envelope_p->get_height()/5<<endl;
+//  h_slider_p -> setMaximum(batch_mode_driver_p->envelope_p->get_height()/5);
   envelope_p = batch_mode_driver_p -> envelope_p;
   envelope_picture_p = new envelope_picture(envelope_p->image_p);
   
@@ -162,6 +162,7 @@ void position_envelope_field::back_button_clicked()
 
 void position_envelope_field::select_previous_button_clicked()
 {
+  
   envelope_p -> select_previous_field();
 
   x_slider_p -> setValue(envelope_p->get_selected_x());
@@ -175,6 +176,7 @@ void position_envelope_field::select_previous_button_clicked()
 
 void position_envelope_field::select_next_button_clicked()
 {
+  
   envelope_p -> select_next_field();
 
   x_slider_p -> setValue(envelope_p->get_selected_x());
@@ -182,6 +184,7 @@ void position_envelope_field::select_next_button_clicked()
   h_slider_p -> setValue(envelope_p->get_selected_h());
   if(envelope_p->get_selected_type() == Ubuntu_mono) text_button_p->setChecked(true);
   if(envelope_p->get_selected_type() == code_39) code39_button_p->setChecked(true);
+  
 }
 
 void position_envelope_field::delete_selected_clicked()
@@ -248,6 +251,7 @@ void position_envelope_field::set_h(int h_s)
 
 void position_envelope_field::run()
 {
+
   envelope_picture_p -> update();
   QString x_slider_string = QString("X = %1").arg(envelope_p->get_selected_x());
   x_label_p -> setText(x_slider_string);
@@ -255,4 +259,5 @@ void position_envelope_field::run()
   y_label_p -> setText(y_slider_string);
   QString h_slider_string = QString("Height = %1").arg(envelope_p->get_selected_h());
   h_label_p -> setText(h_slider_string);
+
 }

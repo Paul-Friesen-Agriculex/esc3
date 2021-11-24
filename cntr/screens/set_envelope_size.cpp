@@ -63,7 +63,7 @@ void set_envelope_size::back_button_clicked()
 
 void set_envelope_size::no_envelope_button_clicked()
 {
-  batch_mode_driver_p->print_envelope = false;
+//  batch_mode_driver_p->print_envelope = false;
   centre_p->add_waiting_screen(33);//ss_batch
   centre_p->add_waiting_screen(31);//ss_options
   centre_p->screen_done = true;
@@ -71,8 +71,7 @@ void set_envelope_size::no_envelope_button_clicked()
 
 void set_envelope_size::ok_button_clicked()
 {
-  batch_mode_driver_p -> envelope_p -> set_size(width_slider_p->value(), height_slider_p->value());
-//  centre_p -> add_waiting_screen(36);//select_field_data_source
+//  batch_mode_driver_p -> envelope_p -> set_size(width_slider_p->value(), height_slider_p->value());
   centre_p -> add_waiting_screen(35);//position_envelope_field
   centre_p -> screen_done = true;
 }
