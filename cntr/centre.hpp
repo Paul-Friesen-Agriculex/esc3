@@ -172,6 +172,8 @@ class centre : public QObject
   QString serial_port_name;
   bool serial_port_opened;
   
+  bool communicate_by_opcua;
+  
   //batch mode
   bool block_endgate_opening;//true prevents endgate from opening.  Used if barcode test fails in batch.
   

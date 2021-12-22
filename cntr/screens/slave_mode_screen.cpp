@@ -36,6 +36,7 @@ slave_mode_screen::slave_mode_screen(centre*set_centre_p, batch_mode_driver* set
   function_as_server_2_button_p = new button("Function as TCP Server Using 192.168.200.1");
   function_as_client_button_p = new button("Function as TCP Client");
   communicate_by_serial_port_button_p = new button("Communicate by Serial Port");
+  opcua_button_p = new button("Communicate by OPC UA");
   help_button_p = new button("Help");
   exit_button_p = new button("Exit Slave Mode");
   connection_message_p = new QLabel("Choose communication method");
@@ -52,6 +53,7 @@ slave_mode_screen::slave_mode_screen(centre*set_centre_p, batch_mode_driver* set
   main_layout_p->addWidget(function_as_server_2_button_p, 2, 0);
   main_layout_p->addWidget(function_as_client_button_p, 3, 0);
   main_layout_p->addWidget(communicate_by_serial_port_button_p, 4, 0);
+  main_layout_p->addWidget(opcua_button_p, 5, 0);
   main_layout_p->addWidget(help_button_p, 6, 0);
   main_layout_p->addWidget(connection_message_p, 1, 1);
   main_layout_p->addWidget(command_screen_p, 2, 1, 3, 1);
@@ -64,11 +66,13 @@ slave_mode_screen::slave_mode_screen(centre*set_centre_p, batch_mode_driver* set
   connect(function_as_server_2_button_p, SIGNAL(clicked()), this, SLOT(function_as_server_2_clicked()));
   connect(function_as_client_button_p, SIGNAL(clicked()), this, SLOT(function_as_client_clicked()));
   connect(communicate_by_serial_port_button_p, SIGNAL(clicked()), this, SLOT(communicate_by_serial_port_clicked()));
+  connect(opcua_button_p, SIGNAL(clicked()), this, SLOT(opcua_clicked()));
   connect(help_button_p, SIGNAL(clicked()), this, SLOT(help_button_clicked()));
   connect(exit_button_p, SIGNAL(clicked()), this, SLOT(exit_button_clicked()));
   connect(centre_p, SIGNAL(tcp_connection_detected_signal()), this, SLOT(connection_detected()));
   connect(centre_p, SIGNAL(char_from_tcp(QChar)), this, SLOT(command_char(QChar)));
   connect(centre_p, SIGNAL(char_from_serial_port(QChar)), this, SLOT(command_char(QChar)));
+  connect(centre_p, SIGNAL(char_from_serial_port(QChar)), this, SLOT(opcua_command_char(QChar)));
   connect(batch_mode_driver_p, SIGNAL(slave_mode_set_finished()), this, SLOT(command_finished()));
   connect(batch_mode_driver_p, SIGNAL(pack_ready()), this, SLOT(pack_ready()));
   connect(batch_mode_driver_p, SIGNAL(pack_collected(int)), this, SLOT(pack_collected(int)));
@@ -84,10 +88,19 @@ slave_mode_screen::slave_mode_screen(centre*set_centre_p, batch_mode_driver* set
   end_gate_full = false;
   end_gate_opened_full = false;
   end_gate_filling = true;
+  
+  opcua_query_sent = false;
+  opcua_response_received = false;
+  opcua_count = 0;
 
   if(centre_p->communicate_by_serial_port == true)
   {
     connection_message_p->setText("Serial port adapter cable detected.\nReady to communicate");
+  }
+  
+  if(centre_p->communicate_by_opcua == true)
+  {
+    connection_message_p->setText("Set to communicate with Agriculex\nOPC UA device");
   }
   
   timer_p = new QTimer;
@@ -172,6 +185,10 @@ void slave_mode_screen::back_button_clicked()
 
 void slave_mode_screen::function_as_server_1_clicked()
 {
+  centre_p->communicate_by_keyboard_cable = false;
+  centre_p->communicate_by_tcp = true;
+  centre_p->communicate_by_serial_port = false;
+  centre_p->communicate_by_opcua = false;
   QString message_string = centre_p->choose_tcp_network(1);
   if(message_string=="")//success
   {
@@ -183,6 +200,10 @@ void slave_mode_screen::function_as_server_1_clicked()
 
 void slave_mode_screen::function_as_server_2_clicked()
 {
+  centre_p->communicate_by_keyboard_cable = false;
+  centre_p->communicate_by_tcp = true;
+  centre_p->communicate_by_serial_port = false;
+  centre_p->communicate_by_opcua = false;
   QString message_string = centre_p->choose_tcp_network(2);
   if(message_string=="")//success
   {
@@ -194,6 +215,10 @@ void slave_mode_screen::function_as_server_2_clicked()
 
 void slave_mode_screen::function_as_client_clicked()
 {
+  centre_p->communicate_by_keyboard_cable = false;
+  centre_p->communicate_by_tcp = true;
+  centre_p->communicate_by_serial_port = false;
+  centre_p->communicate_by_opcua = false;
   centre_p->add_waiting_screen(60);//come back here when done
   centre_p->add_waiting_screen(42);//tcp_client_server_addr_entry
   centre_p->screen_done = true;
@@ -204,10 +229,20 @@ void slave_mode_screen::communicate_by_serial_port_clicked()
   centre_p->communicate_by_keyboard_cable = false;
   centre_p->communicate_by_tcp = false;
   centre_p->communicate_by_serial_port = true;
+  centre_p->communicate_by_opcua = false;
   centre_p->add_waiting_screen(60);//come back here
   centre_p->add_waiting_screen(61);//serial_port_setup
   centre_p->screen_done = true;
 }  
+
+void slave_mode_screen::opcua_clicked()
+{
+  centre_p->communicate_by_keyboard_cable = false;
+  centre_p->communicate_by_tcp = false;
+  centre_p->communicate_by_serial_port = false;
+  centre_p->communicate_by_opcua = true;
+  connection_message_p->setText("Set to communicate with Agriculex\nOPC UA device");
+}
 
 void slave_mode_screen::help_button_clicked()
 {
@@ -266,6 +301,7 @@ void slave_mode_screen::connection_detected()
   centre_p->communicate_by_tcp = true;
   centre_p->tcp_link_established = true;
   centre_p->communicate_by_serial_port = false;
+  centre_p->communicate_by_opcua = false;
 }
   
 void slave_mode_screen::exit_button_clicked() 
@@ -414,6 +450,13 @@ void slave_mode_screen::command_char(QChar character)
   command_line_string.append(character);
 }
 
+void slave_mode_screen::opcua_command_char(QChar character)
+{
+//  cout<<"slave_mode_screen::opcua_command_char("<<character.unicode()<<")\n";
+  opcua_response_received = true;
+  opcua_command_segment.append(character);
+}
+
 void slave_mode_screen::command_finished()
 {
   cout<<"slave_mode_screen::command_finished()\n";
@@ -462,31 +505,53 @@ void slave_mode_screen::run()
   }
   
   QByteArray array;
-  array.append(QChar(2));
-  array.append('d');
-  array.append(QChar(31));
-  array.append(QString::number(centre_p->count));
-  array.append(QChar(31));
-  if(batch_mode)
+  if(  (centre_p->communicate_by_tcp)  ||  (centre_p->communicate_by_serial_port)  )
   {
-    array.append(QString::number(batch_mode_driver_p->cutgate_pack));
-  }
-  else
-  {
-    array.append('0');
-  }
-  array.append(QChar(31));
-  array.append(QChar(3));
-  if(centre_p->communicate_by_tcp)
-  {
-    if(centre_p->tcp_link_established)
+    array.append(QChar(2));
+    array.append('d');
+    array.append(QChar(31));
+    array.append(QString::number(centre_p->count));
+    array.append(QChar(31));
+    if(batch_mode)
     {
-      centre_p->tcp_socket_p->write(array);
+      array.append(QString::number(batch_mode_driver_p->cutgate_pack));
+    }
+    else
+    {
+      array.append('0');
+    }
+    array.append(QChar(31));
+    array.append(QChar(3));
+    if(centre_p->communicate_by_tcp)
+    {
+      if(centre_p->tcp_link_established)
+      {
+        centre_p->tcp_socket_p->write(array);
+      }
+    }
+    else if(centre_p->communicate_by_serial_port)
+    {
+      centre_p->serial_port_write(QString(array));
     }
   }
-  else if(centre_p->communicate_by_serial_port)
+  else if(centre_p->communicate_by_opcua)
   {
-    centre_p->serial_port_write(QString(array));
+//    cout<<"communicate_by_opcua is true\n";
+    array.append("OPCUAW.001 = ");
+    array.append(QString::number(centre_p->count));
+//    centre_p->serial_port_write(QString(array));
+    array.clear();
+    array.append("OPCUAW.002 = ");
+    if(batch_mode)
+    {
+      array.append(QString::number(batch_mode_driver_p->cutgate_pack));
+    }
+    else
+    {
+      array.append('0');
+    }
+//    centre_p->serial_port_write(QString(array));
+    check_opcua();
   }
   else cout<<"no communication method for slave mode\n";
   
@@ -624,6 +689,135 @@ void slave_mode_screen::run()
       }
     }
     return;
+  }
+}
+
+void slave_mode_screen::check_opcua()//query opcua device.  if new command, interpret, add to command list, mark received in device.  
+{
+  if(opcua_query_sent == false)
+  {
+    opcua_command.clear();
+    opcua_command_segment.clear();
+    opcua_response_received = false;
+    centre_p->serial_port_write("OPCUAR.003");//request command string from opcua device
+    cout<<"wrote OPCUAR.003 to serial\n";
+    opcua_query_sent = true;
+    opcua_count = 0;
+  }
+  else//query was sent
+  {
+    ++opcua_count;
+    if(opcua_count>10)//timeout.  no response.
+    {
+      connection_message_p->setText(QString("OPCUA device not responding."));
+    }
+    if(opcua_response_received)
+    {
+      opcua_command.append(opcua_command_segment);
+      opcua_command_segment.clear();
+      cout<<"opcua_command = "<<opcua_command.toStdString()<<endl;
+      opcua_command.clear();
+      opcua_count = 0;
+      if(opcua_command.trimmed().endsWith("."))//command is complete
+      {
+        if(opcua_command.startsWith("D:") == false)
+        {
+//          connection_message_p->setText("opcua_command not expected form. -> " + opcua_command);
+          cout<<(QString("opcua_command not expected form. -> ") + opcua_command).toStdString()<<endl;
+          opcua_command.clear();
+          return;
+        }
+        opcua_command.remove(0,2);
+        opcua_command.trimmed();//remove possible whitespace from ends
+        new_command_p = new slave_mode_command;
+        if(opcua_command == "start")
+        {
+          new_command_p->type_flag = 'C';
+          new_command_p->crop_name = centre_p->crops[0].name;
+          new_command_p->number_of_sets = 0;
+          new_command_p->speed = centre_p->feed_speed;
+          new_command_p->command = "Start";
+        }
+        else if(opcua_command == "stop")
+        {
+          new_command_p->type_flag = 'C';
+          new_command_p->crop_name = centre_p->crops[0].name;
+          new_command_p->number_of_sets = 0;
+          new_command_p->speed = centre_p->feed_speed;
+          new_command_p->command = "Stop";
+        }
+        else if(opcua_command == "zero")
+        {
+          new_command_p->type_flag = 'C';
+          new_command_p->crop_name = centre_p->crops[0].name;
+          new_command_p->number_of_sets = 0;
+          new_command_p->speed = centre_p->feed_speed;
+          new_command_p->command = "Zero";
+        }
+        else if(opcua_command == "dump")
+        {
+          new_command_p->type_flag = 'C';
+          new_command_p->crop_name = centre_p->crops[0].name;
+          new_command_p->number_of_sets = 0;
+          new_command_p->speed = centre_p->feed_speed;
+          new_command_p->command = "Dump";
+        }
+        else if(opcua_command == "repeat")
+        {
+          new_command_p->type_flag = 'C';
+          new_command_p->crop_name = centre_p->crops[0].name;
+          new_command_p->number_of_sets = 0;
+          new_command_p->speed = centre_p->feed_speed;
+          new_command_p->command = "Recycle";
+        }
+        else if(opcua_command == "reset")
+        {
+          new_command_p->type_flag = 'C';
+          new_command_p->crop_name = centre_p->crops[0].name;
+          new_command_p->number_of_sets = 0;
+          new_command_p->speed = centre_p->feed_speed;
+          new_command_p->command = "Reset";
+        }
+        else if(opcua_command == "open_cut_gate")
+        {
+          new_command_p->type_flag = 'C';
+          new_command_p->crop_name = centre_p->crops[0].name;
+          new_command_p->number_of_sets = 0;
+          new_command_p->speed = centre_p->feed_speed;
+          new_command_p->command = "OpenCut";
+        }
+        else if(opcua_command == "close_cut_gate")
+        {
+          new_command_p->type_flag = 'C';
+          new_command_p->crop_name = centre_p->crops[0].name;
+          new_command_p->number_of_sets = 0;
+          new_command_p->speed = centre_p->feed_speed;
+          new_command_p->command = "CloseCut";
+        }
+        else if(opcua_command == "open_end_gate")
+        {
+          new_command_p->type_flag = 'C';
+          new_command_p->crop_name = centre_p->crops[0].name;
+          new_command_p->number_of_sets = 0;
+          new_command_p->speed = centre_p->feed_speed;
+          new_command_p->command = "OpenEnd";
+        }
+        else if(opcua_command == "close_end_gate")
+        {
+          new_command_p->type_flag = 'C';
+          new_command_p->crop_name = centre_p->crops[0].name;
+          new_command_p->number_of_sets = 0;
+          new_command_p->speed = centre_p->feed_speed;
+          new_command_p->command = "CloseEnd";
+        }
+        else
+        {
+          cout<<"Unknown opcua_command\n";
+        }
+        command_p_list.enqueue(new_command_p);
+        display_command(new_command_p);
+      }
+    }
   }
 }
 

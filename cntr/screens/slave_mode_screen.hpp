@@ -44,10 +44,12 @@ class slave_mode_screen : public screen
   void function_as_server_2_clicked();
   void function_as_client_clicked();
   void communicate_by_serial_port_clicked();
+  void opcua_clicked();
   void help_button_clicked();
   void exit_button_clicked();
   void connection_detected();
   void command_char(QChar character);
+  void opcua_command_char(QChar character);
   void command_finished();
   void run();
 
@@ -59,6 +61,7 @@ class slave_mode_screen : public screen
   button* function_as_server_2_button_p;
   button* function_as_client_button_p;
   button* communicate_by_serial_port_button_p;
+  button* opcua_button_p;
   button* help_button_p;
   button* exit_button_p;
   QLabel* connection_message_p;
@@ -76,6 +79,13 @@ class slave_mode_screen : public screen
   QQueue<slave_mode_command*> command_p_list;
   slave_mode_command* executing_command_p;
   slave_mode_command* previous_command_p;
+  
+  QString opcua_command;
+  QString opcua_command_segment;//command may not arrive all at once.  this holds each segment
+  bool opcua_query_sent;
+  bool opcua_response_received;
+  int opcua_count;//to time wait for query response
+  void check_opcua();//query opcua device.  if new command, interpret, add to command list, mark received in device.  
   
   bool batch_mode;
   int pack_count;

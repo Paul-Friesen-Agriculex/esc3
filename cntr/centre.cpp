@@ -240,6 +240,7 @@ void centre::init()
   block_endgate_opening = false;//true prevents endgate from opening.  Used if barcode test fails in batch.
   communicate_by_keyboard_cable = false;
   communicate_by_tcp = false;
+  communicate_by_opcua = false;
   tcp_link_established = false;
   network = 0;//0-> not set.  1->use 192.168.100.1.  2->use 192.168.200.1.
   QString tcp_client_server_addr = "";
@@ -402,7 +403,7 @@ void centre::read_serial_port()
   memset(str, 0, sizeof(str));
   if(read(serial_port_fd, str, 9) > 0)
   {
-    cout<<"centre::read_serial_port().  str = "<<str<<endl;
+//    cout<<"centre::read_serial_port().  str = "<<str<<endl;
     for(unsigned int i=0; i<sizeof(str); ++i)
     {
       if(str[i] == 0) break;
@@ -645,6 +646,7 @@ bool centre::save_settings(QString file_name)
   fset<<communicate_by_keyboard_cable<<endl;
   fset<<communicate_by_tcp<<endl;
   fset<<communicate_by_serial_port<<endl;
+  fset<<communicate_by_opcua<<endl;
   fset<<baud_rate<<endl;
   fset<<serial_port_name.toStdString()<<endl;
 
@@ -654,6 +656,7 @@ bool centre::save_settings(QString file_name)
 
 bool centre::load_settings(QString file_name)
 {
+  cout<<"centre::load_settings\n";
   QString f_path = QString("settings/");
   f_path += file_name;
   std::ifstream fset(f_path.toLatin1().data(),std::ofstream::out);
@@ -704,12 +707,18 @@ bool centre::load_settings(QString file_name)
   communicate_by_serial_port = atoi(input);
   
   fset.getline(input, 100);
+  communicate_by_opcua = atoi(input);
+  cout<<"communicate_by_opcua = "<<communicate_by_opcua<<endl;
+  
+  fset.getline(input, 100);
   baud_rate = atoi(input);
+  cout<<"baud_rate = "<<baud_rate<<endl;
 
   fset.getline(input, 100);
   serial_port_name = QString(input);
   
   fset.close();
+  cout<<"end centre::load_settings\n";
   return true;
 }
 
@@ -1203,7 +1212,8 @@ void centre::setup_serial_communications(int baud_rate)//assumes serial port cab
   QString full_port_name = QString("/dev/") + serial_port_name;
   communicate_by_keyboard_cable = false;
   communicate_by_tcp = false;
-  communicate_by_serial_port = true;
+//  communicate_by_serial_port = true;
+//  communicate_by_opcua = false;
 
   termios_p = new termios;
   memset(termios_p,0,sizeof(*termios_p));
@@ -1261,7 +1271,7 @@ void centre::setup_serial_communications(int baud_rate)//assumes serial port cab
 
 void centre::serial_port_write(QString str)
 {
-  cout<<"centre::serial_port_write:    "<<str.toStdString()<<endl;
+//  cout<<"centre::serial_port_write:    "<<str.toStdString()<<endl;
   char cstring[100];
   memset(cstring, 0, sizeof(cstring));
   strcpy(cstring, str.toLatin1());
