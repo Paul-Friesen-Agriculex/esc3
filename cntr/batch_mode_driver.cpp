@@ -841,6 +841,9 @@ void batch_mode_driver::run()
       {
         cutgate_p->open();
         endgate_p->close();
+        
+        cout<<"batch_mode_driver mode hi_o_c starting.  cutgate_count_limit = "<<cutgate_count_limit<<endl;
+        
         endgate_count_limit = cutgate_count_limit;
         endgate_pack_limit = cutgate_pack_limit;
         endgate_set = cutgate_set;
@@ -884,6 +887,7 @@ void batch_mode_driver::run()
       }
       if(centre_p->count > lower_chamber_count_limit)
       {
+        cout<<"batch_mode_driver switch_mode to lower_chamber_full_o_c.  lower_chamber_lount_limit = "<<lower_chamber_count_limit<<endl;
         switch_mode(lower_chamber_full_o_c, "lower_chamber_full_o_c");
       }
       if(pack_present && (pack_barcode_ok||release_pack) && (centre_p->count>cutgate_count_limit/8) )
@@ -1652,6 +1656,7 @@ void batch_mode_driver::run()
           emit substitution_barcode_entered(substitute_barcode);
         }
         emit dump_complete(centre_p->count);
+        emit slave_mode_set_finished();
         
 //        cout<<"batch_mode_driver::run 2\n";
         centre_p->dump_count_str = QString::number(centre_p->count);
@@ -3313,7 +3318,7 @@ void batch_mode_driver::chamber_count_limit_calculation() //2021_03_19
 {
   //Chamber Volumes
   double lower_chamber_volume = 787*0.8;  //endgate to cutgate - approximated using CAD model (units are cm^3) 
-  double upper_chamber_volume = 1053;     //cutgate to camera opening
+//  double upper_chamber_volume = 1053;     //cutgate to camera opening
   
   //Reference Variables (corn)
   double measured_seed_volume = 0.79650 * 0.49395 * 1.23505;        //(measured corn in centimetres)
@@ -3326,7 +3331,7 @@ void batch_mode_driver::chamber_count_limit_calculation() //2021_03_19
   
   //Calculated From Selected Seed
   double lower_chamber_seed_limit = (lower_chamber_volume * cm3_to_pixel) / selected_average_seed_volume;
-  double upper_chamber_seed_limit = (upper_chamber_volume * cm3_to_pixel) / selected_average_seed_volume;
+//  double upper_chamber_seed_limit = (upper_chamber_volume * cm3_to_pixel) / selected_average_seed_volume;
   
 //  upper_chamber_count_limit = upper_chamber_seed_limit*.7; //class variable
   lower_chamber_count_limit = lower_chamber_seed_limit*.5; //

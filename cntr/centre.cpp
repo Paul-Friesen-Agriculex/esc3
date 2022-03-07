@@ -435,12 +435,14 @@ void centre::run()
   read_serial_port();
 
 //  if(  (current_screen==5)  ||  (current_screen==15)  ||  (current_screen==60)  )//totalize or batch or slave mode screen
-  if(  (current_screen==5)  ||  (current_screen==60)  )//totalize or slave mode screen
+//  if(  (current_screen==5)  ||  (current_screen==60)  )//totalize or slave mode screen
+  if(current_screen==5)//totalize
   {
     if(endgate_state == ENDGATE_CLOSED)
     {
       if(totalize_force_endgate_open==true || envelope_present==true)
       {
+        cout<<"setting endgate open 1 \n";
         set_endgate_state(ENDGATE_OPEN);
       }
     }
@@ -448,11 +450,13 @@ void centre::run()
     {
       if(totalize_force_endgate_open==false && envelope_present==false)
       {
+        cout<<"setting endgate closed 1 \n";
         set_endgate_state(ENDGATE_CLOSED);
       }
     }
   }
-  else if( (current_screen==15) || (current_screen==33) )//batch or ss_batch
+//  else if( (current_screen==15) || (current_screen==33) )//batch or ss_batch
+  else if( (current_screen==15) || (current_screen==33) ||  (current_screen==60)  )//batch or ss_batch or slave_mode_screen
   {
     /*
     if(endgate_state == ENDGATE_CLOSED)
