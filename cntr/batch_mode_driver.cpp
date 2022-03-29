@@ -474,6 +474,7 @@ void batch_mode_driver::program_remove_last()
 
 void batch_mode_driver::start()
 {
+  cout<<"batch_mode_driver::start\n";
   timer_p->start(1);
   count_rate_old_count = centre_p->count;
   count_rate_time.start();
@@ -481,6 +482,7 @@ void batch_mode_driver::start()
 
 void batch_mode_driver::stop()
 {
+  cout<<"batch_mode_driver::stop\n";
   timer_p->stop();
 }
 
@@ -984,7 +986,7 @@ void batch_mode_driver::run()
         emit enable_substitute_button(false);
         cutgate_p->close();
         switch_mode(hi_c_c, "hi_c_c");
-        
+        emit pack_ready();
         if(use_spreadsheet)
         {
 
@@ -1113,6 +1115,7 @@ void batch_mode_driver::run()
       {
         emit enable_substitute_button(false);
         switch_mode(hi_c_o, "hi_c_o");
+        emit pack_ready();
         if(use_spreadsheet)
         {
           if(spreadsheet_line_number>=0) ss_first_column_p->data_list[spreadsheet_line_number] = "Y";

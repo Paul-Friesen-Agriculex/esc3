@@ -89,6 +89,8 @@ class slave_mode_screen : public screen
 //  bool opcua_response_received;
   int opcua_count;//to time wait for query response
   void run_opcua();
+  bool opcua_message_to_write;
+  QString opcua_message;
   
   bool batch_mode;
   int pack_count;

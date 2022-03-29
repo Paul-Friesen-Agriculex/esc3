@@ -97,6 +97,7 @@ slave_mode_screen::slave_mode_screen(centre*set_centre_p, batch_mode_driver* set
 //  opcua_response_received = false;
   opcua_count = 0;
   just_starting = true;//wish to ignore any command on opc device when starting.  enter command only if changed.
+  opcua_message_to_write = false;
 
   if(centre_p->communicate_by_serial_port == true)
   {
@@ -124,6 +125,8 @@ slave_mode_screen::~slave_mode_screen()
 
 void slave_mode_screen::pack_ready()
 {
+  cout<<"slave_mode_screen::pack_ready\n";
+  
   QByteArray array;
   array.append(QChar(2));
   array.append('c');
@@ -139,6 +142,13 @@ void slave_mode_screen::pack_ready()
   {
     centre_p->serial_port_write(QString(array));
   }
+  else if(centre_p->communicate_by_opcua)
+  {
+//    centre_p->serial_port_write(QString("OPCUAW.004=Pack Ready           "));
+    opcua_message = "Pack Ready";
+    opcua_message_to_write = true;
+  }
+    
   else cout<<"no communication method for slave mode\n";
 }
   
@@ -159,6 +169,12 @@ void slave_mode_screen::pack_collected(int)
   {
     centre_p->serial_port_write(QString(array));
   }
+  else if(centre_p->communicate_by_opcua)
+  {
+//    centre_p->serial_port_write(QString("OPCUAW.004=Pack Collected           "));
+    opcua_message = "Pack Collected";
+    opcua_message_to_write = true;
+  }
   else cout<<"no communication method for slave mode\n";
 }
   
@@ -178,6 +194,12 @@ void slave_mode_screen::dump_complete(int)
   else if(centre_p->communicate_by_serial_port)
   {
     centre_p->serial_port_write(QString(array));
+  }
+  else if(centre_p->communicate_by_opcua)
+  {
+//    centre_p->serial_port_write(QString("OPCUAW.004=Dump Complete           "));
+    opcua_message = "Dump Complete";
+    opcua_message_to_write = true;
   }
   else cout<<"no communication method for slave mode\n";
 }
@@ -466,10 +488,12 @@ void slave_mode_screen::command_finished()
 {
   cout<<"slave_mode_screen::command_finished()\n";
   command_finished_bool = true;
+  batch_mode_driver_p->stop();
 }
 
 void slave_mode_screen::run()
 {
+//  cout<<"slave_mode_screen::run\n";
   if(batch_mode_driver_p->mode == wait_for_pack)
   {
     if(end_gate_filling == true)
@@ -547,6 +571,7 @@ void slave_mode_screen::run()
   
   if(executing_command_p == 0)
   {
+//    cout<<"executing_command_p == 0\n";
     if(command_p_list.size() == 0) return;
     executing_command_p = command_p_list.dequeue();
     command_finished_bool = false;
@@ -640,6 +665,7 @@ void slave_mode_screen::run()
   {
     if(command_finished_bool == true)
     {
+      cout<<"ending command\n";
       end_command();
       batch_mode_driver_p->stop();
       return;
@@ -701,6 +727,9 @@ void slave_mode_screen::run()
 
 void slave_mode_screen::run_opcua()
 {
+  
+  cout<<"slave_mode_screen::run_opcua.  opcua_mode = "<<opcua_mode<<endl;
+  
   QByteArray array;
   if(opcua_mode == 0)//send count to opcua device
   {
@@ -722,6 +751,7 @@ void slave_mode_screen::run_opcua()
     if(opcua_count > 10)//timeout
     {
       connection_message_p->setText(QString("OPCUA device not responding."));
+      cout<<"opcua_line = "<<opcua_line.toStdString()<<endl;
     }
     if(opcua_line.startsWith("count="))//response started, but might not be complete
     {
@@ -761,6 +791,7 @@ void slave_mode_screen::run_opcua()
     if(opcua_count > 10)//timeout
     {
       connection_message_p->setText(QString("OPCUA device not responding."));
+      cout<<"opcua_line = "<<opcua_line.toStdString()<<endl;
     }
     if(opcua_line.startsWith("pack number="))//response started, but might not be complete
     {
@@ -796,6 +827,7 @@ void slave_mode_screen::run_opcua()
     if(opcua_count > 10)//timeout
     {
       connection_message_p->setText(QString("OPCUA device not responding."));
+      cout<<"opcua_line = "<<opcua_line.toStdString()<<endl;
     }
     if(opcua_line.startsWith("command:="))//response started, but might not be complete
     {
@@ -820,9 +852,18 @@ void slave_mode_screen::run_opcua()
 //    cout<<"opcua_mode 9 start.  opcua_line = "<<opcua_line.toStdString()<<endl;;
     opcua_line.remove(0,9);//remove "command:=" from start of line
     opcua_line.trimmed();//remove possible whitespace from ends
+//    cout<<"opcua_mode 9.  opcua_line = "<<opcua_line.toStdString()<<"    old_command = "<<old_command.toStdString()<<endl;
     if(opcua_line == old_command)//command same as before.  ignore.
     {
-      opcua_mode = 0;
+      if(opcua_message_to_write == true)
+      {
+        opcua_mode = 10;
+        opcua_message_to_write = false;
+      }
+      else
+      {
+        opcua_mode = 0;
+      }
       return;
     }
     old_command = opcua_line;
@@ -844,11 +885,24 @@ void slave_mode_screen::run_opcua()
     }
     else if(opcua_line == "stop")
     {
+      cout<<"opcua_line == stop\n";
+      delete new_command_p;
+      new_command_p = 0;
+      delete executing_command_p;
+      executing_command_p = 0;
+      centre_p->set_speed(0);
+      command_message_p->setText(QString("Command ") + command_line + QString(" received"));
+      opcua_mode= 0;
+      batch_mode_driver_p->mode = entry;
+      batch_mode_driver_p->stop();
+      return;
+      /*
       new_command_p->type_flag = 'C';
       new_command_p->crop_name = centre_p->crops[0].name;
       new_command_p->number_of_sets = 0;
       new_command_p->speed = speed;
       new_command_p->command = "Stop";
+      */
     }
     else if(opcua_line == "zero")
     {
@@ -1028,6 +1082,7 @@ void slave_mode_screen::run_opcua()
     else
     {
       command_message_p->setText(QString("Unknown command ") + opcua_line);
+      cout<<"unknown command = "<<opcua_line.toStdString()<<endl;
       delete new_command_p;
       new_command_p = 0;
       opcua_mode = 0;
@@ -1036,18 +1091,17 @@ void slave_mode_screen::run_opcua()
     //following only runs if command recognized
     command_message_p->setText(QString("Command ") + command_line + QString(" received"));
     command_p_list.enqueue(new_command_p);
-    cout<<"opcua_mode 9.  run display_command.  command_line = "<<command_line.toStdString()<<endl;;
+//    cout<<"opcua_mode 9.  run display_command.  command_line = "<<command_line.toStdString()<<endl;;
     display_command(new_command_p);
-    opcua_mode = 0;
     return;
   }
-  
-/*  
-  if(opcua_mode == 10)//blank out command on opcua device
+  if(opcua_mode == 10)//send message to opcua device
   {
     array.clear();
     opcua_line.clear();
-    array.append("OPCUAW.003 = done                 ");
+    array.append("OPCUAW.004=");
+    array.append(opcua_message);
+    array.append("          ");
     centre_p->serial_port_write(QString(array));
     opcua_mode = 11;
     opcua_count = 0;
@@ -1059,8 +1113,9 @@ void slave_mode_screen::run_opcua()
     if(opcua_count > 10)//timeout
     {
       connection_message_p->setText(QString("OPCUA device not responding."));
+      cout<<"opcua_line = "<<opcua_line.toStdString()<<endl;
     }
-    if(opcua_line.startsWith("command="))//response started, but might not be complete
+    if(opcua_line.startsWith("message="))//response started, but might not be complete
     {
       connection_message_p->setText("Set to communicate with Agriculex\nOPC UA device");
       opcua_count = 0;
@@ -1071,14 +1126,13 @@ void slave_mode_screen::run_opcua()
   if(opcua_mode == 12)//wait to make sure response complete
   {
     ++opcua_count;
-    cout<<"opcua_mode 12.  opcua_count = "<<opcua_count<<".  opcua_line = "<<opcua_line.toStdString()<<endl;
     if(opcua_count > 3)//assume complete
     {
       opcua_mode = 0;
     }
     return;
   }
-*/
+
   //following should not execute
   cout<<"opcua_mode not found "<<opcua_mode<<endl;
 }        
@@ -1248,7 +1302,9 @@ void slave_mode_screen::end_command()
   }
   previous_command_p = executing_command_p;
   executing_command_p = 0;
+  cout<<"executing_command_p set to 0\n";
   batch_mode_driver_p->slave_mode = false;
+  batch_mode_driver_p->stop();
   return;
 }
 
