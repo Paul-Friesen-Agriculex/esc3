@@ -182,6 +182,29 @@ void communications_menu::function_as_client_clicked()
 void communications_menu::communicate_by_serial_port_clicked()
 {
   QDir dir("/dev");
+  cout<<"centre_p->serial_port_name = "<<centre_p->serial_port_name.toStdString()<<endl;
+
+  centre_p->add_waiting_screen(61);//serial_port_setup
+  centre_p->screen_done = true;
+
+
+/*
+  if(dir.exists(centre_p->serial_port_name))
+  {
+    centre_p->screen_done = true;//go to waiting screen
+  }
+  else
+  {
+    centre_p->add_waiting_screen(61);//serial_port_setup
+    centre_p->screen_done = true;
+  }
+*/    
+    
+
+
+
+
+/*
   if(dir.exists("ttyACM0"))
   {
     centre_p->communicate_by_keyboard_cable = false;
@@ -195,6 +218,7 @@ void communications_menu::communicate_by_serial_port_clicked()
   {
     message_p->setText("No serial port adapter cable.  This is needed for serial port communication.");
   }
+*/
 }  
 
 

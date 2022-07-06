@@ -49,6 +49,7 @@
 
 #include "ss_setup_delete.hpp"
 #include "ss_options.hpp"
+#include "ss_other_options.hpp"
 #include "ss_column_display_options.hpp"
 #include "ss_batch.hpp"
 #include "select_envelope_field.hpp"
@@ -72,8 +73,8 @@ Q_DECLARE_METATYPE(crop)
 using namespace std;
 
 //extern const int image_lines = 32;
-extern const int image_lines = 64;
-//extern const int image_lines = 128;
+//extern const int image_lines = 64;
+extern const int image_lines = 128;
 //extern const int image_lines = 256;
 //extern const int image_lines = 512;
 //extern const int image_lines = 1024;
@@ -81,8 +82,8 @@ extern const int image_lines = 64;
 
 extern const int line_length = 2048;
 
-//extern const int images_to_record = 128;
-extern const int images_to_record = 512;
+extern const int images_to_record = 128;
+//extern const int images_to_record = 512;
 //extern const int images_to_record = 1500;
 
 centre::centre():
@@ -99,8 +100,8 @@ centre::centre():
 
   //********************  
   //comment out one of these 2 lines:
-//  base_widget_p->setWindowState(Qt::WindowFullScreen);
-  base_widget_p->setGeometry(0, 0, 800, 480);
+//  base_widget_p->setWindowState(Qt::WindowFullScreen);//use for final versions to run on touch screen
+  base_widget_p->setGeometry(0, 0, 800, 480);//use for development on full size terminal
   //********************
 
 
@@ -239,6 +240,7 @@ void centre::init()
   block_endgate_opening = false;//true prevents endgate from opening.  Used if barcode test fails in batch.
   communicate_by_keyboard_cable = false;
   communicate_by_tcp = false;
+  communicate_by_opcua = false;
   tcp_link_established = false;
   network = 0;//0-> not set.  1->use 192.168.100.1.  2->use 192.168.200.1.
   QString tcp_client_server_addr = "";
@@ -247,6 +249,7 @@ void centre::init()
   tcp_input_array_p = new QByteArray;
 
   load_settings("default");
+  setup_serial_communications(baud_rate);
   
   connect(processor_p, SIGNAL(send_message(QString)), diagnostics_console_p, SLOT(receive_message1(QString)));
   connect(batch_mode_driver_p, SIGNAL(send_message2(QString)), diagnostics_console_p, SLOT(receive_message2(QString)));
@@ -400,7 +403,7 @@ void centre::read_serial_port()
   memset(str, 0, sizeof(str));
   if(read(serial_port_fd, str, 9) > 0)
   {
-    cout<<"centre::read_serial_port().  str = "<<str<<endl;
+//    cout<<"centre::read_serial_port().  str = "<<str<<endl;
     for(unsigned int i=0; i<sizeof(str); ++i)
     {
       if(str[i] == 0) break;
@@ -428,14 +431,18 @@ void centre::run()
   endgate_state = endgate_p->get_state();
   envelope_present = envelope_sensor_p->read();
   brother_envelope_feeder_p -> run();
+  
+  read_serial_port();
 
 //  if(  (current_screen==5)  ||  (current_screen==15)  ||  (current_screen==60)  )//totalize or batch or slave mode screen
-  if(  (current_screen==5)  ||  (current_screen==60)  )//totalize or slave mode screen
+//  if(  (current_screen==5)  ||  (current_screen==60)  )//totalize or slave mode screen
+  if(current_screen==5)//totalize
   {
     if(endgate_state == ENDGATE_CLOSED)
     {
       if(totalize_force_endgate_open==true || envelope_present==true)
       {
+        cout<<"setting endgate open 1 \n";
         set_endgate_state(ENDGATE_OPEN);
       }
     }
@@ -443,11 +450,13 @@ void centre::run()
     {
       if(totalize_force_endgate_open==false && envelope_present==false)
       {
+        cout<<"setting endgate closed 1 \n";
         set_endgate_state(ENDGATE_CLOSED);
       }
     }
   }
-  else if( (current_screen==15) || (current_screen==33) )//batch or ss_batch
+//  else if( (current_screen==15) || (current_screen==33) )//batch or ss_batch
+  else if( (current_screen==15) || (current_screen==33) ||  (current_screen==60)  )//batch or ss_batch or slave_mode_screen
   {
     /*
     if(endgate_state == ENDGATE_CLOSED)
@@ -576,6 +585,7 @@ void centre::run()
       case 21: screen_p=new spreadsheet_choice(this, batch_mode_driver_p); break;
       case 22: screen_p=new ss_setup_choice(this, batch_mode_driver_p); break;
       case 23: screen_p=new ss_setup_entry(this, batch_mode_driver_p); break;
+      case 24: screen_p=new ss_other_options(this); break;
       case 25: screen_p=new set_envelope_size(this, batch_mode_driver_p); break;
 //      case : screen_p=new (this); break;
 //      case : screen_p=new (this); break;
@@ -639,6 +649,8 @@ bool centre::save_settings(QString file_name)
   fset<<batch_mode_driver_p->bm_last_table_filename.toStdString()<<endl;
   fset<<communicate_by_keyboard_cable<<endl;
   fset<<communicate_by_tcp<<endl;
+  fset<<communicate_by_serial_port<<endl;
+  fset<<communicate_by_opcua<<endl;
   fset<<baud_rate<<endl;
   fset<<serial_port_name.toStdString()<<endl;
 
@@ -648,6 +660,7 @@ bool centre::save_settings(QString file_name)
 
 bool centre::load_settings(QString file_name)
 {
+  cout<<"centre::load_settings\n";
   QString f_path = QString("settings/");
   f_path += file_name;
   std::ifstream fset(f_path.toLatin1().data(),std::ofstream::out);
@@ -695,12 +708,21 @@ bool centre::load_settings(QString file_name)
   communicate_by_tcp = atoi(input);
   
   fset.getline(input, 100);
+  communicate_by_serial_port = atoi(input);
+  
+  fset.getline(input, 100);
+  communicate_by_opcua = atoi(input);
+  cout<<"communicate_by_opcua = "<<communicate_by_opcua<<endl;
+  
+  fset.getline(input, 100);
   baud_rate = atoi(input);
+  cout<<"baud_rate = "<<baud_rate<<endl;
 
   fset.getline(input, 100);
   serial_port_name = QString(input);
   
   fset.close();
+  cout<<"end centre::load_settings\n";
   return true;
 }
 
@@ -1194,7 +1216,8 @@ void centre::setup_serial_communications(int baud_rate)//assumes serial port cab
   QString full_port_name = QString("/dev/") + serial_port_name;
   communicate_by_keyboard_cable = false;
   communicate_by_tcp = false;
-  communicate_by_serial_port = true;
+//  communicate_by_serial_port = true;
+//  communicate_by_opcua = false;
 
   termios_p = new termios;
   memset(termios_p,0,sizeof(*termios_p));
@@ -1252,6 +1275,7 @@ void centre::setup_serial_communications(int baud_rate)//assumes serial port cab
 
 void centre::serial_port_write(QString str)
 {
+//  cout<<"centre::serial_port_write:    "<<str.toStdString()<<endl;
   char cstring[100];
   memset(cstring, 0, sizeof(cstring));
   strcpy(cstring, str.toLatin1());

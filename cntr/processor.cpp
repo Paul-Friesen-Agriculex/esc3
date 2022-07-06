@@ -526,7 +526,7 @@ void processor::new_image(unsigned char* pixel_p)
   image_cycle_time = slack_time + image_processing_time;
   emit send_cycle_time(image_cycle_time);
   ++run_number;
-  if(run_number >= 5)
+  if(run_number >= 50)
   {
     run_number = 0;
     QString str = QString("Max image processing %1 ms.  Min slack %2 ms.")

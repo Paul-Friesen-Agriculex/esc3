@@ -39,13 +39,8 @@ class ss_options : public screen
   private:
   batch_mode_driver* batch_mode_driver_p;
   QLabel* title_p;
-//  QRadioButton* require_seed_lot_barcode_p;
-//  QRadioButton* require_pack_barcode_p;
-//  QRadioButton* pack_match_lot_p;
-//  QRadioButton* pack_contain_lot_p;
-//  QRadioButton* lot_contain_pack_p;
-//  QRadioButton* pack_match_spreadsheet_p;
-//  QRadioButton* record_only_p;
+  QRadioButton* scan_barcodes_p;
+  QRadioButton* print_envelopes_p;
   
   QRadioButton* start_on_pack_collect_p;
   QRadioButton* start_on_previous_pack_collect_p;
@@ -57,15 +52,17 @@ class ss_options : public screen
   button* macro_menu_button_p;
   button* done_button_p;
   
-//  QGroupBox* barcode_matching_group_p;
+  QGroupBox* scan_or_print_group_p;
+  QGridLayout* scan_or_print_group_layout_p;
   QGroupBox* print_control_group_p;
-//  QGridLayout* barcode_matching_group_layout_p;
   QGridLayout* print_control_group_layout_p;
   QGridLayout* main_layout_p;
   
   
   public slots:
   void done_button_clicked();
+  void scan_barcodes_clicked();
+  void print_envelopes_clicked();
 };
 
 

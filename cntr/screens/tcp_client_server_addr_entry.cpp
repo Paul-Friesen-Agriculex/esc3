@@ -11,6 +11,7 @@
 #include "button.hpp"
 #include <QHostAddress>
 #include <QNetworkInterface>
+#include <QDebug> //2022_01_20
 
 using namespace std;
 
@@ -28,6 +29,7 @@ tcp_client_server_addr_entry::tcp_client_server_addr_entry(centre*set_centre_p)
   message_p = new QLabel;
   help_button_p = new button("Help");
   ok_button_p = new button("OK");
+  diagnostics_button_p = new button("Diag.");   //2022_01_20
 
   main_layout_p=new QGridLayout;
   
@@ -37,6 +39,7 @@ tcp_client_server_addr_entry::tcp_client_server_addr_entry(centre*set_centre_p)
   main_layout_p->addWidget(addr3_p, 1, 2);
   main_layout_p->addWidget(addr4_p, 1, 3);
   main_layout_p->addWidget(connect_button_p, 2, 0);
+  main_layout_p->addWidget(diagnostics_button_p, 2, 2); //2022_01_20
   main_layout_p->addWidget(message_p, 3, 0, 1, 4);
 //  main_layout_p->addWidget(help_button_p, 4, 0);
   main_layout_p->addWidget(ok_button_p, 4, 3);
@@ -65,6 +68,7 @@ tcp_client_server_addr_entry::tcp_client_server_addr_entry(centre*set_centre_p)
   connect(help_button_p, SIGNAL(clicked()), this, SLOT(help_button_clicked()));
   connect(ok_button_p, SIGNAL(clicked()), this, SLOT(ok_button_clicked()));
   connect(centre_p, SIGNAL(tcp_connection_detected_signal()), this, SLOT(connection_detected()));
+  connect(diagnostics_button_p, SIGNAL(clicked()), this, SLOT(diagnostic_button_clicked()));   //2022_01_20
   
   message_p->setText("Enter the IP address of the host and touch \"connect\".");
   ok_button_p->setEnabled(false);
@@ -85,6 +89,9 @@ void tcp_client_server_addr_entry::connect_button_clicked()
 //  cout<<"addr_string = "<<addr_string.toStdString()<<endl;
   centre_p->tcp_socket_p->connectToHost(addr_string, 50000);
   message_p->setText("Attempting connection");
+  
+  //2022_01_19---------------------------------------------TEST~~~//
+  qDebug()<<centre_p->tcp_socket_p->state();  //
 }
   
 void tcp_client_server_addr_entry::ok_button_clicked()
@@ -144,3 +151,23 @@ void tcp_client_server_addr_entry::retrieve_connection_ip()
   addr4_p->setValue(addr4);  
 }
 
+//============================================================================================//
+
+void tcp_client_server_addr_entry::diagnostic_button_clicked()
+{
+  cout<<"~~diagnostic_button_clicked()~~"<<endl;  //OMIT~~~//
+  
+  QString addr_string = QString::number(addr1_p->value()) + "." 
+                        + QString::number(addr2_p->value()) + "." 
+                        + QString::number(addr3_p->value()) 
+                        + "." + QString::number(addr4_p->value());
+  
+  qDebug() << addr_string;
+  qDebug() << centre_p->tcp_socket_p->state();
+  
+  //centre_p->tcp_socket_p
+  
+
+}
+
+//============================================================================================//

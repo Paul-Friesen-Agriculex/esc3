@@ -7,6 +7,7 @@
 #include <QTimer>
 #include <QKeyEvent>
 #include <QFileDialog>
+#include <QMessageBox>
 #include "centre.hpp"
 #include "ss_batch.hpp"
 #include "button.hpp"
@@ -41,14 +42,14 @@ ss_batch::ss_batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_drive
   }
   count_message_p = new QLabel;
   options_button_p = new button("Options");
-  remove_drive_button_p = new button("Safely remove\nUSB stick(s)");
+//  remove_drive_button_p = new button("Safely remove\nUSB stick(s)");
   back_button_p = new button("Back");
   barcode_line_p = new ss_barcode_line;
   barcode_line_p->setMaximumSize(120,40);  //ORIGINAL~~~
   release_pack_button_p = new button("Release pack");
   restart_button_p = new button("Dump out and\nrestart seed lot");
   substitution_button_p = new button("Substitute seed lot");
-  cancel_substitution_button_p = new button("Cancel substitute\nseed lot");
+//  cancel_substitution_button_p = new button("Cancel substitute\nseed lot");
   high_speed_label_p = new QLabel("High");
   high_speed_set_p = new QSlider;
   high_speed_set_p->setMinimum(0);
@@ -107,8 +108,8 @@ ss_batch::ss_batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_drive
   status_box_p -> setMinimumSize(250,100);
   save_program_button_p = new button("Save Spreadsheet\nSetup");
   
-  reprint_button_1_p = new button("");
-  reprint_button_2_p = new button("");
+//  reprint_button_1_p = new button("");
+//  reprint_button_2_p = new button("");
   manual_print_button_p = new button("Manual\noperation");
   
   quit_button_p = new button("Quit");
@@ -129,7 +130,7 @@ ss_batch::ss_batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_drive
 
   top_layout_p -> addWidget(count_message_p, 0, 0);
   top_layout_p -> addWidget(options_button_p, 0, 1);
-  top_layout_p -> addWidget(remove_drive_button_p, 0, 2);
+//  top_layout_p -> addWidget(remove_drive_button_p, 0, 2);
   top_layout_p -> addWidget(back_button_p, 0, 3);
   bottom_layout_p -> addWidget(barcode_line_p, 1, 4);  
   barcode_line_p->setFocus();
@@ -140,7 +141,7 @@ ss_batch::ss_batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_drive
   control_layout_p -> addWidget(release_pack_button_p, 0, 0);
   control_layout_p -> addWidget(restart_button_p, 0, 1);
   control_layout_p -> addWidget(substitution_button_p, 1, 0);
-  control_layout_p -> addWidget(cancel_substitution_button_p, 1, 1);
+//  control_layout_p -> addWidget(cancel_substitution_button_p, 1, 1);
   control_layout_p -> addWidget(speed_box_p, 2, 0, 1, 2);     
   speed_layout_p -> addWidget(high_speed_label_p, 0, 0);
   speed_layout_p -> addWidget(high_speed_set_p, 0, 1);
@@ -150,8 +151,8 @@ ss_batch::ss_batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_drive
   speed_layout_p -> addWidget(dump_speed_set_p, 2, 1);
   bottom_layout_p -> addWidget(status_box_p, 0, 0, 2, 1);
   bottom_layout_p -> addWidget(save_program_button_p, 0, 2);
-  bottom_layout_p -> addWidget(reprint_button_1_p, 0, 3);
-  bottom_layout_p -> addWidget(reprint_button_2_p, 0, 4);
+//  bottom_layout_p -> addWidget(reprint_button_1_p, 0, 3);
+//  bottom_layout_p -> addWidget(reprint_button_2_p, 0, 4);
   bottom_layout_p -> addWidget(manual_print_button_p, 0, 5);
   bottom_layout_p -> addWidget(quit_button_p, 0, 6);
   bottom_layout_p -> addWidget(barcode_status_p, 1, 2, 1, 4);
@@ -167,18 +168,18 @@ ss_batch::ss_batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_drive
   setLayout(main_layout_p);
   
   connect(options_button_p, SIGNAL(clicked()), this, SLOT(options_clicked()));
-  connect(remove_drive_button_p, SIGNAL(clicked()), this, SLOT(remove_drive_clicked()));
+//  connect(remove_drive_button_p, SIGNAL(clicked()), this, SLOT(remove_drive_clicked()));
   connect(back_button_p, SIGNAL(clicked()), this, SLOT(back_clicked()));
   connect(release_pack_button_p, SIGNAL(clicked()), this, SLOT(release_pack_clicked()));
   connect(restart_button_p, SIGNAL(clicked()), this, SLOT(restart_clicked()));
   connect(substitution_button_p, SIGNAL(clicked()), this, SLOT(substitution_button_clicked()));
-  connect(cancel_substitution_button_p, SIGNAL(clicked()), this, SLOT(cancel_substitution_button_clicked()));
+//  connect(cancel_substitution_button_p, SIGNAL(clicked()), this, SLOT(cancel_substitution_button_clicked()));
   connect(high_speed_set_p, SIGNAL(valueChanged(int)), batch_mode_driver_p, SLOT(set_high_feed_speed(int)));
   connect(low_speed_set_p, SIGNAL(valueChanged(int)), batch_mode_driver_p, SLOT(set_low_feed_speed(int)));
   connect(dump_speed_set_p, SIGNAL(valueChanged(int)), batch_mode_driver_p, SLOT(set_dump_feed_speed(int)));
   connect(save_program_button_p, SIGNAL(clicked()), this, SLOT(save_program_clicked()));
-  connect(reprint_button_1_p, SIGNAL(clicked()), this, SLOT(reprint_button_1_clicked()));
-  connect(reprint_button_2_p, SIGNAL(clicked()), this, SLOT(reprint_button_2_clicked()));
+//  connect(reprint_button_1_p, SIGNAL(clicked()), this, SLOT(reprint_button_1_clicked()));
+//  connect(reprint_button_2_p, SIGNAL(clicked()), this, SLOT(reprint_button_2_clicked()));
   connect(manual_print_button_p, SIGNAL(clicked()), this, SLOT(manual_print_button_clicked()));
   connect(quit_button_p, SIGNAL(clicked()), this, SLOT(quit_clicked()));
   connect(barcode_line_p, SIGNAL(barcode_entered(QString)), batch_mode_driver_p, SLOT(barcode_entered(QString)));
@@ -230,6 +231,7 @@ ss_batch::ss_batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_drive
   connect(batch_mode_driver_p, SIGNAL(bad_lot_signal()), this, SLOT(bad_lot_slot()));
   cout<<"ss_batch::ss_batch after bad lot slot connect\n";
   connect(batch_mode_driver_p, SIGNAL(refresh_screen()), this, SLOT(refresh_screen()));
+  connect(batch_mode_driver_p, SIGNAL(enable_substitute_button(bool)), this, SLOT(enable_substitute_button(bool)));
     
   if(batch_mode_driver_p->bm_save_ss_setup_filename != "")//returning from batch_save_ss_setup screen with name of file to save
   {
@@ -239,8 +241,8 @@ ss_batch::ss_batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_drive
   
   batch_mode_driver_p ->fill_ss_column_pointers();
   ss_table_p -> refresh();
-  reprint_line_1 = reprint_line_2 = 0;
-  update_reprint_buttons();
+//  reprint_line_1 = reprint_line_2 = 0;
+//  update_reprint_buttons();
    
   top_layout_p->setContentsMargins(0,0,0,0);        //set layout margins to shrink to designated container dimensions//
   control_layout_p->setContentsMargins(0,0,0,0);
@@ -372,6 +374,8 @@ ss_batch::~ss_batch()
   if(manual_operation_window_created) delete manual_operation_window_p;
   manual_operation_window_created = false;
   manual_operation_window_p = 0;
+  
+//  (batch_mode_driver_p->display_column_numbers).clear();
 }
 
 void ss_batch::get_status_message(QString message, QColor foreground, QColor background, int text_size)
@@ -385,6 +389,8 @@ void ss_batch::get_status_message(QString message, QColor foreground, QColor bac
 
 void ss_batch::get_barcode_status_message(QString message, QColor foreground, QColor background, int text_size)
 {
+  cout<<"ss_batch::get_barcode_status_message.  message = "<<message.toStdString()<<endl;
+  
   barcode_status_p->set_text_size(text_size);
   barcode_status_p->set_foreground(foreground);
   barcode_status_p->set_background(background);
@@ -434,6 +440,13 @@ void ss_batch::focus_on_barcode()
 {
   barcode_line_p -> setFocus();
 }
+
+void ss_batch::enable_substitute_button(bool on)
+{
+  substitution_button_p->setEnabled(on);
+}
+
+
 /*
 void ss_batch::bad_lot_slot()
 {
@@ -455,7 +468,7 @@ void ss_batch::options_clicked()
   centre_p->add_waiting_screen(31);//ss_options
   centre_p->screen_done=true;
 }
-
+/*
 void ss_batch::remove_drive_clicked()
 {
   eject_memory_sticks = true;//signal to destructor
@@ -465,7 +478,7 @@ void ss_batch::remove_drive_clicked()
   centre_p->add_waiting_screen(0);
   centre_p->screen_done = true;
 }
-
+*/
 void ss_batch::back_clicked()
 {
   batch_mode_driver_p -> stop();
@@ -492,17 +505,26 @@ void ss_batch::release_pack_clicked()
   
   
   batch_mode_driver_p->release_pack = true;//true signals to release counted seed, even if barcode matching not satisfied.  For use in case of lost packet.
-  
+  get_barcode_status_message("Release pack chosen",  QColor(0,0,0), QColor(255,255,0), 25);
   focus_on_barcode();
 }
 
 void ss_batch::restart_clicked()
 {
-  batch_mode_driver_p -> restart();
+  QMessageBox box;
+  box.setText("This will dump out the current seed lot and mark all packs from it unfilled.");
+  box.setStandardButtons(QMessageBox::Cancel | QMessageBox::Ok);
+  int ret = box.exec();
+  if(ret == QMessageBox::Ok)
+  {
+    batch_mode_driver_p -> restart();
+  }
+  focus_on_barcode();
 }
 
 void ss_batch::substitution_button_clicked()
 {
+  batch_mode_driver_p -> seed_lot_substitution();
   /*
   if(centre_p->get_endgate_state() == ENDGATE_CLOSED)
   {
@@ -521,10 +543,10 @@ void ss_batch::substitution_button_clicked()
   */
   focus_on_barcode();
 }
-
+/*
 void ss_batch::cancel_substitution_button_clicked()
 {
-  /*
+  
   batch_mode_driver_p->current_pack --;
   if(centre_p->get_endgate_state() == ENDGATE_CLOSED)
   {
@@ -539,10 +561,10 @@ void ss_batch::cancel_substitution_button_clicked()
   batch_mode_driver_p->pack_barcode_old = true;
   batch_mode_driver_p->substitute_seed_lot = false;
   batch_mode_driver_p->barcode_mode = seed_lot;
-  */
+  
   focus_on_barcode();
 }
-
+*/
 void ss_batch::save_program_clicked()
 {
   batch_mode_driver_p -> stop();
@@ -1039,7 +1061,7 @@ void ss_batch::run()
       
 }
 */
-
+/*
 void ss_batch::update_reprint_buttons()
 {
 
@@ -1078,7 +1100,7 @@ void ss_batch::reprint_button_2_clicked()
 {
   batch_mode_driver_p -> envelope_p -> print(reprint_line_2);
 }
-  
+*/  
 void ss_batch::manual_print_button_clicked()
 {
   manual_operation_window_p = new manual_operation_window(0, batch_mode_driver_p, this);

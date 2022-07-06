@@ -46,7 +46,7 @@ keyboard::keyboard(centre* set_centre_p)
   n5_key_p=new kb_key(":\n5");
   n6_key_p=new kb_key(";\n6");
   n7_key_p=new kb_key("@\n7");
-  n8_key_p=new kb_key("#\n8");
+  n8_key_p=new kb_key("=\n8");
   n9_key_p=new kb_key("(\n9");
   n0_key_p=new kb_key(")\n0");
   Q_key_p=new kb_key("Q");
@@ -245,7 +245,7 @@ void keyboard::n7_clicked()
 }
 void keyboard::n8_clicked()
 {
-  if(shift_active) entry_line_p->append("#");
+  if(shift_active) entry_line_p->append("=");
   else entry_line_p->append("8");
   entry_line_display_p->setText(*entry_line_p);
   shift_active = false;

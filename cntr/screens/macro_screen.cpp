@@ -93,7 +93,8 @@ macro_screen::macro_screen(centre*set_centre_p)
 items listed in the selected macro will be sent to the computer, which will see \
 them as keyboard input.");
   }
-  if(centre_p->tcp_link_established)
+//  if(centre_p->tcp_link_established)
+  if(centre_p->communicate_by_tcp)
   {
     description_p->setText("A TCP connection has been established to another device. \
 Items listed in the selected macro will be sent to that device.");
@@ -107,9 +108,13 @@ Items listed in the selected macro will be sent to that device.");
   }
 
   initialize_macro_menu();
-  load_macro_table();  
-  tableWidget_p->setStyleSheet("QTableWidget { font: 15pt;}");
-  tableWidget_p->verticalHeader()->setDefaultSectionSize(45);
+  load_macro_table(); 
+  cout<<"tableWidget_p->styleSheet = "<<(tableWidget_p->styleSheet()).toStdString()<<endl;  
+//  tableWidget_p->setStyleSheet("QTableWidget { font: 15pt;}");
+  tableWidget_p->setStyleSheet("QTableWidget { font: 10pt;}");
+  cout<<"tableWidget_p->styleSheet = "<<(tableWidget_p->styleSheet()).toStdString()<<endl;
+//  tableWidget_p->verticalHeader()->setDefaultSectionSize(45);
+  tableWidget_p->verticalHeader()->setDefaultSectionSize(80);
   
   help_screen_p = 0;
   current_row = 0;

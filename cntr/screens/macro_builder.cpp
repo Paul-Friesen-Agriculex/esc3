@@ -3,6 +3,7 @@
 #include <QHBoxLayout>
 #include <QGroupBox>
 #include <QLabel>
+#include <QTextEdit>
 #include "centre.hpp"
 #include "macro_screen.hpp"
 #include "button.hpp"
@@ -42,11 +43,13 @@ macro_builder::macro_builder(centre* centre_p_s)
 
   
   instruction_label_p -> setWordWrap(true);
-  lineEdit = new QLineEdit;//(&dialog);
+//  lineEdit = new QLineEdit;//(&dialog);
+  lineEdit = new QTextEdit;//(&dialog);
   lineEdit->setPlaceholderText("Click buttons to add preloaded values or type custom text here.");
   lineEdit->setAlignment(Qt::AlignCenter);
   lineEdit->setFixedWidth(650);
   lineEdit->setFixedHeight(50);
+//  lineEdit->setWordWrap(true);
   lineEdit->setText(centre_p->get_macro_display_string());
   
   totalize_count_button = new QPushButton(tr("Count"), this);

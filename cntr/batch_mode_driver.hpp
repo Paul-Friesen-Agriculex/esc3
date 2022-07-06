@@ -53,76 +53,11 @@ enum mode_enum
   dump_into_container,
   wait_for_dump_container_removal,
   repeat_wait_for_container,
-  repeat_wait_for_container_removal
+  repeat_wait_for_container_removal,
+  substitute_wait_for_container,
+  substitute_wait_for_container_removal,
+  substitute_wait_for_substitute_barcode
 };
-
-
-
-/*
-{
-  entry,
-  wait_for_seed_lot_barcode_start,
-  wait_for_seed_lot_barcode,
-  hi_o_c_start,
-  hi_o_c,
-  hi_o_o_start,
-  hi_o_o,
-  ramp_down_o_c_start,
-  ramp_down_o_c,
-  ramp_down_o_o_start,
-  ramp_down_o_o,
-  gate_delay_o_c_start,
-  gate_delay_o_c,
-  gate_delay_o_o_start,
-  gate_delay_o_o,
-  hi_c_c_start,
-  hi_c_c,
-  hi_c_o_start,
-  hi_c_o,
-  wait_for_endgate_to_close,
-  wait_for_pack,
-  wait_for_bad_lot_cleanout,
-  dump_into_cut_gate,
-  dump_wait_for_endgate_to_close,
-  wait_for_final_pack,
-  dump_into_end,
-  wait_for_dump_container,
-  dump_into_container,
-  wait_for_dump_container_removal,
-  substitution_wait_for_cleanout_open,
-  substitution_wait_for_cleanout_close,
-  substitution_wait_for_barcode, 
-  cancel_substitution_wait_for_cleanout_open,
-  cancel_substitution_wait_for_cleanout_close,
-};
-*/
-/*
-enum mode_enum
-{
-  wait_for_seed_lot_barcode,
-  slave_mode_entry,
-  hi_open,
-  ramp_down,
-  gate_delay,
-  hi_closed,
-  wait_for_endgate_to_close,
-  wait_for_pack,
-  wait_for_bad_lot_cleanout,
-  dump_into_cut_gate,
-  dump_wait_for_endgate_to_close,
-  wait_for_final_pack,
-  dump_into_end,
-  wait_for_dump_container,
-  dump_into_container,
-  wait_for_dump_container_removal,
-  substitution_wait_for_cleanout_open,
-  substitution_wait_for_cleanout_close,
-  substitution_wait_for_barcode, 
-  cancel_substitution_wait_for_cleanout_open,
-  cancel_substitution_wait_for_cleanout_close,
-};
-*/
-
 
 enum barcode_entry_mode
 {
@@ -202,6 +137,7 @@ class batch_mode_driver : public QObject
   ~batch_mode_driver();
 
   void set_normal_status_message();
+  void set_incorrect_barcode_message();
   mode_enum mode;
   void switch_mode(mode_enum new_mode, string str);
   void load_program();//load the program indicated by program_path
@@ -284,6 +220,8 @@ class batch_mode_driver : public QObject
   bool barcode_is_new;
   QString seed_lot_barcode;
   QString pack_barcode;
+  QString barcode_as_entered;
+  QString spreadsheet_pack_barcode;
   bool seed_lot_barcode_old;//seed lot it codes is finished
   bool pack_barcode_old;//pack that was scanned is finished
   bool seed_lot_barcode_ok;
@@ -354,6 +292,7 @@ class batch_mode_driver : public QObject
   
   //substitute seed lot
   bool substitute_seed_lot;
+  bool substitution_barcode_ok;
   QString substitute_barcode;
   
   //slave mode
@@ -376,6 +315,7 @@ class batch_mode_driver : public QObject
 //  void cutgate_timing_error();
   void chamber_count_limit_calculation(); //calculates count limit for seed chambers for currently selected seed size //2021_03_19
   void repeat_pack();
+  void seed_lot_substitution();
   
   signals:
   void dumping();
@@ -383,6 +323,7 @@ class batch_mode_driver : public QObject
   void pack_collected(int count);
   void dump_complete(int dump_count);
   void seed_lot_barcode_entered(QString barcode);
+  void substitution_barcode_entered(QString barcode);
   void pack_barcode_entered(QString barcode);
   void bad_lot_signal();//issued if count went over limit on this batch
   void refresh_screen();
@@ -392,6 +333,7 @@ class batch_mode_driver : public QObject
   void send_status_message(QString message, QColor foreground, QColor background, int text_size);
   void send_barcode_status_message(QString message, QColor foreground, QColor background, int text_size);
   void enable_repeat_pack_button(bool on);
+  void enable_substitute_button(bool on);
   
   //testing
   void send_message2(QString);

@@ -74,7 +74,6 @@ class centre : public QObject
   void init();
   
   QThread* processor_thread_p;
-  endgate* endgate_p;
   envelope_sensor* envelope_sensor_p;
   feeder* feeder_p;
   brother_envelope_feeder* brother_envelope_feeder_p;
@@ -124,6 +123,7 @@ class centre : public QObject
   
   processor* processor_p;
   cutgate* cutgate_p;
+  endgate* endgate_p;
   int count;
   int feed_speed;
   int totalize_feed_speed;//feed speed while running
@@ -171,6 +171,8 @@ class centre : public QObject
   int baud_rate;
   QString serial_port_name;
   bool serial_port_opened;
+  
+  bool communicate_by_opcua;
   
   //batch mode
   bool block_endgate_opening;//true prevents endgate from opening.  Used if barcode test fails in batch.

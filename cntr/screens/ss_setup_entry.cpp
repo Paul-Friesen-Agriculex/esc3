@@ -171,7 +171,7 @@ void ss_setup_entry::enter_choice(int column)
   else if(mode=='s')
   {
     batch_mode_driver_p -> ss_setup_p -> substitution_column = column;
-    centre_p -> add_waiting_screen(25);//set_envelope_size
+    centre_p -> add_waiting_screen(31);//ss_options
     centre_p -> screen_done = true;
   }
   display_headings();

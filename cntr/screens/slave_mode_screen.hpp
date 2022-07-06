@@ -44,10 +44,12 @@ class slave_mode_screen : public screen
   void function_as_server_2_clicked();
   void function_as_client_clicked();
   void communicate_by_serial_port_clicked();
+  void opcua_clicked();
   void help_button_clicked();
   void exit_button_clicked();
   void connection_detected();
   void command_char(QChar character);
+  void opcua_command_char(QChar character);
   void command_finished();
   void run();
 
@@ -59,9 +61,11 @@ class slave_mode_screen : public screen
   button* function_as_server_2_button_p;
   button* function_as_client_button_p;
   button* communicate_by_serial_port_button_p;
+  button* opcua_button_p;
   button* help_button_p;
   button* exit_button_p;
   QLabel* connection_message_p;
+  QLabel* command_message_p;
   QTextEdit* command_screen_p;
   help_screen* help_screen_p;
   QGridLayout* main_layout_p;
@@ -77,10 +81,22 @@ class slave_mode_screen : public screen
   slave_mode_command* executing_command_p;
   slave_mode_command* previous_command_p;
   
+  int opcua_mode;
+  QString opcua_line;
+  QString old_command;//to detect if command changes
+//  QString opcua_command_segment;//command may not arrive all at once.  this holds each segment
+//  bool opcua_query_sent;
+//  bool opcua_response_received;
+  int opcua_count;//to time wait for query response
+  void run_opcua();
+  bool opcua_message_to_write;
+  QString opcua_message;
+  
   bool batch_mode;
   int pack_count;
   int speed;
   bool command_finished_bool;
+  bool just_starting;//wish to ignore any command on opc device when starting.  enter command only if changed.
   
   bool end_gate_full;
   bool end_gate_opened_full;

@@ -151,6 +151,7 @@ void ss_column_display_options::previous_headings_clicked()
 
 void ss_column_display_options::done_clicked()
 {
+  centre_p->add_waiting_screen(31);//ss_options
   centre_p->screen_done = true;
 }
 

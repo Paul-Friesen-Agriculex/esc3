@@ -9,6 +9,7 @@ class QGroupBox;
 class QVBoxLayout;
 class QLabel;
 class QRadioButton;
+class help_screen;
 
 class tool_choice : public screen
 {
@@ -18,6 +19,7 @@ class tool_choice : public screen
   tool_choice(centre*set_centre_p);
   
   private slots:
+  void about_button_clicked();
   void crop_edit_clicked();
   void communications_setup_button_clicked();
   void diagnostics_clicked();
@@ -26,6 +28,7 @@ class tool_choice : public screen
   void signal_port_pulse_when_endgate_closes(bool state);
 
   private:
+  button* about_button_p;
   button* crop_edit_button_p;
   button* communications_setup_button_p;
   button* diagnostics_button_p;
@@ -34,7 +37,7 @@ class tool_choice : public screen
   QRadioButton* signal_port_pulse_when_endgate_closes_button_p;
 
   QGridLayout* main_layout_p;
-
+  help_screen* help_screen_p;
 //  centre* centre_p;
 };
 #endif
