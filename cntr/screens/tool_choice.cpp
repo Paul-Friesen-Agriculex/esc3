@@ -86,7 +86,9 @@ void tool_choice::about_button_clicked()
   help_screen_p = new help_screen;
   help_screen_p -> setGeometry(geometry());
   
-  help_screen_p -> set_text("Copyright 2021 Agriculex Inc.\n\n"
+  help_screen_p -> set_text("AGRICULEX ESC-3 PROGRAM VERSION 2022-07-06\n\n"
+  
+                            "Copyright 2021 Agriculex Inc.\n\n"
 
                             "The Agriculex ESC-3 program is free software: you can redistribute it and/or modify "
                             "it under the terms of the GNU General Public License as published by "
