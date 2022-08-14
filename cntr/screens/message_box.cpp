@@ -44,8 +44,6 @@ void message_box::set_text(QString text_s)
 {
   if(text==text_s) return;
   text = text_s;
-  cout<<"message_box::set_text.  text_size = "<<text_size<<endl;
-  cout<<"  text = "<<text.toStdString()<<endl;
   update();
 }
 

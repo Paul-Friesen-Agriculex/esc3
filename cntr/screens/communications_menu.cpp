@@ -135,6 +135,8 @@ void communications_menu::communicate_by_keyboard_cable_button_clicked()
     message_p->setText("Ready to communicate.");
     centre_p->communicate_by_keyboard_cable = true;
     centre_p->communicate_by_tcp = false;
+    centre_p->communicate_by_opcua = false;
+    centre_p->communicate_by_serial_port = false;
     ok_button_p->setEnabled(true);
   }
   else
@@ -354,6 +356,8 @@ void communications_menu::connection_detected()
   }
   centre_p->communicate_by_keyboard_cable = false;
   centre_p->communicate_by_tcp = true;
+  centre_p->communicate_by_opcua = false;
+  centre_p->communicate_by_serial_port = false;
   centre_p->tcp_link_established = true;
   ok_button_p->setEnabled(true);
   

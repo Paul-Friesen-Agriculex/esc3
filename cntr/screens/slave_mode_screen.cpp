@@ -116,6 +116,8 @@ slave_mode_screen::slave_mode_screen(centre*set_centre_p, batch_mode_driver* set
   end_gate_opened_full = false;
   end_gate_filling = true;
   
+  batch_mode_driver_p -> dump_automatically = false;
+  
   opcua_mode = 0;
 //  opcua_mode = 10;//start in this mode to blank out any existing command on OPC device
 //  opcua_query_sent = false;
@@ -124,19 +126,32 @@ slave_mode_screen::slave_mode_screen(centre*set_centre_p, batch_mode_driver* set
   just_starting = true;//wish to ignore any command on opc device when starting.  enter command only if changed.
   opcua_message_to_write = false;
 
+/*
   if(centre_p->communicate_by_serial_port == true)
   {
-    connection_message_p->setText("Serial port adapter cable detected.\nReady to communicate");
+    QString messg("Set to communicate by serial port\n");
+    if(centre_p->serial_port_opened == true)
+    {
+      messg.append("Serial port adapter cable detected.");
+    }
+    else
+    {
+      messg.append("NO SERIAL PORT ADAPTER CABLE DETECTED.");
+    }
+    connection_message_p->setText(messg);
   }
   
   if(centre_p->communicate_by_opcua == true)
   {
     connection_message_p->setText("Set to communicate with Agriculex\nOPC UA device");
   }
+  */
+  
+  
   
   timer_p = new QTimer;
   connect(timer_p, SIGNAL(timeout()), this, SLOT(run()));
-  timer_p->start(50);
+  timer_p->start(500);
 }
 
 slave_mode_screen::~slave_mode_screen()
@@ -451,6 +466,14 @@ void slave_mode_screen::command_char(QChar character)
       }
       new_command_p->command = list[2*(new_command_p->number_of_sets) + 7];
     }
+    else if(new_command_p->type_flag == 'D')
+    {
+      new_command_p->crop_name = centre_p->crops[0].name;
+      new_command_p->number_of_sets = 0;
+      new_command_p->speed = 0;
+      new_command_p->command = list[1];
+    }
+    
     else
     {
       cout<<"type flag not recognized\n";
@@ -470,7 +493,7 @@ void slave_mode_screen::command_char(QChar character)
 //      batch_mode_driver_p->mode = slave_mode_entry;
       batch_mode_driver_p->slave_mode = false;
   
-      batch_mode_driver_p->stop();
+//      batch_mode_driver_p->stop();
       
       for(int i=0; i<command_p_list.size(); ++i)
       {
@@ -490,6 +513,69 @@ void slave_mode_screen::command_char(QChar character)
       {
         delete previous_command_p;
         previous_command_p = 0;
+      }
+      return;
+    }
+    
+    if(new_command_p->type_flag == 'D')//these commands need immediate action
+    {
+      QByteArray array;
+      if(new_command_p->command == "Count")
+      {
+        if(  (centre_p->communicate_by_tcp)  ||  (centre_p->communicate_by_serial_port)  )
+        {
+          array.append(QChar(2));
+          array.append('c');
+          array.append(QChar(31));
+          array.append(QString::number(centre_p->count));
+          array.append(QChar(3));
+        }
+      }
+      if(new_command_p->command == "Status")
+      {
+        
+//        cout<<"command = Status\n";
+        
+        if(  (centre_p->communicate_by_tcp)  ||  (centre_p->communicate_by_serial_port)  )
+        {
+          array.append(QChar(2));
+          array.append('t');
+          array.append(QChar(31));
+          /*
+          if(command_finished_bool)
+          {
+            array.append("Ready");
+          }
+          else
+          {
+            array.append("Busy");
+          }
+          */
+          array.append("Ready");
+          array.append(QChar(3));
+        }
+      }
+      if(new_command_p->command == "Pack")
+      {
+        array.append(QChar(2));
+        array.append('c');
+        array.append(QChar(31));
+        array.append(QString::number(batch_mode_driver_p->cutgate_pack));
+        array.append(QChar(3));
+      }
+      if(centre_p->communicate_by_tcp)
+      {
+        if(centre_p->tcp_link_established)
+        {
+          centre_p->tcp_socket_p->write(array);
+        }
+      }
+      else if(centre_p->communicate_by_serial_port)
+      {
+        centre_p->serial_port_write(QString(array));
+        
+//        cout<<"wrote to serial port "<<(QString(array)).toStdString()<<endl;
+        
       }
       return;
     }
@@ -513,7 +599,7 @@ void slave_mode_screen::command_finished()
 {
   cout<<"slave_mode_screen::command_finished()\n";
   command_finished_bool = true;
-  batch_mode_driver_p->stop();
+//  batch_mode_driver_p->stop();
 }
 
 void slave_mode_screen::run()
@@ -558,6 +644,39 @@ void slave_mode_screen::run()
     }
   }
   
+  
+  
+  
+  
+
+  if(centre_p->communicate_by_serial_port == true)
+  {
+    QString messg("Set to communicate by serial port\n");
+    if(centre_p->serial_port_opened == true)
+    {
+      messg.append("Serial port adapter cable detected.");
+    }
+    else
+    {
+      messg.append("NO SERIAL PORT ADAPTER CABLE DETECTED.");
+    }
+    connection_message_p->setText(messg);
+  }
+  
+  if(centre_p->communicate_by_opcua == true)
+  {
+    connection_message_p->setText("Set to communicate with Agriculex\nOPC UA device");
+    run_opcua();
+  }
+  
+  
+  
+  
+  
+  
+  
+  
+  /*
   QByteArray array;
   if(  (centre_p->communicate_by_tcp)  ||  (centre_p->communicate_by_serial_port)  )
   {
@@ -593,6 +712,7 @@ void slave_mode_screen::run()
     run_opcua();
   }
   else cout<<"no communication method for slave mode\n";
+  */
   
   if(executing_command_p == 0)
   {
@@ -600,6 +720,7 @@ void slave_mode_screen::run()
     if(command_p_list.size() == 0) return;
     executing_command_p = command_p_list.dequeue();
     command_finished_bool = false;
+    emit new_slave_mode_command();
   }
   if(executing_command_p->type_flag == 'C')
   {
@@ -626,19 +747,19 @@ void slave_mode_screen::run()
     }
     if(executing_command_p->command == "Dump")
     {
-      cout<<"executing_command_p->command == Dump\n";
+//      cout<<"executing_command_p->command == Dump\n";
       if(batch_mode_driver_p->slave_mode == false)//execution of this command is starting.  set-up needed.
       {
         batch_mode_driver_p->chamber_count_limit_calculation();
         batch_mode_driver_p->start();
-//        batch_mode_driver_p->slave_mode = true;
+        batch_mode_driver_p->slave_mode = true;
         batch_mode_driver_p->dump_speed = 1000;
         batch_mode_driver_p->restart();
       }
       if(command_finished_bool == true)
       {
         end_command();
-        batch_mode_driver_p->stop();
+//        batch_mode_driver_p->stop();
         return;
       }
     }
@@ -692,7 +813,7 @@ void slave_mode_screen::run()
     {
       cout<<"ending command\n";
       end_command();
-      batch_mode_driver_p->stop();
+//      batch_mode_driver_p->stop();
       return;
     }
     if(  (executing_command_p->number_of_packs.size()!=executing_command_p->number_of_sets)  ||  (executing_command_p->seeds_per_pack.size()!=executing_command_p->number_of_sets)  )
@@ -730,7 +851,7 @@ void slave_mode_screen::run()
         }
         batch_mode_driver_p -> seed_lot_barcode = "";
         batch_mode_driver_p -> pack_barcode = "";
-        batch_mode_driver_p -> switch_mode(entry, "entry");
+//        batch_mode_driver_p -> switch_mode(entry, "entry");
         batch_mode_driver_p -> use_spreadsheet = false;
         batch_mode_driver_p->require_seed_lot_barcode = false;
         batch_mode_driver_p->require_pack_barcode = false;
@@ -748,6 +869,66 @@ void slave_mode_screen::run()
     }
     return;
   }
+  
+  /*
+  if(executing_command_p->type_flag == 'D')
+  {
+    QByteArray array;
+    if(executing_command_p->command == "Count")
+    {
+      if(  (centre_p->communicate_by_tcp)  ||  (centre_p->communicate_by_serial_port)  )
+      {
+        array.append(QChar(2));
+        array.append('d');
+        array.append(QChar(31));
+        array.append(QString::number(centre_p->count));
+        array.append(QChar(31));
+      }
+    }
+    if(executing_command_p->command == "Status")
+    {
+      if(  (centre_p->communicate_by_tcp)  ||  (centre_p->communicate_by_serial_port)  )
+      {
+        array.append(QChar(2));
+        array.append('d');
+        array.append(QChar(31));
+        array.append(QString::number(centre_p->count));
+        array.append(QChar(31));
+      }
+    }
+    if(batch_mode)
+    {
+      array.append(QString::number(batch_mode_driver_p->cutgate_pack));
+    }
+    else
+    {
+      array.append('0');
+    }
+    array.append(QChar(31));
+    array.append(QChar(3));
+    if(centre_p->communicate_by_tcp)
+    {
+      if(centre_p->tcp_link_established)
+      {
+        centre_p->tcp_socket_p->write(array);
+      }
+    }
+    else if(centre_p->communicate_by_serial_port)
+    {
+      centre_p->serial_port_write(QString(array));
+    }
+  }
+  else if(centre_p->communicate_by_opcua)
+  {
+    run_opcua();
+  }
+  else cout<<"no communication method for slave mode\n";
+  */
+
+
+
+  
+  
 }
 
 void slave_mode_screen::run_opcua()
@@ -1327,9 +1508,9 @@ void slave_mode_screen::end_command()
   }
   previous_command_p = executing_command_p;
   executing_command_p = 0;
-  cout<<"executing_command_p set to 0\n";
+  cout<<"slave_mode_screen::end_command.  executing_command_p set to 0\n";
   batch_mode_driver_p->slave_mode = false;
-  batch_mode_driver_p->stop();
+//  batch_mode_driver_p->stop();
   return;
 }
 

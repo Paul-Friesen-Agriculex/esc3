@@ -400,7 +400,7 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
 //  repeat_pack_window_p = 0;
 //  repeat_pack_window_exists = false;
   batch_mode_driver_p -> use_spreadsheet = false;
-  
+  batch_mode_driver_p -> dump_automatically = true;
 //  cout<<"batch::batch end\n";
   
 }

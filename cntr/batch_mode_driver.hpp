@@ -81,7 +81,10 @@ enum mode_enum
   repeat_wait_for_container_removal,
   substitute_wait_for_container,
   substitute_wait_for_container_removal,
-  substitute_wait_for_substitute_barcode
+  substitute_wait_for_substitute_barcode,
+  wait_for_slave_mode_command_c_c,
+  wait_for_slave_mode_command_c_o,
+  wait_for_slave_mode_command_after_dump
 };
 
 enum barcode_entry_mode
@@ -322,6 +325,8 @@ class batch_mode_driver : public QObject
   
   //slave mode
   bool slave_mode;
+  bool dump_automatically;//in slave mode, should not dump automatically after a program
+  bool new_slave_mode_command_bool;
 //  bool slave_mode_wait;
   
   //diagnostics
@@ -341,6 +346,7 @@ class batch_mode_driver : public QObject
   void chamber_count_limit_calculation(); //calculates count limit for seed chambers for currently selected seed size //2021_03_19
   void repeat_pack();
   void seed_lot_substitution();
+  void new_slave_mode_command();
   
   signals:
   void dumping();

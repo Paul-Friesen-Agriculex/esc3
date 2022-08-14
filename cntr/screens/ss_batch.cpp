@@ -319,6 +319,7 @@ ss_batch::ss_batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_drive
   barcode_line_p->setFocus();
   batch_mode_driver_p->mode = entry;//wait_for_seed_lot_barcode;
   batch_mode_driver_p->seed_lot_barcode_ok = false;
+  batch_mode_driver_p -> dump_automatically = true;
 
 //  batch_mode_driver_p -> restart();
 

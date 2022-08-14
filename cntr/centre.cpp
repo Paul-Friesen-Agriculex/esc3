@@ -125,8 +125,8 @@ centre::centre():
 
   //********************  
   //comment out one of these 2 lines:
-//  base_widget_p->setWindowState(Qt::WindowFullScreen);//use for final versions to run on touch screen
-  base_widget_p->setGeometry(0, 0, 800, 480);//use for development on full size terminal
+  base_widget_p->setWindowState(Qt::WindowFullScreen);//use for final versions to run on touch screen
+//  base_widget_p->setGeometry(0, 0, 800, 480);//use for development on full size terminal
   //********************
 
 
@@ -456,6 +456,16 @@ void centre::run()
   endgate_state = endgate_p->get_state();
   envelope_present = envelope_sensor_p->read();
   brother_envelope_feeder_p -> run();
+  
+  
+  if(communicate_by_serial_port)
+  {
+    if(serial_port_opened == false)
+    {
+      setup_serial_communications(baud_rate);
+    }
+  }
+  
   
   read_serial_port();
 
@@ -1239,8 +1249,8 @@ void centre::tcp_write(QString string)
 void centre::setup_serial_communications(int baud_rate)//assumes serial port cable is attached
 {
   QString full_port_name = QString("/dev/") + serial_port_name;
-  communicate_by_keyboard_cable = false;
-  communicate_by_tcp = false;
+//  communicate_by_keyboard_cable = false;
+//  communicate_by_tcp = false;
 //  communicate_by_serial_port = true;
 //  communicate_by_opcua = false;
 

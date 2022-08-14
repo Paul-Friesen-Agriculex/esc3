@@ -130,6 +130,8 @@ batch_mode_driver::batch_mode_driver(centre* centre_p_s, cutgate* cutgate_p_s, e
   endgate_count_limit = 0;
   endgate_pack_limit = 0;
   
+  dump_automatically = true;
+  new_slave_mode_command_bool = false;
   
   //diagnostics
   cout_counter = 0;
@@ -716,7 +718,7 @@ void batch_mode_driver::run()
   switch(mode)
   {
     case entry:
-      cout<<"mode = entry\n";
+//      cout<<"mode = entry\n";
       cutgate_p->open();
       endgate_p->close();
       substitute_seed_lot = false;
@@ -844,7 +846,7 @@ void batch_mode_driver::run()
         cutgate_p->open();
         endgate_p->close();
         
-        cout<<"batch_mode_driver mode hi_o_c starting.  cutgate_count_limit = "<<cutgate_count_limit<<endl;
+//        cout<<"batch_mode_driver mode hi_o_c starting.  cutgate_count_limit = "<<cutgate_count_limit<<endl;
         
         endgate_count_limit = cutgate_count_limit;
         endgate_pack_limit = cutgate_pack_limit;
@@ -985,7 +987,7 @@ void batch_mode_driver::run()
       {
         emit enable_substitute_button(false);
         cutgate_p->close();
-        switch_mode(hi_c_c, "hi_c_c");
+//        switch_mode(hi_c_c, "hi_c_c");
         emit pack_ready();
         if(use_spreadsheet)
         {
@@ -1022,6 +1024,7 @@ void batch_mode_driver::run()
           }
           else
           {
+            switch_mode(hi_c_c, "hi_c_c");
             bool conversion_ok_flag = false;
             cutgate_count_limit = ss_required_count_p->data_list[spreadsheet_line_number].toInt(&conversion_ok_flag);
             if(conversion_ok_flag==false)
@@ -1040,17 +1043,29 @@ void batch_mode_driver::run()
         else//not using spreadsheet
         {
           ++cutgate_pack;
-//        cout<<"mode gate_delay_o_c.  cutgate_pack = "<<cutgate_pack<<endl;
+          cout<<"mode gate_delay_o_c.  cutgate_pack = "<<cutgate_pack<<".  cutgate_pack_limit = "<<cutgate_pack_limit<<endl;
           if(cutgate_pack>=cutgate_pack_limit)
           {
             cutgate_pack = 0;
             ++cutgate_set;
-//          cout<<"mode gate_delay_o_c.  cutgate_pack zeroed.  cutgate_set = "<<cutgate_set<<endl;
+            cout<<"mode gate_delay_o_c.  cutgate_pack zeroed.  cutgate_set = "<<cutgate_set<<endl;
             if(cutgate_set>=program_size)
             {
               cutgate_set = 0;
-              switch_mode(dump_into_cut_gate_c_c, "dump_into_cut_gate_c_c");
+              if(dump_automatically == true)
+              {
+                switch_mode(dump_into_cut_gate_c_c, "dump_into_cut_gate_c_c");
+              }
+              else
+              {
+                emit slave_mode_set_finished();
+                switch_mode(wait_for_slave_mode_command_c_c, "wait_for_slave_mode_command_c_c");
+              }
             }
+          }
+          else
+          {
+            switch_mode(hi_c_c, "hi_c_c");
           }
           cutgate_count_limit = program[cutgate_set]->seeds;
           cutgate_pack_limit = program[cutgate_set]->packs;
@@ -1160,7 +1175,15 @@ void batch_mode_driver::run()
             if(cutgate_set>=program_size)
             {
               cutgate_set = 0;
-              switch_mode(dump_into_cut_gate_c_o, "dump_into_cut_gate_c_o");
+              if(dump_automatically == true)
+              {
+                switch_mode(dump_into_cut_gate_c_o, "dump_into_cut_gate_c_o");
+              }
+              else
+              {
+                emit slave_mode_set_finished();
+                switch_mode(wait_for_slave_mode_command_c_o, "wait_for_slave_mode_command_c_o");
+              }
             }
             cutgate_count_limit = program[cutgate_set]->seeds;
             cutgate_pack_limit = program[cutgate_set]->packs;
@@ -1659,7 +1682,7 @@ void batch_mode_driver::run()
           emit substitution_barcode_entered(substitute_barcode);
         }
         emit dump_complete(centre_p->count);
-        emit slave_mode_set_finished();
+//        emit slave_mode_set_finished();
         
 //        cout<<"batch_mode_driver::run 2\n";
         centre_p->dump_count_str = QString::number(centre_p->count);
@@ -1671,7 +1694,26 @@ void batch_mode_driver::run()
         hi_rate = 0;
         slowdown_count_diff = 0;
         stop_count_diff = 0;
-        switch_mode(entry, "entry");
+//        switch_mode(entry, "entry");
+        
+        
+        
+        
+        
+        if(dump_automatically == true)
+        {
+          switch_mode(entry, "entry");
+        }
+        else
+        {
+          emit slave_mode_set_finished();
+          switch_mode(wait_for_slave_mode_command_after_dump, "wait_for_slave_mode_command_after_dump");
+        }
+        
+        
+        
+        
+        
 //        cout<<"batch_mode_driver::run 5\n";
       }
 //      cout<<"batch_mode_driver::run e\n";
@@ -1768,6 +1810,50 @@ void batch_mode_driver::run()
         send_barcode_status_message("Substitute Barcode Scanned", QColor(0,0,0), QColor(0,255,0), 25);
         barcode_mode = pack;
         switch_mode(hi_o_c, "hi_o_c");
+      }
+      break;
+    case wait_for_slave_mode_command_c_c:
+      if(mode_new)
+      {
+        centre_p->set_speed(0);
+        cutgate_p->close();
+        endgate_p->close();
+      }
+      if(new_slave_mode_command_bool == true)
+      {
+        cout<<"mode wait_for_slave_mode_command_c_c.  new_slave_mode_command_bool == true\n";
+        new_slave_mode_command_bool = false;
+        switch_mode(hi_c_c, "hi_c_c");
+      }
+      if(pack_present == true)
+      {
+        switch_mode(wait_for_slave_mode_command_c_o, "wait_for_slave_mode_command_c_o");
+      }
+      break;
+    case wait_for_slave_mode_command_c_o:
+      if(mode_new)
+      {
+        centre_p->set_speed(0);
+        cutgate_p->close();
+        endgate_p->open();
+      }
+      if(new_slave_mode_command_bool == true)
+      {
+        new_slave_mode_command_bool = false;
+        switch_mode(hi_c_o, "hi_c_o");
+      }
+      break;
+    case wait_for_slave_mode_command_after_dump:
+      if(mode_new)
+      {
+        centre_p->set_speed(0);
+        cutgate_p->open();
+        endgate_p->close();
+      }
+      if(new_slave_mode_command_bool == true)
+      {
+        new_slave_mode_command_bool = false;
+        switch_mode(entry, "entry");
       }
       break;
 
@@ -3450,3 +3536,7 @@ void batch_mode_driver::seed_lot_substitution()
 //  emit enable_repeat_pack_button(false);  
 }
 
+void batch_mode_driver::new_slave_mode_command()
+{
+  new_slave_mode_command_bool = true;
+}

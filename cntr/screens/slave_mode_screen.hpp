@@ -77,6 +77,9 @@ class slave_mode_screen : public screen
   void opcua_command_char(QChar character);
   void command_finished();
   void run();
+  
+  signals:
+  void new_slave_mode_command();
 
   private:
   batch_mode_driver* batch_mode_driver_p;

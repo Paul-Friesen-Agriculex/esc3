@@ -56,7 +56,7 @@ endgate::~endgate()
 
 void endgate::open()
 {
-  cout<<"endgate::open\n";
+//  cout<<"endgate::open\n";
   
   if(state == ENDGATE_OPEN) return;
   FILE * fp;
@@ -70,7 +70,7 @@ void endgate::open()
 
 void endgate::close()
 {
-  cout<<"endgate::close\n";
+//  cout<<"endgate::close\n";
   
   if(state == ENDGATE_CLOSED) return;
   FILE * fp;
