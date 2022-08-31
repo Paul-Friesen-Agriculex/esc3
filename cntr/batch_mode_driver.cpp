@@ -738,46 +738,46 @@ void batch_mode_driver::run()
 //      cout<<"mode = wait_for_seed_lot_barcode\n";
       if(mode_new)
       {
-        cout<<"mode wait_for_seed_lot_barcode 1\n";
+//        cout<<"mode wait_for_seed_lot_barcode 1\n";
         set_normal_status_message();
-        cout<<"mode wait_for_seed_lot_barcode 1a\n";
+//        cout<<"mode wait_for_seed_lot_barcode 1a\n";
         send_barcode_status_message("Scan Seed Lot Barcode", QColor(0,0,0), QColor(255,255,0), 25);
-        cout<<"mode wait_for_seed_lot_barcode 1b\n";
+//        cout<<"mode wait_for_seed_lot_barcode 1b\n";
         barcode_mode = seed_lot;
-        cout<<"mode wait_for_seed_lot_barcode 1c\n";
+//        cout<<"mode wait_for_seed_lot_barcode 1c\n";
         centre_p->set_speed(0);
-        cout<<"mode wait_for_seed_lot_barcode 2\n";
+//        cout<<"mode wait_for_seed_lot_barcode 2\n";
       }
       if(seed_lot_barcode_ok)
       {
         if(use_spreadsheet == true)
         {
-          cout<<"mode wait_for_seed_lot_barcode 3\n";
+//          cout<<"mode wait_for_seed_lot_barcode 3\n";
           spreadsheet_line_number = get_next_spreadsheet_line_number();
           if(spreadsheet_line_number>=0)
           {
             centre_p->bar_str_1 = ss_envelope_id_p->data_list[spreadsheet_line_number];
           }
-          cout<<"mode wait_for_seed_lot_barcode 4\n";
+//          cout<<"mode wait_for_seed_lot_barcode 4\n";
           emit refresh_screen();
           end_valve_spreadsheet_line_number = spreadsheet_line_number;
           if(print_envelope)
           {
             if(print_control_mode==start_on_pack_collect)
             {
-              cout<<"mode wait_for_seed_lot_barcode.  print_control_mode==start_on_pack_collect\n";
+//              cout<<"mode wait_for_seed_lot_barcode.  print_control_mode==start_on_pack_collect\n";
               envelope_p -> print(spreadsheet_line_number);
             }
             else if(print_control_mode==start_on_previous_pack_collect)
             {
-              cout<<"mode wait_for_seed_lot_barcode.  print_control_mode==start_on_previous_pack_collect\n";
-              cout<<"  calling print(spreadsheet_line_number).  spreadsheet_line_number = "<<spreadsheet_line_number<<endl;  
+//              cout<<"mode wait_for_seed_lot_barcode.  print_control_mode==start_on_previous_pack_collect\n";
+//              cout<<"  calling print(spreadsheet_line_number).  spreadsheet_line_number = "<<spreadsheet_line_number<<endl;  
               envelope_p -> print(spreadsheet_line_number);
-              cout<<"  calling print(get_spreadsheet_line_number_after).  get_spreadsheet_line_number_after = "<<get_spreadsheet_line_number_after(spreadsheet_line_number)<<endl;
+//              cout<<"  calling print(get_spreadsheet_line_number_after).  get_spreadsheet_line_number_after = "<<get_spreadsheet_line_number_after(spreadsheet_line_number)<<endl;
               envelope_p -> print(get_spreadsheet_line_number_after(spreadsheet_line_number));
             }
           }
-          cout<<"mode wait_for_seed_lot_barcode 5\n";
+//          cout<<"mode wait_for_seed_lot_barcode 5\n";
           if(spreadsheet_line_number==-1)//-1 value signals no more lines for this seed_lot_barcode
           {
             QMessageBox box;
@@ -891,7 +891,7 @@ void batch_mode_driver::run()
       }
       if(centre_p->count > lower_chamber_count_limit)
       {
-        cout<<"batch_mode_driver switch_mode to lower_chamber_full_o_c.  lower_chamber_lount_limit = "<<lower_chamber_count_limit<<endl;
+//        cout<<"batch_mode_driver switch_mode to lower_chamber_full_o_c.  lower_chamber_lount_limit = "<<lower_chamber_count_limit<<endl;
         switch_mode(lower_chamber_full_o_c, "lower_chamber_full_o_c");
       }
       if(pack_present && (pack_barcode_ok||release_pack) && (centre_p->count>cutgate_count_limit/8) )

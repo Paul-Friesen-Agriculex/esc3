@@ -1508,7 +1508,7 @@ void slave_mode_screen::end_command()
   }
   previous_command_p = executing_command_p;
   executing_command_p = 0;
-  cout<<"slave_mode_screen::end_command.  executing_command_p set to 0\n";
+//  cout<<"slave_mode_screen::end_command.  executing_command_p set to 0\n";
   batch_mode_driver_p->slave_mode = false;
 //  batch_mode_driver_p->stop();
   return;
