@@ -28,12 +28,24 @@ ESC-3 machines produced by Agriculex Inc.
 
 #include <QObject>
 
+class QTimer;
+
 class envelope_sensor:public QObject
 {
   Q_OBJECT
   
+  private:
+  QTimer* timer_p;
+  bool raw_present;//raw output of sensor
+  bool old_raw_present;
+  bool filtered_present;//short glitches in raw_present removed
+  int duration_count;
+  
   public:
   envelope_sensor();
+  
+  private slots:
+  void run();
   
   public slots:
   bool read(); //returns true if envelope is present

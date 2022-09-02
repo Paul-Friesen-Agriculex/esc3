@@ -25,6 +25,7 @@ ESC-3 machines produced by Agriculex Inc.
 
 #include <stdio.h>
 #include <iostream>
+#include <QTimer>
 
 #include "envelope_sensor.hpp"
 
@@ -32,23 +33,47 @@ using namespace std;
 
 envelope_sensor::envelope_sensor()
 {
+  timer_p = new QTimer;
+  raw_present = false;//raw output of sensor
+  old_raw_present = false;
+  filtered_present = false;//short glitches in raw_present removed
+  duration_count = 0;
+  connect (timer_p, SIGNAL(timeout()), this, SLOT(run()));
+  timer_p->start(50);
 }
 
-bool envelope_sensor :: read() //returns true if envelope is present
+void envelope_sensor::run()
 {
   FILE * fp;
   int i;
   fp = fopen("/sys/class/gpio/gpio174/value", "r");
-  if(!fscanf(fp,"%d",&i)) cout<<"fscanf failure\n";
+  if(!fscanf(fp,"%d",&i)) cout<<"envelope_sensor::run.  fscanf failure\n";
   fclose(fp);
   if (i==1)
   {
-    return(false);
+    raw_present = false;
   }
   else
   {
-    return(true);
+    raw_present = true;
   }
+  
+  if(raw_present != old_raw_present)
+  {
+    duration_count = 0;
+  }
+  old_raw_present = raw_present;
+  ++ duration_count;
+  if(duration_count>=256) duration_count = 256;//limit to prevent possible overflow
+  if(duration_count<5) return;//reading is unstable
+  
+  //only executes if reading is stable
+  filtered_present = raw_present;
+}
+
+bool envelope_sensor :: read() //returns true if envelope is present
+{
+  return(filtered_present);
 }
 
 
