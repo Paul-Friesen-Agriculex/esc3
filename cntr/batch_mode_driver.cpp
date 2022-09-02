@@ -1042,6 +1042,7 @@ void batch_mode_driver::run()
         }
         else//not using spreadsheet
         {
+          bool end_program = false;
           ++cutgate_pack;
           cout<<"mode gate_delay_o_c.  cutgate_pack = "<<cutgate_pack<<".  cutgate_pack_limit = "<<cutgate_pack_limit<<endl;
           if(cutgate_pack>=cutgate_pack_limit)
@@ -1051,24 +1052,29 @@ void batch_mode_driver::run()
             cout<<"mode gate_delay_o_c.  cutgate_pack zeroed.  cutgate_set = "<<cutgate_set<<endl;
             if(cutgate_set>=program_size)
             {
+              end_program = true;
               cutgate_set = 0;
-              if(dump_automatically == true)
-              {
-                switch_mode(dump_into_cut_gate_c_c, "dump_into_cut_gate_c_c");
-              }
-              else
-              {
-                emit slave_mode_set_finished();
-                switch_mode(wait_for_slave_mode_command_c_c, "wait_for_slave_mode_command_c_c");
-              }
+            }
+          }
+          cutgate_count_limit = program[cutgate_set]->seeds;
+          cutgate_pack_limit = program[cutgate_set]->packs;
+          
+          if(end_program)
+          {
+            if(dump_automatically == true)
+            {
+              switch_mode(dump_into_cut_gate_c_c, "dump_into_cut_gate_c_c");
+            }
+            else
+            {
+              emit slave_mode_set_finished();
+              switch_mode(wait_for_slave_mode_command_c_c, "wait_for_slave_mode_command_c_c");
             }
           }
           else
           {
             switch_mode(hi_c_c, "hi_c_c");
           }
-          cutgate_count_limit = program[cutgate_set]->seeds;
-          cutgate_pack_limit = program[cutgate_set]->packs;
         }
       }
       break;
@@ -1166,27 +1172,38 @@ void batch_mode_driver::run()
         }
         else//use_spreadsheet false
         {
+          bool end_program = false;
           ++cutgate_pack;
-          cout<<"cutgate_pack = "<<cutgate_pack<<endl;
+          cout<<"mode gate_delay_o_o.  cutgate_pack = "<<cutgate_pack<<".  cutgate_pack_limit = "<<cutgate_pack_limit<<endl;
           if(cutgate_pack>=cutgate_pack_limit)
           {
             cutgate_pack = 0;
             ++cutgate_set;
+            cout<<"mode gate_delay_o_o.  cutgate_pack zeroed.  cutgate_set = "<<cutgate_set<<endl;
             if(cutgate_set>=program_size)
             {
+              end_program = true;
               cutgate_set = 0;
-              if(dump_automatically == true)
-              {
-                switch_mode(dump_into_cut_gate_c_o, "dump_into_cut_gate_c_o");
-              }
-              else
-              {
-                emit slave_mode_set_finished();
-                switch_mode(wait_for_slave_mode_command_c_o, "wait_for_slave_mode_command_c_o");
-              }
             }
-            cutgate_count_limit = program[cutgate_set]->seeds;
-            cutgate_pack_limit = program[cutgate_set]->packs;
+          }
+          cutgate_count_limit = program[cutgate_set]->seeds;
+          cutgate_pack_limit = program[cutgate_set]->packs;
+          
+          if(end_program)
+          {
+            if(dump_automatically == true)
+            {
+              switch_mode(dump_into_cut_gate_c_o, "dump_into_cut_gate_c_o");
+            }
+            else
+            {
+              emit slave_mode_set_finished();
+              switch_mode(wait_for_slave_mode_command_c_o, "wait_for_slave_mode_command_c_o");
+            }
+          }
+          else
+          {
+            switch_mode(hi_c_o, "hi_c_o");
           }
         }
       }
