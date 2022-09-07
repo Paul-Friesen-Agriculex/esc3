@@ -718,7 +718,7 @@ void batch_mode_driver::run()
   switch(mode)
   {
     case entry:
-//      cout<<"mode = entry\n";
+      cout<<"mode = entry\n";
       cutgate_p->open();
       endgate_p->close();
       substitute_seed_lot = false;
@@ -887,6 +887,7 @@ void batch_mode_driver::run()
       }
       if(cutgate_count_limit-centre_p->count <  slowdown_count_diff)
       {
+        cout<<"  mode hi_o_c.  cutgate_count_limit = "<<cutgate_count_limit<<".  centre_p->count = "<<centre_p->count<<endl;
         switch_mode(ramp_down_o_c, "ramp_down_o_c");
       }
       if(centre_p->count > lower_chamber_count_limit)
@@ -1724,7 +1725,7 @@ void batch_mode_driver::run()
         else
         {
           emit slave_mode_set_finished();
-          switch_mode(wait_for_slave_mode_command_after_dump, "wait_for_slave_mode_command_after_dump");
+          switch_mode(wait_for_slave_mode_command_empty, "wait_for_slave_mode_command_empty");
         }
         
         
@@ -1836,12 +1837,6 @@ void batch_mode_driver::run()
         cutgate_p->close();
         endgate_p->close();
       }
-      if(new_slave_mode_command_bool == true)
-      {
-        cout<<"mode wait_for_slave_mode_command_c_c.  new_slave_mode_command_bool == true\n";
-        new_slave_mode_command_bool = false;
-        switch_mode(hi_c_c, "hi_c_c");
-      }
       if(pack_present == true)
       {
         switch_mode(wait_for_slave_mode_command_c_o, "wait_for_slave_mode_command_c_o");
@@ -1854,24 +1849,20 @@ void batch_mode_driver::run()
         cutgate_p->close();
         endgate_p->open();
       }
-      if(new_slave_mode_command_bool == true)
+      if(pack_present == false)
       {
-        new_slave_mode_command_bool = false;
-        switch_mode(hi_c_o, "hi_c_o");
+        switch_mode(wait_for_slave_mode_command_empty, "wait_for_slave_mode_command_empty");
       }
       break;
-    case wait_for_slave_mode_command_after_dump:
+    case wait_for_slave_mode_command_empty:
       if(mode_new)
       {
         centre_p->set_speed(0);
-        cutgate_p->open();
+        cutgate_p->close();
         endgate_p->close();
       }
-      if(new_slave_mode_command_bool == true)
-      {
-        new_slave_mode_command_bool = false;
-        switch_mode(entry, "entry");
-      }
+      emit slave_mode_program_finished();
+      stop();
       break;
 
     default: cout<<"batch_mode_driver::run.  mode not found\n";
@@ -2725,6 +2716,7 @@ void batch_mode_driver::run()
   if(cout_counter >= cout_counter_limit)
   {
     cout_counter = 0;
+    cout<<"  cout_counter mode = "<<mode<<endl;
   }
 }
 

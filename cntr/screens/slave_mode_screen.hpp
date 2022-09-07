@@ -62,6 +62,7 @@ class slave_mode_screen : public screen
   void pack_ready();
   void pack_collected(int);
   void dump_complete(int);
+  void slave_mode_program_finished();
   
   private slots:
   void back_button_clicked();
@@ -75,7 +76,7 @@ class slave_mode_screen : public screen
   void connection_detected();
   void command_char(QChar character);
   void opcua_command_char(QChar character);
-  void command_finished();
+//  void command_finished();
   void run();
   
   signals:
@@ -125,6 +126,7 @@ class slave_mode_screen : public screen
   int speed;
   bool command_finished_bool;
   bool just_starting;//wish to ignore any command on opc device when starting.  enter command only if changed.
+  mode_enum mode_to_start;
   
   bool end_gate_full;
   bool end_gate_opened_full;

@@ -51,40 +51,40 @@ struct bm_set //batch mode set of packs
 
 enum mode_enum
 {
-  entry,
-  wait_for_seed_lot_barcode,
-  hi_o_c,
-  lower_chamber_full_o_c,
-  ramp_down_o_c,
-  gate_delay_o_c,
-  hi_o_o,
-  ramp_down_o_o,
-  gate_delay_o_o,
-  hi_c_o,
-  hi_c_c,
-  wait_for_endgate_to_close,
-  hi_o_c_old_pack,
-  wait_old_pack,
-  wait_for_pack,
-  wait_for_endgate_to_clear,
-  dump_into_cut_gate_c_o,
-  dump_into_cut_gate_c_c,
-  dump_into_cut_gate_wait_for_endgate_to_close,
-  dump_into_cut_gate_wait_for_pack,
-  dump_into_cut_gate_wait_for_pack_removal,
-  dump_into_cut_gate_wait_for_endgate_to_clear,
-  dump_into_end_gate,
-  dump_into_end_gate_wait_for_container,
-  dump_into_container,
-  wait_for_dump_container_removal,
-  repeat_wait_for_container,
-  repeat_wait_for_container_removal,
-  substitute_wait_for_container,
-  substitute_wait_for_container_removal,
-  substitute_wait_for_substitute_barcode,
-  wait_for_slave_mode_command_c_c,
-  wait_for_slave_mode_command_c_o,
-  wait_for_slave_mode_command_after_dump
+  entry,//0
+  wait_for_seed_lot_barcode,//1
+  hi_o_c,//2
+  lower_chamber_full_o_c,//3
+  ramp_down_o_c,//4
+  gate_delay_o_c,//5
+  hi_o_o,//6
+  ramp_down_o_o,//7
+  gate_delay_o_o,//8
+  hi_c_o,//9
+  hi_c_c,//10
+  wait_for_endgate_to_close,//11
+  hi_o_c_old_pack,//12
+  wait_old_pack,//13
+  wait_for_pack,//14
+  wait_for_endgate_to_clear,//15
+  dump_into_cut_gate_c_o,//16
+  dump_into_cut_gate_c_c,//17
+  dump_into_cut_gate_wait_for_endgate_to_close,//18
+  dump_into_cut_gate_wait_for_pack,//19
+  dump_into_cut_gate_wait_for_pack_removal,//20
+  dump_into_cut_gate_wait_for_endgate_to_clear,//21
+  dump_into_end_gate,//22
+  dump_into_end_gate_wait_for_container,//23
+  dump_into_container,//24
+  wait_for_dump_container_removal,//25
+  repeat_wait_for_container,//26
+  repeat_wait_for_container_removal,//27
+  substitute_wait_for_container,//28
+  substitute_wait_for_container_removal,//29
+  substitute_wait_for_substitute_barcode,//30
+  wait_for_slave_mode_command_c_c,//31
+  wait_for_slave_mode_command_c_o,//32
+  wait_for_slave_mode_command_empty//33
 };
 
 enum barcode_entry_mode
@@ -361,6 +361,7 @@ class batch_mode_driver : public QObject
   void send_extra_pack_message(QString message);
   void extra_pack_finished_signal();
   void slave_mode_set_finished();
+  void slave_mode_program_finished();
   void send_status_message(QString message, QColor foreground, QColor background, int text_size);
   void send_barcode_status_message(QString message, QColor foreground, QColor background, int text_size);
   void enable_repeat_pack_button(bool on);

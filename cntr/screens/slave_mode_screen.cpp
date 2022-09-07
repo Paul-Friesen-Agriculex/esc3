@@ -100,7 +100,10 @@ slave_mode_screen::slave_mode_screen(centre*set_centre_p, batch_mode_driver* set
   connect(centre_p, SIGNAL(char_from_tcp(QChar)), this, SLOT(command_char(QChar)));
   connect(centre_p, SIGNAL(char_from_serial_port(QChar)), this, SLOT(command_char(QChar)));
   connect(centre_p, SIGNAL(char_from_serial_port(QChar)), this, SLOT(opcua_command_char(QChar)));
-  connect(batch_mode_driver_p, SIGNAL(slave_mode_set_finished()), this, SLOT(command_finished()));
+  
+//  connect(batch_mode_driver_p, SIGNAL(slave_mode_set_finished()), this, SLOT(command_finished()));
+  
+  connect(batch_mode_driver_p, SIGNAL(slave_mode_program_finished()), this, SLOT(slave_mode_program_finished()));
   connect(batch_mode_driver_p, SIGNAL(pack_ready()), this, SLOT(pack_ready()));
   connect(batch_mode_driver_p, SIGNAL(pack_collected(int)), this, SLOT(pack_collected(int)));
   connect(batch_mode_driver_p, SIGNAL(dump_complete(int)), this, SLOT(dump_complete(int)));
@@ -125,6 +128,7 @@ slave_mode_screen::slave_mode_screen(centre*set_centre_p, batch_mode_driver* set
   opcua_count = 0;
   just_starting = true;//wish to ignore any command on opc device when starting.  enter command only if changed.
   opcua_message_to_write = false;
+  mode_to_start = entry;
 
 /*
   if(centre_p->communicate_by_serial_port == true)
@@ -243,7 +247,12 @@ void slave_mode_screen::dump_complete(int)
   }
   else cout<<"no communication method for slave mode\n";
 }
-  
+
+void slave_mode_screen::slave_mode_program_finished()  
+{
+  end_command();
+}
+
 void slave_mode_screen::back_button_clicked()
 {
   centre_p->add_waiting_screen(centre_p->get_previous_screen());
@@ -577,7 +586,7 @@ void slave_mode_screen::command_char(QChar character)
 //        cout<<"wrote to serial port "<<(QString(array)).toStdString()<<endl;
         
       }
-      return;
+      return;//at end of command requiring immediate action.  do not enqueue
     }
       
     command_p_list.enqueue(new_command_p);
@@ -594,14 +603,14 @@ void slave_mode_screen::opcua_command_char(QChar character)
 //  opcua_response_received = true;
   opcua_line.append(character);
 }
-
+/*
 void slave_mode_screen::command_finished()
 {
   cout<<"slave_mode_screen::command_finished()\n";
   command_finished_bool = true;
 //  batch_mode_driver_p->stop();
 }
-
+*/
 void slave_mode_screen::run()
 {
 //  cout<<"slave_mode_screen::run\n";
@@ -863,7 +872,13 @@ void slave_mode_screen::run()
 //        batch_mode_driver_p->mode = slave_mode_entry;
 //        batch_mode_driver_p->slave_mode = true;
         batch_mode_driver_p->chamber_count_limit_calculation();
+        
+        
         batch_mode_driver_p->reset_program();
+        
+        cout<<"  executing_command_p->type_flag == 'P'.  mode_to_start = "<<mode_to_start<<endl;
+        batch_mode_driver_p->mode = mode_to_start;
+        
         batch_mode_driver_p->start();
       }
     }
@@ -1502,6 +1517,7 @@ void slave_mode_screen::run_opcua()
 */
 void slave_mode_screen::end_command()
 {
+  cout<<"slave_mode_screen::end_command.  batch_mode_driver_p->mode = "<<batch_mode_driver_p->mode<<endl;
   if(previous_command_p != 0)
   {
     delete previous_command_p;
@@ -1510,6 +1526,18 @@ void slave_mode_screen::end_command()
   executing_command_p = 0;
 //  cout<<"slave_mode_screen::end_command.  executing_command_p set to 0\n";
   batch_mode_driver_p->slave_mode = false;
+  mode_to_start = entry;
+  /*
+  if(batch_mode_driver_p->mode == wait_for_slave_mode_command_c_c)
+  {
+    mode_to_start = hi_c_c;
+  }
+  if(batch_mode_driver_p->mode == wait_for_slave_mode_command_c_o)
+  {
+    mode_to_start = hi_c_o;
+    cout<<"mode_to_start = hi_c_o.  num value "<<mode_to_start<<endl;
+  }
+  */
 //  batch_mode_driver_p->stop();
   return;
 }
