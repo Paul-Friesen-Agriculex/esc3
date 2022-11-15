@@ -41,8 +41,15 @@ class envelope_sensor:public QObject
   bool filtered_present;//short glitches in raw_present removed
   int duration_count;
   
+  //for software trigger
+  bool physical_sensor_enabled;
+  bool software_triggered;
+  int software_trigger_count;
+  
   public:
   envelope_sensor();
+  void software_trigger();//generates a pulse as though the sensor was triggered
+  void enable_physical_sensor(bool enabled);//physical sensor in enabled by default.  Send false to disable and trigger only by software.
   
   private slots:
   void run();

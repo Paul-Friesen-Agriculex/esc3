@@ -2716,7 +2716,7 @@ void batch_mode_driver::run()
   if(cout_counter >= cout_counter_limit)
   {
     cout_counter = 0;
-    cout<<"  cout_counter mode = "<<mode<<endl;
+//    cout<<"  cout_counter mode = "<<mode<<endl;
   }
 }
 

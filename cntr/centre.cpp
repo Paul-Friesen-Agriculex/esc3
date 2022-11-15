@@ -405,7 +405,7 @@ void centre::tcp_connection_detected()
 
 void centre::read_tcp_socket()
 {
-  cout<<"start read_tcp_socket\n";
+//  cout<<"start read_tcp_socket\n";
   tcp_input_array_p -> clear();
   *tcp_input_array_p = tcp_socket_p->readAll();
 }

@@ -40,10 +40,27 @@ envelope_sensor::envelope_sensor()
   duration_count = 0;
   connect (timer_p, SIGNAL(timeout()), this, SLOT(run()));
   timer_p->start(50);
+  
+  physical_sensor_enabled = true;
+  software_triggered = false;
+  software_trigger_count = 100;
+  
 }
 
 void envelope_sensor::run()
 {
+  //for software trigger
+  if(software_trigger_count<10)
+  {
+    software_triggered = true;
+    ++software_trigger_count;
+  }
+  else
+  {
+    software_triggered = false;
+  }
+
+  //for physical sensor
   FILE * fp;
   int i;
   fp = fopen("/sys/class/gpio/gpio174/value", "r");
@@ -65,7 +82,7 @@ void envelope_sensor::run()
   old_raw_present = raw_present;
   ++ duration_count;
   if(duration_count>=256) duration_count = 256;//limit to prevent possible overflow
-  if(duration_count<5) return;//reading is unstable
+  if(duration_count<3) return;//reading is unstable
   
   //only executes if reading is stable
   filtered_present = raw_present;
@@ -73,7 +90,22 @@ void envelope_sensor::run()
 
 bool envelope_sensor :: read() //returns true if envelope is present
 {
-  return(filtered_present);
+  if(physical_sensor_enabled)
+  {
+    return(filtered_present || software_triggered);
+  }
+  else
+  {
+    return software_triggered;
+  }
 }
 
+void envelope_sensor::software_trigger()//generates a pulse as though the sensor was triggered
+{
+  software_trigger_count = 0;
+}
 
+void envelope_sensor::enable_physical_sensor(bool enabled)//physical sensor in enabled by default.  Send false to disable and trigger only by software.
+{
+  physical_sensor_enabled = enabled;
+}

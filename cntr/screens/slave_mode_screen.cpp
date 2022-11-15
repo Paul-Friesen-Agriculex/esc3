@@ -55,6 +55,7 @@ slave_mode_screen::slave_mode_screen(centre*set_centre_p, batch_mode_driver* set
 {
   batch_mode_driver_p = set_batch_mode_driver_p;
   help_screen_p = 0;
+  envelope_sensor_p = centre_p->envelope_sensor_p;
   
   back_button_p = new button("Back");
   function_as_server_1_button_p = new button("Function as TCP Server Using 192.168.100.1");
@@ -67,6 +68,8 @@ slave_mode_screen::slave_mode_screen(centre*set_centre_p, batch_mode_driver* set
   connection_message_p = new QLabel("Choose communication method");
   command_message_p = new QLabel;
   command_screen_p = new QTextEdit;
+  display_data_requests_p = new QRadioButton("Display data requests");
+  display_data_requests_p->setCheckable(true);
   if(centre_p->tcp_link_established)
   {
     connection_message_p->setText("Set up to communicate by TCP.");
@@ -74,17 +77,18 @@ slave_mode_screen::slave_mode_screen(centre*set_centre_p, batch_mode_driver* set
 
   main_layout_p=new QGridLayout;
   
-  main_layout_p->addWidget(back_button_p,0,1);
+  main_layout_p->addWidget(back_button_p,0,1,1,2);
   main_layout_p->addWidget(function_as_server_1_button_p, 1, 0);
   main_layout_p->addWidget(function_as_server_2_button_p, 2, 0);
   main_layout_p->addWidget(function_as_client_button_p, 3, 0);
   main_layout_p->addWidget(communicate_by_serial_port_button_p, 4, 0);
   main_layout_p->addWidget(opcua_button_p, 5, 0);
   main_layout_p->addWidget(help_button_p, 6, 0);
-  main_layout_p->addWidget(connection_message_p, 1, 1);
-  main_layout_p->addWidget(command_screen_p, 2, 1, 3, 1);
-  main_layout_p->addWidget(command_message_p, 5, 1);
-  main_layout_p->addWidget(exit_button_p, 6, 1);
+  main_layout_p->addWidget(connection_message_p, 1, 1, 1, 2);
+  main_layout_p->addWidget(command_screen_p, 2, 1, 3, 2);
+  main_layout_p->addWidget(display_data_requests_p, 5, 1);
+  main_layout_p->addWidget(command_message_p, 5, 2);
+  main_layout_p->addWidget(exit_button_p, 6, 2);
   
   setLayout(main_layout_p);
   
@@ -112,6 +116,7 @@ slave_mode_screen::slave_mode_screen(centre*set_centre_p, batch_mode_driver* set
   previous_command_p = 0;
   pack_count = 0;
   speed = 0;
+  remembered_speed = 20;
   command_finished_bool = false;
   batch_mode = false;
   
@@ -403,6 +408,32 @@ void slave_mode_screen::command_char(QChar character)
       cout<<"list size <2\n";
       return;
     }
+    QString display_string;
+    if(  (list[0]=="P")  &&  (list.size()>2)  ) //program
+    {
+      display_string = list[0] + "  Program " + list[1];
+
+      display_string.append("     "+list[2]+" sets\n");
+      for(int i=3; i<list.size()-5; ++i)
+      {
+        if(i%2 == 1)
+        {
+          display_string.append("          "+list[i]+" seeds   ");
+        }
+        else
+        {
+          display_string.append(list[i]+" packs\n");
+        }
+      }
+      display_string.append("     Speed "+list[list.size()-2]+"\n");
+      display_string.append("     "+list[list.size()-1]+"\n");
+    }
+    else
+    {
+      display_string = list[0] + "     " + list[1];
+    }
+      
+    
     QString type_flag_string = list[0];
     if(type_flag_string.size() != 1)
     {
@@ -410,6 +441,19 @@ void slave_mode_screen::command_char(QChar character)
       return;
     }
     new_command_p->type_flag = type_flag_string[0];
+
+    if(new_command_p->type_flag == 'D')
+    {
+      if(display_data_requests_p->isChecked())
+      {
+        command_screen_p->append(display_string);
+      }
+    }
+    else
+    {
+      command_screen_p->append(display_string);
+    }
+
     if(new_command_p->type_flag == 'C')
     {
       new_command_p->crop_name = centre_p->crops[0].name;
@@ -475,7 +519,7 @@ void slave_mode_screen::command_char(QChar character)
       }
       new_command_p->command = list[2*(new_command_p->number_of_sets) + 7];
     }
-    else if(new_command_p->type_flag == 'D')
+    else if(  (new_command_p->type_flag=='D')  ||  (new_command_p->type_flag=='I')  )
     {
       new_command_p->crop_name = centre_p->crops[0].name;
       new_command_p->number_of_sets = 0;
@@ -526,7 +570,7 @@ void slave_mode_screen::command_char(QChar character)
       return;
     }
     
-    if(new_command_p->type_flag == 'D')//these commands need immediate action
+    if(  (new_command_p->type_flag == 'D')  ||  (new_command_p->type_flag == 'I')  )//these commands need immediate action
     {
       QByteArray array;
       if(new_command_p->command == "Count")
@@ -586,11 +630,17 @@ void slave_mode_screen::command_char(QChar character)
 //        cout<<"wrote to serial port "<<(QString(array)).toStdString()<<endl;
         
       }
+
+      if(new_command_p->command == "PackSet")
+      {
+        envelope_sensor_p->software_trigger();
+      }
+
       return;//at end of command requiring immediate action.  do not enqueue
     }
       
     command_p_list.enqueue(new_command_p);
-    display_command(new_command_p);
+//    display_command(new_command_p);
     return;
   }
   //if gets to here, character is neither 2 nor 3
@@ -735,10 +785,11 @@ void slave_mode_screen::run()
   {
     if(executing_command_p->command == "Start")
     {
-      speed = executing_command_p->speed;
-      batch_mode_driver_p->high_feed_speed = speed;
-      batch_mode_driver_p->low_feed_speed = speed/10;
-      centre_p->set_speed(speed);
+//      speed = executing_command_p->speed;
+//      batch_mode_driver_p->high_feed_speed = speed;
+//      batch_mode_driver_p->low_feed_speed = speed/10;
+//      centre_p->set_speed(speed);
+      centre_p->set_speed(remembered_speed);
       end_command();
       return;
     }
@@ -813,6 +864,7 @@ void slave_mode_screen::run()
     batch_mode_driver_p->high_feed_speed = speed;
     batch_mode_driver_p->low_feed_speed = speed/10;
     centre_p->set_speed(speed);
+    remembered_speed = speed;
     end_command();
     return;
   }
@@ -1313,7 +1365,7 @@ void slave_mode_screen::run_opcua()
     command_message_p->setText(QString("Command ") + command_line + QString(" received"));
     command_p_list.enqueue(new_command_p);
 //    cout<<"opcua_mode 9.  run display_command.  command_line = "<<command_line.toStdString()<<endl;;
-    display_command(new_command_p);
+//    display_command(new_command_p);
     return;
   }
   if(opcua_mode == 10)//send message to opcua device
@@ -1517,7 +1569,7 @@ void slave_mode_screen::run_opcua()
 */
 void slave_mode_screen::end_command()
 {
-  cout<<"slave_mode_screen::end_command.  batch_mode_driver_p->mode = "<<batch_mode_driver_p->mode<<endl;
+//  cout<<"slave_mode_screen::end_command.  batch_mode_driver_p->mode = "<<batch_mode_driver_p->mode<<endl;
   if(previous_command_p != 0)
   {
     delete previous_command_p;

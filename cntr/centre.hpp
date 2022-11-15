@@ -99,7 +99,6 @@ class centre : public QObject
   void init();
   
   QThread* processor_thread_p;
-  envelope_sensor* envelope_sensor_p;
   feeder* feeder_p;
   brother_envelope_feeder* brother_envelope_feeder_p;
   QTimer* run_timer_p;
@@ -149,6 +148,7 @@ class centre : public QObject
   processor* processor_p;
   cutgate* cutgate_p;
   endgate* endgate_p;
+  envelope_sensor* envelope_sensor_p;
   int count;
   int feed_speed;
   int totalize_feed_speed;//feed speed while running

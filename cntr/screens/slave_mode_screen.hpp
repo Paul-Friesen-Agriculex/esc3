@@ -36,7 +36,10 @@ class QGridLayout;
 class QTimer;
 class QLabel;
 class QTextEdit;
+//class QGroupBox;
+class QRadioButton;
 class help_screen;
+class envelope_sensor;
 
 
 struct slave_mode_command
@@ -96,9 +99,13 @@ class slave_mode_screen : public screen
   QLabel* connection_message_p;
   QLabel* command_message_p;
   QTextEdit* command_screen_p;
+//  QGroupBox* command_display_options_p;
+  QRadioButton* display_data_requests_p;
   help_screen* help_screen_p;
   QGridLayout* main_layout_p;
   QTimer* timer_p;
+  envelope_sensor* envelope_sensor_p;
+  int remembered_speed;
   
   char command_type_flag;
   QString command_line_string;//to hold entire command line between character 2 (marks start) and character 3 (marks end).  Does not include start and end markers, but does include delimiters (character 31)
