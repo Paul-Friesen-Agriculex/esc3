@@ -130,6 +130,7 @@ class slave_mode_screen : public screen
   
   bool batch_mode;
   int pack_count;
+  bool pack_ready_bool;
   int speed;
   bool command_finished_bool;
   bool just_starting;//wish to ignore any command on opc device when starting.  enter command only if changed.

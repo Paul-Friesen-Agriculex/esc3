@@ -887,7 +887,7 @@ void batch_mode_driver::run()
       }
       if(cutgate_count_limit-centre_p->count <  slowdown_count_diff)
       {
-        cout<<"  mode hi_o_c.  cutgate_count_limit = "<<cutgate_count_limit<<".  centre_p->count = "<<centre_p->count<<endl;
+//        cout<<"  mode hi_o_c.  cutgate_count_limit = "<<cutgate_count_limit<<".  centre_p->count = "<<centre_p->count<<endl;
         switch_mode(ramp_down_o_c, "ramp_down_o_c");
       }
       if(centre_p->count > lower_chamber_count_limit)
@@ -1045,12 +1045,12 @@ void batch_mode_driver::run()
         {
           bool end_program = false;
           ++cutgate_pack;
-          cout<<"mode gate_delay_o_c.  cutgate_pack = "<<cutgate_pack<<".  cutgate_pack_limit = "<<cutgate_pack_limit<<endl;
+//          cout<<"mode gate_delay_o_c.  cutgate_pack = "<<cutgate_pack<<".  cutgate_pack_limit = "<<cutgate_pack_limit<<endl;
           if(cutgate_pack>=cutgate_pack_limit)
           {
             cutgate_pack = 0;
             ++cutgate_set;
-            cout<<"mode gate_delay_o_c.  cutgate_pack zeroed.  cutgate_set = "<<cutgate_set<<endl;
+//            cout<<"mode gate_delay_o_c.  cutgate_pack zeroed.  cutgate_set = "<<cutgate_set<<endl;
             if(cutgate_set>=program_size)
             {
               end_program = true;
@@ -1175,7 +1175,7 @@ void batch_mode_driver::run()
         {
           bool end_program = false;
           ++cutgate_pack;
-          cout<<"mode gate_delay_o_o.  cutgate_pack = "<<cutgate_pack<<".  cutgate_pack_limit = "<<cutgate_pack_limit<<endl;
+//          cout<<"mode gate_delay_o_o.  cutgate_pack = "<<cutgate_pack<<".  cutgate_pack_limit = "<<cutgate_pack_limit<<endl;
           if(cutgate_pack>=cutgate_pack_limit)
           {
             cutgate_pack = 0;
@@ -1202,10 +1202,12 @@ void batch_mode_driver::run()
               switch_mode(wait_for_slave_mode_command_c_o, "wait_for_slave_mode_command_c_o");
             }
           }
+          /*
           else
           {
             switch_mode(hi_c_o, "hi_c_o");
           }
+          */
         }
       }
       break;      
@@ -1327,7 +1329,7 @@ void batch_mode_driver::run()
         cutgate_p->close();
         endgate_p->close();
         endgate_close_time.restart();
-        cout<<"mode wait_for_endgate_to_close emitting pack_collected("<<endgate_count_limit<<")\n";
+//        cout<<"mode wait_for_endgate_to_close emitting pack_collected("<<endgate_count_limit<<")\n";
         emit pack_collected(endgate_count_limit);
         if(use_spreadsheet)
         {

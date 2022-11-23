@@ -115,6 +115,7 @@ slave_mode_screen::slave_mode_screen(centre*set_centre_p, batch_mode_driver* set
   executing_command_p = 0;
   previous_command_p = 0;
   pack_count = 0;
+  pack_ready_bool = false;
   speed = 0;
   remembered_speed = 20;
   command_finished_bool = false;
@@ -174,14 +175,16 @@ slave_mode_screen::~slave_mode_screen()
 
 void slave_mode_screen::pack_ready()
 {
+  pack_ready_bool = true;
+  
+  /*
   cout<<"slave_mode_screen::pack_ready\n";
   
   QByteArray array;
   array.append(QChar(2));
-  array.append('c');
+  array.append('i');
   array.append(QChar(31));
   array.append(QString("Full"));
-  array.append(QChar(31));
   array.append(QChar(3));
   if(centre_p->communicate_by_tcp)
   {
@@ -199,6 +202,7 @@ void slave_mode_screen::pack_ready()
   }
     
   else cout<<"no communication method for slave mode\n";
+  */
 }
   
 void slave_mode_screen::pack_collected(int)
@@ -572,41 +576,28 @@ void slave_mode_screen::command_char(QChar character)
     
     if(  (new_command_p->type_flag == 'D')  ||  (new_command_p->type_flag == 'I')  )//these commands need immediate action
     {
+      if(new_command_p->command == "PackSet")
+      {
+        envelope_sensor_p->software_trigger();
+        return;
+      }
+
       QByteArray array;
       if(new_command_p->command == "Count")
       {
-        if(  (centre_p->communicate_by_tcp)  ||  (centre_p->communicate_by_serial_port)  )
-        {
-          array.append(QChar(2));
-          array.append('c');
-          array.append(QChar(31));
-          array.append(QString::number(centre_p->count));
-          array.append(QChar(3));
-        }
+        array.append(QChar(2));
+        array.append('c');
+        array.append(QChar(31));
+        array.append(QString::number(centre_p->count));
+        array.append(QChar(3));
       }
       if(new_command_p->command == "Status")
       {
-        
-//        cout<<"command = Status\n";
-        
-        if(  (centre_p->communicate_by_tcp)  ||  (centre_p->communicate_by_serial_port)  )
-        {
-          array.append(QChar(2));
-          array.append('t');
-          array.append(QChar(31));
-          /*
-          if(command_finished_bool)
-          {
-            array.append("Ready");
-          }
-          else
-          {
-            array.append("Busy");
-          }
-          */
-          array.append("Ready");
-          array.append(QChar(3));
-        }
+        array.append(QChar(2));
+        array.append('t');
+        array.append(QChar(31));
+        array.append("Ready");
+        array.append(QChar(3));
       }
       if(new_command_p->command == "Pack")
       {
@@ -614,6 +605,23 @@ void slave_mode_screen::command_char(QChar character)
         array.append('c');
         array.append(QChar(31));
         array.append(QString::number(batch_mode_driver_p->cutgate_pack));
+        array.append(QChar(3));
+      }
+
+      if(new_command_p->command == "PStatus")
+      {
+//        cout<<"new_command_p->command == PStatus\n";
+        array.append(QChar(2));
+        array.append('s');
+        array.append(QChar(31));
+        if(centre_p->cutgate_p->get_state() == CUTGATE_CLOSED)
+        {
+          array.append("Full");
+        }
+        else
+        {
+          array.append("Filling");
+        }
         array.append(QChar(3));
       }
       if(centre_p->communicate_by_tcp)
@@ -626,16 +634,7 @@ void slave_mode_screen::command_char(QChar character)
       else if(centre_p->communicate_by_serial_port)
       {
         centre_p->serial_port_write(QString(array));
-        
-//        cout<<"wrote to serial port "<<(QString(array)).toStdString()<<endl;
-        
       }
-
-      if(new_command_p->command == "PackSet")
-      {
-        envelope_sensor_p->software_trigger();
-      }
-
       return;//at end of command requiring immediate action.  do not enqueue
     }
       

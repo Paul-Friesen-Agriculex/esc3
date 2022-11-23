@@ -39,7 +39,7 @@ envelope_sensor::envelope_sensor()
   filtered_present = false;//short glitches in raw_present removed
   duration_count = 0;
   connect (timer_p, SIGNAL(timeout()), this, SLOT(run()));
-  timer_p->start(50);
+  timer_p->start(100);
   
   physical_sensor_enabled = true;
   software_triggered = false;
@@ -50,7 +50,7 @@ envelope_sensor::envelope_sensor()
 void envelope_sensor::run()
 {
   //for software trigger
-  if(software_trigger_count<10)
+  if(software_trigger_count<20)
   {
     software_triggered = true;
     ++software_trigger_count;
