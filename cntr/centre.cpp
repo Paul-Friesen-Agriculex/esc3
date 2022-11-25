@@ -212,7 +212,6 @@ void centre::init()
   {
     f.getline(name_string,99);
     crops[i].name = QString(name_string);
-//    cout<<"loaded crop "<<name_string<<endl;
     f>>crops[i].sensitivity;
     f>>crops[i].gate_setting;
     f>>crops[i].area_mean;
@@ -280,8 +279,6 @@ void centre::init()
   connect(batch_mode_driver_p, SIGNAL(send_message2(QString)), diagnostics_console_p, SLOT(receive_message2(QString)));
   connect(batch_mode_driver_p, SIGNAL(send_message_time_to_end(QString)), diagnostics_console_p, SLOT(receive_message3(QString)));
   connect(diagnostics_console_p, SIGNAL(reset_time_tests_signal()), processor_p, SLOT(reset_time_tests()));
-//  connect(cutgate_p, SIGNAL(closed_while_opening()), batch_mode_driver_p, SLOT(cutgate_timing_error()));
-//  connect(cutgate_p, SIGNAL(opened_while_closing()), batch_mode_driver_p, SLOT(cutgate_timing_error()));
   connect(tcp_server_p, SIGNAL(newConnection()), this, SLOT(tcp_connection_detected())); 
   connect(tcp_socket_p, SIGNAL(connected()), this, SIGNAL(tcp_connection_detected_signal())); 
   
@@ -322,11 +319,6 @@ centre::~centre()
   delete base_widget_p;
   delete diagnostics_console_p;
 
-//  if(screen_p) 
-//  {
-//    delete screen_p;
-//    screen_p = 0;
-//  }
   if(brother_envelope_feeder_p)
   {
 	delete brother_envelope_feeder_p;
@@ -350,7 +342,6 @@ centre::~centre()
     QString crop_name = crops[i].name;
     crop_name.truncate(98);//ensure name is not too long for file loading routine
     f<<crop_name.toStdString()<<"\n";
-//    cout<<"saved crop "<<(crops[i].name).toStdString()<<endl;
     f<<crops[i].sensitivity<<" ";
     f<<crops[i].gate_setting<<" ";
     f<<crops[i].area_mean<<" ";
@@ -405,30 +396,16 @@ void centre::tcp_connection_detected()
 
 void centre::read_tcp_socket()
 {
-//  cout<<"start read_tcp_socket\n";
   tcp_input_array_p -> clear();
   *tcp_input_array_p = tcp_socket_p->readAll();
 }
-/*
+
 void centre::read_serial_port()
 {
-//  cout<<"centre::read_serial_port() "<<endl;
-  unsigned char c=0;
-  if(read(serial_port_fd, &c, 1) > 0)
-  {
-//    cout<<"centre::read_serial_port().  c = "<<c<<endl;
-    emit char_from_serial_port(QChar(c));
-  }
-}
-*/
-void centre::read_serial_port()
-{
-//  cout<<"centre::read_serial_port() "<<endl;
   unsigned char str[50];
   memset(str, 0, sizeof(str));
   if(read(serial_port_fd, str, 9) > 0)
   {
-//    cout<<"centre::read_serial_port().  str = "<<str<<endl;
     for(unsigned int i=0; i<sizeof(str); ++i)
     {
       if(str[i] == 0) break;
@@ -465,12 +442,8 @@ void centre::run()
       setup_serial_communications(baud_rate);
     }
   }
-  
-  
   read_serial_port();
 
-//  if(  (current_screen==5)  ||  (current_screen==15)  ||  (current_screen==60)  )//totalize or batch or slave mode screen
-//  if(  (current_screen==5)  ||  (current_screen==60)  )//totalize or slave mode screen
   if(current_screen==5)//totalize
   {
     if(endgate_state == ENDGATE_CLOSED)
@@ -490,65 +463,8 @@ void centre::run()
       }
     }
   }
-//  else if( (current_screen==15) || (current_screen==33) )//batch or ss_batch
   else if( (current_screen==15) || (current_screen==33) ||  (current_screen==60)  )//batch or ss_batch or slave_mode_screen
   {
-    /*
-    if(endgate_state == ENDGATE_CLOSED)
-    {
-      bool should_open = false;
-      if(envelope_present==true &&   (block_endgate_opening==false || batch_mode_driver_p->release_pack==true)    )
-      {
-        batch_mode_driver_p->release_pack = false;
-        should_open = true;
-      }
-      if(totalize_force_endgate_open)
-      {
-        should_open = true;
-      }
-      if(should_open)
-      {
-        set_endgate_state(ENDGATE_OPEN);
-      }
-    }
-    else //endgate is open
-    {
-      bool should_stay_open=true;
-      if(envelope_present==false)
-      {
-        should_stay_open = false;
-      }
-      if(totalize_force_endgate_open)
-      {
-        should_stay_open=true;
-      }
-      if(should_stay_open == false)
-      {
-        set_endgate_state(ENDGATE_CLOSED);
-      }
-    }
-    */
-
-    /*
-    if(endgate_state == ENDGATE_CLOSED)
-    {
-      if(envelope_present==true &&   (block_endgate_opening==false || batch_mode_driver_p->release_pack==true)    )
-      {
-        
-        cout<<"envelope_present = "<<envelope_present<<"  block_endgate_opening = "<<block_endgate_opening<<"  batch_mode_driver_p->release_pack = "<<batch_mode_driver_p->release_pack<<endl;
-        
-        batch_mode_driver_p->release_pack = false;
-        set_endgate_state(ENDGATE_OPEN);
-      }
-    }
-    else //endgate is open
-    {
-      if(envelope_present==false)
-      {
-        set_endgate_state(ENDGATE_CLOSED);
-      }
-    }
-    */
   }
   else //current screen is not totalize or batch
   {
@@ -747,11 +663,9 @@ bool centre::load_settings(QString file_name)
   
   fset.getline(input, 100);
   communicate_by_opcua = atoi(input);
-  cout<<"communicate_by_opcua = "<<communicate_by_opcua<<endl;
   
   fset.getline(input, 100);
   baud_rate = atoi(input);
-  cout<<"baud_rate = "<<baud_rate<<endl;
 
   fset.getline(input, 100);
   serial_port_name = QString(input);
@@ -1249,10 +1163,6 @@ void centre::tcp_write(QString string)
 void centre::setup_serial_communications(int baud_rate)//assumes serial port cable is attached
 {
   QString full_port_name = QString("/dev/") + serial_port_name;
-//  communicate_by_keyboard_cable = false;
-//  communicate_by_tcp = false;
-//  communicate_by_serial_port = true;
-//  communicate_by_opcua = false;
 
   termios_p = new termios;
   memset(termios_p,0,sizeof(*termios_p));
@@ -1281,7 +1191,6 @@ void centre::setup_serial_communications(int baud_rate)//assumes serial port cab
   
   if(baud_rate == 9600)
   {
-    cout<<"set 9600 baud\n";
     cfsetospeed(termios_p,B9600);          
     cfsetispeed(termios_p,B9600);          
   }
@@ -1310,20 +1219,9 @@ void centre::setup_serial_communications(int baud_rate)//assumes serial port cab
 
 void centre::serial_port_write(QString str)
 {
-//  cout<<"centre::serial_port_write:    "<<str.toStdString()<<endl;
   char cstring[100];
   memset(cstring, 0, sizeof(cstring));
   strcpy(cstring, str.toLatin1());
-  /*
-  for(int i=0; i<100; ++i)
-  {
-    cout<<"cstring["<<i<<"] = "<<cstring[i]<<"   number "<<int(cstring[i])<<endl;
-    if(cstring[i] == 0) break;
-  }
-  cout<<"sizeof(str.toLatin1) "<<sizeof(str.toLatin1())<<endl;
-  cout<<"sizeof(cstring) "<<sizeof(cstring)<<endl;
-  */
-//  int res = write(serial_port_fd, str.toLatin1(), sizeof(str.toLatin1()));
   int res = write(serial_port_fd, cstring, str.size());
   if(res<0) cout<<"write error\n";
 }
@@ -1557,12 +1455,9 @@ void centre::load_macros()
     }
     return;
   }
-  //  cout<<"communication_macros file\n";
   while(!file.atEnd())
   {
     file.getChar(&ch);
-    //    if(ch<32) cout<<"character "<<int(ch)<<endl;
-    //    else cout<<ch<<endl;
     if(ch == 0)//marks end of macro
     {
       if(getting_totalize_macros)
@@ -1609,7 +1504,6 @@ void centre::load_macros()
       string.append(ch);
     }
   }
-  //cout<<"end communication_macros file\n";
 }
 
 void centre::save_macros()

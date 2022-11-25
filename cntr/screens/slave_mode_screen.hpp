@@ -36,7 +36,6 @@ class QGridLayout;
 class QTimer;
 class QLabel;
 class QTextEdit;
-//class QGroupBox;
 class QRadioButton;
 class help_screen;
 class envelope_sensor;
@@ -79,7 +78,6 @@ class slave_mode_screen : public screen
   void connection_detected();
   void command_char(QChar character);
   void opcua_command_char(QChar character);
-//  void command_finished();
   void run();
   
   signals:
@@ -99,7 +97,6 @@ class slave_mode_screen : public screen
   QLabel* connection_message_p;
   QLabel* command_message_p;
   QTextEdit* command_screen_p;
-//  QGroupBox* command_display_options_p;
   QRadioButton* display_data_requests_p;
   help_screen* help_screen_p;
   QGridLayout* main_layout_p;
@@ -120,9 +117,6 @@ class slave_mode_screen : public screen
   int opcua_mode;
   QString opcua_line;
   QString old_command;//to detect if command changes
-//  QString opcua_command_segment;//command may not arrive all at once.  this holds each segment
-//  bool opcua_query_sent;
-//  bool opcua_response_received;
   int opcua_count;//to time wait for query response
   void run_opcua();
   bool opcua_message_to_write;
