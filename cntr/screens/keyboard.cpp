@@ -572,6 +572,10 @@ void crop_name_entry::enter_clicked()
   centre_p->crops[0].max_inflection_3=0;
   centre_p->crops[0].max_inflection_9=0;
   centre_p->crops[0].calibrated=0;
+  centre_p->crops[0].high_feed_speed=100;
+  centre_p->crops[0].low_feed_speed=10;
+  centre_p->crops[0].dump_speed=1000;
+  centre_p->crops[0].count_rate_multiplier=0;
   centre_p->add_waiting_screen(10);
   centre_p->screen_done=true;
 }

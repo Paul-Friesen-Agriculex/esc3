@@ -107,7 +107,7 @@ slave_mode_screen::slave_mode_screen(centre*set_centre_p, batch_mode_driver* set
   
   connect(batch_mode_driver_p, SIGNAL(slave_mode_program_finished()), this, SLOT(slave_mode_program_finished()));
   connect(batch_mode_driver_p, SIGNAL(pack_ready()), this, SLOT(pack_ready()));
-  connect(batch_mode_driver_p, SIGNAL(pack_collected(int)), this, SLOT(pack_collected(int)));
+//  connect(batch_mode_driver_p, SIGNAL(pack_collected(int)), this, SLOT(pack_collected(int)));
   connect(batch_mode_driver_p, SIGNAL(dump_complete(int)), this, SLOT(dump_complete(int)));
   
   executing_command_p = 0;
@@ -147,9 +147,10 @@ slave_mode_screen::~slave_mode_screen()
 
 void slave_mode_screen::pack_ready()
 {
+  cout<<"slave_mode_screen::pack_ready\n";
   pack_ready_bool = true;
 }
-  
+/*  
 void slave_mode_screen::pack_collected(int)
 {
   QByteArray array;
@@ -174,7 +175,7 @@ void slave_mode_screen::pack_collected(int)
   }
   else cout<<"no communication method for slave mode\n";
 }
-  
+*/  
 void slave_mode_screen::dump_complete(int)
 {
   QByteArray array;
@@ -517,6 +518,7 @@ void slave_mode_screen::command_char(QChar character)
     {
       if(new_command_p->command == "PackSet")
       {
+//        cout<<"command PackSet\n";
         envelope_sensor_p->software_trigger();
         return;
       }
@@ -552,6 +554,21 @@ void slave_mode_screen::command_char(QChar character)
         array.append(QChar(2));
         array.append('s');
         array.append(QChar(31));
+
+
+
+        if(pack_ready_bool)
+        {
+          array.append("Full");
+          pack_ready_bool = false;
+        }
+        else
+        {
+          array.append("Filling");
+        }
+
+
+        /*
         if(centre_p->cutgate_p->get_state() == CUTGATE_CLOSED)
         {
           array.append("Full");
@@ -560,6 +577,7 @@ void slave_mode_screen::command_char(QChar character)
         {
           array.append("Filling");
         }
+        */
         array.append(QChar(3));
       }
       if(centre_p->communicate_by_tcp)
@@ -784,6 +802,7 @@ void slave_mode_screen::run()
         batch_mode_driver_p->mode = mode_to_start;
         batch_mode_driver_p->start();
       }
+      envelope_sensor_p->software_trigger();
     }
     return;
   }

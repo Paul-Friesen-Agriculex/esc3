@@ -31,6 +31,7 @@ ESC-3 machines produced by Agriculex Inc.
 #include <QWidget>
 #include <QTime>
 #include <QColor>
+#include <QQueue>
 #include <iostream>
 #include <string>
 
@@ -121,6 +122,12 @@ enum print_control_mode_e
   preprint_batch
 };
 
+struct count_rate_observation
+{
+  int turntable_speed;
+  int count_rate;//seeds/sec
+};
+
 class batch_mode_driver : public QObject
 {
   Q_OBJECT
@@ -132,7 +139,7 @@ class batch_mode_driver : public QObject
   endgate* endgate_p;
   bool pack_present;
   bool old_pack_present;
-  int pack_present_counter;
+//  int pack_present_counter;
   bool pack_changed;
   int old_count;
   QList<bm_set*> program;
@@ -151,6 +158,7 @@ class batch_mode_driver : public QObject
   static const int endgate_close_time_limit = 1000;
   QTime dump_end_qtime;
   static const int dump_end_qtime_limit = 2000;
+  QTime test_time;
   
   public:
   batch_mode_driver(centre* centre_p_s, cutgate* cutgate_p_s, endgate* endgate_p_s);
@@ -197,6 +205,8 @@ class batch_mode_driver : public QObject
   QTime low_speed_mode_time;
   int stop_count_diff;//will stop feeder if reaches this in mode hi_closed
 
+  QQueue<count_rate_observation> count_rate_observation_queue;
+  float count_rate_multiplier;
   
   float slowdown_time;//seconds
   int count_rate_old_count;
@@ -316,6 +326,7 @@ class batch_mode_driver : public QObject
   void repeat_pack();
   void seed_lot_substitution();
   void new_slave_mode_command();
+  void cutgate_closed_while_opening();
   
   signals:
   void dumping();

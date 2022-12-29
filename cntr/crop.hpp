@@ -42,6 +42,8 @@ struct crop
   int high_feed_speed;
   int low_feed_speed;
   int dump_speed;
+  
+  float count_rate_multiplier;
 };
 
 #endif

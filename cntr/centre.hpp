@@ -33,6 +33,8 @@ ESC-3 machines produced by Agriculex Inc.
 #include <QWidget>
 #include <QImage>
 #include <QFile>
+#include <QTime>
+
 
 #include "cutgate.hpp"
 #include "endgate.hpp"
@@ -125,6 +127,7 @@ class centre : public QObject
   */
   QByteArray* tcp_input_array_p;
   termios* termios_p;
+//  QTime test_time;
   
   public:
   QApplication* application_p;

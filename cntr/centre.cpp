@@ -203,6 +203,7 @@ void centre::init()
     crops[i].high_feed_speed=0;
     crops[i].low_feed_speed=0;
     crops[i].dump_speed=0;
+    crops[i].count_rate_multiplier=0;
   }
 
   ifstream f("crop_file");
@@ -223,6 +224,7 @@ void centre::init()
     f>>crops[i].high_feed_speed;
     f>>crops[i].low_feed_speed;
     f>>crops[i].dump_speed;
+    f>>crops[i].count_rate_multiplier;
     f.get();
     if(f.eof()) break;
   }
@@ -353,7 +355,8 @@ centre::~centre()
     f<<endl;
     f<<crops[i].high_feed_speed<<" ";
     f<<crops[i].low_feed_speed<<" ";
-    f<<crops[i].dump_speed;
+    f<<crops[i].dump_speed<<" ";
+    f<<crops[i].count_rate_multiplier;
     f<<endl;
   }
   f.close();
@@ -422,12 +425,18 @@ void centre::run()
     init_ran = true;
   }
   
+//  int ctime = test_time.restart();
+//  if(ctime > 15) cout<< "run cycle "<<ctime<<" ms\n";
+  
   while(tcp_input_array_p->length() > 0)
   {
     QChar input_char = tcp_input_array_p->at(0);
     emit char_from_tcp(input_char);
     tcp_input_array_p->remove(0, 1);
   }
+  
+//  int tcp_time = test_time.elapsed();
+//  if(tcp_time > 5) cout<<"tcp_time "<<tcp_time<<" ms\n";
   
   emit set_crop(crops[0]);
   endgate_state = endgate_p->get_state();
@@ -450,7 +459,7 @@ void centre::run()
     {
       if(totalize_force_endgate_open==true || envelope_present==true)
       {
-        cout<<"setting endgate open 1 \n";
+//        cout<<"setting endgate open 1 \n";
         set_endgate_state(ENDGATE_OPEN);
       }
     }
@@ -458,7 +467,7 @@ void centre::run()
     {
       if(totalize_force_endgate_open==false && envelope_present==false)
       {
-        cout<<"setting endgate closed 1 \n";
+//        cout<<"setting endgate closed 1 \n";
         set_endgate_state(ENDGATE_CLOSED);
       }
     }
@@ -749,6 +758,7 @@ void centre::delete_crop(int crop_index)
     crops[99].max_inflection_3=0;
     crops[99].max_inflection_9=0;
     crops[99].calibrated=0;
+    crops[99].count_rate_multiplier=0;
   }
 }
 

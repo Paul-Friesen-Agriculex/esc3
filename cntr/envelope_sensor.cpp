@@ -105,7 +105,7 @@ void envelope_sensor::software_trigger()//generates a pulse as though the sensor
   software_trigger_count = 0;
 }
 
-void envelope_sensor::enable_physical_sensor(bool enabled)//physical sensor in enabled by default.  Send false to disable and trigger only by software.
+void envelope_sensor::enable_physical_sensor(bool enabled)//physical sensor is enabled by default.  Send false to disable and trigger only by software.
 {
   physical_sensor_enabled = enabled;
 }
