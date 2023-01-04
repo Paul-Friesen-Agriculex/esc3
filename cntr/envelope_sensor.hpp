@@ -39,6 +39,8 @@ class envelope_sensor:public QObject
   bool raw_present;//raw output of sensor
   bool old_raw_present;
   bool filtered_present;//short glitches in raw_present removed
+  bool old_read;
+  bool rise_occurred;
   int duration_count;
   
   //for software trigger
@@ -56,6 +58,7 @@ class envelope_sensor:public QObject
   
   public slots:
   bool read(); //returns true if envelope is present
+  bool read_rise(); //returns true once after a new envelope is put in place
 };
 
 #endif

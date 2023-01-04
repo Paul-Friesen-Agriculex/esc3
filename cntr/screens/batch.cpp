@@ -239,6 +239,8 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
   connect(batch_mode_driver_p, SIGNAL(enable_repeat_pack_button(bool)), this, SLOT(enable_repeat_pack_button(bool)));
   connect(batch_mode_driver_p, SIGNAL(enable_substitute_button(bool)), this, SLOT(enable_substitute_button(bool)));
   
+  centre_p->set_endgate_state(ENDGATE_CLOSED);
+  
 //  cout<<"batch::batch 5\n";
   /*
   centre_p->set_endgate_state(ENDGATE_CLOSED);

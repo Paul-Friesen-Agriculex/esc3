@@ -38,6 +38,8 @@ envelope_sensor::envelope_sensor()
   old_raw_present = false;
   filtered_present = false;//short glitches in raw_present removed
   duration_count = 0;
+  old_read = false;
+  rise_occurred = false;
   connect (timer_p, SIGNAL(timeout()), this, SLOT(run()));
   timer_p->start(100);
   
@@ -49,6 +51,12 @@ envelope_sensor::envelope_sensor()
 
 void envelope_sensor::run()
 {
+  if(  (old_read==false)  &&  (read()==true)  )
+  {
+    rise_occurred = true;
+  }
+  old_read = read();
+
   //for software trigger
   if(software_trigger_count<20)
   {
@@ -98,6 +106,18 @@ bool envelope_sensor :: read() //returns true if envelope is present
   {
     return software_triggered;
   }
+}
+
+bool envelope_sensor::read_rise() //returns true once after a new envelope is put in place
+{
+  bool ret = false;
+  if(rise_occurred)
+  {
+    ret = true;
+    cout<<"envelope_sensor::read_rise returning true\n";
+  }
+  rise_occurred = false;
+  return ret;
 }
 
 void envelope_sensor::software_trigger()//generates a pulse as though the sensor was triggered

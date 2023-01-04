@@ -192,7 +192,7 @@ void start_screen::help_button_clicked()
                             "SLAVE MODE - This allows control of the ESC-3 by another computer, PLC, or other device.  "
                             "The other device can send commands to the ESC-3 over an ethernet cable using TCP, "
                             "or it can use serial port communications.  The serial port option requires a special cable.  "
-                            "The ESC-3 also sends seed counts and the number of packets back to the other device.  ");
+                            "The ESC-3 can also send seed counts and the number of packets back to the other device.  ");
   
   help_screen_p -> show();
 }

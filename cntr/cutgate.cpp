@@ -57,7 +57,7 @@ void cutgate::open()
 {
   if( (state==CUTGATE_OPEN) || (state==CUTGATE_OPENING) ) return;
 
-  cout<<"new cutgate::open\n";
+//  cout<<"new cutgate::open\n";
   
   if(closing==true)
   {

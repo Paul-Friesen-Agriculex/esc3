@@ -82,7 +82,7 @@ slave_mode_screen::slave_mode_screen(centre*set_centre_p, batch_mode_driver* set
   main_layout_p->addWidget(function_as_server_2_button_p, 2, 0);
   main_layout_p->addWidget(function_as_client_button_p, 3, 0);
   main_layout_p->addWidget(communicate_by_serial_port_button_p, 4, 0);
-  main_layout_p->addWidget(opcua_button_p, 5, 0);
+//  main_layout_p->addWidget(opcua_button_p, 5, 0);
   main_layout_p->addWidget(help_button_p, 6, 0);
   main_layout_p->addWidget(connection_message_p, 1, 1, 1, 2);
   main_layout_p->addWidget(command_screen_p, 2, 1, 3, 2);
@@ -288,7 +288,7 @@ void slave_mode_screen::help_button_clicked()
                             "Commands can be sent from the other device to control the ESC-3.  "
                             "You can send a command to make the machine count out a series of packets with a "
                             "different number of seeds in each, for example.  "
-                            "The ESC-3 also sends out data that can be read by the other device.  "
+                            "You can also command the ESC-3 to send out data that can be read by the other device.  "
                             "See the manual for details on the commands to be used and the data sent out. "
                             "On this screen, you can choose the communication method.  "
                             "\n\n"
@@ -313,7 +313,11 @@ void slave_mode_screen::help_button_clicked()
                             "Contact Agriculex if you want to attempt this.  "
                             "NOTE - YOU DO NEED TO USE A USB-SERIAL CONVERTER.  "
                             "DO NOT TRY TO USE THE 9-PIN CONNECTORS ON THE BACK OF THE ESC-3.  "
-                            "THEY ARE NOT SERIAL PORTS AND MIGHT DAMAGE SERIAL PORT DEVICES.\n\n");
+                            "THEY ARE NOT SERIAL PORTS AND MIGHT DAMAGE SERIAL PORT DEVICES.\n\n"
+                            
+                            "We would generally recommend using serial port connection, at least for short distance communication."
+                            "Once the connection is correctly set up, it generally re-establishes itself automatically if the computer and/or the ESC-3 are re-started."
+                            "This is not always the case if using TCP.");
   help_screen_p -> show();
 }
 

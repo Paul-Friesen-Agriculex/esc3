@@ -36,11 +36,12 @@ ESC-3 machines produced by Agriculex Inc.
 
 using namespace std;
 
-batch_mode_driver::batch_mode_driver(centre* centre_p_s, cutgate* cutgate_p_s, endgate* endgate_p_s)
+batch_mode_driver::batch_mode_driver(centre* centre_p_s, cutgate* cutgate_p_s, endgate* endgate_p_s, envelope_sensor* envelope_sensor_p_s)
 {
   centre_p = centre_p_s;
   cutgate_p = cutgate_p_s;
   endgate_p = endgate_p_s;
+  envelope_sensor_p = envelope_sensor_p_s;
   connect(cutgate_p, SIGNAL(closed_while_opening()), this, SLOT(cutgate_closed_while_opening()));
   pack_present = old_pack_present = false;
   pack_changed = true;
@@ -631,8 +632,8 @@ void batch_mode_driver::list_program()
 void batch_mode_driver::run()
 {
   
-  int ctime = test_time.restart();
-  if(ctime > 5) cout<< "batch mode run cycle "<<ctime<<" ms.  count "<<centre_p->count<<endl;
+//  int ctime = test_time.restart();
+//  if(ctime > 5) cout<< "batch mode run cycle "<<ctime<<" ms.  count "<<centre_p->count<<endl;
   
   
   old_pack_present = pack_present;
@@ -712,6 +713,7 @@ void batch_mode_driver::run()
       cout<<"mode = entry\n";
       cutgate_p->open();
       endgate_p->close();
+      envelope_sensor_p->read_rise();//to eat any rise signal from dumping or anything else
       substitute_seed_lot = false;
       substitution_barcode_ok = false;
       count_rate_multiplier = centre_p->crops[0].count_rate_multiplier;
@@ -847,7 +849,7 @@ void batch_mode_driver::run()
         emit enable_substitute_button(true);
         release_pack = false;
         
-        cout<<"mode hi_o_c.  slowdown_count_diff = "<<slowdown_count_diff<<endl;
+//        cout<<"mode hi_o_c.  slowdown_count_diff = "<<slowdown_count_diff<<endl;
         
       }
       if(use_spreadsheet)
@@ -862,7 +864,7 @@ void batch_mode_driver::run()
       {
         switch_mode(ramp_down_o_c, "ramp_down_o_c");
         
-        cout<<"  mode hi_o_c switch to ramp_down_o_c.  slowdown_count_diff = "<<slowdown_count_diff<<endl;
+//        cout<<"  mode hi_o_c switch to ramp_down_o_c.  slowdown_count_diff = "<<slowdown_count_diff<<endl;
         
       }
       if(centre_p->count > lower_chamber_count_limit)
@@ -870,7 +872,7 @@ void batch_mode_driver::run()
         switch_mode(lower_chamber_full_o_c, "lower_chamber_full_o_c");
       }
 //      if(pack_present && (pack_barcode_ok||release_pack) && (centre_p->count>cutgate_count_limit/8) )
-      if(pack_present && (pack_barcode_ok||release_pack)  )
+      if(envelope_sensor_p->read_rise() && (pack_barcode_ok||release_pack)  )
       {
         switch_mode(hi_o_o, "hi_o_o");
       }
@@ -897,7 +899,7 @@ void batch_mode_driver::run()
         centre_p->set_speed(0);
         send_status_message("Waiting for\nPack", QColor(0,0,0), QColor(255,255,0), 16);
       }
-      if(pack_present && (pack_barcode_ok||release_pack))
+      if(envelope_sensor_p->read_rise() && (pack_barcode_ok||release_pack))
       {
         switch_mode(hi_o_o, "hi_o_o");
       }
@@ -929,11 +931,11 @@ void batch_mode_driver::run()
       }
       if(centre_p->count >= cutgate_count_limit)
       {
-        cout<<"count at switch to gate_delay_o_c "<<centre_p->count<<endl;
+//        cout<<"count at switch to gate_delay_o_c "<<centre_p->count<<endl;
         centre_p->count = 0;
         switch_mode(gate_delay_o_c, "gate_delay_o_c");
       }
-      if(pack_present && (pack_barcode_ok||release_pack))
+      if(envelope_sensor_p->read_rise() && (pack_barcode_ok||release_pack))
       {
         switch_mode(ramp_down_o_o, "ramp_down_o_o");
       }
@@ -1050,7 +1052,7 @@ void batch_mode_driver::run()
         endgate_pack_limit = cutgate_pack_limit;
         set_normal_status_message();
         
-        cout<<"mode hi_o_o.  slowdown_count_diff = "<<slowdown_count_diff<<endl;
+//        cout<<"mode hi_o_o.  slowdown_count_diff = "<<slowdown_count_diff<<endl;
         
       }
       if(centre_p->feed_speed != high_feed_speed)
@@ -1061,7 +1063,7 @@ void batch_mode_driver::run()
       {
         switch_mode(ramp_down_o_o, "ramp_down_o_o");
         
-        cout<<"  mode hi_o_o switch to ramp_down_o_o.  slowdown_count_diff = "<<slowdown_count_diff<<endl;
+//        cout<<"  mode hi_o_o switch to ramp_down_o_o.  slowdown_count_diff = "<<slowdown_count_diff<<endl;
         
       }
       break;
@@ -1087,7 +1089,7 @@ void batch_mode_driver::run()
       }
       if(centre_p->count >= cutgate_count_limit)
       {
-        cout<<"count at switch to gate_delay_o_o "<<centre_p->count<<endl;
+//        cout<<"count at switch to gate_delay_o_o "<<centre_p->count<<endl;
         centre_p->count = 0;
         switch_mode(gate_delay_o_o, "gate_delay_o_o");
       }
@@ -1248,10 +1250,10 @@ void batch_mode_driver::run()
         centre_p->set_speed(0);
 //        cout<<"speed 0\n";
       }
-      if(pack_present)
-      {
-        switch_mode(hi_o_o, "hi_o_o");
-      }
+//      if(pack_present)
+//      {
+//        switch_mode(hi_o_o, "hi_o_o");
+//      }
       if(endgate_close_time.elapsed()>endgate_close_time_limit)
       {
         switch_mode(hi_o_c, "hi_o_c");
@@ -1291,7 +1293,7 @@ void batch_mode_driver::run()
       {
         switch_mode(wait_for_pack, "wait_for_pack");
       }
-      if(pack_present && (pack_barcode_ok||release_pack))
+      if(envelope_sensor_p->read_rise() && (pack_barcode_ok||release_pack))
       {
         switch_mode(hi_c_o, "hi_c_o");
       }
@@ -1384,7 +1386,7 @@ void batch_mode_driver::run()
         endgate_p->close();
         emit enable_repeat_pack_button(true);
       }
-      if(pack_present && (pack_barcode_ok||release_pack))
+      if(envelope_sensor_p->read_rise() && (pack_barcode_ok||release_pack))
       {
         emit enable_repeat_pack_button(false);
         switch_mode(wait_for_endgate_to_clear, "wait_for_endgate_to_clear");
@@ -1433,6 +1435,7 @@ void batch_mode_driver::run()
       }
       if(end_chute_clear_time.elapsed() > end_chute_clear_time_limit)
       {
+        emit pack_ready();
         switch_mode(wait_for_endgate_to_close, "wait_for_endgate_to_close");
       }
       break;
@@ -1498,7 +1501,7 @@ void batch_mode_driver::run()
       {
         centre_p->set_speed(dump_speed);
       }
-      if(pack_present && (pack_barcode_ok||release_pack))
+      if(envelope_sensor_p->read_rise() && (pack_barcode_ok||release_pack))
       {
         switch_mode(dump_into_cut_gate_wait_for_endgate_to_clear, "dump_into_cut_gate_wait_for_endgate_to_clear");
       }
@@ -1524,7 +1527,7 @@ void batch_mode_driver::run()
         cutgate_p->close();
         endgate_p->close();
         endgate_close_time.restart();
-        cout<<"mode dump_into_cut_gate_wait_for_endgate_to_close emitting pack_collected("<<endgate_count_limit<<")\n";
+//        cout<<"mode dump_into_cut_gate_wait_for_endgate_to_close emitting pack_collected("<<endgate_count_limit<<")\n";
         emit pack_collected(endgate_count_limit);
         if(use_spreadsheet)
         {
@@ -1553,7 +1556,7 @@ void batch_mode_driver::run()
         endgate_p->close();
         emit enable_repeat_pack_button(true);
       }
-      if(pack_present==true && (pack_barcode_ok||release_pack))
+      if(envelope_sensor_p->read_rise()==true && (pack_barcode_ok||release_pack))
       {
         emit enable_repeat_pack_button(false);
         switch_mode(dump_into_cut_gate_wait_for_endgate_to_clear, "dump_into_cut_gate_wait_for_endgate_to_clear");
@@ -1623,7 +1626,8 @@ void batch_mode_driver::run()
         cutgate_p->open();
         endgate_p->close();
       }
-      if(pack_present)
+//      if(pack_present)
+      if(envelope_sensor_p->read_rise())
       {
         switch_mode(dump_into_container, "dump_into_container");
       }

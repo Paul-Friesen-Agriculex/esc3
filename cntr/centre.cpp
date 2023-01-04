@@ -252,7 +252,7 @@ void centre::init()
   end_of_playback_flag = false;
   measured_line_frequency = 4700;
   
-  batch_mode_driver_p = new batch_mode_driver(this, cutgate_p, endgate_p);
+  batch_mode_driver_p = new batch_mode_driver(this, cutgate_p, endgate_p, envelope_sensor_p);
   
   //totalize mode
   tm_barcode_columns = 0;

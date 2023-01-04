@@ -41,6 +41,7 @@ ESC-3 machines produced by Agriculex Inc.
 
 class QTimer;
 class envelope;
+class envelope_sensor;
 
 using namespace std;
 
@@ -137,6 +138,7 @@ class batch_mode_driver : public QObject
   centre* centre_p;
   cutgate* cutgate_p;
   endgate* endgate_p;
+  envelope_sensor* envelope_sensor_p;
   bool pack_present;
   bool old_pack_present;
 //  int pack_present_counter;
@@ -161,7 +163,7 @@ class batch_mode_driver : public QObject
   QTime test_time;
   
   public:
-  batch_mode_driver(centre* centre_p_s, cutgate* cutgate_p_s, endgate* endgate_p_s);
+  batch_mode_driver(centre* centre_p_s, cutgate* cutgate_p_s, endgate* endgate_p_s, envelope_sensor* envelope_sensor_p_s);
   ~batch_mode_driver();
 
   void set_normal_status_message();
