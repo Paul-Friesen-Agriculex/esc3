@@ -1295,6 +1295,7 @@ void batch_mode_driver::run()
       }
       if(envelope_sensor_p->read_rise() && (pack_barcode_ok||release_pack))
       {
+        emit pack_ready();
         switch_mode(hi_c_o, "hi_c_o");
       }
       if(require_pack_barcode == false)
