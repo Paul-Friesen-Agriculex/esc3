@@ -965,7 +965,7 @@ void batch_mode_driver::run()
       {
         emit enable_substitute_button(false);
         cutgate_p->close();
-        emit pack_ready();
+//        emit pack_ready();
         if(use_spreadsheet)
         {
 
