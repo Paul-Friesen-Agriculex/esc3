@@ -57,6 +57,7 @@ slave_mode_screen::slave_mode_screen(centre*set_centre_p, batch_mode_driver* set
   help_screen_p = 0;
   envelope_sensor_p = centre_p->envelope_sensor_p;
   
+  count_label_p = new QLabel;
   back_button_p = new button("Back");
   function_as_server_1_button_p = new button("Function as TCP Server Using 192.168.100.1");
   function_as_server_2_button_p = new button("Function as TCP Server Using 192.168.200.1");
@@ -77,6 +78,7 @@ slave_mode_screen::slave_mode_screen(centre*set_centre_p, batch_mode_driver* set
 
   main_layout_p=new QGridLayout;
   
+  main_layout_p->addWidget(count_label_p,0,0);
   main_layout_p->addWidget(back_button_p,0,1,1,2);
   main_layout_p->addWidget(function_as_server_1_button_p, 1, 0);
   main_layout_p->addWidget(function_as_server_2_button_p, 2, 0);
@@ -150,32 +152,7 @@ void slave_mode_screen::pack_ready()
   cout<<"slave_mode_screen::pack_ready\n";
   pack_ready_bool = true;
 }
-/*  
-void slave_mode_screen::pack_collected(int)
-{
-  QByteArray array;
-  array.append(QChar(2));
-  array.append('c');
-  array.append(QChar(31));
-  array.append(QString("Empty"));
-  array.append(QChar(31));
-  array.append(QChar(3));
-  if(centre_p->communicate_by_tcp)
-  {
-    centre_p->tcp_socket_p->write(array);
-  }
-  else if(centre_p->communicate_by_serial_port)
-  {
-    centre_p->serial_port_write(QString(array));
-  }
-  else if(centre_p->communicate_by_opcua)
-  {
-    opcua_message = "Pack Collected";
-    opcua_message_to_write = true;
-  }
-  else cout<<"no communication method for slave mode\n";
-}
-*/  
+
 void slave_mode_screen::dump_complete(int)
 {
   QByteArray array;
@@ -522,7 +499,6 @@ void slave_mode_screen::command_char(QChar character)
     {
       if(new_command_p->command == "PackSet")
       {
-//        cout<<"command PackSet\n";
         envelope_sensor_p->software_trigger();
         return;
       }
@@ -558,9 +534,6 @@ void slave_mode_screen::command_char(QChar character)
         array.append(QChar(2));
         array.append('s');
         array.append(QChar(31));
-
-
-
         if(pack_ready_bool)
         {
           array.append("Full");
@@ -570,18 +543,6 @@ void slave_mode_screen::command_char(QChar character)
         {
           array.append("Filling");
         }
-
-
-        /*
-        if(centre_p->cutgate_p->get_state() == CUTGATE_CLOSED)
-        {
-          array.append("Full");
-        }
-        else
-        {
-          array.append("Filling");
-        }
-        */
         array.append(QChar(3));
       }
       if(centre_p->communicate_by_tcp)
@@ -612,6 +573,7 @@ void slave_mode_screen::opcua_command_char(QChar character)
 
 void slave_mode_screen::run()
 {
+  count_label_p->setText(QString("Count: ") + (QString::number(centre_p->count)));
   if(batch_mode_driver_p->mode == wait_for_pack)
   {
     if(end_gate_filling == true)

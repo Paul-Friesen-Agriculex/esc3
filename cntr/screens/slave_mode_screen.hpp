@@ -86,6 +86,7 @@ class slave_mode_screen : public screen
   private:
   batch_mode_driver* batch_mode_driver_p;
   
+  QLabel* count_label_p;
   button* back_button_p;
   button* function_as_server_1_button_p;
   button* function_as_server_2_button_p;

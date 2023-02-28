@@ -635,19 +635,8 @@ void batch_mode_driver::run()
 //  int ctime = test_time.restart();
 //  if(ctime > 5) cout<< "batch mode run cycle "<<ctime<<" ms.  count "<<centre_p->count<<endl;
   
-  
   old_pack_present = pack_present;
-//  if(centre_p->envelope_present)
-//  {
-//    ++pack_present_counter;
-//    if(pack_present_counter>100) pack_present = true;
-//  }
   pack_present = centre_p->envelope_present;
-//  else
-//  {
-//    pack_present = false;
-//    pack_present_counter = 0;
-//  }
   
   if(record_only) pack_barcode_ok = true;
   
@@ -657,26 +646,16 @@ void batch_mode_driver::run()
     float measured_interval = float(count_rate_time.restart()) / 1000.0;//in seconds
     float inst_count_rate = float(new_count - count_rate_old_count) / measured_interval;//counts/sec
     count_rate_old_count = new_count;
-//    cout<<"inst_count_rate = "<<inst_count_rate<<endl;
     count_rate_observation cro;
     cro.turntable_speed = centre_p->feed_speed;
     cro.count_rate = inst_count_rate;
     count_rate_observation_queue.enqueue(cro);
     count_rate_observation_queue.dequeue();
-    /*
-    cout<<inst_count_rate<<", ";
-    for(int i=0; i<count_rate_observation_queue.size(); ++i)
-    {
-      cout<<count_rate_observation_queue[i].turntable_speed<<", ";
-    }
-    cout<<endl;
-    */
     
     int historic_speed = count_rate_observation_queue[3].turntable_speed;//best predictor of current count rate
     if(  (historic_speed>0)  &&  (inst_count_rate>0)  )
     {
       float inst_count_rate_multiplier = float(inst_count_rate)/float(historic_speed);
-//      cout<<"  inst_count_rate = "<<inst_count_rate<<"   historic_speed = "<<historic_speed<<"   inst_count_rate_multiplier = "<<inst_count_rate_multiplier<<endl;
       if(inst_count_rate_multiplier>count_rate_multiplier)
       {
         count_rate_multiplier = (count_rate_multiplier*3.0 + inst_count_rate_multiplier)/4.0;
@@ -687,21 +666,9 @@ void batch_mode_driver::run()
       }
     }
     centre_p->crops[0].count_rate_multiplier = count_rate_multiplier;
-    /*
-    if(inst_count_rate >= 0) count_rate = (inst_count_rate+count_rate) / 2.0;
-    count_rate_old_count = new_count;
-    if(count_rate > hi_rate) hi_rate = count_rate;
-    else hi_rate *= 0.999;    
-    */
     hi_rate = high_feed_speed*count_rate_multiplier;
     slowdown_count_diff = hi_rate * slowdown_time;
     stop_count_diff = slowdown_count_diff*0.8;
-    
-//    cout<<"\nrate calc\n";
-//    cout<<"  new_count = "<<new_count<<endl;
-//    cout<<"  count_rate_old_count = "<<count_rate_old_count<<endl;
-//    cout<<"  measured_interval = "<<measured_interval<<endl;
-    
   }
   
   if(mode_changed) mode_new = true;//this is the signal to run the setup part of the new mode.  It is set false at the end of run().
@@ -848,9 +815,6 @@ void batch_mode_driver::run()
         set_normal_status_message();
         emit enable_substitute_button(true);
         release_pack = false;
-        
-//        cout<<"mode hi_o_c.  slowdown_count_diff = "<<slowdown_count_diff<<endl;
-        
       }
       if(use_spreadsheet)
       {
@@ -863,15 +827,11 @@ void batch_mode_driver::run()
       if(cutgate_count_limit-centre_p->count <  slowdown_count_diff)
       {
         switch_mode(ramp_down_o_c, "ramp_down_o_c");
-        
-//        cout<<"  mode hi_o_c switch to ramp_down_o_c.  slowdown_count_diff = "<<slowdown_count_diff<<endl;
-        
       }
       if(centre_p->count > lower_chamber_count_limit)
       {
         switch_mode(lower_chamber_full_o_c, "lower_chamber_full_o_c");
       }
-//      if(pack_present && (pack_barcode_ok||release_pack) && (centre_p->count>cutgate_count_limit/8) )
       if(envelope_sensor_p->read_rise() && (pack_barcode_ok||release_pack)  )
       {
         switch_mode(hi_o_o, "hi_o_o");
@@ -931,7 +891,6 @@ void batch_mode_driver::run()
       }
       if(centre_p->count >= cutgate_count_limit)
       {
-//        cout<<"count at switch to gate_delay_o_c "<<centre_p->count<<endl;
         centre_p->count = 0;
         switch_mode(gate_delay_o_c, "gate_delay_o_c");
       }
@@ -965,7 +924,6 @@ void batch_mode_driver::run()
       {
         emit enable_substitute_button(false);
         cutgate_p->close();
-//        emit pack_ready();
         if(use_spreadsheet)
         {
 
@@ -1051,9 +1009,6 @@ void batch_mode_driver::run()
         endgate_count_limit = cutgate_count_limit;
         endgate_pack_limit = cutgate_pack_limit;
         set_normal_status_message();
-        
-//        cout<<"mode hi_o_o.  slowdown_count_diff = "<<slowdown_count_diff<<endl;
-        
       }
       if(centre_p->feed_speed != high_feed_speed)
       {
@@ -1062,9 +1017,6 @@ void batch_mode_driver::run()
       if(cutgate_count_limit-centre_p->count <  slowdown_count_diff)
       {
         switch_mode(ramp_down_o_o, "ramp_down_o_o");
-        
-//        cout<<"  mode hi_o_o switch to ramp_down_o_o.  slowdown_count_diff = "<<slowdown_count_diff<<endl;
-        
       }
       break;
     case ramp_down_o_o:
@@ -1089,7 +1041,6 @@ void batch_mode_driver::run()
       }
       if(centre_p->count >= cutgate_count_limit)
       {
-//        cout<<"count at switch to gate_delay_o_o "<<centre_p->count<<endl;
         centre_p->count = 0;
         switch_mode(gate_delay_o_o, "gate_delay_o_o");
       }
@@ -1103,7 +1054,6 @@ void batch_mode_driver::run()
       {
         emit enable_substitute_button(false);
         cutgate_p->close();
-//        switch_mode(hi_c_o, "hi_c_o");
         emit pack_ready();
         if(use_spreadsheet)
         {
@@ -1212,16 +1162,10 @@ void batch_mode_driver::run()
         }
         end_chute_clear_time.restart();
       }
-//      if(centre_p->feed_speed != high_feed_speed)
-//      {
-//        centre_p->set_speed(high_feed_speed);
-//      }
       if(cutgate_count_limit-centre_p->count <  stop_count_diff)
       {
         centre_p->set_speed(0);
-//        cout<<"speed 0\n";
       }
-//      if(pack_present == false)
       if(end_chute_clear_time.elapsed() >= end_chute_clear_time_limit)
       {
         switch_mode(count_while_endgate_closing, "count_while_endgate_closing");
@@ -1248,12 +1192,7 @@ void batch_mode_driver::run()
       if(cutgate_count_limit-centre_p->count <  stop_count_diff)
       {
         centre_p->set_speed(0);
-//        cout<<"speed 0\n";
       }
-//      if(pack_present)
-//      {
-//        switch_mode(hi_o_o, "hi_o_o");
-//      }
       if(endgate_close_time.elapsed()>endgate_close_time_limit)
       {
         switch_mode(hi_o_c, "hi_o_c");
@@ -1528,7 +1467,6 @@ void batch_mode_driver::run()
         cutgate_p->close();
         endgate_p->close();
         endgate_close_time.restart();
-//        cout<<"mode dump_into_cut_gate_wait_for_endgate_to_close emitting pack_collected("<<endgate_count_limit<<")\n";
         emit pack_collected(endgate_count_limit);
         if(use_spreadsheet)
         {
@@ -1627,7 +1565,6 @@ void batch_mode_driver::run()
         cutgate_p->open();
         endgate_p->close();
       }
-//      if(pack_present)
       if(envelope_sensor_p->read_rise())
       {
         switch_mode(dump_into_container, "dump_into_container");
@@ -1875,7 +1812,6 @@ void batch_mode_driver::set_dump_feed_speed(int speed_s)
 
 void batch_mode_driver::barcode_entered(QString value)
 {
-  cout<<"batch_mode_driver::barcode_entered.  barcode_mode = "<<barcode_mode<<endl;
   QString value_trimmed = value.trimmed();//remove whitespace at start and end
   barcode_as_entered = value_trimmed;
   if(barcode_mode == seed_lot)
@@ -1939,10 +1875,7 @@ void batch_mode_driver::barcode_entered(QString value)
       if(pack_match_spreadsheet == true)
       {
         spreadsheet_pack_barcode  = ss_envelope_id_p->data_list[end_valve_spreadsheet_line_number];
-        
-//        cout<<"batch_mode_driver::barcode_entered.  pack_match_spreadsheet == true.  pack_barcode = *"<<pack_barcode.toStdString()<<"*  spreadsheet_pack_barcode = *"<<spreadsheet_pack_barcode.toStdString()<<"*\n";
-        
-        if(pack_barcode == spreadsheet_pack_barcode)
+        if(pack_barcode.trimmed() == spreadsheet_pack_barcode.trimmed())
         {
           pack_barcode_ok = true;
         }

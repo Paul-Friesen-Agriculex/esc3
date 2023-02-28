@@ -125,8 +125,8 @@ centre::centre():
 
   //********************  
   //comment out one of these 2 lines:
-//  base_widget_p->setWindowState(Qt::WindowFullScreen);//use for final versions to run on touch screen
-  base_widget_p->setGeometry(0, 0, 800, 480);//use for development on full size terminal
+  base_widget_p->setWindowState(Qt::WindowFullScreen);//use for final versions to run on touch screen
+//  base_widget_p->setGeometry(0, 0, 800, 480);//use for development on full size terminal
   //********************
 
 
