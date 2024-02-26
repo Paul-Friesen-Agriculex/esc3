@@ -574,6 +574,7 @@ void slave_mode_screen::opcua_command_char(QChar character)
 void slave_mode_screen::run()
 {
   count_label_p->setText(QString("Count: ") + (QString::number(centre_p->count)));
+  /*
   if(batch_mode_driver_p->mode == wait_for_pack)
   {
     if(end_gate_filling == true)
@@ -608,7 +609,7 @@ void slave_mode_screen::run()
       end_gate_filling = true;
     }
   }
-
+  */
   if(centre_p->communicate_by_serial_port == true)
   {
     QString messg("Set to communicate by serial port\n");

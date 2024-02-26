@@ -55,6 +55,35 @@ enum mode_enum
 {
   entry,//0
   wait_for_seed_lot_barcode,//1
+  ramp_down_open,//2
+  gate_delay,//3
+  advance_sample,//4
+  ramp_down_closed,//5
+  over_limit,//6
+  dump_into_cutgate,//7
+  dump,//8
+  wait_for_slave_mode_command//9
+};
+
+enum e_mode_enum//for end gate
+{
+  e_full,//0
+  e_open,//1
+  e_close,//2
+  e_empty,//3
+  e_dump_closed,//4
+  e_dump_open,//5
+  e_dump_open_wait,//6
+  e_cleanout_wait_pack,//7
+  e_cleanout_open//8
+};
+
+
+/*
+enum mode_enum
+{
+  entry,//0
+  wait_for_seed_lot_barcode,//1
   hi_o_c,//2
   lower_chamber_full_o_c,//3
   ramp_down_o_c,//4
@@ -88,7 +117,7 @@ enum mode_enum
   wait_for_slave_mode_command_c_o,//32
   wait_for_slave_mode_command_empty,//33
   count_while_endgate_closing //34
-};
+};*/
 
 enum barcode_entry_mode
 {
@@ -143,6 +172,7 @@ class batch_mode_driver : public QObject
   bool old_pack_present;
 //  int pack_present_counter;
   bool pack_changed;
+  bool cutgate_closed_while_opening_bool;
   int old_count;
   QList<bm_set*> program;
   bm_set* set_p;
@@ -151,6 +181,8 @@ class batch_mode_driver : public QObject
   envelope_feeder_brother* e_f_brother_p;
   bool mode_changed;
   bool mode_new;
+  bool e_mode_changed;
+  bool e_mode_new;
 
   QTime cutoff_gate_close_time;
   static const int cutoff_gate_delay_time = 0;//milliseconds 
@@ -168,8 +200,10 @@ class batch_mode_driver : public QObject
 
   void set_normal_status_message();
   void set_incorrect_barcode_message();
-  mode_enum mode;
+  mode_enum mode;//main mode
+  e_mode_enum e_mode;//for end gate
   void switch_mode(mode_enum new_mode, string str);
+  void switch_e_mode(e_mode_enum new_e_mode, string str);
   void load_program();//load the program indicated by program_path
   void reset_program();//start at beginning of current program
   void clear_program();
@@ -205,7 +239,7 @@ class batch_mode_driver : public QObject
   int slowdown_count_diff;//seed feeder slows down when count is this many seeds from limit
   bool slowdown_count_diff_set;//if this is false, run function will estimate a default starting value.  Otherwise, the set value will be used.  The set value will be adjusted continuously.
   QTime low_speed_mode_time;
-  int stop_count_diff;//will stop feeder if reaches this in mode hi_closed
+//  int stop_count_diff;//will stop feeder if reaches this in mode hi_closed
 
   QQueue<count_rate_observation> count_rate_observation_queue;
   float count_rate_multiplier;
