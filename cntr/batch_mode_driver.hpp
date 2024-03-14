@@ -62,7 +62,11 @@ enum mode_enum
   over_limit,//6
   dump_into_cutgate,//7
   dump,//8
-  wait_for_slave_mode_command//9
+  feeder_dump_complete,//9
+  wait_for_slave_mode_command,//10
+  repeat_pack_clean,//11
+  substitute_dump,//12
+  substitute_feeder_dump_complete//13
 };
 
 enum e_mode_enum//for end gate
@@ -243,6 +247,10 @@ class batch_mode_driver : public QObject
 
   QQueue<count_rate_observation> count_rate_observation_queue;
   float count_rate_multiplier;
+  float smoothed_count_rate_multiplier;
+  float lot_max_smoothed_count_rate_multiplier;
+//  bool count_rate_multiplier_history_exists;
+  int count_rate_multiplier_history_counter;
   
   float slowdown_time;//seconds
   int count_rate_old_count;

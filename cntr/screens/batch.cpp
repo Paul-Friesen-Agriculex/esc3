@@ -54,6 +54,7 @@ void barcode_line::keyPressEvent(QKeyEvent* event)
 batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
  :screen(set_centre_p)
 {
+  cout<<"start batch::batch\n";
   batch_mode_driver_p = set_batch_mode_driver_p;
   batch_mode_driver_p->chamber_count_limit_calculation(); //2021_03_22//
 
@@ -73,7 +74,7 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
   repeat_pack_button_p->setEnabled(false);
   restart_button_p = new button("Dump out and\nrestart seed lot");
   substitution_button_p = new button("Substitute seed lot");
-  substitution_button_p->setEnabled(false);
+//  substitution_button_p->setEnabled(false);
   cancel_substitution_button_p = new button("Cancel substitute\nseed lot");
   
   cancel_substitution_button_p->hide();
@@ -213,7 +214,7 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
   run_timer_p->start(100);
   
   centre_p->count = 0;
-  batch_mode_driver_p->start();
+//  batch_mode_driver_p->start();
   
   connect(batch_mode_driver_p, SIGNAL(pack_collected(int)), this, SLOT(pack_collected(int)));
   connect(batch_mode_driver_p, SIGNAL(dump_complete(int)), this, SLOT(dump_complete(int)));
@@ -317,6 +318,8 @@ batch::batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_driver_p)
         
   batch_mode_driver_p -> use_spreadsheet = false;
   batch_mode_driver_p -> dump_automatically = true;
+  batch_mode_driver_p->start();
+  cout<<"end batch::batch\n";
 }
 
 batch::~batch()
@@ -367,6 +370,8 @@ void batch::dump_complete(int dump_count)
   
   barcode_line_p->setFocus();
   centre_p->dump_count_str = QString::number(dump_count);
+  centre_p->communicate_out('d');
+  
   cout<<" end batch::dump_complete\n";
 }
 

@@ -115,13 +115,14 @@ batch_mode_driver::batch_mode_driver(centre* centre_p_s, cutgate* cutgate_p_s, e
   
   slowdown_time = .3;
   count_rate_old_count = centre_p->count;
-  count_rate_time.start();
+//  count_rate_time.start();
   count_rate_interval = 0.2;
   count_rate = 0;//seeds/sec
   hi_rate = 0;
   slowdown_count_diff = 0;//seed feeder slows down when count is this many seeds from limit
 //  stop_count_diff = 0;//will stop feeder if reaches this in mode hi_closed
   ramp_down_counter = 0;
+  count_rate_multiplier_history_counter = 100;//this default value signals that a count rate multiplier is established
   
   cutgate_set = 0;
   cutgate_pack = 0;
@@ -140,7 +141,7 @@ batch_mode_driver::batch_mode_driver(centre* centre_p_s, cutgate* cutgate_p_s, e
   
   //diagnostics
   cout_counter = 0;
-  cout_counter_limit = 500;
+  cout_counter_limit = 1500;
 }
   
 batch_mode_driver::~batch_mode_driver()
@@ -467,7 +468,7 @@ void batch_mode_driver::stop()
 
 void batch_mode_driver::restart()
 {
-  switch_mode(dump_into_cutgate, "dump_into_cutgate");
+  switch_mode(dump, "dump");
   switch_e_mode(e_dump_closed, "e_dump_closed");
   pack_barcode_ok = false;
   pack_barcode_old = true;
@@ -672,6 +673,8 @@ void batch_mode_driver::run()
   
   if(count_rate_time.elapsed() > count_rate_interval*1000.0)
   {
+//    cout<<"batch_mode_driver::run.  count_rate_time.elapsed = "<<count_rate_time.elapsed()<<endl;
+    
     int new_count = centre_p->count;
     float measured_interval = float(count_rate_time.restart()) / 1000.0;//in seconds
     float inst_count_rate = float(new_count - count_rate_old_count) / measured_interval;//counts/sec
@@ -683,6 +686,7 @@ void batch_mode_driver::run()
     count_rate_observation_queue.dequeue();
     
     int historic_speed = count_rate_observation_queue[3].turntable_speed;//best predictor of current count rate
+    /*
     if(  (historic_speed>0)  &&  (inst_count_rate>0)  )
     {
       float inst_count_rate_multiplier = float(inst_count_rate)/float(historic_speed);
@@ -695,7 +699,43 @@ void batch_mode_driver::run()
         count_rate_multiplier = (count_rate_multiplier*99.0 + inst_count_rate_multiplier)/100.0;
       }
     }
-    centre_p->crops[0].count_rate_multiplier = count_rate_multiplier;
+    */
+
+    if(  (historic_speed>0)  &&  (inst_count_rate>0)  )
+    {
+      if(count_rate_multiplier<0)//this signals that no count_rate_multiplier has been established.  
+      {
+        count_rate_multiplier_history_counter = 0;
+      }
+      float inst_count_rate_multiplier = float(inst_count_rate)/float(historic_speed);
+
+      if(count_rate_multiplier_history_counter < 5)
+      {
+        ++count_rate_multiplier_history_counter;
+        count_rate_multiplier = inst_count_rate_multiplier;
+        smoothed_count_rate_multiplier = count_rate_multiplier;
+        cout<<"count_rate_multiplier_history_counter = "<<count_rate_multiplier_history_counter<<".  inst_count_rate_multiplier = "<<inst_count_rate_multiplier<<".  count_rate_multiplier = "<<count_rate_multiplier<<endl;
+      }
+      else if(count_rate_multiplier_history_counter < 20)
+      {
+        ++count_rate_multiplier_history_counter;
+        if(inst_count_rate_multiplier > count_rate_multiplier) count_rate_multiplier = inst_count_rate_multiplier;
+        smoothed_count_rate_multiplier = count_rate_multiplier;
+        cout<<"count_rate_multiplier_history_counter = "<<count_rate_multiplier_history_counter<<".  inst_count_rate_multiplier = "<<inst_count_rate_multiplier<<".  count_rate_multiplier = "<<count_rate_multiplier<<endl;
+      }
+      else
+      {
+        smoothed_count_rate_multiplier = (smoothed_count_rate_multiplier*4.0 + inst_count_rate_multiplier)/5.0;
+        if(smoothed_count_rate_multiplier > lot_max_smoothed_count_rate_multiplier)
+        {
+          lot_max_smoothed_count_rate_multiplier = smoothed_count_rate_multiplier;
+        }
+      }
+    }
+
+
+//    centre_p->crops[0].count_rate_multiplier = count_rate_multiplier;
+//    cout<<"batch_mode_driver::run.  set crm0 to "<<count_rate_multiplier<<endl;
     hi_rate = high_feed_speed*count_rate_multiplier;
     slowdown_count_diff = hi_rate * slowdown_time;
 //    stop_count_diff = slowdown_count_diff*0.8;
@@ -716,7 +756,27 @@ void batch_mode_driver::run()
 //      envelope_sensor_p->read_rise();//to eat any rise signal from dumping or anything else
       substitute_seed_lot = false;
       substitution_barcode_ok = false;
+      /*
       count_rate_multiplier = centre_p->crops[0].count_rate_multiplier;
+      cout<<"count_rate_multiplier loaded from centre = "<<count_rate_multiplier<<endl;
+      smoothed_count_rate_multiplier = count_rate_multiplier;
+      if(lot_max_smoothed_count_rate_multiplier>0)
+      {
+        if(count_rate_multiplier>0)//count rate multiplier set to -1 in new crop
+        {
+          count_rate_multiplier = (count_rate_multiplier*9 + lot_max_smoothed_count_rate_multiplier) / 10;
+        }
+        else
+        {
+          count_rate_multiplier = lot_max_smoothed_count_rate_multiplier;
+        }
+      }
+      lot_max_smoothed_count_rate_multiplier = 0;
+      cout<<"count_rate_multiplier saved to centre = "<<count_rate_multiplier<<endl;
+      centre_p->crops[0].count_rate_multiplier = count_rate_multiplier;
+      */
+      count_rate_multiplier = centre_p->crops[0].count_rate_multiplier;
+      cout<<"count_rate_multiplier loaded from centre = "<<count_rate_multiplier<<endl;
       if(require_seed_lot_barcode)
       {
         seed_lot_barcode_ok = false;
@@ -847,8 +907,18 @@ void batch_mode_driver::run()
         }
         end_valve_spreadsheet_line_number = spreadsheet_line_number;
         set_normal_status_message();
-        emit enable_substitute_button(true);
+//        emit enable_substitute_button(true);
         release_pack = false;
+        if(  (centre_p->count>cutgate_count_limit)  ||  (cutgate_closed_while_opening_bool == true)  )
+        {
+          if(cutgate_closed_while_opening_bool)
+          {
+            cout<<"cutgate_closed_while_opening_bool true in mode ramp_down_open\n";
+          }
+          cutgate_closed_while_opening_bool = false;
+          switch_mode(over_limit, "over_limit");
+          break;
+        }        
       }
 
       ++ramp_down_counter;
@@ -860,10 +930,11 @@ void batch_mode_driver::run()
         if(ramp_speed > high_feed_speed) ramp_speed = high_feed_speed;
         if(ramp_speed < low_feed_speed) ramp_speed = low_feed_speed;
         centre_p->set_speed(ramp_speed);
-        cout<<"mode ramp_down_open.  ramp_speed = "<<ramp_speed<<endl;
+//        cout<<"mode ramp_down_open.  ramp_speed = "<<ramp_speed<<endl;
       }
       if(centre_p->count >= cutgate_count_limit)
       {
+        cout<<"centre_p->count >= cutgate_count_limit.  cutgate_count_limit = "<<cutgate_count_limit<<endl;
         centre_p->count = 0;
         switch_mode(gate_delay, "gate_delay");
       }
@@ -876,15 +947,38 @@ void batch_mode_driver::run()
       }
       if(cutoff_gate_close_time.elapsed() >= cutoff_gate_delay_time)
       {
-        emit enable_substitute_button(false);
+//        emit enable_substitute_button(false);
         cutgate_p->close();
         switch_mode(advance_sample, "advance_sample");
       }
       break;
       
     case advance_sample:
-      emit pack_collected(cutgate_count_limit);
-      switch_e_mode(e_full, "e_full");
+//      emit pack_collected(cutgate_count_limit);
+//      switch_e_mode(e_full, "e_full");
+
+//      count_rate_multiplier = centre_p->crops[0].count_rate_multiplier;
+//      cout<<"count_rate_multiplier loaded from centre = "<<count_rate_multiplier<<endl;
+      smoothed_count_rate_multiplier = count_rate_multiplier;
+      if(lot_max_smoothed_count_rate_multiplier>0)
+      {
+        if(count_rate_multiplier>0)//count rate multiplier set to -1 in new crop
+        {
+          count_rate_multiplier = (count_rate_multiplier*9 + lot_max_smoothed_count_rate_multiplier) / 10;
+        }
+        else
+        {
+          count_rate_multiplier = lot_max_smoothed_count_rate_multiplier;
+        }
+      }
+      lot_max_smoothed_count_rate_multiplier = 0;
+      cout<<"count_rate_multiplier saved to centre = "<<count_rate_multiplier<<endl;
+      centre_p->crops[0].count_rate_multiplier = count_rate_multiplier;
+
+      endgate_count_limit = cutgate_count_limit;
+      endgate_pack_limit = cutgate_pack_limit;
+      endgate_set = cutgate_set;
+      endgate_pack = cutgate_pack;
       if(use_spreadsheet)
       {
 
@@ -984,11 +1078,11 @@ void batch_mode_driver::run()
       if(ramp_down_counter>50)
       {
         ramp_down_counter = 0;
-        float ramp_speed = float(cutgate_count_limit*0.8-5-centre_p->count) / slowdown_time / count_rate_multiplier;
+        float ramp_speed = float(cutgate_count_limit*0.8-10.0-centre_p->count) / slowdown_time / count_rate_multiplier;
         if(ramp_speed > high_feed_speed) ramp_speed = high_feed_speed;
         if(ramp_speed < 0) ramp_speed = 0;
         centre_p->set_speed(ramp_speed);
-        cout<<"mode ramp_down_closed.  ramp_speed = "<<ramp_speed<<endl;
+//        cout<<"mode ramp_down_closed.  ramp_speed = "<<ramp_speed<<endl;
       }
       
       if(  (centre_p->count>cutgate_count_limit)  ||  (cutgate_closed_while_opening_bool == true)  )
@@ -1014,30 +1108,36 @@ void batch_mode_driver::run()
         if(cutgate_pack<0)
         {
           --cutgate_set;
-          if(cutgate_set<0)//not expected
+          if(cutgate_set<0)
           {
-            cout<<"Warning.  Cutgate set less than 0 in mode over_limit\n";
             cutgate_set = 0;
-          }
-          cutgate_pack = program[cutgate_set]->packs - 1;
-          if(cutgate_pack<0)//not expected
-          {
-            cout<<"Warning.  Cutgate pack set less than 0 in mode over_limit\n";
             cutgate_pack = 0;
+          }
+          else
+          {
+            cutgate_pack = program[cutgate_set]->packs - 1;
+            if(cutgate_pack<0)//not expected
+            {
+              cout<<"Warning.  Cutgate pack set less than 0 in mode over_limit\n";
+              cutgate_pack = 0;
+            }
           }
         }
         cutgate_count_limit = program[cutgate_set]->seeds;
         cutgate_pack_limit = program[cutgate_set]->packs;
         endgate_set = cutgate_set;
         endgate_pack = cutgate_pack;
-        QString status_message = QString("Error in sample\nPack %1 of %2.  %3 seeds.\nClean out sample.\nIt will be re-counted").arg(endgate_pack+1).arg(endgate_pack_limit).arg(endgate_count_limit);
-        send_status_message(status_message, QColor(0,0,0), QColor(255,0,0), 20);
-        switch_e_mode(e_cleanout_wait_pack, "e_cleanout_wait_pack");
+        QString status_message = QString("Error in sample.  Speed setting\nmight be too high.\nPack %1 of %2.  %3 seeds.\nClean out sample.\nIt will be re-counted").arg(endgate_pack+1).arg(endgate_pack_limit).arg(endgate_count_limit);
+        send_status_message(status_message, QColor(0,0,0), QColor(255,0,0), 18);
+//        switch_e_mode(e_cleanout_wait_pack, "e_cleanout_wait_pack");
       }
-      if(e_mode == e_empty)
+      else//on first pass, it is possible for e_mode to be e_empty because e_mode has not yet registered over_limit condition
       {
-        centre_p->count = 0;
-        switch_mode(ramp_down_open, "ramp_down_open");
+        if(e_mode == e_empty)
+        {
+          centre_p->count = 0;
+          switch_mode(ramp_down_open, "ramp_down_open");
+        }
       }
       break;
     
@@ -1078,6 +1178,7 @@ void batch_mode_driver::run()
         old_count = centre_p->count;
         dump_end_qtime.restart();
         send_status_message("Dumping", QColor(0,0,0), QColor(0,255,0), 25);
+        send_barcode_status_message("", QColor(0,0,0), QColor(0,255,0), 25);
       }
       if(centre_p->count != old_count)
       {
@@ -1086,10 +1187,24 @@ void batch_mode_driver::run()
       }
       if(dump_end_qtime.elapsed() > dump_end_qtime_limit)
       {
-        emit dump_complete(centre_p->count);
-        switch_mode(entry, "entry");
+//        emit dump_complete(centre_p->count);
+//        switch_mode(entry, "entry");
+        switch_mode(feeder_dump_complete, "feeder_dump_complete");
       }
       break;        
+      
+    case feeder_dump_complete:
+      if(mode_new)
+      {
+        centre_p->set_speed(dump_speed);
+        cutgate_p->open();
+        send_status_message("Dump complete.  Clean out seed.", QColor(0,0,0), QColor(255,255,0), 20);  
+      }
+      if (e_mode == e_empty)
+      {
+        switch_mode(entry, "entry");
+      }
+      break;
       
     case wait_for_slave_mode_command:
       if(mode_new)
@@ -1101,7 +1216,61 @@ void batch_mode_driver::run()
       emit slave_mode_program_finished();
 //      stop();
       break;
-
+      
+    case repeat_pack_clean:
+      if(mode_new)
+      {
+        centre_p->set_speed(0);
+        cutgate_p->open();
+      }
+      if(e_mode == e_empty)
+      {
+        centre_p->count = 0;
+        switch_mode(ramp_down_open, "ramp_down_open");
+      }
+      break;
+      
+    case substitute_dump:
+      if(mode_new)
+      {
+        centre_p->set_speed(dump_speed);
+        cutgate_p->open();
+        old_count = centre_p->count;
+        dump_end_qtime.restart();
+//        send_status_message("Dumping", QColor(0,0,0), QColor(0,255,0), 25);
+        send_barcode_status_message("Scan substitute barcode", QColor(0,0,0), QColor(0,255,0), 25);
+        barcode_mode = substitution;
+        substitute_seed_lot = true;
+        substitution_barcode_ok = false;
+      }
+      if(centre_p->count != old_count)
+      {
+        old_count = centre_p->count;
+        dump_end_qtime.restart();
+      }
+      if(dump_end_qtime.elapsed() > dump_end_qtime_limit)
+      {
+        if(substitution_barcode_ok)
+        {
+          switch_mode(substitute_feeder_dump_complete, "substitute_feeder_dump_complete");
+          barcode_mode = pack;
+        }
+      }
+      break;        
+            
+    case substitute_feeder_dump_complete:
+      if(mode_new)
+      {
+        centre_p->set_speed(dump_speed);
+        cutgate_p->open();
+        send_status_message("Dump complete.  Clean out seed.", QColor(0,0,0), QColor(255,255,0), 20);  
+      }
+      if (e_mode == e_empty)
+      {
+        switch_mode(ramp_down_open, "ramp_down_open");
+      }
+      break;
+      
     default: cout<<"batch_mode_driver::run.  mode not found\n";
   }
 
@@ -1144,6 +1313,7 @@ void batch_mode_driver::run()
       if(endgate_close_time.elapsed()>endgate_close_time_limit)
       {
         switch_e_mode(e_empty, "e_empty");
+        emit pack_collected(endgate_count_limit);
       }
       break;
             
@@ -1151,6 +1321,15 @@ void batch_mode_driver::run()
       if(e_mode_new)
       {
         endgate_p->close();
+        emit enable_repeat_pack_button(true);
+//        if(mode == feeder_dump_complete)
+//        {
+//          emit dump_complete(centre_p->count);
+//        }
+//        else
+//        {
+//          emit pack_collected(endgate_count_limit);
+//        }
       }
       if(mode == ramp_down_closed)
       {
@@ -1160,9 +1339,21 @@ void batch_mode_driver::run()
       {
         switch_e_mode(e_full, "e_full");
       }
+      if(mode == dump_into_cutgate)
+      {
+        switch_e_mode(e_full, "e_full");
+      }
       if(mode == dump)
       {
         switch_e_mode(e_dump_closed, "e_dump_closed");
+      }
+      if(mode == substitute_dump)
+      {
+        switch_e_mode(e_dump_closed, "e_dump_closed");
+      }
+      if(mode == over_limit)
+      {
+        switch_e_mode(e_cleanout_wait_pack, "e_cleanout_wait_pack");
       }
       break;
             
@@ -1171,7 +1362,7 @@ void batch_mode_driver::run()
       {
         endgate_p->close();
       }
-      if(pack_present)
+      if (pack_present)
       {
         switch_e_mode(e_dump_open, "e_dump_open");
       }
@@ -1182,7 +1373,15 @@ void batch_mode_driver::run()
       {
         endgate_p->open();
       }
-      if(mode != dump)
+      if(pack_present == false)
+      {
+        switch_e_mode(e_dump_closed, "e_dump_closed");
+      }
+      if(mode == feeder_dump_complete)
+      {
+        switch_e_mode(e_dump_open_wait, "e_dump_open_wait");
+      }
+      if(mode == substitute_feeder_dump_complete)
       {
         switch_e_mode(e_dump_open_wait, "e_dump_open_wait");
       }
@@ -1196,6 +1395,7 @@ void batch_mode_driver::run()
       }
       if(endgate_close_time.elapsed() > endgate_close_time_limit + end_chute_clear_time_limit)
       {
+        emit dump_complete(centre_p->count);
         switch_e_mode(e_empty, "e_empty");
       }
       break;
@@ -1338,7 +1538,7 @@ void batch_mode_driver::run()
       break;      {
         emit enable_substitute_button(false);
         cutgate_p->close();
-        if(use_spreadsheet)
+        if(use_spreadsheet)dump_complete
         {
 
           if(spreadsheet_line_number>=0) ss_first_column_p->data_list[spreadsheet_line_number] = "Y";
@@ -1410,7 +1610,7 @@ void batch_mode_driver::run()
         }
       }
       break;
-    case lower_chamber_full_o_c:
+    case lower_chamber_full_o_c:enable_substitute_button
       if(mode_new)
       {
         centre_p->set_speed(0);
@@ -1455,7 +1655,7 @@ void batch_mode_driver::run()
       {
         switch_mode(ramp_down_o_o, "ramp_down_o_o");
       }
-      if(require_pack_barcode == false)
+      if(require_pack_barcode == false)dump_complete
       {
         send_barcode_status_message("Barcode Not Required", QColor(0,0,0), QColor(0,255,0), 25);
         pack_barcode_ok_message_posted = true;
@@ -1527,7 +1727,7 @@ void batch_mode_driver::run()
             }
           }
         }
-        else//not using spreadsheet
+        else//not using spreadsheetdump_complete
         {
           bool end_program = false;
           ++cutgate_pack;
@@ -1558,7 +1758,7 @@ void batch_mode_driver::run()
           }
           else
           {
-            switch_mode(hi_c_c, "hi_c_c");
+            switch_mode(hi_c_c, "hi_c_c");enable_substitute_button
           }
         }
       }
@@ -1580,7 +1780,7 @@ void batch_mode_driver::run()
       if(centre_p->feed_speed != high_feed_speed)
       {
         centre_p->set_speed(high_feed_speed);
-      }
+      }substitution
       if(cutgate_count_limit-centre_p->count <  slowdown_count_diff)
       {
         switch_mode(ramp_down_o_o, "ramp_down_o_o");
@@ -1602,7 +1802,7 @@ void batch_mode_driver::run()
       if(ramp_down_counter>50)
       {
         ramp_down_counter = 0;
-        float ramp_speed = low_feed_speed + (high_feed_speed-low_feed_speed)*(cutgate_count_limit-centre_p->count)/slowdown_count_diff;
+        float ramp_speed = low_feed_speed + (hienable_substitute_buttongh_feed_speed-low_feed_speed)*(cutgate_count_limit-centre_p->count)/slowdown_count_diff;
         if(ramp_speed < low_feed_speed) ramp_speed = low_feed_speed;
         centre_p->set_speed(ramp_speed);
       }
@@ -1658,7 +1858,7 @@ void batch_mode_driver::run()
         else//use_spreadsheet false
         {
           bool end_program = false;
-          ++cutgate_pack;
+          ++cutgate_pack;enable_substitute_button
           if(cutgate_pack>=cutgate_pack_limit)
           {
             cutgate_pack = 0;
@@ -1672,7 +1872,7 @@ void batch_mode_driver::run()
           }
           cutgate_count_limit = program[cutgate_set]->seeds;
           cutgate_pack_limit = program[cutgate_set]->packs;
-          
+          dump_complete
           if(end_program)
           {
             if(dump_automatically == true)
@@ -1710,7 +1910,7 @@ void batch_mode_driver::run()
             .arg(ss_required_count_p->data_list[end_valve_spreadsheet_line_number])
             .arg(lines_left_to_fill);
           send_status_message(status_message, QColor(0,0,0), QColor(0,255,0), 14);
-          if(print_envelope)
+          if(print_envesubstitutionlope)
           {
             if(print_control_mode==start_on_pack_collect)
             {
@@ -1725,7 +1925,7 @@ void batch_mode_driver::run()
         else
         {
           status_message = QString("Pack Ready\nPack %1 of %2.\n%3 seeds.").arg(endgate_pack+1).arg(endgate_pack_limit).arg(endgate_count_limit);
-          send_status_message(status_message, QColor(0,0,0), QColor(0,255,0), 25);
+          send_status_message(status_message, Qenable_substitute_buttonColor(0,0,0), QColor(0,255,0), 25);
         }
         end_chute_clear_time.restart();
       }
@@ -1768,7 +1968,7 @@ void batch_mode_driver::run()
           status_message = QString("Pack Ready\nPack %1 of %2.\n%3 seeds.").arg(endgate_pack+1).arg(endgate_pack_limit).arg(endgate_count_limit);
           send_status_message(status_message, QColor(0,0,0), QColor(0,255,0), 25);
         }        
-      }
+      }enable_substitute_button
       if(centre_p->feed_speed != dump_speed)
       {
         centre_p->set_speed(dump_speed);
@@ -2146,7 +2346,7 @@ void batch_mode_driver::run()
       break;
     case dump_into_cut_gate_wait_for_pack_removal:
       if(mode_new)
-      {
+      {substitution
         centre_p->set_speed(0);
         cutgate_p->close();
         endgate_p->open();
@@ -2184,7 +2384,7 @@ void batch_mode_driver::run()
       }
       if(centre_p->feed_speed != dump_speed)
       {
-        centre_p->set_speed(dump_speed);
+        centre_p->set_speed(dump_speed);enable_substitute_button
       }
       if(centre_p->count > lower_chamber_count_limit)
       {
@@ -2483,12 +2683,6 @@ void batch_mode_driver::barcode_entered(QString value)
     seed_lot_barcode = value_trimmed;
     emit seed_lot_barcode_entered(value_trimmed);
   }
-  if(barcode_mode == substitution)
-  {
-    substitution_barcode_ok = true;
-    seed_lot_barcode_old = false;
-    substitute_barcode = value_trimmed;
-  }
   if(barcode_mode == pack)
   {
     pack_barcode = value_trimmed;
@@ -2570,9 +2764,10 @@ void batch_mode_driver::barcode_entered(QString value)
   }
   if(barcode_mode == substitution)
   {
-    seed_lot_barcode_ok = true;
+    substitution_barcode_ok = true;
     seed_lot_barcode_old = false;
     substitute_barcode = value_trimmed;
+    seed_lot_barcode_ok = true;
     centre_p->substitution_str = substitute_barcode;
     centre_p->lotcode_str = substitute_barcode;
   }
@@ -3166,7 +3361,8 @@ void batch_mode_driver::repeat_pack()
     .arg(cutgate_count_limit);
   send_status_message(message, QColor(0,0,0), QColor(255, 255, 0), 16);
   send_barcode_status_message("", QColor(0,0,0), QColor(0,255,0), 16); 
-//  switch_mode(repeat_wait_for_container, "repeat_wait_for_container"); 
+  switch_mode(repeat_pack_clean, "repeat_pack_clean");
+  switch_e_mode(e_cleanout_wait_pack, "e_cleanout_wait_pack");
 }
 
 void batch_mode_driver::seed_lot_substitution()
@@ -3187,8 +3383,9 @@ void batch_mode_driver::seed_lot_substitution()
   }
   send_status_message(message, QColor(0,0,0), QColor(255, 255, 0), 16);
   send_barcode_status_message("", QColor(0,0,0), QColor(0,255,0), 16); 
-//  switch_mode(substitute_wait_for_container, "substitute_wait_for_container"); 
-  barcode_mode = substitution;
+  switch_mode(substitute_dump, "substitute_dump"); 
+//  switch_e_mode(e_cleanout_wait_pack, "e_cleanout_wait_pack");
+//  barcode_mode = substitution;
 }
 
 void batch_mode_driver::new_slave_mode_command()

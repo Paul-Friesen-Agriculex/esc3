@@ -225,6 +225,7 @@ void centre::init()
     f>>crops[i].low_feed_speed;
     f>>crops[i].dump_speed;
     f>>crops[i].count_rate_multiplier;
+    if (i<5) cout<<"i = "<<i<<"  loaded count_rate_multiplier "<<crops[i].count_rate_multiplier<<endl;
     f.get();
     if(f.eof()) break;
   }
@@ -357,6 +358,7 @@ centre::~centre()
     f<<crops[i].low_feed_speed<<" ";
     f<<crops[i].dump_speed<<" ";
     f<<crops[i].count_rate_multiplier;
+    if (i<5) cout<<"saved count_rate_multiplier "<<crops[i].count_rate_multiplier<<endl;
     f<<endl;
   }
   f.close();

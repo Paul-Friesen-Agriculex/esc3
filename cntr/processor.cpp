@@ -518,6 +518,14 @@ void processor::calibrate()//does the calibration after data has been collected
   calibration_crop.max_inflection_3 = max_inflection_3;
   calibration_crop.max_inflection_9 = max_inflection_9;
   
+  
+  calibration_crop.high_feed_speed = 0;
+  calibration_crop.low_feed_speed = 0;
+  calibration_crop.dump_speed = 0;
+  calibration_crop.count_rate_multiplier = -1;//signal that has not been determined
+  
+  
+  
 //  cout<<"end of processor::calibrate.  calibration_crop.name = "<<calibration_crop.name.toStdString()<<".  calibration_crop.calibrated = "<<calibration_crop.calibrated<<endl;
 }
 
