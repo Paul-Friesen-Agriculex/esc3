@@ -56,28 +56,22 @@ endgate::~endgate()
 
 void endgate::open()
 {
-//  cout<<"endgate::open\n";
-  
   if(state == ENDGATE_OPEN) return;
   FILE * fp;
   fp = fopen("/sys/class/gpio/gpio189/value", "w");
   fprintf(fp, "1");
   fclose(fp);
-//  open_pulse_timer_p -> start(200);
   open_pulse_timer_p -> start(600);
   state = ENDGATE_OPEN;
 }
 
 void endgate::close()
 {
-//  cout<<"endgate::close\n";
-  
   if(state == ENDGATE_CLOSED) return;
   FILE * fp;
   fp = fopen("/sys/class/gpio/gpio210/value", "w");
   fprintf(fp, "1");
   fclose(fp);
-//  close_pulse_timer_p -> start(200);
   close_pulse_timer_p -> start(600);
   state = ENDGATE_CLOSED;
 }
@@ -99,6 +93,7 @@ void endgate::end_close()
   if(centre_p->signal_port_pulse_when_endgate_closes)
   {
     signal_port_p->pulse();
+    cout<<"pulsed signal port\n";
   }
 }
 

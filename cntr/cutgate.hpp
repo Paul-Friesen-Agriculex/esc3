@@ -31,7 +31,6 @@ ESC-3 machines produced by Agriculex Inc.
 class QTimer;
 
 enum CUTGATE_STATE{CUTGATE_OPEN, CUTGATE_CLOSED, CUTGATE_OPENING, CUTGATE_CLOSING};
-//enum CUTGATE_STATE{CUTGATE_OPEN, CUTGATE_CLOSED};
 
 class cutgate:public QObject
 {

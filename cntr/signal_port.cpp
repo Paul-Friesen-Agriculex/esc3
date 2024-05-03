@@ -26,6 +26,9 @@ ESC-3 machines produced by Agriculex Inc.
 #include <QTimer>
 #include "signal_port.hpp"
 #include <stdio.h>
+#include <iostream>
+
+using namespace std;
 
 signal_port::signal_port()
 {
@@ -47,6 +50,7 @@ void signal_port::pulse()
   fprintf(fp, "1");
   fclose(fp);
   pulse_timer_p -> start(500);
+  cout<<"signal_port::pulse\n";
 }
 
 void signal_port::end_pulse()

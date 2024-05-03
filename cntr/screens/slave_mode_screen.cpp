@@ -109,7 +109,6 @@ slave_mode_screen::slave_mode_screen(centre*set_centre_p, batch_mode_driver* set
   
   connect(batch_mode_driver_p, SIGNAL(slave_mode_program_finished()), this, SLOT(slave_mode_program_finished()));
   connect(batch_mode_driver_p, SIGNAL(pack_ready()), this, SLOT(pack_ready()));
-//  connect(batch_mode_driver_p, SIGNAL(pack_collected(int)), this, SLOT(pack_collected(int)));
   connect(batch_mode_driver_p, SIGNAL(dump_complete(int)), this, SLOT(dump_complete(int)));
   
   executing_command_p = 0;
@@ -131,7 +130,7 @@ slave_mode_screen::slave_mode_screen(centre*set_centre_p, batch_mode_driver* set
   opcua_count = 0;
   just_starting = true;//wish to ignore any command on opc device when starting.  enter command only if changed.
   opcua_message_to_write = false;
-  mode_to_start = entry;
+  mode_to_start = ramp_down_open;//entry;
 
   timer_p = new QTimer;
   connect(timer_p, SIGNAL(timeout()), this, SLOT(run()));
@@ -492,6 +491,7 @@ void slave_mode_screen::command_char(QChar character)
         delete previous_command_p;
         previous_command_p = 0;
       }
+      command_finished_bool = true;
       return;
     }
     
@@ -499,6 +499,7 @@ void slave_mode_screen::command_char(QChar character)
     {
       if(new_command_p->command == "PackSet")
       {
+        cout<<"software_trigger 1\n";
         envelope_sensor_p->software_trigger();
         return;
       }
@@ -574,42 +575,7 @@ void slave_mode_screen::opcua_command_char(QChar character)
 void slave_mode_screen::run()
 {
   count_label_p->setText(QString("Count: ") + (QString::number(centre_p->count)));
-  /*
-  if(batch_mode_driver_p->mode == wait_for_pack)
-  {
-    if(end_gate_filling == true)
-    {
-      end_gate_filling = false;
-      end_gate_full = true;
-      if(centre_p->get_endgate_state() == ENDGATE_OPEN)
-      {
-        end_gate_full = false;
-        end_gate_opened_full = true;
-      }
-    }
-    else if(end_gate_full == true)
-    {
-      if(centre_p->get_endgate_state() == ENDGATE_OPEN)
-      {
-        end_gate_full = false;
-        end_gate_opened_full = true;
-      }
-    }
-    else if(end_gate_opened_full == true)
-    {
-      if(centre_p->get_endgate_state() == ENDGATE_CLOSED)
-      {
-        end_gate_opened_full = false;
-        end_gate_closed_empty = true;
-      }
-    }
-    else if(end_gate_closed_empty == true)
-    {
-      end_gate_closed_empty = false;
-      end_gate_filling = true;
-    }
-  }
-  */
+
   if(centre_p->communicate_by_serial_port == true)
   {
     QString messg("Set to communicate by serial port\n");
@@ -661,17 +627,23 @@ void slave_mode_screen::run()
     {
       if(batch_mode_driver_p->slave_mode == false)//execution of this command is starting.  set-up needed.
       {
+        cout<<"Dump command started\n";
         batch_mode_driver_p->chamber_count_limit_calculation();
-        batch_mode_driver_p->start();
+//        batch_mode_driver_p->start();
         batch_mode_driver_p->slave_mode = true;
         batch_mode_driver_p->dump_speed = 1000;
-        batch_mode_driver_p->restart();
+//        batch_mode_driver_p->restart();
+        cout<<"before clear_program\n";
+        batch_mode_driver_p->clear_program();
+        cout<<"after clear_program\n";
+        batch_mode_driver_p->switch_mode(dump_into_cutgate, "dump_into_cutgate");
       }
       if(command_finished_bool == true)
       {
         end_command();
         return;
       }
+//      cout<<"Dump command finished\n";
     }
     if(executing_command_p->command == "Recycle")
     {
@@ -730,6 +702,7 @@ void slave_mode_screen::run()
     }
     if(batch_mode_driver_p->slave_mode == false)//execution of this command is starting.  set-up needed.
     {
+      cout<<"slave_mode_screen::run.  slave mode false.  1.  count = "<<centre_p->count<<endl;
       batch_mode_driver_p->slave_mode = true;//do not do set-up on subsequent passes
       for(int i=0; i<100; ++i)
       {
@@ -766,10 +739,12 @@ void slave_mode_screen::run()
         batch_mode_driver_p->chamber_count_limit_calculation();
         batch_mode_driver_p->reset_program();
         
-        batch_mode_driver_p->mode = mode_to_start;
+        batch_mode_driver_p->switch_mode(ramp_down_open, "ramp_down_open");
         batch_mode_driver_p->start();
       }
-      envelope_sensor_p->software_trigger();
+//      cout<<"software_trigger 2\n";
+//      envelope_sensor_p->software_trigger();
+      cout<<"slave_mode_screen::run.  slave mode false.  end  count = "<<centre_p->count<<endl;
     }
     return;
   }
@@ -1174,7 +1149,7 @@ void slave_mode_screen::end_command()
   previous_command_p = executing_command_p;
   executing_command_p = 0;
   batch_mode_driver_p->slave_mode = false;
-  mode_to_start = entry;
+//  mode_to_start = entry;
   return;
 }
 

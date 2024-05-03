@@ -41,7 +41,7 @@ envelope_sensor::envelope_sensor()
   old_read = false;
   rise_occurred = false;
   connect (timer_p, SIGNAL(timeout()), this, SLOT(run()));
-  timer_p->start(100);
+  timer_p->start(50);//(100);
   
   physical_sensor_enabled = true;
   software_triggered = false;
@@ -72,9 +72,13 @@ void envelope_sensor::run()
   FILE * fp;
   int i;
   fp = fopen("/sys/class/gpio/gpio174/value", "r");
-  if(!fscanf(fp,"%d",&i)) cout<<"envelope_sensor::run.  fscanf failure\n";
+  if(!fscanf(fp,"%d",&i)) cout<<"envelope_sensor::run.  fscanf failure 1\n";
   fclose(fp);
-  if (i==1)
+  int j;
+  fp = fopen("/sys/class/gpio/gpio192/value", "r");
+  if(!fscanf(fp,"%d",&j)) cout<<"envelope_sensor::run.  fscanf failure 2\n";
+  fclose(fp);
+  if( (i==1)  &&  (j==0)  )
   {
     raw_present = false;
   }
@@ -122,6 +126,7 @@ bool envelope_sensor::read_rise() //returns true once after a new envelope is pu
 
 void envelope_sensor::software_trigger()//generates a pulse as though the sensor was triggered
 {
+  cout<<"envelope_sensor::software_trigger\n";
   software_trigger_count = 0;
 }
 

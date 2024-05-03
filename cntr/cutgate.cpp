@@ -71,7 +71,6 @@ void cutgate::open()
   fclose(fp);
   open_pulse_timer_p -> start(700);
   state = CUTGATE_OPENING;
-//  state = CUTGATE_OPEN;
   opening = true;
 }
 
@@ -93,7 +92,6 @@ void cutgate::close()
   fclose(fp);
   close_pulse_timer_p -> start(300);
   state = CUTGATE_CLOSING;
-//  state = CUTGATE_CLOSED;
   closing = true;
 }
 

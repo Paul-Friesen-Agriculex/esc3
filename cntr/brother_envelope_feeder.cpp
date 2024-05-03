@@ -120,6 +120,7 @@ void brother_envelope_feeder::envelope_feeder_sensor_state()
  
 void brother_envelope_feeder::motor_on()
 {
+  cout<<"brother_envelope_feeder::motor_on\n";
   FILE * fp;
   fp = fopen("/sys/class/gpio/gpio173/value", "w");
   fprintf(fp, "1");

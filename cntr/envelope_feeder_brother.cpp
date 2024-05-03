@@ -26,6 +26,9 @@ ESC-3 machines produced by Agriculex Inc.
 #include <QTimer>
 #include "envelope_feeder_brother.hpp"
 #include <stdio.h>
+#include <iostream>
+
+using namespace std;
 
 envelope_feeder_brother::envelope_feeder_brother()
 {
@@ -42,6 +45,7 @@ envelope_feeder_brother::~envelope_feeder_brother()
 
 void envelope_feeder_brother::feed()
 {
+  cout<<"envelope_feeder_brother::feed\n";
   FILE * fp;
   fp = fopen("/sys/class/gpio/gpio173/value", "w");
   fprintf(fp, "1");

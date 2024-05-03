@@ -102,7 +102,7 @@ class centre : public QObject
   
   QThread* processor_thread_p;
   feeder* feeder_p;
-  brother_envelope_feeder* brother_envelope_feeder_p;
+//  brother_envelope_feeder* brother_envelope_feeder_p;
   QTimer* run_timer_p;
   QTimer* serial_port_timer_p;
   screen* screen_p;

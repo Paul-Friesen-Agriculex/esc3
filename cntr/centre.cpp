@@ -175,7 +175,7 @@ void centre::init()
   signal_port_pulse_when_endgate_closes = true;
   envelope_sensor_p = new envelope_sensor;
   feeder_p = new feeder;
-  brother_envelope_feeder_p = new brother_envelope_feeder;
+//  brother_envelope_feeder_p = new brother_envelope_feeder;
   for(int i=0; i<screen_wait_list_size-1; ++i)
   {
     screen_wait_list[i]=0;
@@ -322,11 +322,11 @@ centre::~centre()
   delete base_widget_p;
   delete diagnostics_console_p;
 
-  if(brother_envelope_feeder_p)
-  {
-	delete brother_envelope_feeder_p;
-	brother_envelope_feeder_p = 0;
-  }
+//  if(brother_envelope_feeder_p)
+//  {
+//	delete brother_envelope_feeder_p;
+//	brother_envelope_feeder_p = 0;
+// }
   emit set_camera_processing(false);//cause camera thread's run() function to return
   clock_t sleep_until = clock() + 1000;//to let run function return
   while(clock()<sleep_until)
@@ -427,9 +427,6 @@ void centre::run()
     init_ran = true;
   }
   
-//  int ctime = test_time.restart();
-//  if(ctime > 15) cout<< "run cycle "<<ctime<<" ms\n";
-  
   while(tcp_input_array_p->length() > 0)
   {
     QChar input_char = tcp_input_array_p->at(0);
@@ -437,13 +434,10 @@ void centre::run()
     tcp_input_array_p->remove(0, 1);
   }
   
-//  int tcp_time = test_time.elapsed();
-//  if(tcp_time > 5) cout<<"tcp_time "<<tcp_time<<" ms\n";
-  
   emit set_crop(crops[0]);
   endgate_state = endgate_p->get_state();
   envelope_present = envelope_sensor_p->read();
-  brother_envelope_feeder_p -> run();
+//  brother_envelope_feeder_p -> run();
   
   
   if(communicate_by_serial_port)
@@ -461,7 +455,6 @@ void centre::run()
     {
       if(totalize_force_endgate_open==true || envelope_present==true)
       {
-//        cout<<"setting endgate open 1 \n";
         set_endgate_state(ENDGATE_OPEN);
       }
     }
@@ -469,7 +462,6 @@ void centre::run()
     {
       if(totalize_force_endgate_open==false && envelope_present==false)
       {
-//        cout<<"setting endgate closed 1 \n";
         set_endgate_state(ENDGATE_CLOSED);
       }
     }
@@ -1189,7 +1181,6 @@ void centre::setup_serial_communications(int baud_rate)//assumes serial port cab
   {
     close(serial_port_fd);
   }
-//  serial_port_fd = open("/dev/ttyACM0", O_RDWR | O_NONBLOCK);
   serial_port_fd = open(full_port_name.toLatin1(), O_RDWR | O_NONBLOCK);
   if(serial_port_fd<0)
   {

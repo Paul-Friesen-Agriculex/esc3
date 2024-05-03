@@ -62,7 +62,6 @@ class slave_mode_screen : public screen
   
   public slots:
   void pack_ready();
-//  void pack_collected(int);
   void dump_complete(int);
   void slave_mode_program_finished();
   

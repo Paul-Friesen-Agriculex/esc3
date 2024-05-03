@@ -60,13 +60,14 @@ enum mode_enum
   advance_sample,//4
   ramp_down_closed,//5
   over_limit,//6
-  dump_into_cutgate,//7
-  dump,//8
-  feeder_dump_complete,//9
-  wait_for_slave_mode_command,//10
-  repeat_pack_clean,//11
-  substitute_dump,//12
-  substitute_feeder_dump_complete//13
+  over_limit_clean,//7
+  dump_into_cutgate,//8
+  dump,//9
+  feeder_dump_complete,//10
+  wait_for_slave_mode_command,//11
+  repeat_pack_clean,//12
+  substitute_dump,//13
+  substitute_feeder_dump_complete//14
 };
 
 enum e_mode_enum//for end gate
@@ -75,53 +76,25 @@ enum e_mode_enum//for end gate
   e_open,//1
   e_close,//2
   e_empty,//3
-  e_dump_closed,//4
-  e_dump_open,//5
-  e_dump_open_wait,//6
-  e_cleanout_wait_pack,//7
-  e_cleanout_open//8
+  e_filling,//4
+  e_dump_closed,//5
+  e_dump_open,//6
+  e_dump_open_wait,//7
+  e_cleanout_wait_pack,//8
+  e_cleanout_open//9
 };
 
-
-/*
-enum mode_enum
+enum c_mode_enum//for pack changer
 {
-  entry,//0
-  wait_for_seed_lot_barcode,//1
-  hi_o_c,//2
-  lower_chamber_full_o_c,//3
-  ramp_down_o_c,//4
-  gate_delay_o_c,//5
-  hi_o_o,//6
-  ramp_down_o_o,//7
-  gate_delay_o_o,//8
-  hi_c_o,//9
-  hi_c_c,//10
-  wait_for_endgate_to_close,//11
-  hi_o_c_old_pack,//12
-  wait_old_pack,//13
-  wait_for_pack,//14
-  wait_for_endgate_to_clear,//15
-  dump_into_cut_gate_c_o,//16
-  dump_into_cut_gate_c_c,//17
-  dump_into_cut_gate_wait_for_endgate_to_close,//18
-  dump_into_cut_gate_wait_for_pack,//19
-  dump_into_cut_gate_wait_for_pack_removal,//20
-  dump_into_cut_gate_wait_for_endgate_to_clear,//21
-  dump_into_end_gate,//22
-  dump_into_end_gate_wait_for_container,//23
-  dump_into_container,//24
-  wait_for_dump_container_removal,//25
-  repeat_wait_for_container,//26
-  repeat_wait_for_container_removal,//27
-  substitute_wait_for_container,//28
-  substitute_wait_for_container_removal,//29
-  substitute_wait_for_substitute_barcode,//30
-  wait_for_slave_mode_command_c_c,//31
-  wait_for_slave_mode_command_c_o,//32
-  wait_for_slave_mode_command_empty,//33
-  count_while_endgate_closing //34
-};*/
+  c_ready,//0
+  c_filling,//1
+  c_full,//2
+  c_changing,//3
+  c_wait,//4
+//  c_dump_wait,//5
+  c_dump_running,
+  c_dump_complete
+};
 
 enum barcode_entry_mode
 {
@@ -174,7 +147,6 @@ class batch_mode_driver : public QObject
   envelope_sensor* envelope_sensor_p;
   bool pack_present;
   bool old_pack_present;
-//  int pack_present_counter;
   bool pack_changed;
   bool cutgate_closed_while_opening_bool;
   int old_count;
@@ -187,15 +159,17 @@ class batch_mode_driver : public QObject
   bool mode_new;
   bool e_mode_changed;
   bool e_mode_new;
+  bool c_mode_changed;
+  bool c_mode_new;
 
   QTime cutoff_gate_close_time;
   static const int cutoff_gate_delay_time = 0;//milliseconds 
   QTime end_chute_clear_time;
   static const int end_chute_clear_time_limit = 1000;
   QTime endgate_close_time;
-  static const int endgate_close_time_limit = 1000;
+  static const int endgate_close_time_limit = 200;
   QTime dump_end_qtime;
-  static const int dump_end_qtime_limit = 2000;
+  static const int dump_end_qtime_limit = 1000;
   QTime test_time;
   
   public:
@@ -206,8 +180,10 @@ class batch_mode_driver : public QObject
   void set_incorrect_barcode_message();
   mode_enum mode;//main mode
   e_mode_enum e_mode;//for end gate
+  c_mode_enum c_mode;//for pack changer
   void switch_mode(mode_enum new_mode, string str);
   void switch_e_mode(e_mode_enum new_e_mode, string str);
+  void switch_c_mode(c_mode_enum new_c_mode, string str);
   void load_program();//load the program indicated by program_path
   void reset_program();//start at beginning of current program
   void clear_program();
@@ -243,14 +219,13 @@ class batch_mode_driver : public QObject
   int slowdown_count_diff;//seed feeder slows down when count is this many seeds from limit
   bool slowdown_count_diff_set;//if this is false, run function will estimate a default starting value.  Otherwise, the set value will be used.  The set value will be adjusted continuously.
   QTime low_speed_mode_time;
-//  int stop_count_diff;//will stop feeder if reaches this in mode hi_closed
 
   QQueue<count_rate_observation> count_rate_observation_queue;
   float count_rate_multiplier;
-  float smoothed_count_rate_multiplier;
-  float lot_max_smoothed_count_rate_multiplier;
-//  bool count_rate_multiplier_history_exists;
-  int count_rate_multiplier_history_counter;
+  float crm_observations[128];
+  float crm_observations_copy[128];
+  int crm_obs_index;
+  int crm_obs_count;
   
   float slowdown_time;//seconds
   int count_rate_old_count;
