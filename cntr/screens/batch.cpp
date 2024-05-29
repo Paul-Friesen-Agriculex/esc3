@@ -372,7 +372,7 @@ void batch::dump_complete(int dump_count)
   centre_p->dump_count_str = QString::number(dump_count);
   centre_p->communicate_out('d');
   
-  cout<<" end batch::dump_complete\n";
+//  cout<<" end batch::dump_complete\n";
 }
 
 
@@ -417,6 +417,7 @@ void batch::repeat_pack_clicked()
 void batch::restart_clicked()
 {
   batch_mode_driver_p -> restart();
+  focus_on_barcode();
 }
 
 void batch::substitution_button_clicked()
@@ -438,13 +439,8 @@ void batch::help_button_clicked()
     "This is the main batch count screen.  "
     "Batch count programs you defined or chose in other screens run here.  "
     "\n\n"
-    "The Endgate button controls the operation of the gate that holds seed just above the discharge spout.  "
-    "Under normal operation, this will only open when the envelope sensor is lifted.  "
-    "However, large batches may over-fill the seed holding chamber above the endgate.  "
-    "This is not a problem if you hold a package under the spout for the chamber to discharge into, raising the envelope sensor.  "
-    "However, it may be convenient to keep the endgate open and leave a container under the spout.  "
-    "When the package is finished, change the container.  "
-    "Lift and release the envelope sensor after the container is changed.  "
+    "You may need to set up the feed hopper for your seed.  "
+    "Instructions are given in the help screen accessible from the startup screen.  "
     "\n\n"
     "The \"Options\" button allows you to set up barcode checking and communications.  "
     "\n\n"

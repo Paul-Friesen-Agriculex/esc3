@@ -173,14 +173,14 @@ void ss_setup_entry::enter_choice(int column)
   else if(mode=='a')
   {
     batch_mode_driver_p -> ss_setup_p -> actual_count_column = column;
-    */
-    
-    
     mode = 'p';
   }
   else if(mode=='p')
   {
     batch_mode_driver_p -> ss_setup_p -> print_time_column = column;
+    */
+    
+    
     mode = 'f';
   }
   else if(mode=='f')

@@ -37,7 +37,7 @@ ESC-3 machines produced by Agriculex Inc.
 #include "ss_batch.hpp"
 #include "button.hpp"
 #include "message_box.hpp"
-
+#include "help_screen.hpp"
 
 using namespace std;
 
@@ -131,6 +131,7 @@ ss_batch::ss_batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_drive
   ss_table_p = new ss_batch_table(centre_p, batch_mode_driver_p);
   status_box_p = new message_box;
   status_box_p -> setMinimumSize(250,100);
+  help_button_p = new button("Help");
   save_program_button_p = new button("Save Spreadsheet\nSetup");
   
 //  reprint_button_1_p = new button("");
@@ -175,12 +176,13 @@ ss_batch::ss_batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_drive
   speed_layout_p -> addWidget(dump_speed_label_p, 2, 0);
   speed_layout_p -> addWidget(dump_speed_set_p, 2, 1);
   bottom_layout_p -> addWidget(status_box_p, 0, 0, 2, 1);
+  bottom_layout_p -> addWidget(help_button_p, 0, 1);
   bottom_layout_p -> addWidget(save_program_button_p, 0, 2);
 //  bottom_layout_p -> addWidget(reprint_button_1_p, 0, 3);
 //  bottom_layout_p -> addWidget(reprint_button_2_p, 0, 4);
-  bottom_layout_p -> addWidget(manual_print_button_p, 0, 5);
-  bottom_layout_p -> addWidget(quit_button_p, 0, 6);
-  bottom_layout_p -> addWidget(barcode_status_p, 1, 2, 1, 4);
+  bottom_layout_p -> addWidget(manual_print_button_p, 0, 3);
+  bottom_layout_p -> addWidget(quit_button_p, 0, 4);
+  bottom_layout_p -> addWidget(barcode_status_p, 1, 1, 1, 4);
   main_layout_p -> addWidget(top_box_p, 0, 0, 1, 2);
   main_layout_p -> addWidget(control_box_p, 1, 0);
   main_layout_p -> addWidget(ss_table_p, 1, 1);
@@ -202,6 +204,7 @@ ss_batch::ss_batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_drive
   connect(high_speed_set_p, SIGNAL(valueChanged(int)), batch_mode_driver_p, SLOT(set_high_feed_speed(int)));
   connect(low_speed_set_p, SIGNAL(valueChanged(int)), batch_mode_driver_p, SLOT(set_low_feed_speed(int)));
   connect(dump_speed_set_p, SIGNAL(valueChanged(int)), batch_mode_driver_p, SLOT(set_dump_feed_speed(int)));
+  connect(help_button_p, SIGNAL(clicked()), this, SLOT(help_button_clicked()));
   connect(save_program_button_p, SIGNAL(clicked()), this, SLOT(save_program_clicked()));
 //  connect(reprint_button_1_p, SIGNAL(clicked()), this, SLOT(reprint_button_1_clicked()));
 //  connect(reprint_button_2_p, SIGNAL(clicked()), this, SLOT(reprint_button_2_clicked()));
@@ -247,8 +250,8 @@ ss_batch::ss_batch(centre* set_centre_p, batch_mode_driver* set_batch_mode_drive
   
   end_valve_empty_counter = 0;
   */
-//  connect(batch_mode_driver_p, SIGNAL(pack_collected(int)), this, SLOT(pack_collected(int)));
-//  connect(batch_mode_driver_p, SIGNAL(dump_complete(int)), this, SLOT(dump_complete(int)));
+  connect(batch_mode_driver_p, SIGNAL(pack_collected(int)), this, SLOT(pack_collected(int)));
+  connect(batch_mode_driver_p, SIGNAL(dump_complete(int)), this, SLOT(dump_complete(int)));
 //  connect(batch_mode_driver_p, SIGNAL(dumping()), this, SLOT(dumping()));
   connect(ss_table_p, SIGNAL(focus_on_barcode()), this, SLOT(focus_on_barcode()));
   
@@ -421,7 +424,40 @@ void ss_batch::get_barcode_status_message(QString message, QColor foreground, QC
   barcode_status_p->set_foreground(foreground);
   barcode_status_p->set_background(background);
   barcode_status_p->set_text(message);
+  cout<<"ss_batch::get_barcode_status_message end\n";
 }
+
+
+
+void ss_batch::pack_collected(int count_to_record)
+{
+//  table_p->enter_seeds(count_to_record);
+//  barcode_line_p->setFocus();
+  centre_p->pack_count_str = QString::number(count_to_record);
+  
+  if(batch_mode_driver_p->substitute_seed_lot==false)
+  {
+    centre_p -> communicate_out('p');
+  }
+  else//substituting seed lot
+  {
+    centre_p -> communicate_out('s');
+  }
+}  
+
+
+void ss_batch::dump_complete(int dump_count)
+{
+//  table_p->enter_dump_count(dump_count);
+  
+//  barcode_line_p->setFocus();
+  centre_p->dump_count_str = QString::number(dump_count);
+  centre_p->communicate_out('d');
+  
+//  cout<<" end batch::dump_complete\n";
+}
+
+
 
 
 //void ss_batch::pack_collected(int)
@@ -591,6 +627,57 @@ void ss_batch::cancel_substitution_button_clicked()
   focus_on_barcode();
 }
 */
+
+void ss_batch::help_button_clicked()
+{
+  help_screen_p = new help_screen;
+  help_screen_p -> setGeometry(geometry());
+  help_screen_p -> set_text(
+    "This is the screen for handling spreadsheets.  "
+    "It fills packets from a spreadsheet, which "
+    "should be in .csv format on a USB memory stick plugged into the machine.  "
+    "Each row of the spreadsheet represents one pack, except the top row, "
+    "which should be column headings.  "
+    "There must be columns to fill the following roles: a column of material identification codes, "
+    "a column of numbers which are the required number of seeds for the packet, "
+    "and a column of unique identifiers for each packet.  "
+    "You can choose columns to fill these roles, so order is not important.  "
+    "You can also choose columns for other optional roles."
+    "\n\n"
+    "In operation, you scan a material identification code from your seed lot.  "
+    "The program picks all rows from your spreadsheet with that code for filling.  "
+    "After all packets are filled, remaining seed dumps automatically.  "
+    "\n\n"
+    "You may need to set up the feed hopper for your seed.  "
+    "Instructions are given in the help screen accessible from the startup screen.  "
+    "\n\n"
+    "The \"Options\" button allows you to set up barcode checking and communications.  "
+    "\n\n"
+    "\"Release Pack\" allows seed in the end gate to be released even if the barcode on the pack does not scan properly.  "
+    "If chosen, that will be recorded in the spreadsheet with an 'R' in the first column.  "
+    "The row will be displayed with a yellow background.  "
+    "\n\n"
+    "The \"Substitute seed lot\" button is for use if you run out of seed of a particular lot, and need to substitute a different lot.  "
+    "The substitution will be recorded, and you can also control how this is communicated to another computer.  "
+    "\n\n"
+    "You can control the speed of counting.  "
+    "High speed is the speed the turntable will run at when a pack starts.  "
+    "As the pack nears the end, the turntable slows down, with the low speed being the minimum.  "
+    "This is to increase the accuracy of the end point where the cut gate closes.  "
+    "In general, the lower the speed, the more accurate the count.  "
+    "\n\n"
+    "Excessive speed may cause problems.  "
+    "The cut valve may not have time to open fully, resulting in a \"cut gate timing error\".  "
+    "Or the seed may come down so fast that the turntable cannot stop before there is already too much seed in the cut gate chamber.  "
+    "The machine will detect both of these problems and advise you to reduce the speed.  "
+    "\n\n"
+    "Dump speed is the speed the turntable will use while dumping.  "
+    "While the machine can count at very high speeds, you may wish to reduce the dump speed if you need an accurate dump count.  "
+    "You can check how accurate the dump count is by re-counting the dumped seed in totalize mode, using a low speed setting.  "
+    "");
+  help_screen_p->show();
+}    
+    
 void ss_batch::save_program_clicked()
 {
   batch_mode_driver_p -> stop();
@@ -1144,11 +1231,6 @@ manual_operation_window::manual_operation_window(QWidget* parent, batch_mode_dri
   
   layout_p = new QGridLayout;
   previous_p = new button("Previous line");
-  print_line_1_p = new button("");
-  print_line_2_p = new button("");
-  print_line_3_p = new button("");
-  print_line_4_p = new button("");
-  print_line_5_p = new button("");
   repeat_line_1_p = new button("");
   repeat_line_2_p = new button("");
   repeat_line_3_p = new button("");
@@ -1157,27 +1239,17 @@ manual_operation_window::manual_operation_window(QWidget* parent, batch_mode_dri
   next_p = new button("Next line");
   close_p = new button("Close");
   
-  layout_p -> addWidget(previous_p,0,0,1,2);
-  layout_p -> addWidget(print_line_1_p,1,0);
-  layout_p -> addWidget(print_line_2_p,2,0);
-  layout_p -> addWidget(print_line_3_p,3,0);
-  layout_p -> addWidget(print_line_4_p,4,0);
-  layout_p -> addWidget(print_line_5_p,5,0);
-  layout_p -> addWidget(repeat_line_1_p,1,1);
-  layout_p -> addWidget(repeat_line_2_p,2,1);
-  layout_p -> addWidget(repeat_line_3_p,3,1);
-  layout_p -> addWidget(repeat_line_4_p,4,1);
-  layout_p -> addWidget(repeat_line_5_p,5,1);
-  layout_p -> addWidget(next_p,6,0,1,2);
-  layout_p -> addWidget(close_p,7,0,1,2);
+  layout_p -> addWidget(previous_p,0,0);
+  layout_p -> addWidget(repeat_line_1_p,1,0);
+  layout_p -> addWidget(repeat_line_2_p,2,0);
+  layout_p -> addWidget(repeat_line_3_p,3,0);
+  layout_p -> addWidget(repeat_line_4_p,4,0);
+  layout_p -> addWidget(repeat_line_5_p,5,0);
+  layout_p -> addWidget(next_p,6,0);
+  layout_p -> addWidget(close_p,7,0);
   setLayout(layout_p);
   
   connect(previous_p, SIGNAL(clicked()), this, SLOT(previous_clicked()));
-  connect(print_line_1_p, SIGNAL(clicked()), this, SLOT(print_line_1_clicked()));
-  connect(print_line_2_p, SIGNAL(clicked()), this, SLOT(print_line_2_clicked()));
-  connect(print_line_3_p, SIGNAL(clicked()), this, SLOT(print_line_3_clicked()));
-  connect(print_line_4_p, SIGNAL(clicked()), this, SLOT(print_line_4_clicked()));
-  connect(print_line_5_p, SIGNAL(clicked()), this, SLOT(print_line_5_clicked()));
   connect(repeat_line_1_p, SIGNAL(clicked()), this, SLOT(repeat_line_1_clicked()));
   connect(repeat_line_2_p, SIGNAL(clicked()), this, SLOT(repeat_line_2_clicked()));
   connect(repeat_line_3_p, SIGNAL(clicked()), this, SLOT(repeat_line_3_clicked()));
@@ -1192,6 +1264,7 @@ manual_operation_window::manual_operation_window(QWidget* parent, batch_mode_dri
   
   ss_batch_p -> manual_operation_window_created = true;
   
+  setWindowFlags(Qt::WindowStaysOnTopHint);
 }
 
 void manual_operation_window::update_buttons()
@@ -1200,60 +1273,39 @@ void manual_operation_window::update_buttons()
   
   int max_first_line = batch_mode_driver_p->ss_envelope_id_p->data_list.size()-5;
   if(first_line>max_first_line) first_line = max_first_line;
-//  if(first_line<0) first_line = 0;
+  if(first_line<0) first_line = 0;
   
   cout<<"manual_operation_window::update_buttons.  first_line = "<<first_line<<endl;
   
   if(first_line>=0)
   {
-    print_line_1_p -> setText(QString("Reprint ") + batch_mode_driver_p->ss_envelope_id_p->data_list[first_line]); 
     repeat_line_1_p -> setText(QString("Repeat ") + batch_mode_driver_p->ss_envelope_id_p->data_list[first_line]); 
   }
   else
   {
-    print_line_1_p -> hide();
     repeat_line_1_p -> hide();
   }
   
   if(first_line+1>=0)
   {
-    print_line_2_p -> setText(QString("Reprint ") + batch_mode_driver_p->ss_envelope_id_p->data_list[first_line+1]); 
     repeat_line_2_p -> setText(QString("Repeat ") + batch_mode_driver_p->ss_envelope_id_p->data_list[first_line+1]); 
-  }
-  else
-  {
-    print_line_2_p -> hide();
   }
   
   if(first_line+2>=0)
   {
-    print_line_3_p -> setText(QString("Reprint ") + batch_mode_driver_p->ss_envelope_id_p->data_list[first_line+2]); 
     repeat_line_3_p -> setText(QString("Repeat ") + batch_mode_driver_p->ss_envelope_id_p->data_list[first_line+2]); 
-  }
-  else
-  {
-    print_line_3_p -> hide();
   }
   
   if(first_line+3>=0)
   {
-    print_line_4_p -> setText(QString("Reprint ") + batch_mode_driver_p->ss_envelope_id_p->data_list[first_line+3]); 
     repeat_line_4_p -> setText(QString("Repeat ") + batch_mode_driver_p->ss_envelope_id_p->data_list[first_line+3]); 
-  }
-  else
-  {
-    print_line_4_p -> hide();
   }
   
   if(first_line+4>=0)
   {
-    print_line_5_p -> setText(QString("Reprint ") + batch_mode_driver_p->ss_envelope_id_p->data_list[first_line+4]); 
     repeat_line_5_p -> setText(QString("Repeat ") + batch_mode_driver_p->ss_envelope_id_p->data_list[first_line+4]); 
   }
-  else
-  {
-    print_line_5_p -> hide();
-  }
+  
 }
 
 void manual_operation_window::previous_clicked()
@@ -1262,36 +1314,6 @@ void manual_operation_window::previous_clicked()
   update_buttons();//will check first_line and may change it
 }
 
-void manual_operation_window::print_line_1_clicked()
-{
-  if(first_line<0) return;
-  batch_mode_driver_p -> envelope_p -> print(first_line);
-}
-  
-void manual_operation_window::print_line_2_clicked()
-{
-  if(first_line+1<0) return;
-  batch_mode_driver_p -> envelope_p -> print(first_line+1);
-}
-  
-void manual_operation_window::print_line_3_clicked()
-{
-  if(first_line+2<0) return;
-  batch_mode_driver_p -> envelope_p -> print(first_line+2);
-}
-  
-void manual_operation_window::print_line_4_clicked()
-{
-  if(first_line+3<0) return;
-  batch_mode_driver_p -> envelope_p -> print(first_line+3);
-}
-  
-void manual_operation_window::print_line_5_clicked()
-{
-  if(first_line+4<0) return;
-  batch_mode_driver_p -> envelope_p -> print(first_line+4);
-}
-  
 void manual_operation_window::repeat_line_1_clicked()
 {
   if(first_line<0) return;

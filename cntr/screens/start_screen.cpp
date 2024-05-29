@@ -155,7 +155,20 @@ void start_screen::help_button_clicked()
 //  cout<<"rect width = "<<rect.width()<<endl;
   help_screen_p -> setGeometry(geometry());
   
-  help_screen_p -> set_text("TOTALIZE MODE - This counts the number of seeds in existing samples.  "
+  help_screen_p -> set_text("SETTING UP THE MACHINE FOR YOR SEED - Generally, appropriate setup depends on seed size.  "
+                            "Large seeds require a large gap between the top hopper and the feed disc, and small seeds need a small gap.  "
+                            "The gap in mm can be read on the gate scale on the side of the hopper.  "
+                            "Very small seeds may be better counted using the small hopper provided.  "
+                            "Counting speed is controlled by both the gate setting and the turntable speed, which is controlled from the counting screens.  "
+                            "We suggest that you start at a slow speed and increase as found desirable.  "
+                            "Counting accuracy will be better at low speeds.\n\n"
+                            
+                            "The other adjustment you can make is the drop channel width on the left side of the machine.  "
+                            "The width (in mm) should be a bit greater than the largest dimension of the seed being counted.  "
+                            "Setting it too wide can reduce counting accuracy.  "
+                            "Be careful not to set it so narrow that seed can jam in the drop channel.\n\n"
+                            
+                            "TOTALIZE MODE - This counts the number of seeds in existing samples.  "
                             "Counts are stored in a table, which you can save as a .csv file and "
                             "open with a spreadsheet or database.  "
                             "You can also record scanned barcodes.\n\n"

@@ -93,7 +93,7 @@ void endgate::end_close()
   if(centre_p->signal_port_pulse_when_endgate_closes)
   {
     signal_port_p->pulse();
-    cout<<"pulsed signal port\n";
+//    cout<<"pulsed signal port\n";
   }
 }
 

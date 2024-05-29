@@ -879,11 +879,20 @@ void centre::communicate_out(char type)//'t'->totalize.  'p'->batch pack.  'd'->
     }
     m_string.remove(0,1);
   }
-  
+  cout<<"\nmacro\n\n   ";
   //remaining m_string is the macro itself
   bool in_text = false;//true indicates that characters in macro should be sent as characters.  Otherwise, interpret as codes
   for(int i=0; i<m_string.size(); ++i)
   {
+    char c = m_string[i].toLatin1();
+    if(c>3)
+    {
+      cout<<c;
+    }
+    else
+    {
+      cout<<'_';
+    }
     if(m_string[i] == 2)//start of text
     {
       in_text = true;
@@ -972,7 +981,8 @@ void centre::communicate_out(char type)//'t'->totalize.  'p'->batch pack.  'd'->
     {
       out_string += "\\L";
     }
-  }  
+  } 
+  cout<<endl<<endl; 
 
   if(communicate_by_keyboard_cable==true)
   {

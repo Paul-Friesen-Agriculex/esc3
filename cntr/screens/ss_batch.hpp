@@ -44,6 +44,7 @@ class QSlider;
 class QTimer;
 class QFileDialog;
 class message_box;
+class help_screen;
 
 class ss_barcode_line : public QLineEdit  
 {
@@ -94,8 +95,8 @@ class ss_batch : public screen
   public slots:
   void get_status_message(QString message, QColor foreground, QColor background, int text_size);
   void get_barcode_status_message(QString message, QColor foreground, QColor background, int text_size);
-//  void pack_collected(int count);
-//  void dump_complete(int dump_count);
+  void pack_collected(int count);
+  void dump_complete(int dump_count);
 //  void dumping();
   void focus_on_barcode();
   void enable_substitute_button(bool on);
@@ -110,6 +111,7 @@ class ss_batch : public screen
   void restart_clicked();
   void substitution_button_clicked();
 //  void cancel_substitution_button_clicked();
+  void help_button_clicked();
   void save_program_clicked();
 //  void reprint_button_1_clicked();
 //  void reprint_button_2_clicked();
@@ -135,6 +137,7 @@ class ss_batch : public screen
   QSlider* dump_speed_set_p;
   ss_batch_table* ss_table_p;
   message_box* status_box_p;
+  button* help_button_p;
   button* save_program_button_p;
 //  button* reprint_button_1_p;
 //  button* reprint_button_2_p;
@@ -153,6 +156,8 @@ class ss_batch : public screen
   QGridLayout* bottom_layout_p;
   QGridLayout* main_layout_p;
   
+  help_screen* help_screen_p;
+    
   bool feeder_is_running;
 //  ENDGATE_STATE screen_endgate;//state of endgate according to screen control.
     //If this is open, endgate will be open regardless of envelope sensor.
@@ -206,11 +211,6 @@ class manual_operation_window : public QWidget
   ss_batch* ss_batch_p;
   
   button* previous_p;
-  button* print_line_1_p;
-  button* print_line_2_p;
-  button* print_line_3_p;
-  button* print_line_4_p;
-  button* print_line_5_p;
   button* repeat_line_1_p;
   button* repeat_line_2_p;
   button* repeat_line_3_p;
@@ -227,11 +227,6 @@ class manual_operation_window : public QWidget
   
   private slots:
   void previous_clicked();
-  void print_line_1_clicked();
-  void print_line_2_clicked();
-  void print_line_3_clicked();
-  void print_line_4_clicked();
-  void print_line_5_clicked();
   void repeat_line_1_clicked();
   void repeat_line_2_clicked();
   void repeat_line_3_clicked();

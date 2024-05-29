@@ -50,7 +50,7 @@ void signal_port::pulse()
   fprintf(fp, "1");
   fclose(fp);
   pulse_timer_p -> start(500);
-  cout<<"signal_port::pulse\n";
+//  cout<<"signal_port::pulse\n";
 }
 
 void signal_port::end_pulse()
