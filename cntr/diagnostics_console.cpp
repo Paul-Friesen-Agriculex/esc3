@@ -71,8 +71,6 @@ diagnostics_console::diagnostics_console(centre* centre_p_s, QWidget* parent)
   connect(timer_p, SIGNAL(timeout()), this, SLOT(run()));
   
   setGeometry(1000,0,100,100);
-  
-  cout<<"end of diagnostics_console::diagnostics_console\n";
 }
 
 void diagnostics_console::start_recording()

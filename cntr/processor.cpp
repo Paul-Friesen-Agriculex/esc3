@@ -83,12 +83,6 @@ static const int calibration_seed_number = 50;		//------------------------------
 
 processor::processor()
 {
-  
-//  SK_STOPGRABBING(0);
-//  SK_CLOSECAMERA(0);
-//  SK_UNLOADDLL();
-//  sleep(10);
-
   int result;
   if(SK_LOADDLL() != SK_RESULT_OK)
   {
@@ -111,13 +105,6 @@ processor::processor()
   
   image_size = line_length * image_lines;
   image_p = 0;
-  /*
-  cout<<"before shadecorr\n";
-  SK_SHADCORR(0, false);
-  SK_SETSCM(0, NULL, 8, line_length, image_lines, 10, 80);
-//  SK_SETSCM(0, NULL, 8, line_length, 8, 10, 80);
-  cout<<"after shadecorr\n";
-  */
   line_count = 0;
   took_slice_index = -1;//indicates no blob has taken slice
   show_blob_bool = false;
@@ -205,9 +192,6 @@ processor::processor()
       corr_factors[i] = 1.0;
     }
     average_pixel_values[i] *= corr_factors[i];
-	
-//	cout<<"average_pixel_values["<<i<<"] = "<<average_pixel_values[i]<<endl;
-	
   }
   int dark_start_end = 0;//this will become the end of the dark area at the start of the line
   for(int i=0; i<500; ++i)
@@ -224,15 +208,6 @@ processor::processor()
   
   cout<<"valid_start = "<<valid_start<<endl;
   cout<<"valid_end = "<<valid_end<<endl;
-		  
-
-  
-  
-  
-  
-  
-  
-
 }
 
 processor::~processor()
@@ -244,8 +219,6 @@ processor::~processor()
   delete [] big_image_start_p;
   
   delete [] rbi_start_p;  
-  
-  cout<<"end ~processor\n";
 }
 
 void processor::increment_count(int increment)
@@ -367,13 +340,7 @@ void processor::set_crop(crop current_crop_set)//this slot runs every time centr
     current_crop.max_inflection_9 = -1000;
     current_crop.sensitivity = 1;//minimum value -> most sensitive
   }
-
-
-
   detect_size = 3 * pow(current_crop.sensitivity, 2);
-  
-//  cout<<"end processor::set_crop\n";
-  
 }
 
 void processor::show_blob_on_terminal(bool show_blob_bool_set)
@@ -383,9 +350,6 @@ void processor::show_blob_on_terminal(bool show_blob_bool_set)
 
 void processor::restart_calibration()//re-starts data collection for calibration
 {
-  
-  cout<<"processor::restart_calibration\n";
-  
   calibration_crop.calibrated = false;
   for(calibration_area_list_index = 0; calibration_area_list_index<50; ++calibration_area_list_index)
   {
@@ -396,11 +360,6 @@ void processor::restart_calibration()//re-starts data collection for calibration
   }
   calibration_area_list_index = 0;
   show_blob_bool = true;
-//  calibration_crop = centre_p->crops[0];
-  
-//  emit send_calibrated_crop(calibration_crop);//will set crops[0] in centre.
-  
-//  cout<<"current_crop.calibrated="<<current_crop.calibrated<<endl;
 }
 
 void processor::save_image(QString file_name)
@@ -462,9 +421,6 @@ void processor::reset_time_tests()
 void processor::calibrate()//does the calibration after data has been collected
 {
   calibration_crop.name = current_crop.name;
-  
-//  cout<<"processor::calibrate.  current_crop.name "<<(current_crop.name).toStdString()<<endl;
-  
   int area_sum = 0;
   for(int i=0; i<50; ++i)
   {
@@ -474,7 +430,6 @@ void processor::calibrate()//does the calibration after data has been collected
     //blobs representing dust & debris.  Use this to set sensitivity,
     //but eliminate any small blobs for other calculations.
   calibration_crop.sensitivity = pow(area_average/15, 0.5);
-//  detect_size = 5 * pow(calibration_crop.sensitivity, 2);
   detect_size = 3 * pow(calibration_crop.sensitivity, 2);
   int blob_count = 0; //to count blobs with area > detect_size
   area_sum = 0;//calculate average again, leaving out small blobs
@@ -494,9 +449,6 @@ void processor::calibrate()//does the calibration after data has been collected
   }
   
   area_average = area_sum/blob_count;//more accurate measure
-  
-//  cout<<"calibration blob_count="<<blob_count<<endl;
-  
   int area_squared_deviations_sum = 0;
   float max_inflection_1 = -1000;
   float max_inflection_3 = -1000;
@@ -517,16 +469,10 @@ void processor::calibrate()//does the calibration after data has been collected
   calibration_crop.max_inflection_1 = max_inflection_1;
   calibration_crop.max_inflection_3 = max_inflection_3;
   calibration_crop.max_inflection_9 = max_inflection_9;
-  
-  
   calibration_crop.high_feed_speed = 0;
   calibration_crop.low_feed_speed = 0;
   calibration_crop.dump_speed = 0;
   calibration_crop.count_rate_multiplier = -1;//signal that has not been determined
-  
-  
-  
-//  cout<<"end of processor::calibrate.  calibration_crop.name = "<<calibration_crop.name.toStdString()<<".  calibration_crop.calibrated = "<<calibration_crop.calibrated<<endl;
 }
 
 void processor::new_image(unsigned char* pixel_p)
@@ -565,7 +511,6 @@ void processor::new_image(unsigned char* pixel_p)
     QString str = QString("Max image processing %1 ms.  Min slack %2 ms.")
     .arg(max_image_processing_time).arg(min_slack_time);
     emit send_message(str);
-    //cout<<(str.toStdString())<<endl;
     first_cycle = false;
   }
 
@@ -666,16 +611,10 @@ void processor::add_line(unsigned char* start_p)
   }
   for(blob_index=0; blob_index<blob_list.size(); ++blob_index)//look for blobs that need to be finished
   {
-    
-//    cout<<"blob list loop.  finish_line="<<blob_list[blob_index]->finish_line<<".  blob_index="<<blob_index<<"\n";
-    
     if(blob_list[blob_index]->finish_line!=-1 && blob_list[blob_index]->finish_line<=line_count)
     {
       blob_list[blob_index]->calculate_characteristics();
       int blob_seed_count;
-  
-//      cout<<"add_line point 1.  current_crop.calibrated="<<current_crop.calibrated<<".  calibration_crop.calibrated="<<calibration_crop.calibrated<<endl;
-  
       if(current_crop.calibrated==false)
       {
         calibration_area_list[calibration_area_list_index] = blob_list[blob_index]->area;
@@ -685,113 +624,19 @@ void processor::add_line(unsigned char* start_p)
         blob_seed_count = 1;
         ++calibration_area_list_index;
         
-//        cout<<"  calibration_area_list_index = "<<calibration_area_list_index<<endl;
-        
         if(calibration_area_list_index == 50) 
         {
-  
-//          cout<<"add_line point 2.  current_crop.calibrated="<<current_crop.calibrated<<".  calibration_crop.calibrated="<<calibration_crop.calibrated<<endl;
-  
           calibrate();
           calibration_area_list_index = 0;
           calibration_crop.calibrated = true;
-          
-//          cout<<"in processor::add_line.  calibration_crop.name = "<<calibration_crop.name.toStdString()<<".  calibration_crop.calibrated = "<<calibration_crop.calibrated<<endl;
-          
           emit send_calibrated_crop(calibration_crop);
-//          current_crop = calibration_crop;
         }
       }
       else //already calibrated
       {
         blob_seed_count = blob_list[blob_index]->seeds_in_blob();
         calibration_crop = current_crop;//this does not happen if crop is being calibrated, so calibration crop data can be different
-  
-//        cout<<"add_line point 3.  current_crop.calibrated="<<current_crop.calibrated<<".  calibration_crop.calibrated="<<calibration_crop.calibrated<<endl;
-  
-
-
-
-/*
-      if(show_blob_bool)
-      //if(show_blob_bool && blob_seed_count>1) //TEST~~~ //to disable and re-enable seed raster generation
-      {
-        cout<<blob_seed_count <<" seeds in blob\n";
-        cout<<"  area = "<<blob_list[blob_index]->area<<endl;
-        cout<<"  detect_size "<<detect_size<<endl;
-        cout<<"  max_inflection = "<<blob_list[blob_index]->max_inflection<<endl;
-        cout<<"  inflection_count = "<<blob_list[blob_index]->inflection_count<<endl;
-        
-        blob_list[blob_index]->form_display_raster();
-        cout<<endl;
-        //------------------------------------------------------------------------------------//
-        //functions for finding centroids
-        //blob_list[blob_index]->kmeans_clustering(blob_seed_count);     //TEST~~~
-        //blob_list[blob_index]->kmeans_clustering(4);     //TEST~~~
-        
-        //------------------------------------------------------------------------------------//        
-        blob_list[blob_index]->print_display_raster();        //original image
-
-//===========================================================================================================================// //TEST~~~        
-        
-        //secondary_processor_p->width = (blob_list[blob_index] -> width);
-        //secondary_processor_p->height = (blob_list[blob_index] -> height);
-        //secondary_processor_p->test_variables();                          //TEST~~~
-        
-        //secondary_processor_p->test_cout((blob_list[blob_index] -> width), (blob_list[blob_index] -> height), blob_seed_count);        //TEST~~~
-        //secondary_processor_p->send_raster(blob_list.size(), ); //TEST~~~
-        //secondary_processor_p->send_raster(1, 2);               //TEST~~~
-        //secondary_processor_p->send_raster(1, 2, blob_list[blob_index] -> display_raster_p); //TEST~~~
-        
-        //secondary_processor_p->send_raster(&(blob_list[blob_index]->form_display_raster()));
-        
-        //secondary_processor_p->overlap_test((blob_list[blob_index] -> width), (blob_list[blob_index] -> height));          //TEST~~~
-        //secondary_processor_p->print_display_raster((blob_list[blob_index] -> width), (blob_list[blob_index] -> height));  //TEST~~~
-        //secondary_processor_p->test_cout(1, 2);                                                                            //TEST~~~
-//===========================================================================================================================// //TEST~~~
-        //blob_list[blob_index]->kmeans_clustering(blob_seed_count);     //ORIGINAL~~~
-        //blob_list[blob_index]->overlap_test(blob_seed_count);          //TEST~~~
-        //blob_list[blob_index]->print_display_raster();                 //TEST~~~  //modified image
-        //------------------------------------------------------------------------------------//
-//=====================================================================================================// //TEST~~~
-        calibration_data = false; //temporary
-        
-        //if(calibration_data) blob_list[blob_index]->store_raw_image_rasters();
-        
-        //if(number_listed_rasters >= calibration_seed_number) blob_list[blob_index]->raster_comparison();  //TEST~~~
-        //if(number_listed_rasters >= calibration_seed_number)
-        //{
-          //blob_list[blob_index]->raster_comparison(blob_seed_count);           //TEST~~~
-          //blob_list[blob_index]->overlap_test(blob_seed_count);                //TEST~~~   //Single Cluster TEST
-          
-          //blob_list[blob_index]->overlap_test_multiple(blob_seed_count);       //TEST~~~  //Multiple Cluster TEST
-          //blob_list[blob_index]->overlap_test_multiple(3);                     //TEST~~~  //Multiple Cluster TEST
-          
-          //blob_list[blob_index]->silhouette_scoring();
-        //}
-        
-        //else if(!calibration_data && blob_seed_count < 2) blob_list[blob_index]->store_raw_image_rasters(); 
-            //  1.store_raw_image_rasters()
-            //  2.store_rotated_rasters()
-            //  3.remove_similar_rasters()
-
-
-
-
-        if(blob_seed_count < 2) blob_list[blob_index]->store_raw_image_rasters(); 	//TEST~~	(more than 50 seeds)
-          //blob_list[blob_index]->store_rotated_rasters();    //toggle rotation functions 
-        }
-        
-
-
-        
-//=====================================================================================================// //TEST~~~
-        //------------------------------------------------------------------------------------//
-        cout<<endl<<endl<<endl;
       }
-      */
-      }
-      
       
       increment_count(blob_seed_count);
     
@@ -1085,122 +930,6 @@ void blob::form_outline()
     outline_point_list[i]->distance = d;
     outline_point_list[i]->direction = anglexy(    outline_point_list[next_index]->x - outline_point_list[i]->x    ,   outline_point_list[next_index]->y - outline_point_list[i]->y    );
   }
-/*
-  //fill in inflection_0.  This is the inflection of the two lines that meet at the point
-  for(int i=0; i<opl_size; ++i)
-  {
-    int previous_index = opl_decrement(i);
-    if(outline_point_list[i]->direction<-500 || outline_point_list[previous_index]->direction<-500)//invalid angle signaled by direction value -1000.  See processor_calcs.hpp.
-    {
-      outline_point_list[i]->inflection_0 = -1000;//invalid inflection
-    }
-    else
-    {
-      float inflection_temp = (outline_point_list[previous_index]->direction) - (outline_point_list[i]->direction);
-      if(inflection_temp<-M_PI) inflection_temp += (2.0*M_PI);
-      if(inflection_temp>M_PI) inflection_temp -= (2.0*M_PI);
-      outline_point_list[i] -> inflection_0 = inflection_temp;
-    }
-  }
-*/
-
-
-
-
- 
-  
-
-
-
-
-
-/*  
-  //fill in other inflections
-  //arm lengths to calculate inflections
-  float d1 = ol_length*.01;
-  float d3 = ol_length*.03;
-  float d9 = ol_length*.09;
-  for(int i=0; i<opl_size; ++i)
-  {
-    int forward_i = i;
-    int back_i = opl_decrement(i);
-    float ti1=0;//temporary inflection.  These will be added to to create final values.
-    float ti3=0;
-    float ti9=0;
-    float dist_total = 0;
-    bool got_arm_end_1 = false;
-    bool got_arm_end_3 = false;
-    bool got_arm_end_9 = false;
-    bool inflection_invalid = false;//will be set to true if invalid angle encountered
-    while(1)//loop until break.  move forward on curve, incrementing or decrementing start inflections until longest arm length reached
-    {
-      dist_total += outline_point_list[forward_i]->distance;
-      if(outline_point_list[forward_i]->inflection_0 < -500) inflection_invalid = true;
-      if(got_arm_end_1==false)
-      {
-        if(dist_total>=d1) got_arm_end_1=true;
-        ti1 += outline_point_list[forward_i]->inflection_0;
-      }
-      if(got_arm_end_3==false)
-      {
-        if(dist_total>=d3) got_arm_end_3=true;
-        ti3 += outline_point_list[forward_i]->inflection_0;
-      }
-      if(got_arm_end_9==false)
-      {
-        if(dist_total>=d9) got_arm_end_9=true;
-        ti9 += outline_point_list[forward_i]->inflection_0;
-      }
-      if(got_arm_end_9==true) break;
-      forward_i = opl_increment(forward_i);
-    }
-
-    //repeat process, but move backward on curve, incrementing or decrementing start inflections until longest arm length reached
-    dist_total = 0;
-    got_arm_end_1 = false;
-    got_arm_end_3 = false;
-    got_arm_end_9 = false;
-    while(1)//loop until break.  
-    {
-      dist_total += outline_point_list[back_i]->distance;
-      if(outline_point_list[back_i]->inflection_0 < -500) inflection_invalid = true;
-      if(got_arm_end_1==false)
-      {
-        if(dist_total>=d1) got_arm_end_1=true;
-        else ti1 += outline_point_list[back_i]->inflection_0;
-      }
-      if(got_arm_end_3==false)
-      {
-        if(dist_total>=d3) got_arm_end_3=true;
-        else ti3 += outline_point_list[back_i]->inflection_0;
-      }
-      if(got_arm_end_9==false)
-      {
-        if(dist_total>=d9) got_arm_end_9=true;
-        else ti9 += outline_point_list[back_i]->inflection_0;
-      }
-      if(got_arm_end_9==true) break;
-      back_i = opl_decrement(back_i);
-    }
-    if(inflection_invalid==true)
-    {
-      outline_point_list[i]->inflection_1 = -1000;
-      outline_point_list[i]->inflection_3 = -1000;
-      outline_point_list[i]->inflection_9 = -1000;
-    }
-    else
-    {
-      outline_point_list[i]->inflection_1 = ti1;
-      outline_point_list[i]->inflection_3 = ti3;
-      outline_point_list[i]->inflection_9 = ti9;
-    }
-  }
-*/  
-  
-  
-  
-  
-  
 }
 
 void blob::ol_try_start(int start_angle)//start_angle >= 0, <360.  45 degree steps.
@@ -1428,16 +1157,6 @@ void blob::calculate_characteristics()
   }
   else //not calibrating
   {
-    
-    /*
-    if(processor_p->show_blob_bool)
-    {
-      cout<<"\n\n\ncalculate characteristics\n";
-    }
-    */
-    
-    
-    
     float crop_max_inflection_1 = processor_p->current_crop.max_inflection_1;
     float crop_max_inflection_3 = processor_p->current_crop.max_inflection_3;
     float crop_max_inflection_9 = processor_p->current_crop.max_inflection_9;
@@ -1459,30 +1178,6 @@ void blob::calculate_characteristics()
       if(i_score_9<0) i_score_9=0;
       float inflection_score = 0.1*i_score_1 + 0.5*i_score_3 + i_score_9;
       outline_point_list[i] -> inflection_score = inflection_score;
-
-
-
-/*
-      if(processor_p->show_blob_bool)
-      {
-        cout
-        <<setw(20)<<i
-        <<setw(20)<<std::fixed<<std::setprecision(2)<<crop_max_inflection_1
-        <<setw(20)<<std::fixed<<std::setprecision(2)<<inflection_1_out
-        <<setw(20)<<std::fixed<<std::setprecision(2)<<crop_max_inflection_3
-        <<setw(20)<<std::fixed<<std::setprecision(2)<<inflection_3_out
-        <<setw(20)<<std::fixed<<std::setprecision(2)<<crop_max_inflection_9
-        <<setw(20)<<std::fixed<<std::setprecision(2)<<inflection_9_out
-        <<setw(20)<<std::fixed<<std::setprecision(2)<<inflection_score
-        <<endl;
-      }
-*/
-
-
-
-
-
-
     }
     
     float inflection_peak = 0;
@@ -1585,16 +1280,10 @@ int blob::seeds_in_blob()
     expected_mean_area[i] = area_n + .8*(i-1)*area_n; //factor .8 is to allow for seeds overlapping, which will reduce area of entire blob
     expected_variance_area[i] = float(i) * area_sd * area_sd;
     float f = pow(2.0*3.14*expected_variance_area[i], -0.5) * exp(-pow(float(area)-expected_mean_area[i], 2.0)/2.0/expected_variance_area[i]);//height of normal dist
-//    score_area[i] = f * expected_mean_area[i] * 6.0;
     score_area[i] = -0.002/(f*expected_mean_area[i]+.0001);
     score_ic[i] = 120.0/((ic_estimate-float(i))*(ic_estimate-float(i))+1)/(1+ic_uncertainty);
     score_likelihood[i] = -15*i;
   }
-
-//  score_mi1[1] = 2 * (mi1_n - max_inflection_1);//negative if single seed is unlikely
-//  score_mi3[1] = 8 * (mi3_n - max_inflection_3);//negative if single seed is unlikely
-//  score_mi9[1] = 32 * (mi9_n - max_inflection_9);//negative if single seed is unlikely
-
   score_mi1[1] = 2 * (mi1_n*1.2 - max_inflection_1);//negative if single seed is unlikely
   score_mi3[1] = 8 * (mi3_n*1.2 - max_inflection_3);//negative if single seed is unlikely
   score_mi9[1] = 32 * (mi9_n*1.2 - max_inflection_9);//negative if single seed is unlikely
@@ -1612,8 +1301,6 @@ int blob::seeds_in_blob()
   }
   
   if(processor_p -> show_blob_bool)
-//  if(processor_p->show_blob_bool && most_likely_number>1)
-
   {
     cout<<"\n\n\nseeds_in_blob\n";
 
@@ -1628,8 +1315,6 @@ int blob::seeds_in_blob()
     cout<<endl;
     print_display_raster();
 
-
-
     cout<< "\n              number  expected_mean_area   expected_variance          score_area            score_mi1           score_mi3           score_mi9           score_ic    score_likelihood         total score\n";
     cout<<setprecision(4);
     for(int i=1;i<max_seeds;++i)
@@ -1638,24 +1323,6 @@ int blob::seeds_in_blob()
       cout<<setw(20)<<score_area[i]+score_mi1[i]+score_mi3[i]+score_mi9[i]+score_ic[i]+score_likelihood[i]<<endl;
     }
     cout<<endl;
-    
-    /*
-    cout<< "outline point list\n";
-    cout<<         "                   i                   x                   y           direction          inflection_score\n";
-    for(int i=0; i<outline_point_list.size(); ++i)
-    {
-      cout
-      <<setw(20)<<i
-      <<setw(20)<<outline_point_list[i]->x
-      <<setw(20)<<outline_point_list[i]->y
-      <<setw(20)<<outline_point_list[i]->direction
-      <<setw(20)<<std::fixed<<std::setprecision(2)<<outline_point_list[i]->inflection_score
-      <<endl;
-    }
-    cout<<endl;
-    */
-    
-    
   }
   return most_likely_number;
 }
@@ -1679,11 +1346,6 @@ void blob::form_display_raster()
     int y = inflection_y[i];
     cout<<"  inflection at ("<<inflection_x[i]<<", "<<inflection_y[i]<<").  score "<<outline_point_list[inflection_i[i]]->inflection_score<<"\n";
     display_raster_p[x+width*y] = 'I';
-  
-
-
-
-
 
     int index = inflection_i[i];//index of inflection point in outline_point_list
 
@@ -1777,7 +1439,6 @@ void blob::form_display_raster()
       back_i = opl_decrement(back_i);
     }
   
-  
     display_raster_p[xf9+width*yf9] = 'A';
     display_raster_p[xb9+width*yb9] = 'A';
     display_raster_p[xf3+width*yf3] = 'B';
@@ -1785,13 +1446,6 @@ void blob::form_display_raster()
     display_raster_p[xf1+width*yf1] = 'C';
     display_raster_p[xb1+width*yb1] = 'C';
   }
-
-
-
-
-
-
-  
 }
 
 void blob::print_display_raster()

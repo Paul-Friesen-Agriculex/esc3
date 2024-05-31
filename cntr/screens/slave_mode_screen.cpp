@@ -148,7 +148,6 @@ slave_mode_screen::~slave_mode_screen()
 
 void slave_mode_screen::pack_ready()
 {
-  cout<<"slave_mode_screen::pack_ready\n";
   pack_ready_bool = true;
 }
 
@@ -499,7 +498,6 @@ void slave_mode_screen::command_char(QChar character)
     {
       if(new_command_p->command == "PackSet")
       {
-        cout<<"software_trigger 1\n";
         envelope_sensor_p->software_trigger();
         return;
       }
@@ -627,15 +625,10 @@ void slave_mode_screen::run()
     {
       if(batch_mode_driver_p->slave_mode == false)//execution of this command is starting.  set-up needed.
       {
-        cout<<"Dump command started\n";
         batch_mode_driver_p->chamber_count_limit_calculation();
-//        batch_mode_driver_p->start();
         batch_mode_driver_p->slave_mode = true;
         batch_mode_driver_p->dump_speed = 1000;
-//        batch_mode_driver_p->restart();
-        cout<<"before clear_program\n";
         batch_mode_driver_p->clear_program();
-        cout<<"after clear_program\n";
         batch_mode_driver_p->switch_mode(dump_into_cutgate, "dump_into_cutgate");
       }
       if(command_finished_bool == true)
@@ -643,8 +636,8 @@ void slave_mode_screen::run()
         end_command();
         return;
       }
-//      cout<<"Dump command finished\n";
     }
+
     if(executing_command_p->command == "Recycle")
     {
       executing_command_p = previous_command_p;
@@ -659,18 +652,21 @@ void slave_mode_screen::run()
       end_command();
       return;
     }
+
     if(executing_command_p->command == "CloseCut")
     {
       centre_p->cutgate_p->close();
       end_command();
       return;
     }
+
     if(executing_command_p->command == "OpenEnd")
     {
       centre_p->endgate_p->open();
       end_command();
       return;
     }
+
     if(executing_command_p->command == "CloseEnd")
     {
       centre_p->endgate_p->close();
@@ -678,6 +674,7 @@ void slave_mode_screen::run()
       return;
     }
   }
+
   if(executing_command_p->type_flag == 'M')
   {
     speed = executing_command_p->speed;
@@ -688,6 +685,7 @@ void slave_mode_screen::run()
     end_command();
     return;
   }
+
   if(executing_command_p->type_flag == 'P')
   {
     if(command_finished_bool == true)
@@ -702,14 +700,12 @@ void slave_mode_screen::run()
     }
     if(batch_mode_driver_p->slave_mode == false)//execution of this command is starting.  set-up needed.
     {
-      cout<<"slave_mode_screen::run.  slave mode false.  1.  count = "<<centre_p->count<<endl;
       batch_mode_driver_p->slave_mode = true;//do not do set-up on subsequent passes
       for(int i=0; i<100; ++i)
       {
         if(centre_p->crops[i].name == executing_command_p->crop_name)
         {
           centre_p->set_crop_f(centre_p->crops[i]);
-          cout<<"set crop to "<<(executing_command_p->crop_name).toStdString()<<endl;
           break;
         }
       }
@@ -742,9 +738,6 @@ void slave_mode_screen::run()
         batch_mode_driver_p->switch_mode(ramp_down_open, "ramp_down_open");
         batch_mode_driver_p->start();
       }
-//      cout<<"software_trigger 2\n";
-//      envelope_sensor_p->software_trigger();
-      cout<<"slave_mode_screen::run.  slave mode false.  end  count = "<<centre_p->count<<endl;
     }
     return;
   }
@@ -1149,7 +1142,6 @@ void slave_mode_screen::end_command()
   previous_command_p = executing_command_p;
   executing_command_p = 0;
   batch_mode_driver_p->slave_mode = false;
-//  mode_to_start = entry;
   return;
 }
 

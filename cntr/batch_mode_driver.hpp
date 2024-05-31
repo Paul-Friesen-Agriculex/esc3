@@ -85,7 +85,9 @@ enum e_mode_enum//for end gate
   e_substitute_wait_pack,
   e_substitute_open,
   e_over_limit_wait_dump,
-  e_over_limit_dump
+  e_over_limit_dump,
+  e_repeat_wait_cleanout,
+  e_repeat_cleaning
 };
 
 enum c_mode_enum//for pack changer
@@ -95,14 +97,15 @@ enum c_mode_enum//for pack changer
   c_full,//2
   c_changing,//3
   c_wait,//4
-//  c_dump_wait,//5
   c_dump_running,
   c_dump_complete,
   c_substitute_dump_container_empty,
   c_substitute_dump_container_full,
   c_over_limit_change_to_dump,
   c_over_limit_dump,
-  c_over_limit_change_pack
+  c_over_limit_change_pack,
+  c_repeat_wait_cleanout,
+  c_repeat_cleaning
 };
 
 enum barcode_entry_mode

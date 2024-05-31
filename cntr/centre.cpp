@@ -175,7 +175,6 @@ void centre::init()
   signal_port_pulse_when_endgate_closes = true;
   envelope_sensor_p = new envelope_sensor;
   feeder_p = new feeder;
-//  brother_envelope_feeder_p = new brother_envelope_feeder;
   for(int i=0; i<screen_wait_list_size-1; ++i)
   {
     screen_wait_list[i]=0;
@@ -225,7 +224,6 @@ void centre::init()
     f>>crops[i].low_feed_speed;
     f>>crops[i].dump_speed;
     f>>crops[i].count_rate_multiplier;
-    if (i<5) cout<<"i = "<<i<<"  loaded count_rate_multiplier "<<crops[i].count_rate_multiplier<<endl;
     f.get();
     if(f.eof()) break;
   }
@@ -322,11 +320,6 @@ centre::~centre()
   delete base_widget_p;
   delete diagnostics_console_p;
 
-//  if(brother_envelope_feeder_p)
-//  {
-//	delete brother_envelope_feeder_p;
-//	brother_envelope_feeder_p = 0;
-// }
   emit set_camera_processing(false);//cause camera thread's run() function to return
   clock_t sleep_until = clock() + 1000;//to let run function return
   while(clock()<sleep_until)
@@ -358,7 +351,6 @@ centre::~centre()
     f<<crops[i].low_feed_speed<<" ";
     f<<crops[i].dump_speed<<" ";
     f<<crops[i].count_rate_multiplier;
-    if (i<5) cout<<"saved count_rate_multiplier "<<crops[i].count_rate_multiplier<<endl;
     f<<endl;
   }
   f.close();
@@ -437,8 +429,6 @@ void centre::run()
   emit set_crop(crops[0]);
   endgate_state = endgate_p->get_state();
   envelope_present = envelope_sensor_p->read();
-//  brother_envelope_feeder_p -> run();
-  
   
   if(communicate_by_serial_port)
   {
@@ -614,7 +604,6 @@ bool centre::save_settings(QString file_name)
 
 bool centre::load_settings(QString file_name)
 {
-  cout<<"centre::load_settings\n";
   QString f_path = QString("settings/");
   f_path += file_name;
   std::ifstream fset(f_path.toLatin1().data(),std::ofstream::out);
@@ -629,7 +618,6 @@ bool centre::load_settings(QString file_name)
   totalize_feed_speed = atoi(input);
   
   fset.getline(input, 100);
-  cout<<"input="<<input<<endl;
   QString crop_name = QString(input);
   for(int i=0; i<100; ++i)
   {
@@ -674,7 +662,6 @@ bool centre::load_settings(QString file_name)
   serial_port_name = QString(input);
   
   fset.close();
-  cout<<"end centre::load_settings\n";
   return true;
 }
 
@@ -814,7 +801,6 @@ void centre::processor_display_blobs_f(bool value)
 
 void centre::restart_calibration_f()
 {
-  cout<<"centre::restart_calibration_f\n";
   emit restart_calibration_signal();
 }
 
@@ -879,20 +865,11 @@ void centre::communicate_out(char type)//'t'->totalize.  'p'->batch pack.  'd'->
     }
     m_string.remove(0,1);
   }
-  cout<<"\nmacro\n\n   ";
+
   //remaining m_string is the macro itself
   bool in_text = false;//true indicates that characters in macro should be sent as characters.  Otherwise, interpret as codes
   for(int i=0; i<m_string.size(); ++i)
   {
-    char c = m_string[i].toLatin1();
-    if(c>3)
-    {
-      cout<<c;
-    }
-    else
-    {
-      cout<<'_';
-    }
     if(m_string[i] == 2)//start of text
     {
       in_text = true;
@@ -982,7 +959,6 @@ void centre::communicate_out(char type)//'t'->totalize.  'p'->batch pack.  'd'->
       out_string += "\\L";
     }
   } 
-  cout<<endl<<endl; 
 
   if(communicate_by_keyboard_cable==true)
   {

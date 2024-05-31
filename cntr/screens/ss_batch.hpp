@@ -56,30 +56,7 @@ class ss_barcode_line : public QLineEdit
   signals:
   void barcode_entered(QString barcode);
 };
-/*
-enum ss_end_valve_mode_enum
-{
-  ss_closed_empty,
-  ss_opened_while_empty,
-  ss_closed_filling,
-  ss_closed_full,
-  ss_open_emptying,
-  ss_open_pass_through,
-  ss_open_empty,
-  ss_pack_removed_too_soon,
-  ss_closed_bad_lot,
-  ss_open_emptying_bad_lot,
-  ss_dump_closed_empty,
-  ss_dump_opened_while_empty,
-  ss_dump_closed_filling,
-  ss_dump_pass_through,
-  ss_dump_open_empty,
-  ss_dump_container_removed_too_soon,
-  ss_substitution_wait_for_cleanout,
-  ss_substitution_enter_barcode,
-  ss_cancel_substitution
-};
-*/
+
 class manual_operation_window;
 
 class ss_batch : public screen
@@ -97,24 +74,18 @@ class ss_batch : public screen
   void get_barcode_status_message(QString message, QColor foreground, QColor background, int text_size);
   void pack_collected(int count);
   void dump_complete(int dump_count);
-//  void dumping();
   void focus_on_barcode();
   void enable_substitute_button(bool on);
-//  void bad_lot_slot();
   void refresh_screen();
   
   private slots:
   void options_clicked();
-//  void remove_drive_clicked();
   void back_clicked();
   void release_pack_clicked();
   void restart_clicked();
   void substitution_button_clicked();
-//  void cancel_substitution_button_clicked();
   void help_button_clicked();
   void save_program_clicked();
-//  void reprint_button_1_clicked();
-//  void reprint_button_2_clicked();
   void manual_print_button_clicked();
   void quit_clicked();
   void run();
@@ -122,13 +93,11 @@ class ss_batch : public screen
   private:
   QLabel* count_message_p;
   button* options_button_p;
-//  button* remove_drive_button_p;
   button* back_button_p;
   ss_barcode_line* barcode_line_p;
   button* release_pack_button_p;
   button* restart_button_p;
   button* substitution_button_p;
-//  button* cancel_substitution_button_p;
   QLabel* high_speed_label_p;
   QLabel* low_speed_label_p;
   QLabel* dump_speed_label_p;
@@ -139,8 +108,6 @@ class ss_batch : public screen
   message_box* status_box_p;
   button* help_button_p;
   button* save_program_button_p;
-//  button* reprint_button_1_p;
-//  button* reprint_button_2_p;
   button* manual_print_button_p;
   button* quit_button_p;
   message_box* barcode_status_p;
@@ -165,32 +132,8 @@ class ss_batch : public screen
   
   int count;
   
-//  mode_enum mode;
-//  mode_enum old_mode;
-//  ss_end_valve_mode_enum end_valve_mode;
-//  ss_end_valve_mode_enum old_end_valve_mode;
-//  int end_valve_empty_counter;//use to time valve emptying
-  
-  
-/*  
-  QString pack_ready_message;
-  QString pack_removed_too_soon_message;
-  QString dump_container_needed_message;
-  QString dump_container_ready_message;
-  QString dump_container_removed_too_soon_message;
-  QString bad_seed_lot_message;
-  QString substitution_cleanout_message;
-  QString substitution_barcode_message;
-  QString cancel_substitution_message;
-*/  
-//  barcode_entry_mode old_barcode_mode;
-  
-//  int reprint_line_1;//line number that will be reprinted on envelope if reprint button 1 is clicked
-//  int reprint_line_2;//line number that will be reprinted on envelope if reprint button 2 is clicked
+
   int reprint_line_manual;//line number that will be reprinted on envelope if manual reprint button is clicked
-//  void update_reprint_buttons();
-  
-//  macro_screen* macro_screen_p;
   QString count_string;				//seed count access from gpio_keyboard
   QTimer* run_timer_p;
   

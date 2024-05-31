@@ -42,10 +42,6 @@ ss_setup_entry::ss_setup_entry(centre*set_centre_p, batch_mode_driver* batch_mod
   centre_p=set_centre_p;
   batch_mode_driver_p = batch_mode_driver_p_s;
 
-
-//  cout<<"ss_setup_entry::ss_setup_entry\n";
-//  batch_mode_driver_p->list_ss_setup();
-
   choice1_p=new button("");
   choice2_p=new button("");
   choice3_p=new button("");
@@ -341,6 +337,4 @@ barcode will be entered in this column.");
   column_p = batch_mode_driver_p->get_spreadsheet_column_pointer(first_heading_displayed+5);
   if(column_p==0) choice6_p->setText("");
   else choice6_p->setText(column_p->heading);
-
-//  cout<<"end ss_setup_entry::display_headings.  mode="<<mode<<endl;
 }
