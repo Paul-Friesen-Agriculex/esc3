@@ -1,6 +1,6 @@
 /***********
 
-Copyright 2021 Agriculex Inc.
+Copyright 2021-2024 Agriculex Inc.
 
 This file is part of the Agriculex ESC-3 program.
 
@@ -125,8 +125,8 @@ centre::centre():
 
   //********************  
   //comment out one of these 2 lines:
-//  base_widget_p->setWindowState(Qt::WindowFullScreen);//use for final versions to run on touch screen
-  base_widget_p->setGeometry(0, 0, 800, 480);//use for development on full size terminal
+  base_widget_p->setWindowState(Qt::WindowFullScreen);//use for final versions to run on touch screen
+//  base_widget_p->setGeometry(0, 0, 800, 480);//use for development on full size terminal
   //********************
 
 
