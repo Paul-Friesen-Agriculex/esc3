@@ -1519,14 +1519,14 @@ void batch_mode_driver::run()
     case c_changing:
       if(pack_present == true)
       {
-        if(centre_p->count>0)
-        {
+//        if(centre_p->count>0)  //don't understand why this test was here.  caused gate to fail to open if count was 0 when batch ready.  removed 2024-10-31.
+//        {
           if(  (pack_barcode_ok==true)  ||  (release_pack==true)  ||  (e_mode==e_dump_closed)  )
           {
             release_pack = false;
             switch_c_mode(c_wait, "c_wait");
           }
-        }
+//        }
       }
       break;  
 
